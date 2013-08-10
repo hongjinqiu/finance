@@ -1,0 +1,870 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.papersns.com/template" xmlns:tns="http://www.papersns.com/template" elementFormDefault="qualified">
+	<annotation>
+		<appinfo>framework.component for MongoDB</appinfo>
+		<documentation>MongoDB查询框架约束规范</documentation>
+	</annotation>
+
+	<element name="templates">
+		<annotation>
+			<documentation>配置根节点,子节点包括import-template,xml-template
+			</documentation>
+		</annotation>
+		<complexType>
+			<choice maxOccurs="unbounded" minOccurs="0">
+				<element name="import-template">
+					<annotation>
+						<documentation>导入配置文件</documentation>
+					</annotation>
+					<complexType>
+						<attribute name="resource" use="required">
+							<annotation>
+								<documentation>配置资源文件</documentation>
+							</annotation>
+						</attribute>
+					</complexType>
+				</element>
+				<element ref="tns:xml-template" maxOccurs="unbounded"></element>
+			</choice>
+		</complexType>
+	</element>
+	<element name="xml-template">
+		<annotation>
+			<documentation>配置节点</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element ref="tns:xml-template" minOccurs="0" maxOccurs="unbounded"></element>
+			</sequence>
+			<attribute name="name" use="required" type="ID">
+				<annotation>
+					<documentation>名称</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="title" use="required">
+				<annotation>
+					<documentation>标题</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="resource" use="required">
+				<annotation>
+					<documentation>配置资源文件</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="module">
+				<annotation>
+					<documentation>模块名称</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="author" use="required">
+				<annotation>
+					<documentation>作者</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="hidden" default="false" type="boolean">
+				<annotation>
+					<documentation>是否隐藏</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="showTitle" default="true" type="boolean">
+				<annotation>
+					<documentation>是否显示标题</documentation>
+				</annotation>
+			</attribute>
+		</complexType>
+	</element>
+	<element name="list-template">
+		<annotation>
+			<documentation>基于列表查询的配置</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element ref="tns:adapter" minOccurs="0" />
+				<element ref="tns:description" minOccurs="0" />
+				<element ref="tns:scripts" minOccurs="0" />
+				<element ref="tns:view-template" minOccurs="0" />
+				<element ref="tns:toolbar" minOccurs="0" />
+				<element ref="tns:security" minOccurs="0" />
+				<element ref="tns:data-provider" />
+				<element ref="tns:column-model" />
+				<element ref="tns:query-parameter" minOccurs="0" />
+			</sequence>
+		</complexType>
+	</element>
+
+	<element name="adapter">
+		<complexType>
+			<attribute name="name"></attribute>
+		</complexType>
+	</element>
+	
+	<element name="description">
+		<annotation>
+			<documentation>描述</documentation>
+		</annotation>
+	</element>
+	
+	<element name="scripts">
+		<annotation>
+			<documentation>js脚本</documentation>
+		</annotation>
+	</element>
+	
+	<element name="view-template">
+		<annotation>
+			<documentation>模版</documentation>
+		</annotation>
+		<complexType>
+			<attribute name="view" use="required">
+				<annotation>
+					<documentation>模版视图</documentation>
+				</annotation>
+			</attribute>
+		</complexType>
+	</element>
+	
+	<element name="toolbar">
+		<complexType>
+			<choice minOccurs="0">
+				<element name="button-group">
+					<complexType>
+						<choice maxOccurs="unbounded">
+							<element ref="tns:button" />
+							<element ref="tns:split-button" />
+						</choice>
+						<attribute name="title" />
+						<attribute name="columns" type="int" use="required" />
+						<attribute name="iconAlign" default="left">
+							<simpleType>
+								<restriction base="string">
+									<enumeration value="top" />
+									<enumeration value="right" />
+									<enumeration value="bottom" />
+									<enumeration value="left" />
+								</restriction>
+							</simpleType>
+						</attribute>
+						<attribute name="scale" default="small">
+							<simpleType>
+								<restriction base="string">
+									<enumeration value="small" />
+									<enumeration value="medium" />
+									<enumeration value="large" />
+								</restriction>
+							</simpleType>
+						</attribute>
+					</complexType>
+				</element>
+				<element ref="tns:button" maxOccurs="unbounded" />
+				<element ref="tns:split-button" />
+			</choice>
+			<attribute name="export" default="true" type="boolean"></attribute> 
+			<attribute name="exporter"></attribute>
+			<attribute name="exportParam" default="false" type="boolean"></attribute>
+			<attribute name="freezedHeader" default="true" type="boolean"></attribute>
+			<attribute name="exportChart" default="true" type="boolean"></attribute>
+			<attribute name="excelChart"></attribute>
+			<attribute name="excelChartType">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="xlColumnClustered" />
+						<enumeration value="xlLineMarkers" />
+						<enumeration value="xlColumnStacked" />
+					</restriction>
+				</simpleType>
+			</attribute>
+			<attribute name="exportTitle"></attribute>
+			<attribute name="exportSuffix" default="xlsx">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="xlsx" />
+						<enumeration value="xls" />
+					</restriction>
+				</simpleType>
+			</attribute>
+		</complexType>
+	</element>
+	
+	<element name="button">
+		<complexType>
+			<sequence>
+				<element name="expression" minOccurs="0"></element>
+				<element name="button-attribute" minOccurs="0" maxOccurs="unbounded">
+					<complexType>
+						<attribute name="name" use="required"></attribute>
+						<attribute name="value"></attribute>
+					</complexType>
+				</element>
+			</sequence>
+			<attributeGroup ref="tns:button-attribute" />
+		</complexType>
+	</element>
+	
+	<element name="split-button">
+		<complexType>
+			<attributeGroup ref="tns:button-attribute" />
+		</complexType>
+	</element>
+	<attributeGroup name="button-attribute">
+		<attribute name="xtype" default="splitbutton" />
+		<attribute name="name" />
+		<attribute name="text" use="required" />
+		<attribute name="iconCls" />
+		<attribute name="iconAlign" default="left">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="top" />
+					<enumeration value="right" />
+					<enumeration value="bottom" />
+					<enumeration value="left" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="disabled" type="boolean" default="true" />
+		<attribute name="hidden" type="boolean" default="true" />
+		<attribute name="arrowAlign" default="bottom">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="top" />
+					<enumeration value="right" />
+					<enumeration value="bottom" />
+					<enumeration value="left" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="scale" default="small">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="small" />
+					<enumeration value="medium" />
+					<enumeration value="large" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="rowspan" type="int" default="2" />
+		<attribute name="handler" />
+		<attribute name="mode">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="fn" />
+					<enumeration value="url" />
+					<enumeration value="url^" />
+				</restriction>
+			</simpleType>
+		</attribute>
+	</attributeGroup>
+	
+	<element name="security">
+		<complexType>
+			<attribute name="functionId" type="long" use="required"></attribute>
+			<attribute name="override" type="boolean"></attribute>
+			<attribute name="DEFAULT_RESOURCE_CODE">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="G"></enumeration>
+						<enumeration value="D"></enumeration>
+						<enumeration value="U"></enumeration>
+						<enumeration value="J"></enumeration>
+						<enumeration value="R"></enumeration>
+						<enumeration value="A"></enumeration>
+					</restriction>
+				</simpleType>
+			</attribute>
+		</complexType>
+	</element>
+
+	<element name="data-provider">
+		<complexType>
+
+			<sequence>
+				<choice>
+					<!-- 
+					<element name="table" />
+					<element name="sql" />
+					<element name="class" />
+					 -->
+					<element name="collection" />
+				</choice>
+				<element name="fix-bson-query" minOccurs="0" maxOccurs="1" type="string" />
+				<!-- 
+				<element name="template-sql" minOccurs="0" maxOccurs="unbounded">
+					<complexType>
+						<sequence>
+							<element name="sql" />
+						</sequence>
+						<attribute name="name" use="required"></attribute>
+						<attribute name="template"></attribute>
+					</complexType>
+				</element>
+				<element name="summary-sql" minOccurs="0" maxOccurs="unbounded">
+					<complexType>
+						<sequence>
+							<element name="sql" />
+						</sequence>
+						<attribute name="name" use="required"></attribute>
+						<attribute name="template"></attribute>
+						<attribute name="position">
+							<simpleType>
+								<restriction base="string">
+									<enumeration value="top"></enumeration>
+									<enumeration value="bottom"></enumeration>
+								</restriction>
+							</simpleType>
+						</attribute>
+						<attribute name="security" type="boolean"></attribute>
+					</complexType>
+				</element>
+				 -->
+			</sequence>
+			<attribute name="size" type="int">
+				<annotation>
+					<documentation>每页大小</documentation>
+				</annotation>
+			</attribute>
+			<!-- 
+			<attribute name="dialect">
+				<annotation>
+					<documentation>数据库方言</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="oracle" />
+						<enumeration value="mysql" />
+						<enumeration value="hsql" />
+						<enumeration value="sqlserver" />
+						<enumeration value="sqlite" />
+					</restriction>
+				</simpleType>
+			</attribute>
+			<attribute name="dataSource" />
+			<attribute name="sqlIntercept" />
+			 -->
+			<attribute name="bsonIntercept" />
+		</complexType>
+	</element>
+	
+	<element name="column-model">
+		<annotation>
+			<documentation>列模型</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element ref="tns:checkbox-column" minOccurs="0" />
+				<element ref="tns:id-column" minOccurs="0" />
+				<choice minOccurs="1" maxOccurs="unbounded">
+					<element name="string-column">
+						<annotation>
+							<documentation>字符列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:column-attribute" minOccurs="0" maxOccurs="unbounded"></element>
+								<element ref="tns:editor" minOccurs="0">
+								</element>
+								<element ref="tns:column-model" minOccurs="0" />
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+						</complexType>
+					</element>
+					<element name="number-column">
+						<annotation>
+							<documentation>数字列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:editor" minOccurs="0"></element>
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+							<attribute name="format"></attribute>
+						</complexType>
+					</element>
+					<element name="date-column">
+						<annotation>
+							<documentation>日期列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:editor" minOccurs="0"></element>
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+							<attribute name="pattern">
+								<annotation>
+									<documentation>日期格式化</documentation>
+								</annotation>
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="yyyy"></enumeration>
+										<enumeration value="yyyy-MM"></enumeration>
+										<enumeration value="HH:mm:ss"></enumeration>
+										<enumeration value="HH:mm"></enumeration>
+										<enumeration value="yyyy-MM-dd"></enumeration>
+										<enumeration value="yyyy-MM-dd HH:mm"></enumeration>
+										<enumeration value="yyyy-MM-dd HH:mm:ss"></enumeration>
+									</restriction>
+								</simpleType>
+							</attribute>
+							<attribute name="source_partern">
+								<annotation>
+									<documentation>自定义日期格式</documentation>
+								</annotation>
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="yyyy"></enumeration>
+										<enumeration value="yyyyMM"></enumeration>
+										<enumeration value="HHmmss"></enumeration>
+										<enumeration value="HHmm"></enumeration>
+										<enumeration value="yyyyMMdd"></enumeration>
+										<enumeration value="yyyyMMddHHmm"></enumeration>
+										<enumeration value="yyyyMMddHHmmss"></enumeration>
+									</restriction>
+								</simpleType>
+							</attribute>
+						</complexType>
+					</element>
+					<element name="boolean-column">
+						<annotation>
+							<documentation>布尔列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:editor" minOccurs="0"></element>
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+							<attributeGroup ref="tns:boolean-column-attributes" />
+						</complexType>
+					</element>
+					<element name="dictionary-column">
+						<annotation>
+							<documentation>字典列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:editor" minOccurs="0"></element>
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+							<attribute name="dictionary" use="required">
+								<annotation>
+									<documentation>字典名称</documentation>
+								</annotation>
+							</attribute>
+							<attribute name="complex" type="boolean">
+								<annotation>
+									<documentation>是否复杂字典</documentation>
+								</annotation>
+							</attribute>
+						</complexType>
+					</element>
+					<element name="virtual-column">
+						<annotation>
+							<documentation>虚拟列</documentation>
+						</annotation>
+						<complexType>
+							<choice minOccurs="0">
+								<element name="buttons" minOccurs="0">
+									<complexType>
+										<sequence>
+											<element ref="tns:button" maxOccurs="unbounded" />
+										</sequence>
+									</complexType>
+								</element>
+								<element name="expression" minOccurs="0"></element>
+							</choice>
+							<attributeGroup ref="tns:column-attributes" />
+							<!-- 
+							<attribute name="flowId" type="long"></attribute>
+							 -->
+						</complexType>
+					</element>
+				</choice>
+			</sequence>
+			<attributeGroup ref="tns:column-model-attribute" />
+		</complexType>
+	</element>
+	
+	<element name="id-column">
+		<annotation>
+			<documentation>主键列</documentation>
+		</annotation>
+		<complexType>
+			<attributeGroup ref="tns:column-attributes" />
+		</complexType>
+	</element>
+	
+	<element name="checkbox-column">
+		<complexType>
+			<sequence>
+				<element name="expression" minOccurs="0"></element>
+				<element ref="tns:column-attribute" minOccurs="0" maxOccurs="unbounded"></element>
+			</sequence>
+			<attribute name="hideable" type="boolean" use="required">
+			</attribute>
+		</complexType>
+	</element>	
+	
+	<element name="column-attribute">
+		<complexType>
+			<attribute name="name" use="required"></attribute>
+			<attribute name="value" use="required"></attribute>
+		</complexType>
+	</element>
+	
+	<attributeGroup name="column-attributes">
+		<annotation>
+			<documentation>列属性</documentation>
+		</annotation>
+		<attribute name="name" use="required">
+			<annotation>
+				<documentation>列名称</documentation>
+			</annotation>
+		</attribute>
+		<!-- 
+		<attribute name="outName">
+			<annotation>
+				<documentation>输出列表字段别名</documentation>
+			</annotation>
+		</attribute>
+		 -->
+		<attribute name="bson">
+			<annotation>
+				<documentation>字段名称或SQL语句</documentation>
+			</annotation>
+		</attribute>
+		<!-- 
+		<attribute name="sql">
+			<annotation>
+				<documentation>字段名称或SQL语句</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="text">
+			<annotation>
+				<documentation>列标题</documentation>
+			</annotation>
+		</attribute>
+		 -->
+		<attribute name="align">
+			<annotation>
+				<documentation>对应方式</documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="left"></enumeration>
+					<enumeration value="center"></enumeration>
+					<enumeration value="right"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="graggable" type="boolean">
+			<annotation>
+				<documentation>是否可拖拽</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="groupable" type="boolean">
+			<annotation>
+				<documentation>是否可分组</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="hideable" type="boolean">
+			<annotation>
+				<documentation>是否隐藏</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="editable" type="boolean">
+			<annotation>
+				<documentation>是否编辑</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="menuDisabled" type="boolean">
+			<annotation>
+				<documentation>是否禁用列显示在列头菜单</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="sortable" type="boolean">
+			<annotation>
+				<documentation>是否可排序</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="comparable" type="boolean">
+			<annotation>
+				<documentation>是否可比较</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="locked" type="boolean">
+			<annotation>
+				<documentation>是否可锁定</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="width" />
+		<attribute name="excelWidth" />
+		<attribute name="renderer" />
+		<attribute name="rendererTemplate" />
+		<attribute name="summaryText" />
+		<attribute name="summaryType">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="text"></enumeration>
+					<enumeration value="count"></enumeration>
+					<enumeration value="sum"></enumeration>
+					<enumeration value="min"></enumeration>
+					<enumeration value="max"></enumeration>
+					<enumeration value="avg"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="cycle">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="year"></enumeration>
+					<enumeration value="quarter"></enumeration>
+					<enumeration value="month"></enumeration>
+					<enumeration value="week"></enumeration>
+					<enumeration value="day"></enumeration>
+					<enumeration value="dictionary"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="exported" type="boolean" default="true">
+			<annotation>
+				<documentation>是否导出</documentation>
+			</annotation>
+		</attribute>
+	</attributeGroup>
+	
+	<element name="editor">
+		<complexType>
+			<sequence>
+				<element name="editor_attribute" minOccurs="0" maxOccurs="unbounded">
+					<complexType>
+						<attribute name="name" use="required"></attribute>
+						<attribute name="value" use="required"></attribute>
+					</complexType>
+				</element>
+			</sequence>
+			<attribute name="name"></attribute>
+		</complexType>
+	</element>
+	
+	<attributeGroup name="boolean-column-attributes">
+		<annotation>
+			<documentation>布尔列属性组</documentation>
+		</annotation>
+		<attribute name="trueText">
+			<annotation>
+				<documentation>true显示的文本</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="falseText">
+			<annotation>
+				<documentation>false显示的文本</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="undefinedText">
+			<annotation>
+				<documentation>未定义显示的文本</documentation>
+			</annotation>
+		</attribute>
+	</attributeGroup>
+	
+	<attributeGroup name="column-model-attribute">
+		<annotation>
+			<documentation>列模型属性</documentation>
+		</annotation>
+		<attribute name="autoLoad" type="boolean">
+			<annotation>
+				<documentation>是否查询</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="summaryLoad" type="boolean">
+			<annotation>
+				<documentation>是否统计查询</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="summaryStat" type="boolean">
+			<annotation>
+				<documentation>是否合计查询</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="summation" type="boolean">
+			<annotation>
+				<documentation>是否合计</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="groupSummation" type="boolean">
+			<annotation>
+				<documentation>是否分组合计</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="groupMerge" type="boolean">
+			<annotation>
+				<documentation>是否分组合并</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="showGroupFilter" type="boolean">
+			<annotation>
+				<documentation>是否显示分组项</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="showAggregationFilter" type="boolean">
+			<annotation>
+				<documentation>是否显示聚合项</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="autoRowHeight" type="boolean">
+			<annotation>
+				<documentation>是否自动高度</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="nowrap" type="boolean">
+			<annotation>
+				<documentation>不换行</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="rownumber" type="boolean">
+			<annotation>
+				<documentation>是否显示列号</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="selectionMode">
+			<annotation>
+				<documentation>选择模式</documentation>
+			</annotation>
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="checkbox"></enumeration>
+					<enumeration value="radio"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="showClearBtn" type="boolean" default="true">
+			<annotation>
+				<documentation>是否显示清楚按钮(单选框特有属性)</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="selectionSupport" type="boolean" default="true">
+			<annotation>
+				<documentation>是否是选择器</documentation>
+			</annotation>
+		</attribute>
+		
+		<attribute name="groupField">
+			<annotation>
+				<documentation>分组显示字组</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="sqlOrderBy">
+			<annotation>
+				<documentation>SQL排序语句</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="saveUrl">
+			<annotation>
+				<documentation>保存URL</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="deleteUrl">
+			<annotation>
+				<documentation>删除URL</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="storeIntercept"></attribute>
+		<attribute name="recordIntercept"></attribute>
+		<attribute name="selectionTemplate"></attribute>
+		<attribute name="selectionTitle"></attribute>
+	</attributeGroup>
+	
+	<element name="query-parameter">
+		<complexType>
+			<choice maxOccurs="unbounded">
+				<element name="fixed-parameter">
+					<complexType>
+						<attributeGroup ref="tns:query-param-attributes"></attributeGroup>
+					</complexType>
+				</element>
+				<element name="query-parameter">
+					<complexType>
+						<sequence>
+							<element name="parameter-attribute" minOccurs="0" maxOccurs="unbounded">
+								<complexType>
+									<attribute name="name" use="required"></attribute>
+									<attribute name="value" use="required"></attribute>
+								</complexType>
+							</element>
+						</sequence>
+						<attributeGroup ref="tns:query-param-attributes"></attributeGroup>
+					</complexType>
+				</element>
+			</choice>
+			<attribute name="formColumns" type="int" default="4"></attribute>
+			<attribute name="enableEnterParam" type="boolean"></attribute>
+		</complexType>
+	</element>
+	
+	<attributeGroup name="query-param-attributes">
+		<attribute name="name" use="required"></attribute>
+		<attribute name="text" use="required"></attribute>
+		<attribute name="columnName"></attribute>
+		<attribute name="enterParam" type="boolean"></attribute>
+		<attribute name="editor">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="textfield"></enumeration>
+					<enumeration value="textarea"></enumeration>
+					<enumeration value="numberfield"></enumeration>
+					<enumeration value="betweennumberfield"></enumeration>
+					<enumeration value="datefield"></enumeration>
+					<enumeration value="betweendatefield"></enumeration>
+					<enumeration value="timefield"></enumeration>
+					<enumeration value="combo"></enumeration>
+					<enumeration value="combotree"></enumeration>
+					<enumeration value="displayfield"></enumeration>
+					<enumeration value="hidden"></enumeration>
+					<enumeration value="htmleditor"></enumeration>
+					<enumeration value="checkbox"></enumeration>
+					<enumeration value="checkboxgroup"></enumeration>
+					<enumeration value="radio"></enumeration>
+					<enumeration value="radiogroup"></enumeration>
+					<enumeration value="trigger"></enumeration>
+					<enumeration value="wlightbox"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="restriction">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="eq"></enumeration>
+					<enumeration value="nq"></enumeration>
+					<enumeration value="ge"></enumeration>
+					<enumeration value="le"></enumeration>
+					<enumeration value="gt"></enumeration>
+					<enumeration value="lt"></enumeration>
+					<enumeration value="null"></enumeration>
+					<enumeration value="not_null"></enumeration>
+					<enumeration value="between"></enumeration>
+					<enumeration value="not_between"></enumeration>
+					<enumeration value="in"></enumeration>
+					<enumeration value="not_in"></enumeration>
+					<enumeration value="like"></enumeration>
+					<enumeration value="left_like"></enumeration>
+					<enumeration value="right_like"></enumeration>
+					<enumeration value="not_like"></enumeration>
+					<enumeration value="not_left_like"></enumeration>
+					<enumeration value="not_right_like"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="colSpan" type="int" default="1"></attribute>
+		<attribute name="rowSpan" type="int" default="1"></attribute>
+		<attribute name="value"></attribute>
+		<attribute name="otherName"></attribute>
+		<attribute name="having" type="boolean"></attribute>
+		<attribute name="required" type="boolean"></attribute>
+		<attribute name="use-in">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="data-provider"></enumeration>
+					<enumeration value="column-model"></enumeration>
+					<enumeration value="none"></enumeration>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</attributeGroup>
+</schema>

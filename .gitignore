@@ -1,0 +1,8 @@
+test-results/
+tmp/
+routes/
+bin/
+pkg/
+.settings/
+.project
+

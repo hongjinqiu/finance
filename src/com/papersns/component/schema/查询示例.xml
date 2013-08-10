@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+
+	<description>员工外出申请</description>
+	<view-template view="component/template.ui.ftl" />
+	<styles>/hr/archives/empsalarycheck/empsalarychecklist.js</styles>
+
+	<toolbar>
+		<button text="新增" mode="fn" handler="doSave">
+			<button-attribute name="code" value="C" />
+			<button-attribute name="functionId" value="50010" />
+		</button>
+
+		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+			<button-attribute name="code" value="D" />
+			<button-attribute name="functionId" value="50010" />
+		</button>
+
+		<button name="xx" text="导出" mode="fn" handler="doExport">
+			<button-attribute name="code" value="U" />
+			<button-attribute name="functionId" value="10018" />
+		</button>
+
+	</toolbar>
+
+	<security functionId="10018">
+	</security>
+
+	<data-provider size="10">
+		<!-- <sql>SELECT T.*,U.UNIT_ANAME AS UNIT_NAME,D.UNIT_ANAME AS DEPT_NAME,E.CNAME AS APP_NAME FROM OA_EMPEGRESS T,HR_EMPLOYEE E,PUB_UNIT D,PUB_UNIT U WHERE T.EMPLOYEE_ID=E.EMPLOYEE_ID AND
+			E.DEPT_ID=D.UNIT_ID AND E.UNIT_ID=U.UNIT_ID</sql> -->
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-query></fix-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
+	<column-model rownumber="true" orderBy="json order by">
+		<checkbox-column hideable="true">
+			<expression>"31".equals(record.get("AUDIT_STATUS")+"")</expression><!-- python language -->
+		</checkbox-column>
+		<id-column name="EMPEGRESS_ID" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
+					<expression>!"3".equals(record.get("AUDIT_STATUS")+"")</expression>
+					<button-attribute name="code" value="U" />
+				</button>
+				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={EMPEGRESS_ID}" >
+					<expression>"13".equals(record.get("AUDIT_STATUS")+"")</expression>
+				</button>
+			</buttons>
+		</virtual-column>
+		<string-column name="CREATE_UNIT" text="创建单位" hideable="true" />
+		<string-column name="CREATE_BY" text="创建单位" hideable="true" />
+
+		<string-column name="UNIT_NAME" text="单位" />
+
+		<string-column name="DEPT_NAME" text="部门" />
+
+		<string-column name="APP_NAME" text="申请人" editable="true">
+			<editor name="text"></editor>
+		</string-column>
+
+		<date-column name="APP_TIME" text="申请日期" />
+
+		<string-column name="AUDIT_STATUS" text="审核状态" sql="'{value}'" >
+			<column-attribute name="paraName" value="AUDIT_STATUS"/>
+		</string-column>
+	</column-model>
+
+	<query-parameter>
+		<query-parameter name="UNIT_NAME" text="发文状态" restriction="like"  otherName="UNIT_ANAME" editor="combotree">
+			<parameter-attribute name="tree" value="DICTIONARY_TREE&amp;dictionary=D_NOTIFY_STATUS"/>
+		</query-parameter>
+
+		<query-parameter name="DEPT_NAME" text="部门" restriction="like"></query-parameter>
+
+		<query-parameter name="APP_NAME" text="申请人" restriction="like"></query-parameter>
+
+		<query-parameter name="AUDIT_STATUS" text="审核状态" otherName="AUDIT_STATUS2" restriction="in"  editor="combotree">
+			<parameter-attribute name="tree" value="DICTIONARY_TREE&amp;dictionary=D_AUDIT_STATUS"/>
+		</query-parameter>
+
+		<query-parameter name="START_TIME" text="申请日期从" restriction="ge" editor="datefield">
+			<parameter-attribute name="format" value="yyyyMM"/>
+ 	 		<parameter-attribute name="pattern" value="yyyyMM"/>
+		</query-parameter>
+
+		<query-parameter name="END_TIME" text="申请日期到" restriction="le" editor="datefield">
+			<parameter-attribute name="pattern" value="yyyyMMddHHmmss" />
+		</query-parameter>
+		<query-parameter name="AUDIT_STATUS" text="审核状态"  restriction="eq" editor="combo">
+			<parameter-attribute name="dictionary" value="D_AUDIT_STATUS" />
+		</query-parameter>
+		<query-parameter name="EMPEGRESS_ID" text="主键" restriction="eq" editor="hidden">
+		</query-parameter>
+	</query-parameter>
+</list-template>
