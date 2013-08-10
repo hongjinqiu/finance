@@ -535,12 +535,12 @@
 				<documentation>字段名称或SQL语句</documentation>
 			</annotation>
 		</attribute>
+		 -->
 		<attribute name="text">
 			<annotation>
 				<documentation>列标题</documentation>
 			</annotation>
 		</attribute>
-		 -->
 		<attribute name="align">
 			<annotation>
 				<documentation>对应方式</documentation>
@@ -750,9 +750,16 @@
 				<documentation>分组显示字组</documentation>
 			</annotation>
 		</attribute>
+		<!-- 
 		<attribute name="sqlOrderBy">
 			<annotation>
 				<documentation>SQL排序语句</documentation>
+			</annotation>
+		</attribute>
+		 -->
+		<attribute name="bsonOrderBy">
+			<annotation>
+				<documentation>bson排序语句</documentation>
 			</annotation>
 		</attribute>
 		<attribute name="saveUrl">

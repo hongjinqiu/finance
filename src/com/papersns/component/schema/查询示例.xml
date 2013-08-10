@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
 
+	<adapter name="name_adapter" />
 	<description>员工外出申请</description>
+	<scripts>/hr/archives/empsalarycheck/empsalarychecklist.js</scripts>
 	<view-template view="component/template.ui.ftl" />
-	<styles>/hr/archives/empsalarycheck/empsalarychecklist.js</styles>
 
 	<toolbar>
 		<button text="新增" mode="fn" handler="doSave">
@@ -23,31 +24,28 @@
 
 	</toolbar>
 
-	<security functionId="10018">
-	</security>
+	<security functionId="10018"></security>
 
 	<data-provider size="10">
-		<!-- <sql>SELECT T.*,U.UNIT_ANAME AS UNIT_NAME,D.UNIT_ANAME AS DEPT_NAME,E.CNAME AS APP_NAME FROM OA_EMPEGRESS T,HR_EMPLOYEE E,PUB_UNIT D,PUB_UNIT U WHERE T.EMPLOYEE_ID=E.EMPLOYEE_ID AND
-			E.DEPT_ID=D.UNIT_ID AND E.UNIT_ID=U.UNIT_ID</sql> -->
 		<collection></collection><!-- mongoDB collection name -->
-		<fix-query></fix-query><!-- mongoDB fix query, json format -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
-	<column-model rownumber="true" orderBy="json order by">
+	<column-model rownumber="true" bsonOrderBy="">
 		<checkbox-column hideable="true">
-			<expression>"31".equals(record.get("AUDIT_STATUS")+"")</expression><!-- python language -->
+			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression><!-- python language -->
 		</checkbox-column>
 		<id-column name="EMPEGRESS_ID" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
 				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
-					<expression>!"3".equals(record.get("AUDIT_STATUS")+"")</expression>
+					<expression>"3" != str(record.get("AUDIT_STATUS"))</expression>
 					<button-attribute name="code" value="U" />
 				</button>
 				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={EMPEGRESS_ID}" >
-					<expression>"13".equals(record.get("AUDIT_STATUS")+"")</expression>
+					<expression>"13" != str(record.get("AUDIT_STATUS"))</expression>
 				</button>
 			</buttons>
 		</virtual-column>
@@ -64,7 +62,7 @@
 
 		<date-column name="APP_TIME" text="申请日期" />
 
-		<string-column name="AUDIT_STATUS" text="审核状态" sql="'{value}'" >
+		<string-column name="AUDIT_STATUS" text="审核状态" bson="'{value}'" >
 			<column-attribute name="paraName" value="AUDIT_STATUS"/>
 		</string-column>
 	</column-model>
