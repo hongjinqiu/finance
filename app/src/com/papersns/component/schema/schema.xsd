@@ -87,7 +87,7 @@
 				<element ref="tns:security" minOccurs="0" />
 				<element ref="tns:data-provider" />
 				<element ref="tns:column-model" />
-				<element ref="tns:query-parameter" minOccurs="0" />
+				<element ref="tns:query-parameters" minOccurs="0" />
 			</sequence>
 		</complexType>
 	</element>
@@ -387,7 +387,7 @@
 								<element ref="tns:editor" minOccurs="0"></element>
 							</sequence>
 							<attributeGroup ref="tns:column-attributes" />
-							<attribute name="pattern">
+							<attribute name="displayPattern">
 								<annotation>
 									<documentation>日期格式化</documentation>
 								</annotation>
@@ -403,9 +403,9 @@
 									</restriction>
 								</simpleType>
 							</attribute>
-							<attribute name="source_partern">
+							<attribute name="dbPartern">
 								<annotation>
-									<documentation>自定义日期格式</documentation>
+									<documentation>数据库中存储的日期格式</documentation>
 								</annotation>
 								<simpleType>
 									<restriction base="string">
@@ -778,7 +778,7 @@
 		<attribute name="selectionTitle"></attribute>
 	</attributeGroup>
 	
-	<element name="query-parameter">
+	<element name="query-parameters">
 		<complexType>
 			<choice maxOccurs="unbounded">
 				<element name="fixed-parameter">

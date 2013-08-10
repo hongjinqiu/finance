@@ -6,8 +6,9 @@
 	<scripts>/hr/archives/empsalarycheck/empsalarychecklist.js</scripts>
 	<view-template view="component/template.ui.ftl" />
 
-	<toolbar>
-		<button text="新增" mode="fn" handler="doSave">
+	<toolbar export="true">
+		<button text="新增" mode="fn" handler="doSave" rowspan="2">
+			<expression>test_expression</expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -21,14 +22,13 @@
 			<button-attribute name="code" value="U" />
 			<button-attribute name="functionId" value="10018" />
 		</button>
-
 	</toolbar>
 
 	<security functionId="10018"></security>
 
 	<data-provider size="10">
-		<collection></collection><!-- mongoDB collection name -->
-		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+		<collection>Person</collection><!-- mongoDB collection name -->
+		<fix-bson-query>{"age": {"$gte": 20}}</fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
@@ -67,7 +67,7 @@
 		</string-column>
 	</column-model>
 
-	<query-parameter>
+	<query-parameters>
 		<query-parameter name="UNIT_NAME" text="发文状态" restriction="like"  otherName="UNIT_ANAME" editor="combotree">
 			<parameter-attribute name="tree" value="DICTIONARY_TREE&amp;dictionary=D_NOTIFY_STATUS"/>
 		</query-parameter>
@@ -93,5 +93,5 @@
 		</query-parameter>
 		<query-parameter name="EMPEGRESS_ID" text="主键" restriction="eq" editor="hidden">
 		</query-parameter>
-	</query-parameter>
+	</query-parameters>
 </list-template>

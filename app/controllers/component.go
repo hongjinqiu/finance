@@ -15,7 +15,7 @@ type Component struct {
 }
 
 func (c Component) Schema() revel.Result {
-	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/src/com/papersns/component/schema/查询示例.xml")
+	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/查询示例.xml")
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
