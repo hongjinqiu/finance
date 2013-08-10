@@ -35,6 +35,10 @@ func (c Component) Schema() revel.Result {
 		return c.Render(err)
 	}
 	
+	// 1.query data, 
+	// from data-provider
+	// from query-parameters
+	
 	xmlDataArray,err := xml.MarshalIndent(listTemplate, "", "\t")
 	if err != nil {
 		fmt.Printf("error: %v", err)
@@ -43,4 +47,13 @@ func (c Component) Schema() revel.Result {
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText(string(xmlDataArray))
+}
+
+func (c Component) MongoTest() revel.Result {
+	querySupport := QuerySupport{}
+	querySupport.Find("", "")
+
+	c.Response.Status = http.StatusOK
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("test mongoDB")
 }
