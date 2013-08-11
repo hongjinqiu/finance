@@ -4,6 +4,7 @@ import "github.com/robfig/revel"
 import (
 	. "com/papersns/component"
 	"encoding/xml"
+	"encoding/json"
 	"os"
 	"fmt"
 	"io/ioutil"
@@ -51,9 +52,16 @@ func (c Component) Schema() revel.Result {
 
 func (c Component) MongoTest() revel.Result {
 	querySupport := QuerySupport{}
-	querySupport.Find("", "")
+	m,isFind := querySupport.Find("SysUser", `{"_id": 15}`)
+	if !isFind {
+		panic("not found")
+	}
 
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
-	return c.RenderText("test mongoDB")
+	data, err := json.MarshalIndent(m, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	return c.RenderText(string(data))
 }
