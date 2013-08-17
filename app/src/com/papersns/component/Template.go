@@ -25,7 +25,7 @@ type Adapter struct {
 type Toolbar struct {
 	XMLName     xml.Name    `xml:"toolbar"`
 	ButtonGroup ButtonGroup `xml:"button-group"`
-	Button      []Button    `xml:",any"`
+	ButtonLi    []Button    `xml:",any"`
 
 	Export         string `xml:"export,attr"`
 	Exporter       string `xml:"exporter,attr"`
@@ -60,7 +60,7 @@ type ColumnModel struct {
 
 	CheckboxColumn CheckboxColumn `xml:"checkbox-column"`
 	IdColumn       IdColumn       `xml:"id-column"`
-	Column         []Column       `xml:",any"`
+	ColumnLi       []Column       `xml:",any"`
 
 	ColumnModelAttributeGroup
 }
@@ -174,8 +174,8 @@ type BooleanColumnAttributeGroup struct {
 type QueryParameterGroup struct {
 	XMLName xml.Name `xml:"query-parameters"`
 
-	FixedParameter []FixedParameter `xml:"fixed-parameter"`
-	QueryParameter []QueryParameter `xml:"query-parameter"`
+	FixedParameterLi []FixedParameter `xml:"fixed-parameter"`
+	QueryParameterLi []QueryParameter `xml:"query-parameter"`
 
 	FormColumns      string `xml:"formColumns,attr"`
 	EnableEnterParam string `xml:"enableEnterParam,attr"`
@@ -190,7 +190,15 @@ type FixedParameter struct {
 type QueryParameter struct {
 	XMLName xml.Name `xml:"query-parameter"`
 
+	ParameterAttributeLi []ParameterAttribute `xml:"parameter-attribute"`
 	QueryParamAttributeGroup
+}
+
+type ParameterAttribute struct {
+	XMLName xml.Name `xml:"parameter-attribute"`
+
+	Name  string `xml:"name,attr"`
+	Value string `xml:"value,attr"`
 }
 
 type QueryParamAttributeGroup struct {
@@ -210,14 +218,14 @@ type QueryParamAttributeGroup struct {
 }
 
 type ButtonGroup struct {
-	XMLName xml.Name `xml:"button-group"`
-	Button  []Button `xml:",any"`
+	XMLName  xml.Name `xml:"button-group"`
+	ButtonLi []Button `xml:",any"`
 }
 
 type Buttons struct {
 	XMLName xml.Name `xml:"buttons"`
 
-	Button []Button `xml:"button"`
+	ButtonLi []Button `xml:"button"`
 }
 
 type Button struct {

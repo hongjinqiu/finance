@@ -791,7 +791,27 @@
 						<sequence>
 							<element name="parameter-attribute" minOccurs="0" maxOccurs="unbounded">
 								<complexType>
-									<attribute name="name" use="required"></attribute>
+									<attribute name="name" use="required">
+										<simpleType>
+											<restriction base="string">
+												<enumeration value="inFormat"></enumeration>
+												<enumeration value="queryFormat"></enumeration>
+												<enumeration value="maxDate"></enumeration>
+												<enumeration value="minDate"></enumeration>
+												<enumeration value="dictionary"></enumeration>
+												<enumeration value="tree"></enumeration>
+												<enumeration value="treeHeight"></enumeration>
+												<enumeration value="observes"></enumeration>
+												<enumeration value="style"></enumeration>
+												<enumeration value="template"></enumeration><!-- 弹出的选择 -->
+												<enumeration value="selectionMode"></enumeration>
+												<enumeration value="selectionTemplate"></enumeration>
+												<enumeration value="fieldName"></enumeration><!-- 弹窗的查询参数 -->
+												<enumeration value="fixparams"></enumeration>
+												<enumeration value="observetree"></enumeration>
+											</restriction>
+										</simpleType>
+									</attribute>
 									<attribute name="value" use="required"></attribute>
 								</complexType>
 							</element>
@@ -816,10 +836,7 @@
 					<enumeration value="textfield"></enumeration>
 					<enumeration value="textarea"></enumeration>
 					<enumeration value="numberfield"></enumeration>
-					<enumeration value="betweennumberfield"></enumeration>
 					<enumeration value="datefield"></enumeration>
-					<enumeration value="betweendatefield"></enumeration>
-					<enumeration value="timefield"></enumeration>
 					<enumeration value="combo"></enumeration>
 					<enumeration value="combotree"></enumeration>
 					<enumeration value="displayfield"></enumeration>
@@ -829,8 +846,7 @@
 					<enumeration value="checkboxgroup"></enumeration>
 					<enumeration value="radio"></enumeration>
 					<enumeration value="radiogroup"></enumeration>
-					<enumeration value="trigger"></enumeration>
-					<enumeration value="wlightbox"></enumeration>
+					<enumeration value="trigger"></enumeration><!-- 弹窗选择 -->
 				</restriction>
 			</simpleType>
 		</attribute>
@@ -845,8 +861,10 @@
 					<enumeration value="lt"></enumeration>
 					<enumeration value="null"></enumeration>
 					<enumeration value="not_null"></enumeration>
-					<enumeration value="between"></enumeration>
-					<enumeration value="not_between"></enumeration>
+					<enumeration value="exist"></enumeration>
+					<enumeration value="not_exist"></enumeration>
+					<!-- <enumeration value="between"></enumeration>
+					<enumeration value="not_between"></enumeration> -->
 					<enumeration value="in"></enumeration>
 					<enumeration value="not_in"></enumeration>
 					<enumeration value="like"></enumeration>

@@ -81,12 +81,12 @@
 		</query-parameter>
 
 		<query-parameter name="START_TIME" text="申请日期从" restriction="ge" editor="datefield">
-			<parameter-attribute name="format" value="yyyyMM"/>
- 	 		<parameter-attribute name="pattern" value="yyyyMM"/>
+			<parameter-attribute name="inFormat" value="yyyyMM"/>
+ 	 		<parameter-attribute name="queryFormat" value="yyyyMM"/>
 		</query-parameter>
 
 		<query-parameter name="END_TIME" text="申请日期到" restriction="le" editor="datefield">
-			<parameter-attribute name="pattern" value="yyyyMMddHHmmss" />
+			<parameter-attribute name="queryFormat" value="yyyyMMddHHmmss" />
 		</query-parameter>
 		<query-parameter name="AUDIT_STATUS" text="审核状态"  restriction="eq" editor="combo">
 			<parameter-attribute name="dictionary" value="D_AUDIT_STATUS" />
