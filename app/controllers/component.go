@@ -69,7 +69,7 @@ func (c Component) MongoTest() revel.Result {
 func (c Component) IndexTest() revel.Result {
 	querySupport := QuerySupport{}
 	collection := "ScheduleSetting"
-	query := `{}`
+	query := map[string]interface{}{}
 	pageNo := 1
 	pageSize := 10
 	result := querySupport.Index(collection, query, pageNo, pageSize)
@@ -84,7 +84,7 @@ func (c Component) IndexTest() revel.Result {
 }
 
 func (c Component) SchemaTest() revel.Result {
-	file, err := os.Open(`D:\goworkspace\src\finance\app\src\com\papersns\component\schema\查询示例.xml`)
+	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/查询示例.xml`)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
@@ -118,23 +118,42 @@ func (c Component) SchemaTest() revel.Result {
 	return c.RenderText(string(xmlDataArray))
 }
 
-func (c Component) MapTest() revel.Result {
-	tmpMap := map[string]string{}
-	println("result1")
-	println(tmpMap["abc"])
-	println("result1 end")
-	println("result1=" + tmpMap["abc"])
-	tmpMap2 := map[string]func(){}
-	println("result2=")
-	println(tmpMap2["abc"])
-	println("result2 end")
-	if tmpMap2["abc"] == nil {
-		println("tmpMap2 is nil")
-	} else {
-		println("tmpMap2 is not nil")
+func (c Component) SchemaQueryParameterTest() revel.Result {
+	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/查询示例.xml`)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
 	}
+	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
+
+	listTemplate := ListTemplate{}
+	err = xml.Unmarshal(data, &listTemplate)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
+
+	// 1.query data,
+	// from data-provider
+	// from query-parameters
+	templateManager := TemplateManager{}
+	paramMap := map[string]string{}
+	pageNo := 1
+	pageSize := 10
+	queryResult := templateManager.QueryDataForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
 	
+	jsonByte,err := json.MarshalIndent(queryResult, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
-	return c.RenderText(string("mapTest"))
+	return c.RenderText(string(jsonByte))
 }

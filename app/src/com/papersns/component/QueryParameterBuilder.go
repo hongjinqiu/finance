@@ -12,154 +12,170 @@ type QueryParameterBuilder struct {
 type RestrictionEditorFunc func(queryParameter QueryParameter, value string) map[string]interface{}
 
 func (o QueryParameterBuilder) buildQuery(queryParameter QueryParameter, value string) map[string]interface{} {
-	// ------------------------------------
-	{
-		funcMap := map[string]map[string]RestrictionEditorFunc{
-			"textfield":     nil,
-			"textarea":      nil,
-			"numberfield":   nil,
-			"datefield":     nil,
-			"combo":         nil,
-			"combotree":     nil,
-			"displayfield":  nil,
-			"hidden":        nil,
-			"htmleditor":    nil,
-			"checkbox":      nil,
-			"checkboxgroup": nil,
-			"radio":         nil,
-			"radiogroup":    nil,
-			"trigger":       nil,
-		}
-		println(funcMap)
-	}
-	// ------------------------------------
-
 	funcMap := map[string]map[string]RestrictionEditorFunc{
-		"eq":             o.eqNqMap("$eq"),
-		"nq":             o.eqNqMap("$ne"),
-		"ge":             o.logicCmpMap("$gte"),
-		"le":             o.logicCmpMap("$lte"),
-		"gt":             o.logicCmpMap("$gt"),
-		"lt":             o.logicCmpMap("$lt"),
-		"null":           o.eqNqMap("$eq"), // don't forget to set value to ""
-		"not_null":       o.eqNqMap("$ne"), // don't forget to set value to ""
-		"exist":          o.existNotExistCmpMap(true),
-		"not_exist":      o.existNotExistCmpMap(false),
-		"in":             o.inNotInMap("$in"),
-		"not_in":         o.inNotInMap("$nin"),
-		"like":           o.regexpCmpMap("$regex"),
-		"left_like":      o.regexpCmpMap("$regex"),
-		"right_like":     o.regexpCmpMap("$regex"),
-		"not_like":       o.regexpCmpMap("$regex"),
-		"not_left_like":  o.regexpCmpMap("$regex"),
-		"not_right_like": o.regexpCmpMap("$regex"),
+		"textfield":     o.stringCmpMap(),
+		"textarea":      o.stringCmpMap(),
+		"numberfield":   o.intOrFloatCmpMap(),
+		"datefield":     o.dateCmpMap(),
+		"combo":         o.intOrFloatOrStringCmpMap(),
+		"combotree":     o.intOrFloatOrStringCmpMap(),
+		"displayfield":  nil,
+		"hidden":        o.intOrFloatOrStringCmpMap(),
+		"htmleditor":    o.stringCmpMap(),
+		"checkbox":      o.intOrFloatOrStringCmpMap(),
+		"checkboxgroup": o.intOrFloatOrStringCmpMap(),
+		"radio":         o.intOrFloatOrStringCmpMap(),
+		"radiogroup":    o.intOrFloatOrStringCmpMap(),
+		"trigger":       o.intOrFloatCmpMap(),
 	}
-	if funcMap[queryParameter.Restriction] != nil {
-		if funcMap[queryParameter.Restriction][queryParameter.Editor] != nil {
+	if funcMap[queryParameter.Editor] != nil {
+		if funcMap[queryParameter.Editor][queryParameter.Restriction] != nil {
 			var restrictionEditorFunc RestrictionEditorFunc
-			restrictionEditorFunc = funcMap[queryParameter.Restriction][queryParameter.Editor]
+			restrictionEditorFunc = funcMap[queryParameter.Editor][queryParameter.Restriction]
 			return restrictionEditorFunc(queryParameter, value)
 		}
 	}
-	panic(queryParameter.Name + ",restriction is:" + queryParameter.Restriction + ",editor is:" + queryParameter.Editor + ", value is:" + value)
+	if funcMap[queryParameter.Editor] != nil && funcMap[queryParameter.Editor][queryParameter.Restriction] == nil {
+		panic(queryParameter.Name + ",editor is:" + queryParameter.Editor + ",restriction is:" + queryParameter.Restriction + ", value is:" + value)
+	}
+	return map[string]interface{}{}
 }
 
-func (o QueryParameterBuilder) eqNqMap(operator string) map[string]RestrictionEditorFunc {
-	inNotIn := "$in"
-	if operator == "$ne" {
-		inNotIn = "$nin"
-	}
+func (o QueryParameterBuilder) stringCmpMap() map[string]RestrictionEditorFunc {
 	return map[string]RestrictionEditorFunc{
-		"textfield":     o.intOrFloatOrStringCmp(operator),
-		"textarea":      o.intOrFloatOrStringCmp(operator),
-		"numberfield":   o.intOrFloatOrStringCmp(operator),
-		"datefield":     o.dateCmp(operator),
-		"combo":         o.intOrStringOrFloatInCmp(inNotIn),
-		"combotree":     o.intOrStringOrFloatInCmp(inNotIn),
-		"displayfield":  nil,
-		"hidden":        o.intOrFloatOrStringCmp(operator),
-		"htmleditor":    o.intOrFloatOrStringCmp(operator),
-		"checkbox":      o.intOrFloatOrStringCmp(operator),
-		"checkboxgroup": o.intOrStringOrFloatInCmp(inNotIn),
-		"radio":         o.intOrFloatOrStringCmp(operator),
-		"radiogroup":    o.intOrFloatOrStringCmp(operator),
-		"trigger":       o.intOrFloatOrStringCmp(operator),
-	}
-}
-
-func (o QueryParameterBuilder) inNotInMap(operator string) map[string]RestrictionEditorFunc {
-	return map[string]RestrictionEditorFunc{
-		"textfield":     o.intOrStringOrFloatInCmp(operator),
-		"textarea":      o.intOrStringOrFloatInCmp(operator),
-		"numberfield":   o.intOrStringOrFloatInCmp(operator),
-		"datefield":     nil,
-		"combo":         o.intOrStringOrFloatInCmp(operator),
-		"combotree":     o.intOrStringOrFloatInCmp(operator),
-		"displayfield":  nil,
-		"hidden":        o.intOrStringOrFloatInCmp(operator),
-		"htmleditor":    o.intOrStringOrFloatInCmp(operator),
-		"checkbox":      o.intOrStringOrFloatInCmp(operator),
-		"checkboxgroup": o.intOrStringOrFloatInCmp(operator),
-		"radio":         o.intOrStringOrFloatInCmp(operator),
-		"radiogroup":    o.intOrStringOrFloatInCmp(operator),
-		"trigger":       o.intOrStringOrFloatInCmp(operator),
+		"eq":             o.stringCmp("$eq"),
+		"nq":             o.stringCmp("$ne"),
+		"ge":             o.stringCmp("$gte"),
+		"le":             o.stringCmp("$lte"),
+		"gt":             o.stringCmp("$gt"),
+		"lt":             o.stringCmp("$lt"),
+		"null":           o.nullCmp("$eq"),
+		"not_null":       o.nullCmp("$ne"),
+		"exist":          o.existNotExistCmp(true),
+		"not_exist":      o.existNotExistCmp(false),
+		"in":             o.stringInCmp("$in"),
+		"not_in":         o.stringInCmp("$nin"),
+		"like":           o.regexpCmp("$regex"),
+		"left_like":      o.regexpCmp("$regex"),
+		"right_like":     o.regexpCmp("$regex"),
+		"not_like":       o.regexpCmp("$regex"),
+		"not_left_like":  o.regexpCmp("$regex"),
+		"not_right_like": o.regexpCmp("$regex"),
 	}
 }
 
-func (o QueryParameterBuilder) logicCmpMap(operator string) map[string]RestrictionEditorFunc {
+func (o QueryParameterBuilder) intOrFloatCmpMap() map[string]RestrictionEditorFunc {
 	return map[string]RestrictionEditorFunc{
-		"textfield":     o.intOrFloatOrStringCmp(operator),
-		"textarea":      nil,
-		"numberfield":   o.intOrFloatOrStringCmp(operator),
-		"datefield":     o.dateCmp(operator),
-		"combo":         o.intOrFloatOrStringCmp(operator),
-		"combotree":     nil,
-		"displayfield":  nil,
-		"hidden":        o.intOrFloatOrStringCmp(operator),
-		"htmleditor":    nil,
-		"checkbox":      o.intOrFloatOrStringCmp(operator),
-		"checkboxgroup": nil,
-		"radio":         o.intOrFloatOrStringCmp(operator),
-		"radiogroup":    nil,
-		"trigger":       o.intOrFloatOrStringCmp(operator),
+		"eq":             o.intOrFloatCmp("$eq"),
+		"nq":             o.intOrFloatCmp("$ne"),
+		"ge":             o.intOrFloatCmp("$gte"),
+		"le":             o.intOrFloatCmp("$lte"),
+		"gt":             o.intOrFloatCmp("$gt"),
+		"lt":             o.intOrFloatCmp("$lt"),
+		"null":           nil,
+		"not_null":       nil,
+		"exist":          o.existNotExistCmp(true),
+		"not_exist":      o.existNotExistCmp(false),
+		"in":             o.intOrFloatInCmp("$in"),
+		"not_in":         o.intOrFloatInCmp("$nin"),
+		"like":           nil,
+		"left_like":      nil,
+		"right_like":     nil,
+		"not_like":       nil,
+		"not_left_like":  nil,
+		"not_right_like": nil,
 	}
 }
 
-func (o QueryParameterBuilder) existNotExistCmpMap(isExist bool) map[string]RestrictionEditorFunc {
+func (o QueryParameterBuilder) intOrFloatOrStringCmpMap() map[string]RestrictionEditorFunc {
 	return map[string]RestrictionEditorFunc{
-		"textfield":     o.existNotExistCmp(isExist),
-		"textarea":      o.existNotExistCmp(isExist),
-		"numberfield":   o.existNotExistCmp(isExist),
-		"datefield":     o.existNotExistCmp(isExist),
-		"combo":         o.existNotExistCmp(isExist),
-		"combotree":     o.existNotExistCmp(isExist),
-		"displayfield":  o.existNotExistCmp(isExist),
-		"hidden":        o.existNotExistCmp(isExist),
-		"htmleditor":    o.existNotExistCmp(isExist),
-		"checkbox":      o.existNotExistCmp(isExist),
-		"checkboxgroup": o.existNotExistCmp(isExist),
-		"radio":         o.existNotExistCmp(isExist),
-		"radiogroup":    o.existNotExistCmp(isExist),
-		"trigger":       o.existNotExistCmp(isExist),
+		"eq":             o.intOrFloatOrStringCmp("$eq"),
+		"nq":             o.intOrFloatOrStringCmp("$ne"),
+		"ge":             o.intOrFloatOrStringCmp("$gte"),
+		"le":             o.intOrFloatOrStringCmp("$lte"),
+		"gt":             o.intOrFloatOrStringCmp("$gt"),
+		"lt":             o.intOrFloatOrStringCmp("$lt"),
+		"null":           nil,
+		"not_null":       nil,
+		"exist":          o.existNotExistCmp(true),
+		"not_exist":      o.existNotExistCmp(false),
+		"in":             o.intOrFloatOrStringInCmp("$in"),
+		"not_in":         o.intOrFloatOrStringInCmp("$nin"),
+		"like":           nil,
+		"left_like":      nil,
+		"right_like":     nil,
+		"not_like":       nil,
+		"not_left_like":  nil,
+		"not_right_like": nil,
 	}
 }
 
-func (o QueryParameterBuilder) regexpCmpMap(operator string) map[string]RestrictionEditorFunc {
+func (o QueryParameterBuilder) dateCmpMap() map[string]RestrictionEditorFunc {
 	return map[string]RestrictionEditorFunc{
-		"textfield":     o.regexpCmp(operator),
-		"textarea":      o.regexpCmp(operator),
-		"numberfield":   nil,
-		"datefield":     nil,
-		"combo":         nil,
-		"combotree":     nil,
-		"displayfield":  nil,
-		"hidden":        o.regexpCmp(operator),
-		"htmleditor":    o.regexpCmp(operator),
-		"checkbox":      nil,
-		"checkboxgroup": nil,
-		"radio":         nil,
-		"radiogroup":    nil,
-		"trigger":       nil,
+		"eq":             o.dateCmp("$eq"),
+		"nq":             o.dateCmp("$ne"),
+		"ge":             o.dateCmp("$gte"),
+		"le":             o.dateCmp("$lte"),
+		"gt":             o.dateCmp("$gt"),
+		"lt":             o.dateCmp("$lt"),
+		"null":           nil,
+		"not_null":       nil,
+		"exist":          o.existNotExistCmp(true),
+		"not_exist":      o.existNotExistCmp(false),
+		"in":             nil,
+		"not_in":         nil,
+		"like":           nil,
+		"left_like":      nil,
+		"right_like":     nil,
+		"not_like":       nil,
+		"not_left_like":  nil,
+		"not_right_like": nil,
+	}
+}
+
+func (o QueryParameterBuilder) intOrFloatCmp(operator string) RestrictionEditorFunc {
+	return func(queryParameter QueryParameter, value string) map[string]interface{} {
+		return o.intOrFloatOperator(queryParameter, value, operator)
+	}
+}
+
+func (o QueryParameterBuilder) intOrFloatOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
+	resultLi := []map[string]interface{}{}
+	intValue, err := strconv.ParseInt(value, 10, 0)
+	if err == nil {
+		if operator == "$eq" {
+			resultLi = append(resultLi, map[string]interface{}{
+				o.GetQueryName(queryParameter): intValue,
+			})
+		} else {
+			resultLi = append(resultLi, map[string]interface{}{
+				o.GetQueryName(queryParameter): map[string]int{
+					operator: int(intValue),
+				},
+			})
+		}
+	}
+
+	floatValue, err := strconv.ParseFloat(value, 32)
+	if err == nil {
+		if operator == "$eq" {
+			resultLi = append(resultLi, map[string]interface{}{
+				o.GetQueryName(queryParameter): float32(floatValue),
+			})
+		} else {
+			resultLi = append(resultLi, map[string]interface{}{
+				o.GetQueryName(queryParameter): map[string]float32{
+					operator: float32(floatValue),
+				},
+			})
+		}
+	}
+
+	if len(resultLi) == 1 {
+		return resultLi[0]
+	}
+	return map[string]interface{}{
+		"$or": resultLi,
 	}
 }
 
@@ -171,46 +187,18 @@ func (o QueryParameterBuilder) intOrFloatOrStringCmp(operator string) Restrictio
 
 func (o QueryParameterBuilder) intOrFloatOrStringOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
 	resultLi := []map[string]interface{}{}
-	intValue, err := strconv.ParseInt(value, 10, 0)
-	if err == nil {
-		if operator == "$eq" {
-			resultLi = append(resultLi, map[string]interface{}{
-				o.getQueryName(queryParameter): intValue,
-			})
-		} else {
-			resultLi = append(resultLi, map[string]interface{}{
-				o.getQueryName(queryParameter): map[string]int{
-					operator: int(intValue),
-				},
-			})
-		}
-	}
 
-	floatValue, err := strconv.ParseFloat(value, 32)
-	if err == nil {
-		if operator == "$eq" {
-			resultLi = append(resultLi, map[string]interface{}{
-				o.getQueryName(queryParameter): float32(floatValue),
-			})
-		} else {
-			resultLi = append(resultLi, map[string]interface{}{
-				o.getQueryName(queryParameter): map[string]float32{
-					operator: float32(floatValue),
-				},
-			})
-		}
-	}
+	resultLi = append(resultLi, o.stringOperator(queryParameter, value, operator))
 
-	if operator == "$eq" {
-		resultLi = append(resultLi, map[string]interface{}{
-			o.getQueryName(queryParameter): value,
-		})
+	intOrFloatMap := o.intOrFloatOperator(queryParameter, value, operator)
+	if intOrFloatMap["$or"] != nil {
+		intOrFloatResultLi := intOrFloatMap["$or"]
+		array := intOrFloatResultLi.([]map[string]interface{})
+		for _, intOrFloatResult := range array {
+			resultLi = append(resultLi, intOrFloatResult)
+		}
 	} else {
-		resultLi = append(resultLi, map[string]interface{}{
-			o.getQueryName(queryParameter): map[string]string{
-				operator: value,
-			},
-		})
+		resultLi = append(resultLi, intOrFloatMap)
 	}
 
 	if len(resultLi) == 1 {
@@ -218,6 +206,31 @@ func (o QueryParameterBuilder) intOrFloatOrStringOperator(queryParameter QueryPa
 	}
 	return map[string]interface{}{
 		"$or": resultLi,
+	}
+}
+
+func (o QueryParameterBuilder) stringCmp(operator string) RestrictionEditorFunc {
+	return func(queryParameter QueryParameter, value string) map[string]interface{} {
+		return o.stringOperator(queryParameter, value, operator)
+	}
+}
+
+func (o QueryParameterBuilder) nullCmp(operator string) RestrictionEditorFunc {
+	return func(queryParameter QueryParameter, value string) map[string]interface{} {
+		return o.stringOperator(queryParameter, "", operator)
+	}
+}
+
+func (o QueryParameterBuilder) stringOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
+	if operator == "$eq" {
+		return map[string]interface{}{
+			o.GetQueryName(queryParameter): value,
+		}
+	}
+	return map[string]interface{}{
+		o.GetQueryName(queryParameter): map[string]string{
+			operator: value,
+		},
 	}
 }
 
@@ -251,31 +264,55 @@ func (o QueryParameterBuilder) dateOperator(queryParameter QueryParameter, value
 
 	if operator == "$eq" {
 		return map[string]interface{}{
-			o.getQueryName(queryParameter): int(queryData),
+			o.GetQueryName(queryParameter): int(queryData),
 		}
 	}
 	return map[string]interface{}{
-		o.getQueryName(queryParameter): map[string]int{
+		o.GetQueryName(queryParameter): map[string]int{
 			operator: int(queryData),
 		},
 	}
 }
 
-func (o QueryParameterBuilder) intOrStringOrFloatInCmp(operator string) RestrictionEditorFunc {
+func (o QueryParameterBuilder) intOrFloatOrStringInCmp(operator string) RestrictionEditorFunc {
 	return func(queryParameter QueryParameter, value string) map[string]interface{} {
-		return o.intOrStringOrFloatInOperator(queryParameter, value, operator)
+		return o.intOrFloatOrStringInOperator(queryParameter, value, operator)
 	}
 }
 
-func (o QueryParameterBuilder) intOrStringOrFloatInOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
-	valueLi := strings.Split(value, ",")
+func (o QueryParameterBuilder) intOrFloatOrStringInOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
 	resultLi := []map[string]interface{}{}
 
-	resultLi = append(resultLi, map[string]interface{}{
-		o.getQueryName(queryParameter): map[string]interface{}{
-			operator: valueLi,
-		},
-	})
+	resultLi = append(resultLi, o.stringInOperator(queryParameter, value, operator))
+
+	intOrFloatInMap := o.intOrFloatInOperator(queryParameter, value, operator)
+	if intOrFloatInMap["$or"] != nil {
+		intOrFloatInResultLi := intOrFloatInMap["$or"]
+		array := intOrFloatInResultLi.([]map[string]interface{})
+		for _, intOrFloatInResult := range array {
+			resultLi = append(resultLi, intOrFloatInResult)
+		}
+	} else {
+		resultLi = append(resultLi, intOrFloatInMap)
+	}
+
+	if len(resultLi) == 1 {
+		return resultLi[0]
+	}
+	return map[string]interface{}{
+		"$or": resultLi,
+	}
+}
+
+func (o QueryParameterBuilder) intOrFloatInCmp(operator string) RestrictionEditorFunc {
+	return func(queryParameter QueryParameter, value string) map[string]interface{} {
+		return o.intOrFloatInOperator(queryParameter, value, operator)
+	}
+}
+
+func (o QueryParameterBuilder) intOrFloatInOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
+	valueLi := strings.Split(value, ",")
+	resultLi := []map[string]interface{}{}
 
 	intValueLi := []int{}
 	for _, valueItem := range valueLi {
@@ -287,7 +324,7 @@ func (o QueryParameterBuilder) intOrStringOrFloatInOperator(queryParameter Query
 
 	if len(intValueLi) > 0 {
 		resultLi = append(resultLi, map[string]interface{}{
-			o.getQueryName(queryParameter): map[string]interface{}{
+			o.GetQueryName(queryParameter): map[string]interface{}{
 				operator: intValueLi,
 			},
 		})
@@ -303,7 +340,7 @@ func (o QueryParameterBuilder) intOrStringOrFloatInOperator(queryParameter Query
 
 	if len(floatValueLi) > 0 {
 		resultLi = append(resultLi, map[string]interface{}{
-			o.getQueryName(queryParameter): map[string]interface{}{
+			o.GetQueryName(queryParameter): map[string]interface{}{
 				operator: floatValueLi,
 			},
 		})
@@ -317,6 +354,22 @@ func (o QueryParameterBuilder) intOrStringOrFloatInOperator(queryParameter Query
 	}
 }
 
+func (o QueryParameterBuilder) stringInCmp(operator string) RestrictionEditorFunc {
+	return func(queryParameter QueryParameter, value string) map[string]interface{} {
+		return o.stringInOperator(queryParameter, value, operator)
+	}
+}
+
+func (o QueryParameterBuilder) stringInOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
+	valueLi := strings.Split(value, ",")
+
+	return map[string]interface{}{
+		o.GetQueryName(queryParameter): map[string]interface{}{
+			operator: valueLi,
+		},
+	}
+}
+
 func (o QueryParameterBuilder) existNotExistCmp(isExist bool) RestrictionEditorFunc {
 	return func(queryParameter QueryParameter, value string) map[string]interface{} {
 		return o.existNotExistOperator(queryParameter, isExist)
@@ -325,7 +378,7 @@ func (o QueryParameterBuilder) existNotExistCmp(isExist bool) RestrictionEditorF
 
 func (o QueryParameterBuilder) existNotExistOperator(queryParameter QueryParameter, isExist bool) map[string]interface{} {
 	return map[string]interface{}{
-		o.getQueryName(queryParameter): map[string]bool{
+		o.GetQueryName(queryParameter): map[string]bool{
 			"$exists": isExist,
 		},
 	}
@@ -350,13 +403,13 @@ func (o QueryParameterBuilder) regexpOperator(queryParameter QueryParameter, val
 	switch queryParameter.Restriction {
 	case "like", "left_like", "right_like":
 		return map[string]interface{}{
-			o.getQueryName(queryParameter): map[string]string{
+			o.GetQueryName(queryParameter): map[string]string{
 				operator: regex,
 			},
 		}
 	case "not_like", "not_left_like", "not_right_like":
 		return map[string]interface{}{
-			o.getQueryName(queryParameter): map[string]map[string]string{
+			o.GetQueryName(queryParameter): map[string]map[string]string{
 				"$not": map[string]string{
 					operator: regex,
 				},
@@ -366,7 +419,7 @@ func (o QueryParameterBuilder) regexpOperator(queryParameter QueryParameter, val
 	panic("input queryParameter.Editor:" + queryParameter.Editor + ", must be one of 'like', 'left_like', 'right_like', 'not_like', 'not_left_like', 'not_left_like'")
 }
 
-func (o QueryParameterBuilder) getQueryName(queryParameter QueryParameter) string {
+func (o QueryParameterBuilder) GetQueryName(queryParameter QueryParameter) string {
 	if queryParameter.ColumnName != "" {
 		return queryParameter.ColumnName
 	}

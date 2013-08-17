@@ -27,8 +27,8 @@
 	<security functionId="10018"></security>
 
 	<data-provider size="10">
-		<collection>Person</collection><!-- mongoDB collection name -->
-		<fix-bson-query>{"age": {"$gte": 20}}</fix-bson-query><!-- mongoDB fix query, json format -->
+		<collection>SysUser</collection><!-- mongoDB collection name -->
+		<fix-bson-query>{"_id": {"$gte": 15}}</fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->

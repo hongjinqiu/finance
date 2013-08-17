@@ -29,25 +29,19 @@ func (qb QuerySupport) Find(collection string, query string) (result map[string]
 	return result, true
 }
 
-func (qb QuerySupport) Index(collection string, query string, pageNo int, pageSize int) (result map[string]interface{}) {
+func (qb QuerySupport) Index(collection string, query map[string]interface{}, pageNo int, pageSize int) (result map[string]interface{}) {
 	session, db := MongoDBFactory.GetConnection()
 	defer session.Close()
 
 	c := db.C(collection)
 
-	queryMap := map[string]interface{}{}
-	err := json.Unmarshal([]byte(query), &queryMap)
-	if err != nil {
-		panic(err)
-	}
-
 	items := []interface{}{}
-	err = c.Find(queryMap).Limit(pageSize).Skip(pageNo).All(&items)
+	err := c.Find(query).Limit(pageSize).Skip(pageNo).All(&items)
 	if err != nil {
 		panic(err)
 	}
 
-	totalResults, err := c.Find(queryMap).Count()
+	totalResults, err := c.Find(query).Count()
 	if err != nil {
 		panic(err)
 	}

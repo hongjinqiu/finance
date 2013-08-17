@@ -1,30 +1,43 @@
 package component
 
-import ()
+import (
+	"encoding/json"
+)
 
 type TemplateManager struct{}
 
-func (qb QuerySupport) QueryDataForListTemplate(listTemplate *ListTemplate, paramMap map[string]string) map[string]interface{} {
+func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
+	queryMap := map[string]interface{}{}
+	
 	collection := listTemplate.DataProvider.Collection
 	fixBsonQuery := listTemplate.DataProvider.FixBsonQuery
+	
+	fixBsonQueryMap := map[string]interface{}{}
+	err := json.Unmarshal([]byte(fixBsonQuery), &fixBsonQueryMap)
+	if err != nil {
+		panic(err)
+	}
+	
+	for k,v := range fixBsonQueryMap {
+		queryMap[k] = v
+	}
+	
 	queryParameters := listTemplate.QueryParameterGroup.QueryParameterLi
+	queryParameterBuilder := QueryParameterBuilder{}
 	for _, queryParameter := range queryParameters {
-		if queryParameter.Restriction == "" {
-
+		if queryParameter.Editor != "" && queryParameter.Restriction != "" {
+			name := queryParameterBuilder.GetQueryName(queryParameter)
+			if paramMap[name] != "" {
+				queryParameterMap := queryParameterBuilder.buildQuery(queryParameter, paramMap[name])
+				for k,v := range queryParameterMap {
+					queryMap[k] = v
+				}
+			}
 		}
 	}
 
 	querySupport := QuerySupport{}
-	query := fixBsonQuery
-	pageNo := 1
-	pageSize := 10
-	return querySupport.Index(collection, query, pageNo, pageSize)
+	return querySupport.Index(collection, queryMap, pageNo, pageSize)
 }
 
-func (qb QuerySupport) buildQueryForQueryParameter(queryParameter QueryParameter, paramMap map[string]string) map[string]interface{} {
-	queryParameterBuilder := QueryParameterBuilder{}
-	return queryParameterBuilder.buildQuery(queryParameter, paramMap[queryParameter.Name])// queryParameter.ColumnName
-}
 
-func (qb QuerySupport) BuildQuery(listTemplate ListTemplate) {
-}
