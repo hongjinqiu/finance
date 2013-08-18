@@ -2,12 +2,14 @@ package component
 
 import (
 	"encoding/json"
+	"log"
 )
 
 type TemplateManager struct{}
 
 func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	queryMap := map[string]interface{}{}
+	queryLi := []map[string]interface{}{}
 	
 	collection := listTemplate.DataProvider.Collection
 	fixBsonQuery := listTemplate.DataProvider.FixBsonQuery
@@ -17,26 +19,27 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	if err != nil {
 		panic(err)
 	}
-	
-	for k,v := range fixBsonQueryMap {
-		queryMap[k] = v
-	}
+
+	queryLi = append(queryLi, fixBsonQueryMap)	
 	
 	queryParameters := listTemplate.QueryParameterGroup.QueryParameterLi
 	queryParameterBuilder := QueryParameterBuilder{}
 	for _, queryParameter := range queryParameters {
 		if queryParameter.Editor != "" && queryParameter.Restriction != "" {
-			name := queryParameterBuilder.GetQueryName(queryParameter)
+			name := queryParameter.Name
 			if paramMap[name] != "" {
 				queryParameterMap := queryParameterBuilder.buildQuery(queryParameter, paramMap[name])
-				for k,v := range queryParameterMap {
-					queryMap[k] = v
-				}
+				queryLi = append(queryLi, queryParameterMap)
 			}
 		}
 	}
 
 	querySupport := QuerySupport{}
+	queryMap["$and"] = queryLi
+
+	queryByte, err := json.MarshalIndent(queryMap, "", "\t")
+	log.Println("QueryDataForListTemplate,query is:" + string(queryByte))
+
 	return querySupport.Index(collection, queryMap, pageNo, pageSize)
 }
 

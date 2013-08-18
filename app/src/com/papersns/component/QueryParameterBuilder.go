@@ -156,6 +156,10 @@ func (o QueryParameterBuilder) intOrFloatOperator(queryParameter QueryParameter,
 		}
 	}
 
+	if len(resultLi) == 1 {
+		return resultLi[0]
+	}
+
 	floatValue, err := strconv.ParseFloat(value, 32)
 	if err == nil {
 		if operator == "$eq" {
@@ -169,6 +173,10 @@ func (o QueryParameterBuilder) intOrFloatOperator(queryParameter QueryParameter,
 				},
 			})
 		}
+	}
+
+	if len(resultLi) == 0 {
+		return map[string]interface{}{}
 	}
 
 	if len(resultLi) == 1 {
@@ -198,7 +206,13 @@ func (o QueryParameterBuilder) intOrFloatOrStringOperator(queryParameter QueryPa
 			resultLi = append(resultLi, intOrFloatResult)
 		}
 	} else {
-		resultLi = append(resultLi, intOrFloatMap)
+		if len(intOrFloatMap) > 0 {
+			resultLi = append(resultLi, intOrFloatMap)
+		}
+	}
+
+	if len(resultLi) == 0 {
+		return map[string]interface{}{}
 	}
 
 	if len(resultLi) == 1 {
@@ -251,27 +265,41 @@ func (o QueryParameterBuilder) dateOperator(queryParameter QueryParameter, value
 			queryFormat = parameterAttribute.Value
 		}
 	}
+	inFormat = o.replaceDateFormat(inFormat)
+	queryFormat = o.replaceDateFormat(queryFormat)
+
 	t, err := time.Parse(inFormat, value)
 	if err != nil {
 		panic(err)
 	}
 
 	queryDataStr := t.Format(queryFormat)
-	queryData, err := strconv.ParseInt(queryDataStr, 10, 0)
+	queryData, err := strconv.ParseInt(queryDataStr, 10, 64)
 	if err != nil {
 		panic(err)
 	}
 
 	if operator == "$eq" {
 		return map[string]interface{}{
-			o.GetQueryName(queryParameter): int(queryData),
+			o.GetQueryName(queryParameter): queryData,
 		}
 	}
 	return map[string]interface{}{
-		o.GetQueryName(queryParameter): map[string]int{
-			operator: int(queryData),
+		o.GetQueryName(queryParameter): map[string]int64{
+			operator: queryData,
 		},
 	}
+}
+
+func (o QueryParameterBuilder) replaceDateFormat(dateStr string) string {
+	result := dateStr
+	result = strings.Replace(result, "yyyy", "2006", -1)
+	result = strings.Replace(result, "MM", "01", -1)
+	result = strings.Replace(result, "dd", "02", -1)
+	result = strings.Replace(result, "HH", "15", -1)
+	result = strings.Replace(result, "mm", "04", -1)
+	result = strings.Replace(result, "ss", "05", -1)
+	return result
 }
 
 func (o QueryParameterBuilder) intOrFloatOrStringInCmp(operator string) RestrictionEditorFunc {
@@ -293,12 +321,19 @@ func (o QueryParameterBuilder) intOrFloatOrStringInOperator(queryParameter Query
 			resultLi = append(resultLi, intOrFloatInResult)
 		}
 	} else {
-		resultLi = append(resultLi, intOrFloatInMap)
+		if len(intOrFloatInMap) > 0 {
+			resultLi = append(resultLi, intOrFloatInMap)
+		}
+	}
+
+	if len(resultLi) == 0 {
+		return map[string]interface{}{}
 	}
 
 	if len(resultLi) == 1 {
 		return resultLi[0]
 	}
+
 	return map[string]interface{}{
 		"$or": resultLi,
 	}
@@ -332,6 +367,11 @@ func (o QueryParameterBuilder) intOrFloatInOperator(queryParameter QueryParamete
 
 	floatValueLi := []float32{}
 	for _, valueItem := range valueLi {
+		_, err := strconv.ParseInt(valueItem, 10, 0)
+		if err == nil {
+			continue
+		}
+
 		float32Value, err := strconv.ParseFloat(valueItem, 32)
 		if err == nil {
 			floatValueLi = append(floatValueLi, float32(float32Value))
@@ -344,6 +384,10 @@ func (o QueryParameterBuilder) intOrFloatInOperator(queryParameter QueryParamete
 				operator: floatValueLi,
 			},
 		})
+	}
+
+	if len(resultLi) == 0 {
+		return map[string]interface{}{}
 	}
 
 	if len(resultLi) == 1 {
@@ -393,26 +437,24 @@ func (o QueryParameterBuilder) regexpCmp(operator string) RestrictionEditorFunc 
 func (o QueryParameterBuilder) regexpOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
 	regex := ""
 	switch queryParameter.Restriction {
-	case "like", "not_like":
-		regex = "^.*?" + value + ".*?$"
-	case "left_like", "not_left_like":
-		regex = "^" + value + ".*?$"
-	case "right_like", "not_right_like":
-		regex = "^.*?" + value + "$"
+	case "like":
+		regex = "(?i)^.*?" + value + ".*?$"
+	case "not_like":
+		regex = "(?i)^((?!" + value + ").)*$"
+	case "left_like":
+		regex = "(?i)^" + value + ".*?$"
+	case "not_left_like":
+		regex = "(?i)^((?!^" + value + ").)*$"
+	case "right_like":
+		regex = "(?i)^.*?" + value + "$"
+	case "not_right_like":
+		regex = "(?i)^((?!" + value + "$).)*$"
 	}
 	switch queryParameter.Restriction {
-	case "like", "left_like", "right_like":
+	case "like", "left_like", "right_like", "not_like", "not_left_like", "not_right_like":
 		return map[string]interface{}{
 			o.GetQueryName(queryParameter): map[string]string{
 				operator: regex,
-			},
-		}
-	case "not_like", "not_left_like", "not_right_like":
-		return map[string]interface{}{
-			o.GetQueryName(queryParameter): map[string]map[string]string{
-				"$not": map[string]string{
-					operator: regex,
-				},
 			},
 		}
 	}

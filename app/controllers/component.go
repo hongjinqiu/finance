@@ -119,7 +119,7 @@ func (c Component) SchemaTest() revel.Result {
 }
 
 func (c Component) SchemaQueryParameterTest() revel.Result {
-	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/查询示例.xml`)
+	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
@@ -144,11 +144,22 @@ func (c Component) SchemaQueryParameterTest() revel.Result {
 	// from query-parameters
 	templateManager := TemplateManager{}
 	paramMap := map[string]string{}
+	{
+		paramMap["nick"] = "abc"
+		paramMap["dept_id"] = "2"
+		paramMap["type"] = "0,1,2.5,3.5,abc"
+		paramMap["createTimeBegin"] = "2013-05-07"
+		paramMap["createTimeEnd"] = "2014-06-03"
+	}
 	pageNo := 1
 	pageSize := 10
 	queryResult := templateManager.QueryDataForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
-	
-	jsonByte,err := json.MarshalIndent(queryResult, "", "\t")
+	items := queryResult["items"].([]interface{})
+	if len(items) > 1 {
+		queryResult["items"] = items[:1]
+	}
+
+	jsonByte, err := json.MarshalIndent(queryResult, "", "\t")
 	if err != nil {
 		panic(err)
 	}
