@@ -65,6 +65,8 @@
 		<string-column name="AUDIT_STATUS" text="审核状态" bson="'{value}'" >
 			<column-attribute name="paraName" value="AUDIT_STATUS"/>
 		</string-column>
+		
+		<date-column name="nick" text="昵称" />
 	</column-model>
 
 	<query-parameters>

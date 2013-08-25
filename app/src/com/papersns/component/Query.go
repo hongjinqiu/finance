@@ -1,9 +1,9 @@
 package component
 
 import (
-	"encoding/json"
-	//	"labix.org/v2/mgo/bson"
 	. "com/papersns/mongo"
+	"encoding/json"
+	"labix.org/v2/mgo/bson"
 )
 
 type QuerySupport struct{}
@@ -36,7 +36,7 @@ func (qb QuerySupport) Index(collection string, query map[string]interface{}, pa
 	c := db.C(collection)
 
 	items := []interface{}{}
-	err := c.Find(query).Limit(pageSize).Skip(pageNo).All(&items)
+	err := c.Find(query).Limit(pageSize).Skip((pageNo - 1) * pageSize).All(&items)
 	if err != nil {
 		panic(err)
 	}
@@ -46,8 +46,17 @@ func (qb QuerySupport) Index(collection string, query map[string]interface{}, pa
 		panic(err)
 	}
 
+	mapItems := []interface{}{}
+	for _, item := range items {
+		record := item.(bson.M)
+		mapItem := map[string]interface{}{}
+		for k,v := range record {
+			mapItem[k] = v
+		}
+		mapItems = append(mapItems, mapItem)
+	}
 	return map[string]interface{}{
 		"totalResults": totalResults,
-		"items":        items,
+		"items":        mapItems,
 	}
 }
