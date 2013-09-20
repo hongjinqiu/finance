@@ -9,7 +9,7 @@ type ListTemplate struct {
 	Adapter             Adapter             `xml:"adapter"`
 	Description         string              `xml:"description"`
 	Scripts             string              `xml:"scripts"`
-	ViewTemplate        string              `xml:"view-template"`
+	ViewTemplate        ViewTemplate        `xml:"view-template"`
 	Toolbar             Toolbar             `xml:"toolbar"`
 	Security            Security            `xml:"security"`
 	DataProvider        DataProvider        `xml:"data-provider"`
@@ -20,6 +20,11 @@ type ListTemplate struct {
 type Adapter struct {
 	XMLName xml.Name `xml:"adapter"`
 	Name    string   `xml:"name,attr"`
+}
+
+type ViewTemplate struct {
+	XMLName xml.Name `xml:"view-template"`
+	View    string   `xml:"view,attr"`
 }
 
 type Toolbar struct {

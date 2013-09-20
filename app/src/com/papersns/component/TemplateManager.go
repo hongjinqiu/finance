@@ -48,8 +48,6 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 }
 
 func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTemplate, items []interface{}) []interface{} {
-//	items := queryResult["items"].([]interface{})
-
 	columnModelItems := []interface{}{}
 	expressionParser := ExpressionParser{}
 	for _, item := range items {
@@ -94,7 +92,7 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTem
 func (o TemplateManager) GetToolbarForListTemplate(listTemplate *ListTemplate) []interface{} {
 	toolbar := []interface{}{}
 
-	expressionParser := ExpressionParser{}	
+	expressionParser := ExpressionParser{}
 	for _, buttonItem := range listTemplate.Toolbar.ButtonLi {
 		button := map[string]interface{}{}
 //		button["isShow"] = expressionParser.Parse(buttonItem.Expression)
@@ -113,12 +111,23 @@ func (o TemplateManager) GetToolbarForListTemplate(listTemplate *ListTemplate) [
 func (o TemplateManager) GetBoForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	queryResult := o.QueryDataForListTemplate(listTemplate, paramMap, pageNo, pageSize)
 	items := queryResult["items"].([]interface{})
-	columnModelItems := o.GetColumnModelDataForListTemplate(listTemplate, items)
-	
-	result := map[string]interface{}{}
-	result[""] = columnModelItems
-	return result
+	bo := o.GetColumnModelDataForListTemplate(listTemplate, items)
+	return map[string]interface{}{
+		"totalResults": queryResult["totalResults"],
+		"items": bo,
+	}
 }
 
+func (o TemplateManager) GetFields(listTemplate *ListTemplate) []string {
+	fields := []string{}
+//	loopItem["isShowCheckbox"] = expressionParser.Parse(recordJson, listTemplate.ColumnModel.CheckboxColumn.Expression)
+//		loopItem["id"] = record[listTemplate.ColumnModel.IdColumn.Name]
+//		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
+	fields = append(fields, listTemplate.ColumnModel.IdColumn.Name)
+	for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
+		fields = append(fields, columnItem.Name)
+	}
+	return fields
+}
 
 

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>yui test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="http://yui.yahooapis.com/3.12.0/build/yui/yui-min.js"></script>
+<script type="text/javascript">
+	YUI_config = {
+		gallery: 'gallery-2013.09.18-18-49'
+	};
+</script>
+<script type="text/javascript">
+	YUI().use("datatable", "datasource", "datatable-scroll", "gallery-datatable-paginator", "gallery-paginator-view", function(Y) {
+		Y.on("domready", function(e) {
+			var data = [
+	            { id: "ga-3475", name: "gadget",   price: "$6.99", cost: "$5.99" },
+	            { id: "sp-9980", name: "sprocket", price: "$3.75", cost: "$3.25" },
+	            { id: "wi-0650", name: "widget",   price: "$4.25", cost: "$3.75" }
+	        ];
+
+	        var table = new Y.DataTable({
+	            columns: ["id", "name", "price"],
+	            data: data,
+
+	            // Optionally configure your table with a caption
+	            caption: "My first DataTable!",
+
+	            // and/or a summary (table attribute)
+	            summary: "Example DataTable showing basic instantiation configuration"
+	        });
+
+	        table.render("#example");
+	        
+	        var data = [
+                { id: "ga-3475", name: "gadget",   price: "$6.99", cost: "$5.99" },
+                { id: "sp-9980", name: "sprocket", price: "$3.75", cost: "$3.25" },
+                { id: "wi-0650", name: "widget",   /* missing */   cost: "$3.75" }
+            ];
+
+            var table = new Y.DataTable({
+                columns: [
+                    "id",
+                    { key: "name", label: "part name测试" },
+                    { key: "price", allowHTML: true, emptyCellValue: "<em>(not set)</em>" },
+                    "cost"
+                ],
+                data: data
+            });
+
+            table.render("#example1");
+            
+            var columns = [
+	             'username',
+	             {
+	                 // Important: Parent columns do NOT get a key...
+	
+	                 // but DO get a label
+	                 label: "Access",
+	
+	                 // Pass an array of column configurations (strings or objects) as children
+	                 children: [
+	                     'read',
+	                     'write',
+	                 ]
+	             }
+	         ];
+	
+	         var data = [
+	             { username: "root", read: true, write: true },
+	             { username: "spilgrim", read: true, write: false },
+	             { username: "fizzgig", read: false, write: false }
+	         ];
+	
+	         var table = new Y.DataTable({
+	             columns: columns,
+	             data   : data
+	         }).render("#example2");
+	         
+	      // Create a JSONP DataSource to query YQL
+	         var myDataSource = new Y.DataSource.Get({
+	             source: 'http://query.yahooapis.com/v1/public/yql?format=json&' +
+	                     'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q='
+	         });
+
+	         myDataSource.plug(Y.Plugin.DataSourceJSONSchema, {
+	                 schema: {
+	                     resultListLocator: 'query.results.Result',
+	                     resultFields: [
+	                         'Title',
+	                         'Phone',
+	                         {
+	                             // Important that record fields NOT include ".", so
+	                             // extract nested data with locators
+	                             key: 'Rating',
+	                             locator: "Rating.AverageRating"
+	                         }
+	                     ]
+	                 }
+	             })
+	             .plug(Y.Plugin.DataSourceCache, {
+	                 max: 3
+	             });
+
+	         // No data is provided at construction because it will load via the
+	         // DataTableDataSource plugin
+	         var table = new Y.DataTable({
+	             columns: ['Title', 'Phone', 'Rating'],
+	             summary: 'Pizza places near 98089',
+	             scrollable: 'y',
+	             height: "100px",
+	             width:  "95%"
+	         });
+
+	         table.plug(Y.Plugin.DataTableDataSource, {
+	             datasource: myDataSource
+	         })
+
+	         // Initially render an empty table and show a loading message
+	         table.render('#pizza')
+	              .showMessage('loadingMessage');
+
+	         // Load the data into the table
+	         table.datasource.load({
+	             request: encodeURIComponent(
+	                 'select *' +
+	                 ' from   local.search' +
+	                 ' where  zip="94089"' +
+	                 ' and    query="pizza"')
+	         });
+	         /* 
+	         */
+		});
+	});
+</script>
+
+</head>
+<body class="yui3-skin-sam">
+	<div id="example"></div>
+	<div id="example1"></div>
+	<div id="example2"></div>
+	<div id="pizza"></div>
+</body>
+</html>

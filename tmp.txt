@@ -1,14 +1,329 @@
-textfield,pass,
-textarea,pass,
-numberfield,pass,
-datefield,pass,没有 in 和 not_in,
-combo,pass,
-combotree,pass,
-displayfield,pass,
-hidden,pass,
-htmleditor,pass,
-checkbox,pass,
-checkboxgroup,pass,
-radio,pass,
-radiogroup,pass,
-trigger,finish,
+grep 3.12.0 tmp.txt | awk -F/ '{print $2}'|sort|uniq
+
+node:
+http://yui.yahooapis.com/combo?
+3.12.0/oop/oop-min.js&3.12.0/event-custom-base/event-custom-base-min.js
+3.12.0/dom-core/dom-core-min.js
+3.12.0/dom-base/dom-base-min.js
+3.12.0/selector-native/selector-native-min.js
+3.12.0/selector/selector-min.js
+3.12.0/node-core/node-core-min.js
+3.12.0/color-base/color-base-min.js
+3.12.0/dom-style/dom-style-min.js
+3.12.0/node-base/node-base-min.js
+3.12.0/event-base/event-base-min.js
+3.12.0/event-delegate/event-delegate-min.js
+3.12.0/node-event-delegate/node-event-delegate-min.js
+3.12.0/pluginhost-base/pluginhost-base-min.js
+3.12.0/pluginhost-config/pluginhost-config-min.js
+3.12.0/node-pluginhost/node-pluginhost-min.js
+3.12.0/dom-screen/dom-screen-min.js
+3.12.0/node-screen/node-screen-min.js
+3.12.0/node-style/node-style-min.js
+3.12.0/event-custom-complex/event-custom-complex-min.js
+3.12.0/event-synthetic/event-synthetic-min.js
+3.12.0/event-mousewheel/event-mousewheel-min.js
+3.12.0/event-mouseenter/event-mouseenter-min.js
+3.12.0/event-key/event-key-min.js
+
+event:
+http://yui.yahooapis.com/combo?
+3.12.0/event-focus/event-focus-min.js
+3.12.0/event-resize/event-resize-min.js
+3.12.0/event-hover/event-hover-min.js
+3.12.0/event-outside/event-outside-min.js
+3.12.0/event-touch/event-touch-min.js
+3.12.0/event-move/event-move-min.js
+3.12.0/event-flick/event-flick-min.js
+3.12.0/event-valuechange/event-valuechange-min.js
+3.12.0/event-tap/event-tap-min.js
+
+
+/home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+
+cp -R array-extras /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R array-invoke /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R arraylist /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R attribute-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R attribute-complex /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R attribute-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R attribute-extras /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R attribute-observable /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R base-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R base-build /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R base-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R base-observable /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R base-pluginhost /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R cache-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R classnamemanager /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R color-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dataschema-array /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dataschema-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dataschema-json /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dataschema-text /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dataschema-xml /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-arrayschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-cache /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-function /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-get /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-io /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-jsonschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-local /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-polling /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-textschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datasource-xmlschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-body /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-column-widths /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-datasource /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-head /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-message /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-mutable /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-scroll /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-sort /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatable-table /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-date-format /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-date-math /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-date-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-number-format /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-number-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-xml-format /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R datatype-xml-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dom-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dom-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dom-screen /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R dom-style /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R escape /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-custom-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-custom-complex /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-delegate /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-flick /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-focus /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-hover /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-key /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-mouseenter /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-mousewheel /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-move /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-outside /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-resize /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-synthetic /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-tap /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-touch /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R event-valuechange /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R intl /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R io-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R json-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R json-stringify /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R model /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R model-list /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R node-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R node-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R node-event-delegate /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R node-pluginhost /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R node-screen /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R node-style /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R oop /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R plugin /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R pluginhost-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R pluginhost-config /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R querystring-stringify-simple /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R selector /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R selector-native /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R substitute /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R view /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R widget-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R widget-htmlparser /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R widget-skin /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R widget-uievents /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+
+
+
+/home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+
+cp -rf gallery-datatable-paginator /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-dimensions /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-funcprog /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-nodelist-extras /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-nodelist-extras2 /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-node-optimizations /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-object-extras /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+cp -rf gallery-paginator-view /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
+
+
+
+
+
+
+gallery
+http://yui.yahooapis.com/combo?gallery-2013.09.18-18-49/build/gallery-layout/gallery-layout-min.js
+http://yui.yahooapis.com/combo?gallery-2013.09.18-18-49/build/gallery-layout/assets/skins/sam/gallery-layout.css
+
+http://yui.yahooapis.com/combo?
+3.12.0/oop/oop-min.js
+3.12.0/attribute-core/attribute-core-min.js
+3.12.0/event-custom-base/event-custom-base-min.js
+3.12.0/event-custom-complex/event-custom-complex-min.js
+3.12.0/attribute-observable/attribute-observable-min.js
+3.12.0/attribute-extras/attribute-extras-min.js
+3.12.0/attribute-base/attribute-base-min.js
+3.12.0/base-core/base-core-min.js
+3.12.0/base-observable/base-observable-min.js
+3.12.0/base-base/base-base-min.js
+3.12.0/pluginhost-base/pluginhost-base-min.js
+3.12.0/pluginhost-config/pluginhost-config-min.js
+3.12.0/base-pluginhost/base-pluginhost-min.js
+3.12.0/base-build/base-build-min.js
+gallery-2013.09.18-18-49/build/gallery-funcprog/gallery-funcprog-min.js
+gallery-2013.09.18-18-49/build/gallery-node-optimizations/gallery-node-optimizations-min.js
+gallery-2013.09.18-18-49/build/gallery-dimensions/gallery-dimensions-min.js
+gallery-2013.09.18-18-49/build/gallery-nodelist-extras2/gallery-nodelist-extras2-min.js
+http://yui.yahooapis.com/combo?
+3.12.0/array-extras/array-extras-min.js
+gallery-2013.09.18-18-49/build/gallery-object-extras/gallery-object-extras-min.js
+3.12.0/dom-core/dom-core-min.js
+3.12.0/dom-base/dom-base-min.js
+3.12.0/selector-native/selector-native-min.js
+3.12.0/selector/selector-min.js
+3.12.0/node-core/node-core-min.js
+3.12.0/color-base/color-base-min.js
+3.12.0/dom-style/dom-style-min.js
+3.12.0/node-base/node-base-min.js
+3.12.0/event-base/event-base-min.js
+3.12.0/node-style/node-style-min.js
+gallery-2013.09.18-18-49/build/gallery-nodelist-extras/gallery-nodelist-extras-min.js
+http://yui.yahooapis.com/combo?
+3.12.0/event-delegate/event-delegate-min.js
+3.12.0/node-event-delegate/node-event-delegate-min.js
+3.12.0/node-pluginhost/node-pluginhost-min.js
+3.12.0/dom-screen/dom-screen-min.js
+3.12.0/node-screen/node-screen-min.js
+
+http://127.0.0.1:9000/app/combo?
+yui.3.12.0/attribute-core/attribute-core-min.js
+yui.3.12.0/attribute-observable/attribute-observable-min.js
+yui.3.12.0/attribute-extras/attribute-extras-min.js
+yui.3.12.0/attribute-base/attribute-base-min.js
+yui.3.12.0/base-core/base-core-min.js
+yui.3.12.0/base-observable/base-observable-min.js
+yui.3.12.0/base-base/base-base-min.js
+yui.3.12.0/base-pluginhost/base-pluginhost-min.js
+yui.3.12.0/base-build/base-build-min.js
+gallery-2013.09.18-18-49/build/gallery-funcprog/gallery-funcprog-min.js
+gallery-2013.09.18-18-49/build/gallery-node-optimizations/gallery-node-optimizations-min.js
+gallery-2013.09.18-18-49/build/gallery-dimensions/gallery-dimensions-min.js
+gallery-2013.09.18-18-49/build/gallery-nodelist-extras2/gallery-nodelist-extras2-min.js
+
+
+
+
+
+
+
+http://yui.yahooapis.com/combo?
+3.12.0/widget-base/assets/skins/sam/widget-base.css
+3.12.0/datatable-base/assets/skins/sam/datatable-base.css
+3.12.0/datatable-message/assets/skins/sam/datatable-message.css
+3.12.0/datatable-sort/assets/skins/sam/datatable-sort.css
+3.12.0/datatable-scroll/assets/skins/sam/datatable-scroll.css
+http://yui.yahooapis.com/combo?
+3.12.0/escape/escape-min.js
+3.12.0/array-extras/array-extras-min.js
+3.12.0/array-invoke/array-invoke-min.js
+3.12.0/arraylist/arraylist-min.js
+3.12.0/oop/oop-min.js
+3.12.0/attribute-core/attribute-core-min.js
+3.12.0/event-custom-base/event-custom-base-min.js
+3.12.0/event-custom-complex/event-custom-complex-min.js
+3.12.0/attribute-observable/attribute-observable-min.js
+3.12.0/attribute-extras/attribute-extras-min.js
+3.12.0/attribute-base/attribute-base-min.js
+3.12.0/base-core/base-core-min.js
+3.12.0/base-observable/base-observable-min.js
+3.12.0/base-base/base-base-min.js
+3.12.0/base-build/base-build-min.js
+3.12.0/json-parse/json-parse-min.js
+3.12.0/model/model-min.js
+3.12.0/model-list/model-list-min.js
+3.12.0/dom-core/dom-core-min.js
+3.12.0/dom-base/dom-base-min.js
+3.12.0/selector-native/selector-native-min.js
+3.12.0/selector/selector-min.js
+3.12.0/node-core/node-core-min.js
+3.12.0/color-base/color-base-min.js
+3.12.0/dom-style/dom-style-min.js
+3.12.0/node-base/node-base-min.js
+http://yui.yahooapis.com/combo?
+3.12.0/event-base/event-base-min.js
+3.12.0/event-delegate/event-delegate-min.js
+3.12.0/node-event-delegate/node-event-delegate-min.js
+3.12.0/datatable-core/datatable-core-min.js
+3.12.0/view/view-min.js
+3.12.0/classnamemanager/classnamemanager-min.js
+3.12.0/datatable-head/datatable-head-min.js
+3.12.0/datatable-body/datatable-body-min.js
+3.12.0/datatable-table/datatable-table-min.js
+3.12.0/attribute-complex/attribute-complex-min.js
+3.12.0/pluginhost-base/pluginhost-base-min.js
+3.12.0/pluginhost-config/pluginhost-config-min.js
+3.12.0/base-pluginhost/base-pluginhost-min.js
+3.12.0/event-synthetic/event-synthetic-min.js
+3.12.0/event-focus/event-focus-min.js
+3.12.0/node-style/node-style-min.js
+3.12.0/widget-base/widget-base-min.js
+3.12.0/widget-htmlparser/widget-htmlparser-min.js
+3.12.0/widget-skin/widget-skin-min.js
+3.12.0/widget-uievents/widget-uievents-min.js
+3.12.0/datatable-base/datatable-base-min.js
+3.12.0/datatable-column-widths/datatable-column-widths-min.js
+http://yui.yahooapis.com/combo?
+3.12.0/intl/intl-min.js
+3.12.0/datatable-message/lang/datatable-message_en.js
+3.12.0/datatable-message/datatable-message-min.js
+3.12.0/datatable-mutable/datatable-mutable-min.js
+3.12.0/datatable-sort/lang/datatable-sort_en.js
+3.12.0/datatable-sort/datatable-sort-min.js
+3.12.0/datasource-local/datasource-local-min.js
+3.12.0/plugin/plugin-min.js
+3.12.0/datatable-datasource/datatable-datasource-min.js
+3.12.0/querystring-stringify-simple/querystring-stringify-simple-min.js
+3.12.0/io-base/io-base-min.js
+3.12.0/datasource-io/datasource-io-min.js
+3.12.0/datasource-get/datasource-get-min.js
+3.12.0/datasource-function/datasource-function-min.js
+3.12.0/cache-base/cache-base-min.js
+3.12.0/datasource-cache/datasource-cache-min.js
+3.12.0/dataschema-base/dataschema-base-min.js
+3.12.0/json-stringify/json-stringify-min.js
+3.12.0/dataschema-json/dataschema-json-min.js
+3.12.0/datasource-jsonschema/datasource-jsonschema-min.js
+3.12.0/datatype-xml-parse/datatype-xml-parse-min.js
+http://yui.yahooapis.com/combo?
+3.12.0/datatype-xml-format/datatype-xml-format-min.js
+3.12.0/dataschema-xml/dataschema-xml-min.js
+3.12.0/datasource-xmlschema/datasource-xmlschema-min.js
+3.12.0/dataschema-array/dataschema-array-min.js
+3.12.0/datasource-arrayschema/datasource-arrayschema-min.js
+3.12.0/dataschema-text/dataschema-text-min.js
+3.12.0/datasource-textschema/datasource-textschema-min.js
+3.12.0/datasource-polling/datasource-polling-min.js
+3.12.0/dom-screen/dom-screen-min.js
+3.12.0/datatable-scroll/datatable-scroll-min.js
+gallery-2013.09.18-18-49/build/gallery-datatable-paginator/gallery-datatable-paginator-min.js
+gallery-2013.09.18-18-49/build/gallery-paginator-view/gallery-paginator-view-min.js
+http://yui.yahooapis.com/combo?
+gallery-2013.09.18-18-49/build/gallery-paginator-view/assets/skins/sam/gallery-paginator-view.css
+http://yui.yahooapis.com/combo?
+3.12.0/substitute/substitute-min.js
+3.12.0/datatype-date-parse/datatype-date-parse-min.js
+3.12.0/datatype-date-format/lang/datatype-date-format_en-US.js
+3.12.0/datatype-date-format/datatype-date-format-min.js
+3.12.0/datatype-date-math/datatype-date-math-min.js
+3.12.0/datatype-number-parse/datatype-number-parse-min.js
+3.12.0/datatype-number-format/datatype-number-format-min.js
+
+
+
+
+

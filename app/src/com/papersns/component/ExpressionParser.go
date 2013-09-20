@@ -3,11 +3,35 @@ package component
 import (
 	"github.com/sbinet/go-python"
 	"strings"
+	"sync"
 )
 
-type ExpressionParser struct{}
+var rwlock sync.RWMutex = sync.RWMutex{}
+var flag bool = false
+var expressionMod *python.PyObject = nil
 
-func (o ExpressionParser) initEnv() {
+func getExpressionMod() *python.PyObject {
+	rwlock.RLock()
+	defer rwlock.RUnlock()
+	
+	return expressionMod
+}
+
+func isEnvInit() bool {
+	rwlock.RLock()
+	defer rwlock.RUnlock()
+	
+	return flag
+}
+
+func InitPythonEnv() {
+	rwlock.Lock()
+	defer rwlock.Unlock()
+
+	if flag {
+		return
+	}	
+	
 	err := python.Initialize()
 	if err != nil {
 		panic(err)
@@ -18,7 +42,7 @@ func (o ExpressionParser) initEnv() {
 		panic("get sys.path return nil")
 	}
 
-	path := python.PyString_FromString("/home/hongjinqiu/goworkspace/src/finance")
+	path := python.PyString_FromString("/home/hongjinqiu/goworkspace/src/finance/app/pyscript")
 	if path == nil {
 		panic("get path return nil")
 	}
@@ -28,26 +52,40 @@ func (o ExpressionParser) initEnv() {
 		panic(err)
 	}
 	
+	expressionMod = python.PyImport_ImportModule("expression")
+	if expressionMod == nil {
+		panic("get module return null")
+	}
+	
+	flag = true
 }
 
-func (o ExpressionParser) exitEnv() {
+func exitEnv() {
 	python.Finalize()
 }
+
+type ExpressionParser struct{}
 
 func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	if strings.TrimSpace(expression) == "" {
 		return true
 	}
-	
-	o.initEnv()
+	if !isEnvInit() {
+		InitPythonEnv()
+	}
+	/*
+	o.InitPythonEnv()
 	defer o.exitEnv()
 
-	mymod := python.PyImport_ImportModule("expression")
-	if mymod == nil {
+	*/
+	/*
+	expressionMod := python.PyImport_ImportModule("expression")
+	if expressionMod == nil {
 		panic("get module return null")
 	}
+	*/
 
-	strfunc := mymod.GetAttrString("trueOrFalse")
+	strfunc := getExpressionMod().GetAttrString("trueOrFalse")
 	if strfunc == nil {
 		panic("get function return null")
 	}

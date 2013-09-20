@@ -3,6 +3,7 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	. "com/papersns/component"
+//	"github.com/sbinet/go-python"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 )
 
 func init() {
+	/*
 	err := python.Initialize()
 	if err != nil {
 		panic(err)
@@ -30,6 +32,25 @@ func init() {
 	err = python.PyList_Append(sys_path, path)
 	if err != nil {
 		panic(err)
+	}
+	*/
+	revel.TemplateFuncs["gt"] = func(a int, b int) bool {
+		return a > b
+	}
+	revel.TemplateFuncs["gte"] = func(a int, b int) bool {
+		return a >= b
+	}
+	revel.TemplateFuncs["lt"] = func(a int, b int) bool {
+		return a < b
+	}
+	revel.TemplateFuncs["lte"] = func(a int, b int) bool {
+		return a <= b
+	}
+	revel.TemplateFuncs["residue"] = func(a int, b int, c int) bool {
+		return a % b == c
+	}
+	revel.TemplateFuncs["last"] = func(a int, b int) bool {
+		return a - 1 == b
 	}
 }
 
@@ -61,7 +82,7 @@ func (c Component) Schema() revel.Result {
 	// 1.query data,
 	// from data-provider
 	// from query-parameters
-
+	
 	xmlDataArray, err := xml.MarshalIndent(listTemplate, "", "\t")
 	if err != nil {
 		fmt.Printf("error: %v", err)
@@ -70,6 +91,48 @@ func (c Component) Schema() revel.Result {
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText(string(xmlDataArray))
+}
+
+func (c Component) ListTemplate() revel.Result {
+	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
+	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
+
+	listTemplate := ListTemplate{}
+	err = xml.Unmarshal(data, &listTemplate)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
+
+	// 1.toolbar bo
+	templateManager := TemplateManager{}
+	toolbarBo := templateManager.GetToolbarForListTemplate(&listTemplate)
+ 	paramMap := map[string]string{}
+ 	pageNo := 1
+ 	pageSize := 10
+	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
+	
+	fields := templateManager.GetFields(&listTemplate)
+	result := map[string]interface{}{
+		"listTemplate": listTemplate,
+		"toolbarBo": toolbarBo,
+		"dataBo": dataBo,
+		"fields": fields,
+	}
+	return c.Render(result)
+	// 1.query data,
+	// from data-provider
+	// from query-parameters
 }
 
 func (c Component) MongoTest() revel.Result {
@@ -278,3 +341,10 @@ func (c Component) GetToolbarForListTemplate() revel.Result {
 	return c.RenderText(string(jsonByte))
 }
 
+func (c Component) YUI() revel.Result {
+	return c.Render()
+}
+
+func (c Component) Layout() revel.Result {
+	return c.Render()
+}

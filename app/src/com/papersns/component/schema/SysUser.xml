@@ -18,7 +18,7 @@
 			<button-attribute name="functionId" value="50010" />
 		</button>
 
-		<button name="xx" text="导出" mode="fn" handler="doExport">
+		<button text="导出" mode="fn" handler="doExport">
 			<button-attribute name="code" value="U" />
 			<button-attribute name="functionId" value="10018" />
 		</button>
@@ -34,18 +34,23 @@
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
 	<column-model rownumber="true" bsonOrderBy="">
 		<checkbox-column hideable="true">
-			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression><!-- python language -->
+			<!-- 
+			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression>
+			 -->
+			<expression>1 == 1</expression>
+			<!-- python language -->
 		</checkbox-column>
-		<id-column name="EMPEGRESS_ID" text="编号" hideable="true" />
+		<!-- <id-column name="EMPEGRESS_ID" text="编号" hideable="true" /> -->
+		<id-column name="_id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
 				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
-					<expression>"3" != str(record.get("AUDIT_STATUS"))</expression>
+					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
 				</button>
 				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={EMPEGRESS_ID}" >
-					<expression>"13" != str(record.get("AUDIT_STATUS"))</expression>
+					<expression>1 == 1</expression>
 				</button>
 			</buttons>
 		</virtual-column>
@@ -71,8 +76,6 @@
 
 	<query-parameters>
 		<query-parameter name="nick" text="昵称" editor="textfield" restriction="eq"></query-parameter>
-
-		<!-- 
 		<query-parameter name="dept_id" text="部门" restriction="eq" editor="numberfield"></query-parameter>
 
 		<query-parameter name="type" text="类型" restriction="in"  editor="combotree">
@@ -89,6 +92,5 @@
 		</query-parameter>
 		<query-parameter name="_id" text="主键" restriction="eq" editor="hidden">
 		</query-parameter>
-		 -->
 	</query-parameters>
 </list-template>

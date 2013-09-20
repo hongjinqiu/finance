@@ -8,7 +8,7 @@
 
 	<toolbar export="true">
 		<button text="新增" mode="fn" handler="doSave" rowspan="2">
-			<expression>test_expression</expression>
+			<expression></expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
