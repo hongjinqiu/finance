@@ -4,141 +4,158 @@
 <head>
 <title>yui test</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.yui3-skin-sam .yui3-datatable-col-select {
+	text-align: center;
+}
+
+#processed {
+	margin-top: 2em;
+	border: 2px inset;
+	border-radius: 5px;
+	padding: 1em;
+	list-style: none;
+}
+</style>
 <script src="http://yui.yahooapis.com/3.12.0/build/yui/yui-min.js"></script>
 <script type="text/javascript">
-	YUI_config = {
+	/* YUI_config = {
 		gallery: 'gallery-2013.09.18-18-49'
-	};
+	}; */
 </script>
 <script type="text/javascript">
-	YUI().use("datatable", "datasource", "datatable-scroll", "gallery-datatable-paginator", "gallery-paginator-view", function(Y) {
-		Y.on("domready", function(e) {
-			var data = [
-	            { id: "ga-3475", name: "gadget",   price: "$6.99", cost: "$5.99" },
-	            { id: "sp-9980", name: "sprocket", price: "$3.75", cost: "$3.25" },
-	            { id: "wi-0650", name: "widget",   price: "$4.25", cost: "$3.75" }
-	        ];
+YUI({ filter: 'raw' }).use( "datatable-sort", "datatable-scroll", "cssbutton", function (Y) {
 
-	        var table = new Y.DataTable({
-	            columns: ["id", "name", "price"],
-	            data: data,
+    var ports = [
+        { port:20,  pname:'FTP_data',ptitle:'File Transfer Process Data' },
+        { port:21,  pname:'FTP',     ptitle:'File Transfer Process' },
+        { port:22,  pname:'SSH',     ptitle:'Secure Shell' },
+        { port:23,  pname:'TELNET',  ptitle:'Telnet remote communications' },
+        { port:25,  pname:'SMTP',    ptitle:'Simple Mail Transfer Protocol' },
+        { port:43,  pname:'WHOIS',   ptitle:'whois Identification' },
+        { port:53,  pname:'DNS',     ptitle:'Domain Name Service' },
+        { port:68,  pname:'DHCP',    ptitle:'Dynamic Host Control Protocol' },
+        { port:79,  pname:'FINGER',  ptitle:'Finger Identification' },
+        { port:80,  pname:'HTTP',    ptitle:'HyperText Transfer Protocol' },
+        { port:110, pname:'POP3',   ptitle:'Post Office Protocol v3' },
+        { port:115, pname:'SFTP',   ptitle:'Secure File Transfer Protocol' },
+        { port:119, pname:'NNTP',   ptitle:'Network New Transfer Protocol' },
+        { port:123, pname:'NTP',    ptitle:'Network Time Protocol' },
+        { port:139, pname:'NetBIOS',ptitle:'NetBIOS Communication' },
+        { port:143, pname:'IMAP',   ptitle:'Internet Message Access Protocol' },
+        { port:161, pname:'SNMP',   ptitle:'Simple Network Management Protocol' },
+        { port:194, pname:'IRC',    ptitle:'Internet Relay Chat' },
+        { port:220, pname:'IMAP3',  ptitle:'Internet Message Access Protocol v3' },
+        { port:389, pname:'LDAP',   ptitle:'Lightweight Directory Access Protocol' },
+        { port:443, pname:'SSL',    ptitle:'Secure Socket Layer' },
+        { port:445, pname:'SMB',    ptitle:'NetBIOS over TCP' },
+        { port:993, pname:'SIMAP',  ptitle:'Secure IMAP Mail' },
+        { port:995, pname:'SPOP',   ptitle:'Secure POP Mail' }
+    ];
 
-	            // Optionally configure your table with a caption
-	            caption: "My first DataTable!",
+    var table = new Y.DataTable({
+        columns : [
+            {   key:        'select',
+                allowHTML:  true, // to avoid HTML escaping
+                label:      '<input type="checkbox" class="protocol-select-all" title="Toggle ALL records"/>',
+                formatter:      '<input type="checkbox" checked/>',
+                emptyCellValue: '<input type="checkbox"/>'
+            },
+            {   key: 'port',   label: 'Port No.' },
+            {   key: 'pname',  label: 'Protocol' },
+            {   key: 'ptitle', label: 'Common Name' }
+        ],
+        data      : ports,
+        scrollable: 'y',
+        height    : '250px',
+        sortable  : ['port','pname'],
+        sortBy    : 'port',
+        recordType: ['select', 'port', 'pname', 'ptitle']
+    }).render("#dtable");
 
-	            // and/or a summary (table attribute)
-	            summary: "Example DataTable showing basic instantiation configuration"
-	        });
+    // To avoid checkbox click causing harmless error in sorting
+    // Workaround for bug #2532244
+    table.detach('*:change');
 
-	        table.render("#example");
-	        
-	        var data = [
-                { id: "ga-3475", name: "gadget",   price: "$6.99", cost: "$5.99" },
-                { id: "sp-9980", name: "sprocket", price: "$3.75", cost: "$3.25" },
-                { id: "wi-0650", name: "widget",   /* missing */   cost: "$3.75" }
-            ];
+    //----------------
+    //   "checkbox" Click listeners ...
+    //----------------
 
-            var table = new Y.DataTable({
-                columns: [
-                    "id",
-                    { key: "name", label: "part name测试" },
-                    { key: "price", allowHTML: true, emptyCellValue: "<em>(not set)</em>" },
-                    "cost"
-                ],
-                data: data
-            });
+    // Define a listener on the DT first column for each record's "checkbox",
+    //   to set the value of `select` to the checkbox setting
+    table.delegate("click", function(e){
+        // undefined to trigger the emptyCellValue
+        var checked = e.target.get('checked') || undefined;
 
-            table.render("#example1");
-            
-            var columns = [
-	             'username',
-	             {
-	                 // Important: Parent columns do NOT get a key...
-	
-	                 // but DO get a label
-	                 label: "Access",
-	
-	                 // Pass an array of column configurations (strings or objects) as children
-	                 children: [
-	                     'read',
-	                     'write',
-	                 ]
-	             }
-	         ];
-	
-	         var data = [
-	             { username: "root", read: true, write: true },
-	             { username: "spilgrim", read: true, write: false },
-	             { username: "fizzgig", read: false, write: false }
-	         ];
-	
-	         var table = new Y.DataTable({
-	             columns: columns,
-	             data   : data
-	         }).render("#example2");
-	         
-	      // Create a JSONP DataSource to query YQL
-	         var myDataSource = new Y.DataSource.Get({
-	             source: 'http://query.yahooapis.com/v1/public/yql?format=json&' +
-	                     'env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q='
-	         });
+        this.getRecord(e.target).set('select', checked);
 
-	         myDataSource.plug(Y.Plugin.DataSourceJSONSchema, {
-	                 schema: {
-	                     resultListLocator: 'query.results.Result',
-	                     resultFields: [
-	                         'Title',
-	                         'Phone',
-	                         {
-	                             // Important that record fields NOT include ".", so
-	                             // extract nested data with locators
-	                             key: 'Rating',
-	                             locator: "Rating.AverageRating"
-	                         }
-	                     ]
-	                 }
-	             })
-	             .plug(Y.Plugin.DataSourceCache, {
-	                 max: 3
-	             });
+        // Uncheck the header checkbox
+        this.get('contentBox')
+            .one('.protocol-select-all').set('checked', false);
+    }, ".yui3-datatable-data .yui3-datatable-col-select input", table);
 
-	         // No data is provided at construction because it will load via the
-	         // DataTableDataSource plugin
-	         var table = new Y.DataTable({
-	             columns: ['Title', 'Phone', 'Rating'],
-	             summary: 'Pizza places near 98089',
-	             scrollable: 'y',
-	             height: "100px",
-	             width:  "95%"
-	         });
 
-	         table.plug(Y.Plugin.DataTableDataSource, {
-	             datasource: myDataSource
-	         })
+    // Also define a listener on the single TH "checkbox" to
+    //   toggle all of the checkboxes
+    table.delegate('click', function (e) {
+        // undefined to trigger the emptyCellValue
+        var checked = e.target.get('checked') || undefined;
 
-	         // Initially render an empty table and show a loading message
-	         table.render('#pizza')
-	              .showMessage('loadingMessage');
+        // Set the selected attribute in all records in the ModelList silently
+        // to avoid each update triggering a table update
+        this.data.invoke('set', 'select', checked, { silent: true });
 
-	         // Load the data into the table
-	         table.datasource.load({
-	             request: encodeURIComponent(
-	                 'select *' +
-	                 ' from   local.search' +
-	                 ' where  zip="94089"' +
-	                 ' and    query="pizza"')
-	         });
-	         /* 
-	         */
-		});
-	});
+        // Update the table now that all records have been updated
+        this.syncUI();
+    }, '.protocol-select-all', table);
+
+    //----------------
+    //  CSS-Button click handlers ....
+    //----------------
+    function process() {
+        var ml  = table.data,
+            msg = '',
+            template = '<li>Record index = {index} Data = {port} : {pname}</li>';
+
+        ml.each(function (item, i) {
+            var data = item.getAttrs(['select', 'port', 'pname']);
+
+            if (data.select) {
+                data.index = i;
+                msg += Y.Lang.sub(template, data);
+            }
+        });
+
+        Y.one("#processed").setHTML(msg || '<li>(None)</li>');
+    }
+
+    Y.one("#btnSelected").on("click", process);
+
+    Y.one("#btnClearSelected").on("click",function () {
+        table.data.invoke('set', 'select', undefined);
+
+        // Uncheck the header checkbox
+        table.get('contentBox')
+            .one('.protocol-select-all').set('checked', false);
+
+        process();
+    });
+
+});
 </script>
 
 </head>
 <body class="yui3-skin-sam">
-	<div id="example"></div>
-	<div id="example1"></div>
-	<div id="example2"></div>
-	<div id="pizza"></div>
+	<div class="example yui3-skin-sam">
+		<!-- You need this skin class -->
+		<div id="dtable"></div>
+		<button id="btnSelected" class="yui3-button">Process Selections</button>
+		<button id="btnClearSelected" class="yui3-button">Clear Selections</button>
+
+		<h4>Processed:</h4>
+		<ul id="processed">
+			<li>(None)</li>
+		</ul>
+	</div>
 </body>
 </html>
