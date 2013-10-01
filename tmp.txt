@@ -41,115 +41,11 @@ http://yui.yahooapis.com/combo?
 
 /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
 
-cp -R array-extras /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R array-invoke /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R arraylist /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R attribute-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R attribute-complex /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R attribute-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R attribute-extras /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R attribute-observable /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R base-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R base-build /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R base-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R base-observable /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R base-pluginhost /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R cache-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R classnamemanager /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R color-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dataschema-array /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dataschema-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dataschema-json /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dataschema-text /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dataschema-xml /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-arrayschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-cache /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-function /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-get /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-io /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-jsonschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-local /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-polling /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-textschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datasource-xmlschema /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-body /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-column-widths /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-datasource /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-head /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-message /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-mutable /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-scroll /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-sort /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatable-table /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-date-format /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-date-math /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-date-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-number-format /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-number-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-xml-format /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R datatype-xml-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dom-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dom-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dom-screen /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R dom-style /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R escape /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-custom-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-custom-complex /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-delegate /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-flick /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-focus /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-hover /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-key /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-mouseenter /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-mousewheel /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-move /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-outside /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-resize /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-synthetic /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-tap /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-touch /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R event-valuechange /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R intl /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R io-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R json-parse /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R json-stringify /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R model /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R model-list /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R node-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R node-core /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R node-event-delegate /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R node-pluginhost /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R node-screen /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R node-style /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R oop /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R plugin /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R pluginhost-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R pluginhost-config /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R querystring-stringify-simple /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R selector /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R selector-native /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R substitute /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R view /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R widget-base /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R widget-htmlparser /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R widget-skin /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
-cp -R widget-uievents /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
 
 
 
 /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
 
-cp -rf gallery-datatable-paginator /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-dimensions /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-funcprog /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-nodelist-extras /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-nodelist-extras2 /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-node-optimizations /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-object-extras /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
-cp -rf gallery-paginator-view /home/hongjinqiu/goworkspace/src/finance/public/js/gallery-2013.09.18-18-49/build/
 
 
 

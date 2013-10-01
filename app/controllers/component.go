@@ -3,7 +3,7 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	. "com/papersns/component"
-//	"github.com/sbinet/go-python"
+	//	"github.com/sbinet/go-python"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -14,25 +14,25 @@ import (
 
 func init() {
 	/*
-	err := python.Initialize()
-	if err != nil {
-		panic(err)
-	}
-	
-	sys_path := python.PySys_GetObject("path")
-	if sys_path == nil {
-		panic("get sys.path return nil")
-	}
+		err := python.Initialize()
+		if err != nil {
+			panic(err)
+		}
 
-	path := python.PyString_FromString("/home/hongjinqiu/goworkspace/src/finance")
-	if path == nil {
-		panic("get path return nil")
-	}
+		sys_path := python.PySys_GetObject("path")
+		if sys_path == nil {
+			panic("get sys.path return nil")
+		}
 
-	err = python.PyList_Append(sys_path, path)
-	if err != nil {
-		panic(err)
-	}
+		path := python.PyString_FromString("/home/hongjinqiu/goworkspace/src/finance")
+		if path == nil {
+			panic("get path return nil")
+		}
+
+		err = python.PyList_Append(sys_path, path)
+		if err != nil {
+			panic(err)
+		}
 	*/
 	revel.TemplateFuncs["gt"] = func(a int, b int) bool {
 		return a > b
@@ -47,10 +47,10 @@ func init() {
 		return a <= b
 	}
 	revel.TemplateFuncs["residue"] = func(a int, b int, c int) bool {
-		return a % b == c
+		return a%b == c
 	}
 	revel.TemplateFuncs["last"] = func(a int, b int) bool {
-		return a - 1 == b
+		return a-1 == b
 	}
 }
 
@@ -82,7 +82,7 @@ func (c Component) Schema() revel.Result {
 	// 1.query data,
 	// from data-provider
 	// from query-parameters
-	
+
 	xmlDataArray, err := xml.MarshalIndent(listTemplate, "", "\t")
 	if err != nil {
 		fmt.Printf("error: %v", err)
@@ -117,17 +117,31 @@ func (c Component) ListTemplate() revel.Result {
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
 	toolbarBo := templateManager.GetToolbarForListTemplate(&listTemplate)
- 	paramMap := map[string]string{}
- 	pageNo := 1
- 	pageSize := 10
+	paramMap := map[string]string{}
+	pageNo := 1
+	pageSize := 10
 	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
+	columns := templateManager.GetColumns(&listTemplate)
+
+	columnsByte, err := json.Marshal(columns)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
+
+	dataBoByte, err := json.Marshal(dataBo)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return c.Render(err)
+	}
 	
-	fields := templateManager.GetFields(&listTemplate)
 	result := map[string]interface{}{
 		"listTemplate": listTemplate,
-		"toolbarBo": toolbarBo,
-		"dataBo": dataBo,
-		"fields": fields,
+		"toolbarBo":    toolbarBo,
+		"dataBo":       dataBo,
+		"columns":       columns,
+		"dataBoJson":   string(dataBoByte),
+		"columnsJson":   string(columnsByte),
 	}
 	return c.Render(result)
 	// 1.query data,

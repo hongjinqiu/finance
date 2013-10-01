@@ -1,161 +1,211 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-<title>yui test</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js"></script>
+<meta charset=utf-8 />
+<title>JS Bin</title>
 <style type="text/css">
-.yui3-skin-sam .yui3-datatable-col-select {
-	text-align: center;
-}
-
-#processed {
-	margin-top: 2em;
-	border: 2px inset;
-	border-radius: 5px;
-	padding: 1em;
-	list-style: none;
-}
-</style>
-<script src="http://yui.yahooapis.com/3.12.0/build/yui/yui-min.js"></script>
-<script type="text/javascript">
-	/* YUI_config = {
-		gallery: 'gallery-2013.09.18-18-49'
-	}; */
-</script>
-<script type="text/javascript">
-YUI({ filter: 'raw' }).use( "datatable-sort", "datatable-scroll", "cssbutton", function (Y) {
-
-    var ports = [
-        { port:20,  pname:'FTP_data',ptitle:'File Transfer Process Data' },
-        { port:21,  pname:'FTP',     ptitle:'File Transfer Process' },
-        { port:22,  pname:'SSH',     ptitle:'Secure Shell' },
-        { port:23,  pname:'TELNET',  ptitle:'Telnet remote communications' },
-        { port:25,  pname:'SMTP',    ptitle:'Simple Mail Transfer Protocol' },
-        { port:43,  pname:'WHOIS',   ptitle:'whois Identification' },
-        { port:53,  pname:'DNS',     ptitle:'Domain Name Service' },
-        { port:68,  pname:'DHCP',    ptitle:'Dynamic Host Control Protocol' },
-        { port:79,  pname:'FINGER',  ptitle:'Finger Identification' },
-        { port:80,  pname:'HTTP',    ptitle:'HyperText Transfer Protocol' },
-        { port:110, pname:'POP3',   ptitle:'Post Office Protocol v3' },
-        { port:115, pname:'SFTP',   ptitle:'Secure File Transfer Protocol' },
-        { port:119, pname:'NNTP',   ptitle:'Network New Transfer Protocol' },
-        { port:123, pname:'NTP',    ptitle:'Network Time Protocol' },
-        { port:139, pname:'NetBIOS',ptitle:'NetBIOS Communication' },
-        { port:143, pname:'IMAP',   ptitle:'Internet Message Access Protocol' },
-        { port:161, pname:'SNMP',   ptitle:'Simple Network Management Protocol' },
-        { port:194, pname:'IRC',    ptitle:'Internet Relay Chat' },
-        { port:220, pname:'IMAP3',  ptitle:'Internet Message Access Protocol v3' },
-        { port:389, pname:'LDAP',   ptitle:'Lightweight Directory Access Protocol' },
-        { port:443, pname:'SSL',    ptitle:'Secure Socket Layer' },
-        { port:445, pname:'SMB',    ptitle:'NetBIOS over TCP' },
-        { port:993, pname:'SIMAP',  ptitle:'Secure IMAP Mail' },
-        { port:995, pname:'SPOP',   ptitle:'Secure POP Mail' }
-    ];
-
-    var table = new Y.DataTable({
-        columns : [
-            {   key:        'select',
-                allowHTML:  true, // to avoid HTML escaping
-                label:      '<input type="checkbox" class="protocol-select-all" title="Toggle ALL records"/>',
-                formatter:      '<input type="checkbox" checked/>',
-                emptyCellValue: '<input type="checkbox"/>'
-            },
-            {   key: 'port',   label: 'Port No.' },
-            {   key: 'pname',  label: 'Protocol' },
-            {   key: 'ptitle', label: 'Common Name' }
-        ],
-        data      : ports,
-        scrollable: 'y',
-        height    : '250px',
-        sortable  : ['port','pname'],
-        sortBy    : 'port',
-        recordType: ['select', 'port', 'pname', 'ptitle']
-    }).render("#dtable");
-
-    // To avoid checkbox click causing harmless error in sorting
-    // Workaround for bug #2532244
-    table.detach('*:change');
-
-    //----------------
-    //   "checkbox" Click listeners ...
-    //----------------
-
-    // Define a listener on the DT first column for each record's "checkbox",
-    //   to set the value of `select` to the checkbox setting
-    table.delegate("click", function(e){
-        // undefined to trigger the emptyCellValue
-        var checked = e.target.get('checked') || undefined;
-
-        this.getRecord(e.target).set('select', checked);
-
-        // Uncheck the header checkbox
-        this.get('contentBox')
-            .one('.protocol-select-all').set('checked', false);
-    }, ".yui3-datatable-data .yui3-datatable-col-select input", table);
-
-
-    // Also define a listener on the single TH "checkbox" to
-    //   toggle all of the checkboxes
-    table.delegate('click', function (e) {
-        // undefined to trigger the emptyCellValue
-        var checked = e.target.get('checked') || undefined;
-
-        // Set the selected attribute in all records in the ModelList silently
-        // to avoid each update triggering a table update
-        this.data.invoke('set', 'select', checked, { silent: true });
-
-        // Update the table now that all records have been updated
-        this.syncUI();
-    }, '.protocol-select-all', table);
-
-    //----------------
-    //  CSS-Button click handlers ....
-    //----------------
-    function process() {
-        var ml  = table.data,
-            msg = '',
-            template = '<li>Record index = {index} Data = {port} : {pname}</li>';
-
-        ml.each(function (item, i) {
-            var data = item.getAttrs(['select', 'port', 'pname']);
-
-            if (data.select) {
-                data.index = i;
-                msg += Y.Lang.sub(template, data);
-            }
-        });
-
-        Y.one("#processed").setHTML(msg || '<li>(None)</li>');
+ #mystatus {
+        background-color: #aaf0ae;
+        width:50em;
+        margin-top: 20px;
     }
+</style>
+<script type="text/javascript">
+YUI({
+	   // load dt-contextmenu and dt-selection from gallery
+	   gallery: 'gallery-2013.01.16-21-05'
+	}).use( "datatable", "cssfonts", "gallery-datatable-selection", "plugin",
+	        "gallery-datatable-contextmenu",
+	         function(Y){
 
-    Y.one("#btnSelected").on("click", process);
+	    var myData =[
+	        {rid:1, rtext:"Character is Destiny.", rnum:8765.43 },
+	        {rid:2, rtext:"You must be the change you wish to see in the world.", rnum:1.23 },
+	        {rid:3, rtext:"Even if you’re on the right track, you’ll get run over if you just sit there", rnum:314.1593 },
+	        {rid:4, rtext:"A ship is safe in harbor, but that's not what ships are for.", rnum:2.718281 },
+	        {rid:5, rtext:"The real voyage of discovery consists not in seeking new lands but seeing with new eyes.", rnum:4 },
+	        {rid:6, rtext:"Always forgive your enemies; nothing annoys them so much.", rnum:172.09 }
+	    ];
 
-    Y.one("#btnClearSelected").on("click",function () {
-        table.data.invoke('set', 'select', undefined);
+	    var randomQ = [
+	      "Ooohh, a woman! Woo-woo-woo-woo-woo-woo!!!",
+	      "Remind me to kill you later. I'll make a note of it...",
+	      "I got an uncle in Cairo. He's a cairo-practor.",
+	      "Oh... a simple job for simple people.",
+	      "Hey Moe! I think we made da wrong toin!"
+	    ];
 
-        // Uncheck the header checkbox
-        table.get('contentBox')
-            .one('.protocol-select-all').set('checked', false);
+	    var recindex = 10.1;
 
-        process();
-    });
+	//
+	//  Create the DataTable
+	//
+	    var dt = new Y.DataTable({
+	        columns: [ 'rid', 'rtext', 'rnum' ],
+	        data:    myData,
+	        sortable: true,
+	        width:   '700px',
+	        // use gallery-datatable-selection to highlight rows
+	        highlightMode: 'row'
+	    });
+	    dt.render('#tablediv');
 
-});
+	   //
+	   //  Add the plugin to this DT instance, one on the TBODY the other on the THEAD
+	   //
+	   dt.plug(Y.Plugin.DataTableContextMenu,{
+	        tbodyMenu:{
+	            menuItems: [
+	                {label:"Update",        value:"u"},
+	                {label:"Insert Before", value:"i"},
+	                {label:"Insert After",  value:"a"},
+	                {label:"<hr/>",         value:null},
+	                {label:"Delete Record", value:"d"},
+	                {label:"Destroy Cmenu", value:"dc"}
+	            ],
+	            after:{
+	               'selectedMenuChange': tdMenuChange
+	            }
+	        },
+
+	        theadMenu:{
+	            menuItems:  [ "Sort A-Z",  "Sort Z-A",  "Hide" ],
+	            after: {
+	               'selectedMenuChange': thMenuSelect
+	            }
+	        }
+	    });
+
+	//
+	//  Define custom handlers for the context menu selections ....
+//	    See http://stlsmiths.github.com/new-gallery/classes/Y.ContextMenuView.html#attr_selectedMenu for the event signature
+	//
+	    function thMenuSelect(e) {
+	        var th    = this.get('contextTarget'),
+	            coln  = th.getData('yui3-col-id'),
+	            col   = dt.getColumn(coln),
+	            mindx = +(e.newVal.menuIndex);
+
+	        if( coln && col && mindx!==null) {
+	            switch(mindx){
+	                case 0:
+	                    sortO = {};
+	                    sortO[coln] = 'asc';
+	                    //dt.sort(sortO);
+	                    dt.set('sortBy',sortO);
+	                    break;
+	                case 1:
+	                    sortO = {};
+	                    sortO[coln] = 'desc';
+	                    dt.sort(sortO);
+	                    break;
+	                case 2:
+	                    dt.removeColumn(col);
+	            }
+	        }
+	    }
+
+	    function tdMenuChange(e){
+	        var tr    = this.get('contextTarget'),
+	            rowid = this.get('contextTarget').get('id'),
+	            menu  = e.newVal.menuItem.label || e.newVal.menuItem,
+	            mval  = e.newVal.menuItem.value;
+
+	        updateStatus("context target TR=[" + rowid + "]  menu choice=[" + menu + "], index=" + e.newVal.menuIndex );
+
+	        var msg;
+	        var rec   = dt.getRecord(tr),
+	            recNo = dt.data.indexOf(rec) + 1;
+
+	        if (!mval) return;
+	        switch(mval) {
+
+	            case "u":
+	                msg = "Updating record No. " + recNo;
+	                msg = null;
+	                rqi = Math.floor(Math.random()*randomQ.length);
+	                dt.modifyRow(rec,{rtext: "UPDATED: "+randomQ[rqi]});
+	                break;
+
+	            case "i":
+	                msg = "Inserting new record before " + recNo;
+	                msg = null;
+	                rqi = Math.floor(Math.random()*randomQ.length);
+	                dt.addRow({
+	                    rid:    recindex++,
+	                    rtext:  "INSERT: "+randomQ[rqi],
+	                    rnum:   Math.random()*1000 - 300.0
+	                    },{index:recNo-1}
+	                );
+	                break;
+
+	            case "a":
+	                msg = "Inserting new record after " + recNo;
+	                msg = null;
+	                rqi = Math.floor(Math.random()*randomQ.length);
+	                dt.addRow({
+	                    rid:    recindex++,
+	                    rtext:  "INSERT: "+randomQ[rqi],
+	                    rnum:   Math.random()*1000 - 300.0
+	                    },{index:recNo}
+	                );
+	                break;
+
+	            case "d":
+	                msg = null;
+	                if (confirm("Are you sure you want to delete this record?") === true) {
+	                    dt.removeRow(rec);
+	                    msg = "Deleted record No. " + recNo;
+	                }
+	                break;
+
+	            case "dc":
+	                if(confirm("You are about to disable this ContextMeny, are you sure=?")){
+	                    cmenu.destroy();
+	                    msg = "ContextMenu was destroyed!";
+	                }
+	        }
+	        if (msg) alert(msg);
+
+	    }
+
+	    //dt.render('#tablediv');
+
+	//
+	//  Define a utility function for updating status and adding two different contextmenus
+	//
+	    function updateStatus(msg){
+	        var dstatus = Y.one("#mystatus");
+	        dstatus.setHTML(dstatus.getHTML()+'<br/>'+msg);
+	    }
+
+	});
 </script>
-
 </head>
 <body class="yui3-skin-sam">
-	<div class="example yui3-skin-sam">
-		<!-- You need this skin class -->
-		<div id="dtable"></div>
-		<button id="btnSelected" class="yui3-button">Process Selections</button>
-		<button id="btnClearSelected" class="yui3-button">Clear Selections</button>
-
-		<h4>Processed:</h4>
-		<ul id="processed">
-			<li>(None)</li>
-		</ul>
+  <h3>YUI 3 DataTable - Context Menu</h3>
+  
+	<div class="ba_intro">
+        Demonstrates a basic context menu (right-click activated) setup on a DataTable instance.
+        <br/>Two separate context menus are demonstrated; one on the table body (TBODY) and another on the "header" (THEAD).
 	</div>
+
+	<div class="ba_content">
+		<div id="tablediv"></div>
+        <div id="mystatus"><b>Status:</b></div>
+	</div>
+
+
+	<div class="ba_remarks">
+        Notes:
+        <ul class="ba_list">
+            <li>This example uses a YUI Gallery plugin called <a href="http://yuilibrary.com/gallery/show/datatable-contextmenu" target="_blank">Y.Plugin.DataTableContextMenu</a> to easily setup a <a href="http://yuilibrary.com/gallery/show/contextmenu-view" target="_blank">Gallery ContextMenu-View</a> class on a Datatable.</li>
+            <li>The plugin can be configured to setup different contextmenus on either the THEAD, TBODY or TFOOT portions of a DataTable.</li>
+            <li>Events are fired with the "contextMenu" is displayed and hidden or when a context menu choice is clicked (as "selectedMenu").</li>
+            <li>When a "selectedMenuChange" event fires (see <a href="http://stlsmiths.github.com/new-gallery/classes/Y.ContextMenuView.html#attr_selectedMenu" target="_blank">Y.ContextMenuView ATTR selectedMenu</a>) it includes a reference to the original "menu" array.</li>
+        </ul>
+	</div>
+
 </body>
 </html>

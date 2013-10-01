@@ -95,13 +95,13 @@ func (o TemplateManager) GetToolbarForListTemplate(listTemplate *ListTemplate) [
 	expressionParser := ExpressionParser{}
 	for _, buttonItem := range listTemplate.Toolbar.ButtonLi {
 		button := map[string]interface{}{}
-//		button["isShow"] = expressionParser.Parse(buttonItem.Expression)
+		//		button["isShow"] = expressionParser.Parse(buttonItem.Expression)
 		expression := buttonItem.Expression
 		expression = ""
 		button["isShow"] = expressionParser.Parse("", expression)
 		toolbar = append(toolbar, button)
 	}
-	
+
 	return toolbar
 }
 
@@ -114,20 +114,19 @@ func (o TemplateManager) GetBoForListTemplate(listTemplate *ListTemplate, paramM
 	bo := o.GetColumnModelDataForListTemplate(listTemplate, items)
 	return map[string]interface{}{
 		"totalResults": queryResult["totalResults"],
-		"items": bo,
+		"items":        bo,
 	}
 }
 
-func (o TemplateManager) GetFields(listTemplate *ListTemplate) []string {
+func (o TemplateManager) GetColumns(listTemplate *ListTemplate) []string {
 	fields := []string{}
-//	loopItem["isShowCheckbox"] = expressionParser.Parse(recordJson, listTemplate.ColumnModel.CheckboxColumn.Expression)
-//		loopItem["id"] = record[listTemplate.ColumnModel.IdColumn.Name]
-//		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
+	//	loopItem["isShowCheckbox"] = expressionParser.Parse(recordJson, listTemplate.ColumnModel.CheckboxColumn.Expression)
+	//		loopItem["id"] = record[listTemplate.ColumnModel.IdColumn.Name]
+	//		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
 	fields = append(fields, listTemplate.ColumnModel.IdColumn.Name)
 	for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
+		//		fields = append(fields, columnItem.Name)
 		fields = append(fields, columnItem.Name)
 	}
 	return fields
 }
-
-

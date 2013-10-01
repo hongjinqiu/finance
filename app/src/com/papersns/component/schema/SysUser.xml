@@ -54,6 +54,7 @@
 				</button>
 			</buttons>
 		</virtual-column>
+		<string-column name="nick" text="昵称" />
 		<string-column name="CREATE_UNIT" text="创建单位" hideable="true" />
 		<string-column name="CREATE_BY" text="创建单位" hideable="true" />
 
@@ -71,7 +72,6 @@
 			<column-attribute name="paraName" value="AUDIT_STATUS"/>
 		</string-column>
 		
-		<date-column name="nick" text="昵称" />
 	</column-model>
 
 	<query-parameters>
