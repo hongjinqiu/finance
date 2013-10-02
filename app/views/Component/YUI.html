@@ -1,211 +1,248 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js"></script>
-<meta charset=utf-8 />
-<title>JS Bin</title>
-<style type="text/css">
- #mystatus {
-        background-color: #aaf0ae;
-        width:50em;
-        margin-top: 20px;
-    }
-</style>
-<script type="text/javascript">
-YUI({
-	   // load dt-contextmenu and dt-selection from gallery
-	   gallery: 'gallery-2013.01.16-21-05'
-	}).use( "datatable", "cssfonts", "gallery-datatable-selection", "plugin",
-	        "gallery-datatable-contextmenu",
-	         function(Y){
+	<title>YUI 3.6 DT Paginator Combo</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-	    var myData =[
-	        {rid:1, rtext:"Character is Destiny.", rnum:8765.43 },
-	        {rid:2, rtext:"You must be the change you wish to see in the world.", rnum:1.23 },
-	        {rid:3, rtext:"Even if you’re on the right track, you’ll get run over if you just sit there", rnum:314.1593 },
-	        {rid:4, rtext:"A ship is safe in harbor, but that's not what ships are for.", rnum:2.718281 },
-	        {rid:5, rtext:"The real voyage of discovery consists not in seeking new lands but seeing with new eyes.", rnum:4 },
-	        {rid:6, rtext:"Always forgive your enemies; nothing annoys them so much.", rnum:172.09 }
-	    ];
+	<!-- <link href="ba_example.css" rel="stylesheet" type="text/css" />
+    <link href="google-code-prettify/prettify.css" rel="stylesheet" type="text/css" /> -->
+    
 
-	    var randomQ = [
-	      "Ooohh, a woman! Woo-woo-woo-woo-woo-woo!!!",
-	      "Remind me to kill you later. I'll make a note of it...",
-	      "I got an uncle in Cairo. He's a cairo-practor.",
-	      "Oh... a simple job for simple people.",
-	      "Hey Moe! I think we made da wrong toin!"
-	    ];
+    <style type="text/css">
+    /*  CSS for Table A's Paginator View container - A "button" type view  */
 
-	    var recindex = 10.1;
+        #pagContA .yui3-button {
+             font-size:  13px;
+             height:     28px;
+             width:      auto;
+             color:      black;
+             text-decoration: none;
+             margin-bottom: 10px;
+         }
 
-	//
-	//  Create the DataTable
-	//
-	    var dt = new Y.DataTable({
-	        columns: [ 'rid', 'rtext', 'rnum' ],
-	        data:    myData,
-	        sortable: true,
-	        width:   '700px',
-	        // use gallery-datatable-selection to highlight rows
-	        highlightMode: 'row'
-	    });
-	    dt.render('#tablediv');
+    /*  CSS for Table B's Paginator View container - a default view, just for spacing */
 
-	   //
-	   //  Add the plugin to this DT instance, one on the TBODY the other on the THEAD
-	   //
-	   dt.plug(Y.Plugin.DataTableContextMenu,{
-	        tbodyMenu:{
-	            menuItems: [
-	                {label:"Update",        value:"u"},
-	                {label:"Insert Before", value:"i"},
-	                {label:"Insert After",  value:"a"},
-	                {label:"<hr/>",         value:null},
-	                {label:"Delete Record", value:"d"},
-	                {label:"Destroy Cmenu", value:"dc"}
-	            ],
-	            after:{
-	               'selectedMenuChange': tdMenuChange
-	            }
-	        },
+        #pagContB {
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
 
-	        theadMenu:{
-	            menuItems:  [ "Sort A-Z",  "Sort Z-A",  "Hide" ],
-	            after: {
-	               'selectedMenuChange': thMenuSelect
-	            }
-	        }
-	    });
+    /*  CSS for Table C's Paginator View container - A "bar" type view */
+        #pagContC {
+            font-size:  12px;
+            vertical-align: middle;
+            padding:    4px 0;
+        }
 
-	//
-	//  Define custom handlers for the context menu selections ....
-//	    See http://stlsmiths.github.com/new-gallery/classes/Y.ContextMenuView.html#attr_selectedMenu for the event signature
-	//
-	    function thMenuSelect(e) {
-	        var th    = this.get('contextTarget'),
-	            coln  = th.getData('yui3-col-id'),
-	            col   = dt.getColumn(coln),
-	            mindx = +(e.newVal.menuIndex);
+        #pagContC img.pgControls {
+            width:  auto;
+            height: 12px;
+            padding: 0 4px 0 4px;
+            border: none;
+            vertical-align: middle;
+            cursor: pointer;
+        }
 
-	        if( coln && col && mindx!==null) {
-	            switch(mindx){
-	                case 0:
-	                    sortO = {};
-	                    sortO[coln] = 'asc';
-	                    //dt.sort(sortO);
-	                    dt.set('sortBy',sortO);
-	                    break;
-	                case 1:
-	                    sortO = {};
-	                    sortO[coln] = 'desc';
-	                    dt.sort(sortO);
-	                    break;
-	                case 2:
-	                    dt.removeColumn(col);
-	            }
-	        }
-	    }
+        #pagContC img.yui3-pagview-disabled {
+            cursor: default;
+        }
+    </style>
+    <script src="http://yui.yahooapis.com/3.11.0pr1/build/yui/yui-min.js"></script>
+    <script type="text/javascript">
+    YUI({
+        gallery: 'gallery-2013.01.16-21-05'
+    }).use( 'datatable-sort', 'datatable-scroll', 'cssfonts', 'cssbutton',  'dataschema-json',
+            'datatable-datasource', 'datasource-io',  "datasource-jsonschema",
+            'model-sync-rest',  "gallery-datatable-paginator", 'gallery-paginator-view',
+            function(Y) {
 
-	    function tdMenuChange(e){
-	        var tr    = this.get('contextTarget'),
-	            rowid = this.get('contextTarget').get('id'),
-	            menu  = e.newVal.menuItem.label || e.newVal.menuItem,
-	            mval  = e.newVal.menuItem.value;
+            Y.one("body").setStyle("visibility","");
 
-	        updateStatus("context target TR=[" + rowid + "]  menu choice=[" + menu + "], index=" + e.newVal.menuIndex );
+    //============================================================================================
+//        Table C - ModelSync.REST with serverPaginationMap
+    //============================================================================================
 
-	        var msg;
-	        var rec   = dt.getRecord(tr),
-	            recNo = dt.data.indexOf(rec) + 1;
 
-	        if (!mval) return;
-	        switch(mval) {
+    //
+    //  Define a custom Model and ModelList for my music data ...
+    //
+        Music = Y.Base.create('recmusic', Y.Model, [],{},{
+            ATTRS:{
+                ma_id:{}, ma_mbid:{}, ma_artist:{}, ma_album:{}, ma_year:{}, ma_label:{}
+            }
+        });
 
-	            case "u":
-	                msg = "Updating record No. " + recNo;
-	                msg = null;
-	                rqi = Math.floor(Math.random()*randomQ.length);
-	                dt.modifyRow(rec,{rtext: "UPDATED: "+randomQ[rqi]});
-	                break;
+        // In the ModelList class extension, mixin the ModelSync.REST component to handle
+        // all server communications.
+        // Also;
+        //    (1) Override the "url" property with my custom server querystring ... including replacement tokens
+        //    (2) Define an attribute "dsSchema" which represents a schema representation to be parsed via DataSchema.
+        //    (3) Override the .parse method, to parse my server's response and store the pagination state on success
+        //
+        MusicList = Y.Base.create('musiclist', Y.ModelList,[Y.ModelSync.REST],{
 
-	            case "i":
-	                msg = "Inserting new record before " + recNo;
-	                msg = null;
-	                rqi = Math.floor(Math.random()*randomQ.length);
-	                dt.addRow({
-	                    rid:    recindex++,
-	                    rtext:  "INSERT: "+randomQ[rqi],
-	                    rnum:   Math.random()*1000 - 300.0
-	                    },{index:recNo-1}
-	                );
-	                break;
+            // url setup to handle extra passed-in options for pagination stuff ...
+            url: '/data/musicPage?currentPage={page}&pageRecords={numPageRecords}&sortBy={sortBy}',
 
-	            case "a":
-	                msg = "Inserting new record after " + recNo;
-	                msg = null;
-	                rqi = Math.floor(Math.random()*randomQ.length);
-	                dt.addRow({
-	                    rid:    recindex++,
-	                    rtext:  "INSERT: "+randomQ[rqi],
-	                    rnum:   Math.random()*1000 - 300.0
-	                    },{index:recNo}
-	                );
-	                break;
+            parseJSON: function(resp){
+                var parsed   = Y.JSON.parse(resp),
+                    results  = [],
+                    metaflds = {};
 
-	            case "d":
-	                msg = null;
-	                if (confirm("Are you sure you want to delete this record?") === true) {
-	                    dt.removeRow(rec);
-	                    msg = "Deleted record No. " + recNo;
-	                }
-	                break;
+                if ( parsed.replyCode === 200 && parsed.Results ) {
+                    metaflds.indexStart = parsed.indexStart;
+                    metaflds.pageRecs   = parsed.pageRecords;
+                    metaflds.totalRecords   = parsed.totalRecords;
+                    results = parsed.Results
+                }
 
-	            case "dc":
-	                if(confirm("You are about to disable this ContextMeny, are you sure=?")){
-	                    cmenu.destroy();
-	                    msg = "ContextMenu was destroyed!";
-	                }
-	        }
-	        if (msg) alert(msg);
+                return {resp:resp, parsed:parsed, results:results, meta:metaflds};
+            },
 
-	    }
+            parseDataSchema: function(resp){
+                var parsed = Y.DataSchema.JSON.apply( this.get('dsSchema'), resp);
+                return {resp:resp, parsed:parsed, results:parsed.results, meta:parsed.meta};
+            },
 
-	    //dt.render('#tablediv');
 
-	//
-	//  Define a utility function for updating status and adding two different contextmenus
-	//
-	    function updateStatus(msg){
-	        var dstatus = Y.one("#mystatus");
-	        dstatus.setHTML(dstatus.getHTML()+'<br/>'+msg);
-	    }
+            parse: function(resp) {
+                var parsedObj = {};
 
-	});
-</script>
+                if ( this.get('dsSchema') )
+                    parsedObj = this.parseDataSchema(resp);
+                else
+                    parsedObj = this.parseJSON(resp);
+
+            // Define my own event to fire after parsing completes .... in case I want to listen to it somewhere
+                this.fire('response',  parsedObj) ;//{resp:resp, parsed:parsed, meta:metadata, results:results});
+
+                return parsedObj.results || [] ;
+
+            }
+
+        },{
+            ATTRS:{
+
+                // Define a schema as an attribute so we can parse the response using DataSchemaJSON ...
+                dsSchema:   {}
+            }
+        });
+
+
+    //
+    //  Instantiate a new ModelList and define some columns for our DataTable
+    //
+        var myMusic = new MusicList({
+            model:      Music,
+
+            dsSchema:   {
+                resultListLocator: 'Results',
+                resultFields: [ 'ma_id', 'ma_mbid', 'ma_artist', 'ma_album', 'ma_year', 'ma_label' ],
+                metaFields: {
+                    indexStart:   'indexStart',
+                    pageRecs:     'pageRecords',
+                    totalRecords: 'totalRecords'
+                }
+            }
+        });
+
+
+        var colsC = [
+            { key: "ma_artist", label: "Artist" },
+            { key: "ma_album",  label: "Release" },
+            { key: "ma_year",   label: "Release Year", className:'align-center' },
+            { key: "ma_label",  label: "Label" }
+        ];
+
+    //
+    //  Setup a DataTable
+    //
+       var dtableC = new Y.DataTable({
+            columns:    colsC,
+            data:       myMusic,
+            scrollable: 'y',
+            sortable:   true,
+            width:      '880px',
+            height:     '265px',
+            sortBy:     [ { ma_artist:'asc'  }, { ma_year:'desc'} ],
+
+            paginator: new Y.PaginatorView({
+                model:              new Y.PaginatorModel({itemsPerPage:20}),
+                container:          '#pagContC',
+                paginatorTemplate:  '#tmpl-bar',
+                pageOptions:        [ 10, 20, 50 ]
+            }),
+
+        //
+        // "maps" Paginator.Model attributes to server querystring / returned response ...
+        //
+            serverPaginationMap: {
+                totalItems:     'totalRecords',
+                itemsPerPage:   { toServer:'numPageRecords', fromServer:'pageRecords' },
+                itemIndexStart: 'startIndex'
+            },
+
+            paginatorResize: true   // this is now a DT attribute (no longer a PaginatorView attribute)
+
+        }).render('#tableC');
+
+        // Set click handler on button to load the data ....
+        Y.one('#btnLoadC').on('click',function(e){
+            // load page 1 data ...
+            this.processPageRequest(1);
+            e.target.set('disabled',true);
+        }, dtableC);
+
+
+    });
+    </script>
 </head>
-<body class="yui3-skin-sam">
-  <h3>YUI 3 DataTable - Context Menu</h3>
-  
-	<div class="ba_intro">
-        Demonstrates a basic context menu (right-click activated) setup on a DataTable instance.
-        <br/>Two separate context menus are demonstrated; one on the table body (TBODY) and another on the "header" (THEAD).
-	</div>
 
-	<div class="ba_content">
-		<div id="tablediv"></div>
-        <div id="mystatus"><b>Status:</b></div>
-	</div>
+<body class="yui3-skin-sam" style="visibility: hidden;">
+<h4>Table A : Local "data" via JS Array:</h4>
+<div id="pagContA"></div>
+<div id="tableA"></div>
+<br/>
 
+<script type="text/x-template" id="tmpl-buttons">
+   <button data-pglink="first" class="yui3-button {pageLinkClass}" title="First Page">First</button>
+   <button data-pglink="prev" class="yui3-button {pageLinkClass}" title="Prior Page">Prev</button>
+   {pageLinks}
+   <button data-pglink="next" class="yui3-button {pageLinkClass}" title="Next Page">Next</button>
+   <button data-pglink="last" class="yui3-button {pageLinkClass}" title="Last Page">Last</button>
+</script>
 
-	<div class="ba_remarks">
-        Notes:
-        <ul class="ba_list">
-            <li>This example uses a YUI Gallery plugin called <a href="http://yuilibrary.com/gallery/show/datatable-contextmenu" target="_blank">Y.Plugin.DataTableContextMenu</a> to easily setup a <a href="http://yuilibrary.com/gallery/show/contextmenu-view" target="_blank">Gallery ContextMenu-View</a> class on a Datatable.</li>
-            <li>The plugin can be configured to setup different contextmenus on either the THEAD, TBODY or TFOOT portions of a DataTable.</li>
-            <li>Events are fired with the "contextMenu" is displayed and hidden or when a context menu choice is clicked (as "selectedMenu").</li>
-            <li>When a "selectedMenuChange" event fires (see <a href="http://stlsmiths.github.com/new-gallery/classes/Y.ContextMenuView.html#attr_selectedMenu" target="_blank">Y.ContextMenuView ATTR selectedMenu</a>) it includes a reference to the original "menu" array.</li>
-        </ul>
-	</div>
+<hr/>
 
+<h4>Table B : Remote data via DataSource.IO:</h4>
+<div id="pagContB"></div>
+<div id="tableB"></div>
+(A listing of Episodes from a popular US drama TV series ... Breaking Bad)
+<br/><br/>
+
+<hr/>
+
+<h4>Table C : Remote data via ModelSync.REST:</h4>
+<div id="tableC"></div>
+<!--  Define the Paginator Bar HTML -->
+<div id="pagContC" class="yui3-pagview-bar"></div>
+
+<br/>
+The table is initially empty, clicking the "Load" button loads the data and sets up pagination from a RESTful GET request.
+<br/><br/>
+<button id="btnLoadC" class="yui3-button">Load Table C Initial Data</button>
+<br/><br/>
+
+<!--       SCRIPT template content     -->
+<script type="text/x-template" id="tmpl-bar">
+     
+    <img src="/yui/images/glyph/glyphicons_170_step_backward.png" class="pgControls {pageLinkClass}" data-pglink="first" title="First Page" border="0" />
+    <img src="/yui/images/glyph/glyphicons_173_backTES.png" class="pgControls {pageLinkClass}" data-pglink="prev" title="Prior Page" border="0" />
+    {inputPage} of {totalPages}
+    <img src="/yui/images/glyph/glyphicons_173_play.png" class="pgControls {pageLinkClass}" data-pglink="next" title="Next Page" border="0" />
+    <img src="/yui/images/glyph/glyphicons_178_step_forward.png" class="pgControls {pageLinkClass}" data-pglink="last" title="Last Page" border="0" />
+    <span style="float:right;margin-right:50px;">Rows per Page: {selectRowsPerPage}</span>
+</script>
 </body>
+
 </html>

@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func init() {
@@ -121,32 +122,53 @@ func (c Component) ListTemplate() revel.Result {
 	pageNo := 1
 	pageSize := 10
 	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
-	columns := templateManager.GetColumns(&listTemplate)
+	dataBo["pageNo"] = 2//pageNo
+	dataBo["pageSize"] = 20//pageSize
+	
+	//	columns := templateManager.GetColumns(&listTemplate)
 
-	columnsByte, err := json.Marshal(columns)
+	//	columnsByte, err := json.Marshal(columns)
+	//	if err != nil {
+	//		fmt.Printf("error: %v", err)
+	//		return c.Render(err)
+	//	}
+
+	dataBoByte, err := json.Marshal(&dataBo)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
 
-	dataBoByte, err := json.Marshal(dataBo)
+	listTemplateByte, err := json.Marshal(&listTemplate)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
 	
-	result := map[string]interface{}{
-		"listTemplate": listTemplate,
-		"toolbarBo":    toolbarBo,
-		"dataBo":       dataBo,
-		"columns":       columns,
-		"dataBoJson":   string(dataBoByte),
-		"columnsJson":   string(columnsByte),
-	}
-	return c.Render(result)
+	format := c.Params.Get("format")
+	if (strings.ToLower(format) == "json") {
+		callback := c.Params.Get("callback")
+		if callback == "" {
+			c.Response.ContentType = "application/json; charset=utf-8"
+			return c.RenderJson(&dataBo)
+		}
+		c.Response.ContentType = "text/javascript; charset=utf-8"
+		return c.RenderText(callback + "(" + string(dataBoByte) + ");")
+	} else {
 	// 1.query data,
 	// from data-provider
 	// from query-parameters
+		result := map[string]interface{}{
+			"listTemplate": listTemplate,
+			"toolbarBo":    toolbarBo,
+	//		"dataBo":       dataBo,
+			//		"columns":       columns,
+			"dataBoJson":       string(dataBoByte),
+			"listTemplateJson": string(listTemplateByte),
+			//		"columnsJson":   string(columnsByte),
+		}
+		return c.Render(result)
+	}
 }
 
 func (c Component) MongoTest() revel.Result {

@@ -78,3 +78,45 @@ func (c App) Combo() revel.Result {
 	}
 	return c.RenderText(content)
 }
+func (c App) ComboView() revel.Result {
+	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
+	content := ""
+	for k := range c.Params.Query {
+		file, err := os.Open(path.Join(jsPath, k))
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+		
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			panic(err)
+		}
+		content += string(data) + "\n"
+	}
+
+	acceptEncoding := c.Request.Header.Get("Accept-Encoding")
+	if strings.Index(acceptEncoding, "gzip") > -1 {
+		data := bytes.Buffer{}
+		w := gzip.NewWriter(&data)
+		w.Write([]byte(content))
+		w.Close()
+
+		c.Response.Status = http.StatusOK
+		if strings.Index(c.Params.Query.Encode(), ".css") <= -1 {
+			c.Response.ContentType = "text/javascript;charset=UTF-8"
+		} else {
+			c.Response.ContentType = "text/css;charset=UTF-8"
+		}
+		c.Response.Out.Header().Set("Content-Encoding", "gzip")
+		return c.RenderText(data.String())
+	}
+
+	c.Response.Status = http.StatusOK
+	if strings.Index(c.Params.Query.Encode(), ".css") <= -1 {
+		c.Response.ContentType = "text/javascript;charset=UTF-8"
+	} else {
+		c.Response.ContentType = "text/css;charset=UTF-8"
+	}
+	return c.RenderText(content)
+}
