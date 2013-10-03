@@ -1,0 +1,41 @@
+from common.urlUtil import *
+from bson.code import Code
+
+mongoDB = getThreadLocalMongoDB()['mongoDB']
+
+map = Code('''
+function() {
+    emit(this._id, {
+        count: 1,
+        nick: this.nick
+    })
+}
+''')
+
+reduce = Code('''
+function(key, values) {
+    var count = 0;
+    values.forEach(function(item){
+        count += item.count;
+    })
+    return {
+        count: count,
+        nick: values[0].nick
+    }
+}
+''')
+
+results = mongoDB.SysUser.inline_map_reduce(map, reduce, query={'_id': {'$lt': 20}})
+print results
+
+
+[{u'_id': 11.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_1'}}, 
+{u'_id': 12.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_12'}}, 
+{u'_id': 13.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_13'}}, 
+{u'_id': 14.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_14'}}, 
+{u'_id': 15.0, u'value': {u'count': 1.0, u'nick': u'\u6d4b\u8bd515'}}, 
+{u'_id': 16.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_16'}}, 
+{u'_id': 17.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_17'}}, 
+{u'_id': 18.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_18'}}, 
+{u'_id': 19.0, u'value': {u'count': 1.0, u'nick': u'sandbox_c_19'}}]
+

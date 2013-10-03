@@ -1,0 +1,87 @@
+def userHandingStat(self, param):
+        query = {
+            'dept_id': param['dept_id'],
+            'oldResult': {'$in': ['neutral', 'bad']},
+        }
+        
+        if param.get('beginTime'):
+            query.update({'created': {'$gte': param['beginTime']}})
+        if param.get('endTime'):
+            if query.get('created'):
+                query['created'].update({'$lt': param['endTime']})
+            else:
+                query['created'] = {'$lt': param['endTime']}
+        mongoDB = getThreadLocalMongoDB()['mongoDB']
+        if param.get('nick'):
+            dealUserIdLi = [item['_id'] for item in mongoDB.SysUser.find({'dept_id': param['dept_id'], 'status': 0, 'nick': re.compile('^.*%s.*$' % (param['nick']))})]
+            query['dealUserId'] = {'$in': dealUserIdLi}
+
+        map = Code('''
+function() {
+    var allCount = 1, unDealCount = 0, dealCount = 0, modifyCount = 0, unModifyCount = 0, otherCount = 0, finishCount = 0;
+    if (this.status == 0)
+        unDealCount++;
+    if (this.status == 8)
+        dealCount++;
+    if (this.status == 1)
+        modifyCount++;
+    if (this.status == 2)
+        unModifyCount++;
+    if (this.status == 3)
+        otherCount++;
+    if (this.status == 4)
+        finishCount++;
+    emit(this.dealUserId, {
+        allCount: allCount,
+        unDealCount: unDealCount,
+        dealCount: dealCount,
+        modifyCount: modifyCount,
+        unModifyCount: unModifyCount,
+        otherCount: otherCount,
+        finishCount: finishCount,
+    });
+}
+''')
+
+        reduce = Code('''
+function(key,values) {
+    var allCount = 0, unDealCount = 0, dealCount = 0, modifyCount = 0, unModifyCount = 0, otherCount = 0, finishCount = 0;
+    values.forEach(function(item){
+        allCount += item.allCount;
+        unDealCount += item.unDealCount;
+        dealCount += item.dealCount;
+        modifyCount += item.modifyCount;
+        unModifyCount += item.unModifyCount;
+        otherCount += item.otherCount;
+        finishCount += item.finishCount;
+    });
+    return {
+        allCount: allCount,
+        unDealCount: unDealCount,
+        dealCount: dealCount,
+        modifyCount: modifyCount,
+        unModifyCount: unModifyCount,
+        otherCount: otherCount,
+        finishCount: finishCount,
+    };
+}
+''')
+        
+        collName = 'handingStat_' + getDateTimeYMDHMS(datetime.datetime.now()) + '_' + getTraceId()
+        result = mongoDB.Evaluation.map_reduce(map, reduce, collName, query=query)
+        totalResults = result.find().count()
+        items = []
+        itemsLi = result.find().sort('unDealCount', pymongo.DESCENDING).limit(param['end'] - param['begin']).skip(param['begin'])
+        for item in itemsLi:
+            if item['_id']:
+                item['value'].update({'dealUser': mongoDB.SysUser.find_one({'_id': item['_id']})})
+            else:
+                item['value'].update({'dealUser': {'nick': '未分配'}})
+            items.append(item['value'])
+        mongoDB[collName].drop()
+            
+        return {
+            'totalResults': totalResults,
+            'items': items,
+        }
+        

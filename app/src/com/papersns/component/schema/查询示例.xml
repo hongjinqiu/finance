@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	
+	<list-id>QueryDemo</list-id>
+	<selector-id>QueryDemoSelector</selector-id>
 
 	<adapter name="name_adapter" />
 	<description>员工外出申请</description>

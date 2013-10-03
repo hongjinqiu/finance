@@ -5,10 +5,6 @@
 <title>layout test</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css" />
-<!-- <link rel="stylesheet" type="text/css" href="/public/js/yui.3.12.0/cssreset/cssreset-min.css" />
-<link rel="stylesheet" type="text/css" href="/public/js/yui.3.12.0/cssfonts/cssfonts-min.css" />
-<link rel="stylesheet" type="text/css" href="/public/js/yui.3.12.0/cssbase/cssbase-min.css" />
- -->
 <style type="text/css">
 #pagContC {
     font-size:  12px;
@@ -52,47 +48,49 @@
 <body class="yui3-skin-sam">
 	<div id="queryParameters">
 		<div class="queryParameters-title">查询参数</div>
-		<div class="queryParameters-content">
-			<table>
-			{{$parameterLen := len .result.listTemplate.QueryParameterGroup.QueryParameterLi}}
-			{{range $index, $queryParameter := .result.listTemplate.QueryParameterGroup.QueryParameterLi}}
-				{{if residue $index 2 0}}
-				<tr>
-				{{end}}
-				<td>
-					{{$queryParameter.Text}}
-				</td>
-				<td>
-					<input type="text" name="{{$queryParameter.Name}}" />
-				</td>
-				{{if lte $parameterLen 2}}
-					{{if last $parameterLen $index}}
-						<td>
-							更多条件
-						</td>
-						<td>
-							<input type="button" value="查询" />
-							<input type="button" value="重置" />
-						</td>
-						</tr>
+		<form action="/component/listtemplate" method="post" name="queryForm" id="queryForm">
+			<div class="queryParameters-content">
+				<table>
+				{{$parameterLen := len .result.listTemplate.QueryParameterGroup.QueryParameterLi}}
+				{{range $index, $queryParameter := .result.listTemplate.QueryParameterGroup.QueryParameterLi}}
+					{{if residue $index 2 0}}
+					<tr>
 					{{end}}
-				{{else}}
-					{{if residue $index 2 1}}
-						{{if eq $index 1}}
-						<td>
-							更多条件
-						</td>
-						<td>
-							<input type="button" value="查询" />
-							<input type="button" value="重置" />
-						</td>
+					<td>
+						{{$queryParameter.Text}}
+					</td>
+					<td>
+						<input type="text" name="{{$queryParameter.Name}}" />
+					</td>
+					{{if lte $parameterLen 2}}
+						{{if last $parameterLen $index}}
+							<td>
+								更多条件
+							</td>
+							<td>
+								<input type="button" value="查询" id="queryBtn" />
+								<input type="button" value="重置" />
+							</td>
+							</tr>
 						{{end}}
-						</tr>
+					{{else}}
+						{{if residue $index 2 1}}
+							{{if eq $index 1}}
+							<td>
+								更多条件
+							</td>
+							<td>
+								<input type="button" value="查询" id="queryBtn" />
+								<input type="button" value="重置" />
+							</td>
+							{{end}}
+							</tr>
+						{{end}}
 					{{end}}
 				{{end}}
-			{{end}}
-			</table>
-		</div>
+				</table>
+			</div>
+		</form>
 	</div>
 	<div id="toolbar">
 		{{$toolbarBo := .result.toolbarBo}}

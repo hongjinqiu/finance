@@ -3,6 +3,7 @@ package component
 import (
 	"encoding/json"
 	"log"
+	"labix.org/v2/mgo"
 )
 
 type TemplateManager struct{}
@@ -12,6 +13,8 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	queryLi := []map[string]interface{}{}
 
 	collection := listTemplate.DataProvider.Collection
+	mapStr := listTemplate.DataProvider.Map
+	reduce := listTemplate.DataProvider.Reduce
 	fixBsonQuery := listTemplate.DataProvider.FixBsonQuery
 
 	fixBsonQueryMap := map[string]interface{}{}
@@ -36,15 +39,33 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 
 	querySupport := QuerySupport{}
 	queryMap["$and"] = queryLi
-	queryMap = queryLi[0]
+	if len(queryLi) == 1 {
+		queryMap = queryLi[0]
+	}
 
 	queryByte, err := json.MarshalIndent(queryMap, "", "\t")
 	if err != nil {
 		panic(err)
 	}
-	log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte))
-
-	return querySupport.Index(collection, queryMap, pageNo, pageSize)
+	if mapStr == "" {
+		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte))
+	
+		return querySupport.Index(collection, queryMap, pageNo, pageSize)
+	}
+	mapReduce := mgo.MapReduce{
+		Map: mapStr,
+		Reduce: reduce,
+	}
+	mapReduceLi := querySupport.MapReduceAll(collection, queryMap, mapReduce)
+	items := []interface{}{}
+	for _, item := range mapReduceLi {
+		item["id"] = item["_id"]
+		items = append(items, item)
+	}
+	return map[string]interface{}{
+		"totalResults": len(mapReduceLi),
+		"items":        items,
+	}
 }
 
 func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTemplate, items []interface{}) []interface{} {
@@ -61,6 +82,7 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTem
 		loopItem := map[string]interface{}{}
 		loopItem["isShowCheckbox"] = expressionParser.Parse(recordJson, listTemplate.ColumnModel.CheckboxColumn.Expression)
 		loopItem["id"] = record[listTemplate.ColumnModel.IdColumn.Name]
+		loopItem["_id"] = record[listTemplate.ColumnModel.IdColumn.Name]
 		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
 			if columnItem.XMLName.Local != "virtual-column" {
 				loopItem[columnItem.Name] = record[columnItem.Name]

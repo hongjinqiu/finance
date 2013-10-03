@@ -1,4 +1,18 @@
-YUI.add('listtemplate-datatable-paginator', function (Y) {
+function getQueryString(Y) {
+	var form = Y.one('#queryForm'), query;
+  
+	query = Y.QueryString.stringify(Y.Array.reduce(Y.one(form).all('input[name],select[name],textarea[name]')._nodes, {}, function (init, el, index, array) {
+		var isCheckable = (el.type == "checkbox" || el.type == "radio");
+		if ((isCheckable && el.checked) || !isCheckable) {
+			init[el.name] = el.value;
+		}
+		return init;
+	}));
+ 
+	return query;
+}
+
+YUI.add('listtemplate-paginator', function (Y) {
 	function ListTemplatePaginator() {}
 	Y.mix(ListTemplatePaginator.prototype, [Y.DataTable.Paginator]);
 	ListTemplatePaginator.prototype.processPageRequest = function(page_no, pag_state) {
@@ -48,7 +62,6 @@ YUI.add('listtemplate-datatable-paginator', function (Y) {
     //   Now, process this page request thru either local data array slicing or
     //    simply firing off a remote server request ...
     //
-    console.log(this._pagDataSrc);
     switch(this._pagDataSrc) {
 
         case 'ds':
@@ -57,9 +70,14 @@ YUI.add('listtemplate-datatable-paginator', function (Y) {
             //  with ATTR `requestStringTemplate` with the "url_obj" map
 
             rqst_str = this.get('requestStringTemplate') || '';
-            console.log(rqst_str);
-            console.log(url_obj);
-            this.paginatorDSRequest( Y.Lang.sub(rqst_str,url_obj) + "&page=1" );
+            var queryString = getQueryString(Y);
+            var pageQueryString = Y.Lang.sub(rqst_str,url_obj);
+            if (queryString) {
+            	queryString += "&" + pageQueryString
+            } else {
+            	queryString = pageQueryString
+            }
+            this.paginatorDSRequest(queryString);
 
             break;
 
@@ -87,7 +105,7 @@ YUI.add('listtemplate-datatable-paginator', function (Y) {
 	Y.Base.mix(Y.DataTable, [Y.DataTable.Paginator]);
 }, 'gallery-2013.01.16-21-05', {"requires": ["datatable-base", "base-build", "datatype", "json", "gallery-datatable-paginator"]});
 
-function getColumns(listTemplate) {
+function getColumns(listTemplate, Y) {
 	var columns = [];
 	columns.push({
 		key:        'select',
@@ -102,22 +120,45 @@ function getColumns(listTemplate) {
 			label: listTemplate.ColumnModel.IdColumn.Text
 		});
 	}
+	
 	for (var i = 0; i < listTemplate.ColumnModel.ColumnLi.length; i++) {
-		if (listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
+		if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local != "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
 			columns.push({
 				key: listTemplate.ColumnModel.ColumnLi[i].Name,
 				label: listTemplate.ColumnModel.ColumnLi[i].Text
+			});
+		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
+			var virtualColumn = listTemplate.ColumnModel.ColumnLi[i];
+			columns.push({
+				key: listTemplate.ColumnModel.ColumnLi[i].Name,
+				label: listTemplate.ColumnModel.ColumnLi[i].Text,
+				allowHTML:  true, // to avoid HTML escaping
+				formatter:      function(virtualColumn){
+					return function(o){
+//						console.log(o);
+						var htmlLi = [];
+						var btnTemplate = "<input type='button' value='{value}' />";
+						var buttonBoLi = o.value[virtualColumn.Buttons.XMLName.Local];
+						for (var j = 0; j < virtualColumn.Buttons.ButtonLi.length; j++) {
+							if (buttonBoLi[j]["isShow"]) {
+								htmlLi.push(Y.Lang.sub(btnTemplate, {
+									value: virtualColumn.Buttons.ButtonLi[j].Text
+								}));
+							}
+						}
+						return htmlLi.join("");
+					}
+				}(virtualColumn)
 			});
 		}
 	}
 	return columns;
 }
-YUI().use("node", "event", "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',  "gallery-datatable-paginator", 'gallery-paginator-view', "listtemplate-datatable-paginator", function(Y) {
+YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',  "gallery-datatable-paginator", 'gallery-paginator-view', "listtemplate-paginator", function(Y) {
 	Y.on("domready", function(e) {
-		console.log(Y.DataTable.Paginator.processPageRequest);
 		var dataBo = Y.JSON.parse(dataBoJson);
 		var listTemplate = Y.JSON.parse(listTemplateJson);
-		var columns = getColumns(listTemplate);
+		var columns = getColumns(listTemplate, Y);
 		var data = dataBo.items;
 
 		var url = "/component/listtemplate?format=json";
@@ -157,7 +198,7 @@ YUI().use("node", "event", "json", "datatable", "datasource-get", "datasource-js
 			//,data: data
 //			,datasource: dataSource
 			,paginationSource: "server"
-			,requestStringTemplate: "pageNo={page}"
+			,requestStringTemplate: "pageNo={page}&pageSize={itemsPerPage}"
 			,paginator: new Y.PaginatorView({
                 model:              new Y.PaginatorModel({itemsPerPage:10}),
                 container:          '#pagContC',
@@ -174,7 +215,8 @@ YUI().use("node", "event", "json", "datatable", "datasource-get", "datasource-js
 		});
 		dt.plug(Y.Plugin.DataTableDataSource, { datasource: dataSource });
 		dt.render("#columnModel");
-		dt.datasource.load({ request: "pageNo=1" });
+		//dt.datasource.load({ request: "pageNo=1" });
+		dt.processPageRequest(1);
 		dt.detach('*:change');
 		
 		dt.delegate("click", function(e){
@@ -184,7 +226,6 @@ YUI().use("node", "event", "json", "datatable", "datasource-get", "datasource-js
 		
 		dt.delegate("click", function(e){
 			var checkLi = Y.all(".yui3-datatable-data .yui3-datatable-col-select input").get("checked");
-			console.log(checkLi);
 			var isAllSelect = true;
 			var i = 0;
 			for(; i < checkLi.length; i++) {
@@ -196,14 +237,14 @@ YUI().use("node", "event", "json", "datatable", "datasource-get", "datasource-js
 			Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
 		}, ".yui3-datatable-data .yui3-datatable-col-select input", dt);
 		
-		Y.one("#testBtn").on("click", function(e){
-			//dt.datasource.load({ request: "&1=1" });
+		Y.one("#queryBtn").on("click", function(e){
 			var pagModel = dt.get('paginator').get('model');
-			//pagModel.set("page", 2);
-			//dt.get("paginator").sayHello();
-			dt.sayHello();
-//			dt.processPageRequest(2);
-//			pagModel.fire("pageChange", pagModel);
+			var page = pagModel.get("page");
+			if (page == 1) {
+				dt.refreshPaginator();
+			} else {
+				pagModel.set("page", 1);
+			}
 		});
 	});
 });

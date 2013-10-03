@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"strconv"
+	"labix.org/v2/mgo"
 )
 
 func init() {
@@ -119,11 +121,27 @@ func (c Component) ListTemplate() revel.Result {
 	templateManager := TemplateManager{}
 	toolbarBo := templateManager.GetToolbarForListTemplate(&listTemplate)
 	paramMap := map[string]string{}
+	for k, v := range c.Params.Form {
+		value := strings.Join(v, ",")
+		if value != "" {
+			paramMap[k] = value
+		}
+	}
 	pageNo := 1
 	pageSize := 10
+	if c.Params.Get("pageNo") != "" {
+		pageNoInt,_ := strconv.ParseInt(c.Params.Get("pageNo"), 10, 0)
+		if pageNoInt > 1 {
+			pageNo = int(pageNoInt)
+		}
+	}
+	if c.Params.Get("pageSize") != "" {
+		pageSizeInt,_ := strconv.ParseInt(c.Params.Get("pageSize"), 10, 0)
+		if pageSizeInt > 10 {
+			pageSize = int(pageSizeInt)
+		}
+	}
 	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
-	dataBo["pageNo"] = 2//pageNo
-	dataBo["pageSize"] = 20//pageSize
 	
 	//	columns := templateManager.GetColumns(&listTemplate)
 
@@ -169,6 +187,42 @@ func (c Component) ListTemplate() revel.Result {
 		}
 		return c.Render(result)
 	}
+}
+
+func (c Component) MapReduce() revel.Result {
+	qb := QuerySupport{}
+
+	collection := "SysUser"
+	query := map[string]interface{}{
+		"_id": map[string]interface{}{
+			"$lt": 20,
+		},
+	}
+	mapReduce := mgo.MapReduce{
+		Map: `
+function() {
+    emit(this.nick, {
+        count: 1,
+        nick: this.nick
+    })
+}
+`,
+		Reduce: `
+function(key, values) {
+    var count = 0;
+    values.forEach(function(item){
+        count += item.count;
+    })
+    return {
+        count: count,
+        nick: values[0].nick
+    }
+}
+`,
+	}
+	results := qb.MapReduce(collection, query, mapReduce, 1, 2)
+	c.Response.ContentType = "application/json; charset=utf-8"
+	return c.RenderJson(&results)
 }
 
 func (c Component) MongoTest() revel.Result {

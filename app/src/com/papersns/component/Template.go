@@ -5,13 +5,19 @@ import (
 )
 
 type ListTemplate struct {
-	XMLName             xml.Name            `xml:"list-template"`
-	Adapter             Adapter             `xml:"adapter"`
-	Description         string              `xml:"description"`
-	Scripts             string              `xml:"scripts"`
-	ViewTemplate        ViewTemplate        `xml:"view-template"`
-	Toolbar             Toolbar             `xml:"toolbar"`
-	Security            Security            `xml:"security"`
+	XMLName      xml.Name     `xml:"list-template"`
+	ListId       string       `xml:"list-id"`
+	SelectorId   string       `xml:"selector-id"`
+	Adapter      Adapter      `xml:"adapter"`
+	Description  string       `xml:"description"`
+	Scripts      string       `xml:"scripts"`
+	ViewTemplate ViewTemplate `xml:"view-template"`
+	Toolbar      Toolbar      `xml:"toolbar"`
+	Security     Security     `xml:"security"`
+	Pyscript         string `xml:"pyscript"`
+	BeforeBuildQuery string `xml:"before-build-query"`
+	AfterBuildQuery  string `xml:"after-build-query"`
+	AfterQueryData   string `xml:"after-query-data"`
 	DataProvider        DataProvider        `xml:"data-provider"`
 	ColumnModel         ColumnModel         `xml:"column-model"`
 	QueryParameterGroup QueryParameterGroup `xml:"query-parameters"`
@@ -56,6 +62,8 @@ type DataProvider struct {
 
 	Collection    string `xml:"collection"`
 	FixBsonQuery  string `xml:"fix-bson-query"`
+	Map           string `xml:"map"`
+	Reduce        string `xml:"reduce"`
 	Size          string `xml:"size,attr"`
 	BsonIntercept string `xml:"bsonIntercept,attr"`
 }

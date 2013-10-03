@@ -79,17 +79,37 @@
 		</annotation>
 		<complexType>
 			<sequence>
+				<element ref="tns:list-id" minOccurs="0" />
+				<element ref="tns:selector-id" minOccurs="0" />
 				<element ref="tns:adapter" minOccurs="0" />
 				<element ref="tns:description" minOccurs="0" />
 				<element ref="tns:scripts" minOccurs="0" />
 				<element ref="tns:view-template" minOccurs="0" />
 				<element ref="tns:toolbar" minOccurs="0" />
 				<element ref="tns:security" minOccurs="0" />
+				
+				<element ref="tns:pyscript" minOccurs="0" />
+				<element ref="tns:before-build-query" minOccurs="0" />
+				<element ref="tns:after-build-query" minOccurs="0" />
+				<element ref="tns:after-query-data" minOccurs="0" />
+				
 				<element ref="tns:data-provider" />
 				<element ref="tns:column-model" />
 				<element ref="tns:query-parameters" minOccurs="0" />
 			</sequence>
 		</complexType>
+	</element>
+	
+	<element name="list-id">
+		<annotation>
+			<documentation>清单ID</documentation>
+		</annotation>
+	</element>
+	
+	<element name="selector-id">
+		<annotation>
+			<documentation>开窗选择器ID</documentation>
+		</annotation>
 	</element>
 
 	<element name="adapter">
@@ -272,6 +292,30 @@
 			</attribute>
 		</complexType>
 	</element>
+	
+	<element name="pyscript">
+		<annotation>
+			<documentation>python脚本</documentation>
+		</annotation>
+	</element>
+	
+	<element name="before-build-query">
+		<annotation>
+			<documentation>将查询参数进行mongoDB查询转化之前,传给python的值是{key:value,...}</documentation>
+		</annotation>
+	</element>
+	
+	<element name="after-build-query">
+		<annotation>
+			<documentation>将查询参数进行mongoDB查询转化之后,传给python的值是[{key:value, ...}, ...]</documentation>
+		</annotation>
+	</element>
+	
+	<element name="after-query-data">
+		<annotation>
+			<documentation>查询出数据之后,传给python的值是[{key:value, ...}, ...]</documentation>
+		</annotation>
+	</element>
 
 	<element name="data-provider">
 		<complexType>
@@ -286,6 +330,8 @@
 					<element name="collection" />
 				</choice>
 				<element name="fix-bson-query" minOccurs="0" maxOccurs="1" type="string" />
+				<element name="map" minOccurs="0" maxOccurs="1" type="string" />
+				<element name="reduce" minOccurs="0" maxOccurs="1" type="string" />
 				<!-- 
 				<element name="template-sql" minOccurs="0" maxOccurs="unbounded">
 					<complexType>
