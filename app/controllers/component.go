@@ -225,6 +225,16 @@ function(key, values) {
 	return c.RenderJson(&results)
 }
 
+func (c Component) ScriptTest() revel.Result {
+	o := ExpressionParser{}
+	classMethod := "SysUser.beforeBuildQuery"
+	result := o.ParseClass(classMethod)
+	c.Response.ContentType = "application/json; charset=utf-8"
+	return c.RenderJson(map[string]string{
+		"result": result,
+	})
+}
+
 func (c Component) MongoTest() revel.Result {
 	querySupport := QuerySupport{}
 	m, isFind := querySupport.Find("SysUser", `{"_id": 15}`)

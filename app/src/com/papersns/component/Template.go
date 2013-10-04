@@ -14,9 +14,7 @@ type ListTemplate struct {
 	ViewTemplate ViewTemplate `xml:"view-template"`
 	Toolbar      Toolbar      `xml:"toolbar"`
 	Security     Security     `xml:"security"`
-	Pyscript         string `xml:"pyscript"`
 	BeforeBuildQuery string `xml:"before-build-query"`
-	AfterBuildQuery  string `xml:"after-build-query"`
 	AfterQueryData   string `xml:"after-query-data"`
 	DataProvider        DataProvider        `xml:"data-provider"`
 	ColumnModel         ColumnModel         `xml:"column-model"`

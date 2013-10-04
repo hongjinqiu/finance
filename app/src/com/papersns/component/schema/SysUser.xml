@@ -29,28 +29,8 @@
 
 	<security functionId="10018"></security>
 
-	<pyscript>
-import json
-
-def sysUser_beforeBuildQuery(jsonString):
-    query = json.loads(jsonString)
-    query["nick"] = "测"
-    return json.dumps(query)
-
-def sysUser_afterBuildQuery(jsonString):
-    query = json.loads(jsonString)
-    query["_id"] = {"$lt": 20}
-    return json.dumps(query)
-
-def sysUser_afterQueryData(jsonString):
-    items = json.loads(jsonString)
-    for item in items:
-        item["nick"] = "测试"
-    return json.dumps(items)
-	</pyscript>
-	<before-build-query>sysUser_beforeBuildQuery</before-build-query>
-	<after-build-query>sysUser_afterBuildQuery</after-build-query>
-	<after-query-data>sysUser_afterQueryData</after-query-data>
+	<before-build-query>SysUser.beforeBuildQuery</before-build-query>
+	<after-query-data>SysUser.afterQueryData</after-query-data>
 
 	<data-provider size="10">
 		<collection>SysUser</collection><!-- mongoDB collection name -->

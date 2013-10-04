@@ -9,12 +9,20 @@ import (
 var rwlock sync.RWMutex = sync.RWMutex{}
 var flag bool = false
 var expressionMod *python.PyObject = nil
+var componentMod *python.PyObject = nil
 
 func getExpressionMod() *python.PyObject {
 	rwlock.RLock()
 	defer rwlock.RUnlock()
 	
 	return expressionMod
+}
+
+func getComponentMod() *python.PyObject {
+	rwlock.RLock()
+	defer rwlock.RUnlock()
+	
+	return componentMod
 }
 
 func isEnvInit() bool {
@@ -54,7 +62,12 @@ func InitPythonEnv() {
 	
 	expressionMod = python.PyImport_ImportModule("expression")
 	if expressionMod == nil {
-		panic("get module return null")
+		panic("get module expression return null")
+	}
+	
+	componentMod = python.PyImport_ImportModule("component")
+	if componentMod == nil {
+		panic("get module component return null")
 	}
 	
 	flag = true
@@ -91,7 +104,7 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	}
 
 	args1 := python.PyString_FromString(recordJson)
-	args2 := python.PyString_FromString(expression)
+	args2 := python.PyString_FromString(strings.TrimSpace(expression))
 
 	strargs := python.PyTuple_New(2)
 	if strargs == nil {
@@ -112,3 +125,42 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	execResult := python.PyString_AS_STRING(strret)
 	return strings.ToLower(execResult) == "true"
 }
+
+func (o ExpressionParser) ParseClass(classMethod string) string {
+	if strings.TrimSpace(classMethod) == "" {
+		return ""
+	}
+	if !isEnvInit() {
+		InitPythonEnv()
+	}
+	
+	className := strings.Split(classMethod, ".")[0]
+	methodName := strings.Split(classMethod, ".")[1]
+	
+	class := getComponentMod().GetAttrString(className)
+	if class == nil {
+		panic("get class:" + className + " return nil")
+	}
+	
+	classArgs := python.PyTuple_New(0)
+	object := class.CallObject(classArgs)
+	
+	method := object.GetAttrString(methodName)
+	if method == nil {
+		panic("get method:" + methodName + " return nil")
+	}
+
+	strargs := python.PyTuple_New(0)
+	
+	strret := method.CallObject(strargs)
+	if strret == nil {
+		panic("call object return null")
+	}
+
+	python.PyErr_Print()
+	python.PyErr_Clear()
+
+	execResult := python.PyString_AS_STRING(strret)
+	return execResult
+}
+

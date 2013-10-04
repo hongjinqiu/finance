@@ -88,9 +88,7 @@
 				<element ref="tns:toolbar" minOccurs="0" />
 				<element ref="tns:security" minOccurs="0" />
 				
-				<element ref="tns:pyscript" minOccurs="0" />
 				<element ref="tns:before-build-query" minOccurs="0" />
-				<element ref="tns:after-build-query" minOccurs="0" />
 				<element ref="tns:after-query-data" minOccurs="0" />
 				
 				<element ref="tns:data-provider" />
@@ -293,21 +291,9 @@
 		</complexType>
 	</element>
 	
-	<element name="pyscript">
-		<annotation>
-			<documentation>python脚本</documentation>
-		</annotation>
-	</element>
-	
 	<element name="before-build-query">
 		<annotation>
 			<documentation>将查询参数进行mongoDB查询转化之前,传给python的值是{key:value,...}</documentation>
-		</annotation>
-	</element>
-	
-	<element name="after-build-query">
-		<annotation>
-			<documentation>将查询参数进行mongoDB查询转化之后,传给python的值是[{key:value, ...}, ...]</documentation>
 		</annotation>
 	</element>
 	

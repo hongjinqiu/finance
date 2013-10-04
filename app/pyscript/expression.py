@@ -1,3 +1,6 @@
+#!/usr/bin/python
+#encoding=utf8
+
 import json,sys
 
 def trueOrFalse(jsonString, action):
