@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<relationDS xmlns="http://www.geeboo.org/relation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.org/relation http://www.geeboo.org/relation ">
+	<id>rl_modify_by</id>
+	<displayName>修改人</displayName>
+	<dataSourceId>emp</dataSourceId>
+	<selectWhereExpr></selectWhereExpr>
+	<detailRowMutilSelect>true</detailRowMutilSelect>
+	<copyFieldSet />
+	<relationFields>
+		<codeField>
+			<id>MODIFY_EMP_NO</id>
+			<srcField>[$F{WORK_NUM}]</srcField>
+			<displayName>修改人工号</displayName>
+			<fieldInList>false</fieldInList>
+			<listWhereField>false</listWhereField>
+		</codeField>
+		<displayField>
+			<id>MODIFY_EMP_CNAME</id>
+			<displayExpr>[$F{CNAME}]</displayExpr>
+			<displayName>修改人姓名</displayName>
+			<fieldInList>false</fieldInList>
+			<listWhereField>false</listWhereField>
+		</displayField>
+	</relationFields>
+</relationDS>

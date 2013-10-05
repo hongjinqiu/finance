@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 数据源模型 -->
+<DataSource Id="cashPayInvoice" ProgId="cashPayInvoice" DisplayName="付款支票" SystemId="CASH" CodeFieldName="BillNo"
+	BusinessDateField="BillDate" OrgIdField="OrgId" IsAccount="true" DepartIdField="DepartId" IsAdvancedPermittion="true"
+	ProgType="ProgType.Bill" EnterParams="OrgId,cashPayInvoiceType" InUsedDenyDelete="true" InUsedDenyEdit="false" 
+	InUsedDenyUnAudit="false" InUsedDenyUnCancel="false">
+	
+	<!-- 主数据集 -->
+	<MasterData Id="A" DatasetIndex="0" DisplayName="主数据集" ParentId="" CurrIdField="" LocalCurrField="" AllowEmptyRow="false"
+		AllowCopy="false" IsReadonly="false">
+				
+		<!-- 固定字段 -->
+		<FixField>
+		
+		</FixField>						
+				
+		<!-- 业务字段 -->		
+		<BizField>					
+			<Field Id="PayInvoice_Id" FieldName="PayInvoice_Id" TableName="cashPayInvoice" FieldIndex="0" DisplayName="单据id" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+							
+			<Field Id="BillNo" FieldName="BillNo" TableName="cashPayInvoice" FieldIndex="0" DisplayName="单据编号" 
+				FieldDataType="String" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.BillNo">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+			
+			<Field Id="BillDate" FieldName="BillDate" TableName="cashPayInvoice" FieldIndex="0" DisplayName="单据日期" 
+				FieldDataType="String" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.BillNo">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+				
+			<Field Id="InvoiceObject" FieldName="InvoiceObject" TableName="cashPayInvoice" FieldIndex="0" DisplayName="收票对象类型" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary>
+					<!-- 这个是票据对象的数据字典，包含4个选项：客户、供应商、人员、其他 -->
+					InvoiceObject
+				</Dictionary>
+				<DictionaryWhere>true</DictionaryWhere>
+			</Field>	
+			
+			<Field Id="InvoiceObjectId" FieldName="InvoiceObjectId" TableName="cashPayInvoice" FieldIndex="0" DisplayName="收票对象" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS>
+					<!-- 根据收票对象，解析不同的关联模型 -->
+					<Relation Condition="[A.InvoiceObject]=0" RelationId="rlsCustomer"/>
+					<Relation Condition="[A.InvoiceObject]=1" RelationId="rlsFactory"/>
+					<Relation Condition="[A.InvoiceObject]=2" RelationId="rlsPerson"/>
+				</RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>		
+		
+		</BizField>
+	</MasterData>
+	
+	<DetailData Id="B" DatasetIndex="1" DisplayName="来源明细分录" ParentId="A" CurrIdField="" LocalCurrField="" AllowEmptyRow="true"
+		AllowCopy="false" IsReadonly="false">
+		
+		<!-- 固定字段 -->
+		<FixField>
+		
+		</FixField>						
+				
+		<!-- 业务字段 -->		
+		<BizField>		
+		
+			<Field Id="PayInvoice_Id" FieldName="PayInvoice_Id" TableName="cashPayInvoiceSrcDetail" FieldIndex="0" DisplayName="单据id" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>		
+			<Field Id="PayInvoice_DetailId" FieldName="PayInvoice_DetailId" TableName="cashPayInvoiceSrcDetail" FieldIndex="0" DisplayName="分录id" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>		
+			
+			<Field Id="SRC_PROG_ID" FieldName="SRC_PROG_ID" TableName="cashPayInvoiceSrcDetail" FieldIndex="0" DisplayName="来源单种类" 
+				FieldDataType="String" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="50" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.ProgId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS>
+					<Relation Condition="true" RelationId="rlsProg"/>
+				</RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>	
+			
+			<Field Id="SRC_ID" FieldName="SRC_ID" TableName="cashPayInvoiceSrcDetail" FieldIndex="0" DisplayName="来源单Id" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysID">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS>
+					<Relation Condition="[B.SRC_PROG_ID]='crmPurchase'" RelationId="rlsPurchase"/>
+				</RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>	
+			
+			<Field Id="Amount" FieldName="Amount" TableName="cashPayInvoiceSrcDetail" FieldIndex="0" DisplayName="金额" 
+				FieldDataType="Amount" FieldNumberType="FieldNumberType.Amount"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="true" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr>[B.Price]*[B.Quantity]*(1 - [A.Discount])</CalcValueExpr>
+				<RelationDS>
+					<Relation Condition="[B.SRC_PROG_ID]='crmPurchase'" RelationId="rlsPurchase"/>
+				</RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>	
+		
+		</BizField>
+						
+	</DetailData>	
+	
+	<DetailData Id="C" DatasetIndex="2" DisplayName="冲销状况分录" ParentId="A" CurrIdField="" LocalCurrField="" AllowEmptyRow="true"
+		AllowCopy="false" IsReadonly="true">
+		
+		<!-- 固定字段 -->
+		<FixField>
+		
+		</FixField>						
+				
+		<!-- 业务字段 -->		
+		<BizField>			
+		
+			<Field Id="PayInvoice_Id" FieldName="PayInvoice_Id" TableName="cashPayInvoiceOffset" FieldIndex="0" DisplayName="单据id" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>		
+			<Field Id="PayInvoice_DetailId" FieldName="PayInvoice_DetailId" TableName="cashPayInvoiceOffset" FieldIndex="0" DisplayName="分录id" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>	
+		</BizField>			 
+	</DetailData>		
+		
+</DataSource>
+
+<!--
+	每个数据集是单独生成取数sql
+	
+	主数据集取数据sql：	
+	Select A.PayInvoice_Id, A.BillNo, A.BillDate,
+		   /*根据收款对象条件取对应的关联数据*/
+		   case when A.InvoiceObject = 0 then A_4_0.CustomerName 
+		   	    when A.InvoiceObject = 1 then A_4_1.FactoryName
+		   	    when A.InvoiceObject = 2 then A_4_2.PersonName
+		   end ObjectName  
+	From cashPayInvoice A
+	/*根据收款对象条件取对应关联模型的数据源的关联主数据集表*/
+	Left Join comCustomer A_4_0 on A.InvoiceObject = 0 And A.InvoiceObjectId = A_4_0.CUSTOMER_ID
+	Left Join comFactory A_4_1 on A.InvoiceObject = 1 And A.InvoiceObjectId = A_4_0.FACTORY_ID
+	Left Join comPerson A_4_2 on A.InvoiceObject = 2 And A.InvoiceObjectId = A_4_0.PERSON_ID
+	Where A.PayInvoice_Id = 'XXX'
+	
+	分录数据取数据sql：	
+	Select B.PayInvoice_Id, B.SRC_PROG_ID, B.SRC_ID, 
+		   case when B.SRC_PROG_ID='crmPurchase' then B_5_0_5.PersonName end SaleMan /*关联出采购单上的业务员*/
+	From cashPayInvoiceSrcDetail B
+	/*关联来源单*/
+	Left Join crmPurchase B_5_0 on B.SRC_ID = B_5_0.PURCHASE_ID
+	Left Join comPerson B_5_0_5 on B.SRC_PROG_ID='crmPurchase' And B_5_0.SaleId = B_5_0_5.PERSON_ID
+	Where B.PayInvoice_Id = 'XXX'	
+	
+ -->
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PersonCode Id="FieldTemplet.PersonCode" FieldName="PersonCode" TableName="" FieldIndex="0" DisplayName="人员编号" 
+	FieldDataType="String" FieldNumberType="FieldNumberType.unDefine"
+	FieldLength="10" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+	IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+	FieldModuleId="">
+	<DefaultValueExpr></DefaultValueExpr>
+	<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+	<AllowDuplicateExpr>true</AllowDuplicateExpr>
+	<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+	<CalcValueExpr></CalcValueExpr>
+	<RelationDS></RelationDS>
+	<Dictionary></Dictionary>
+	<DictionaryWhere></DictionaryWhere>
+</PersonCode>

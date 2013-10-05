@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.geeboo.org/transfer"
+	xmlns:tns="http://www.geeboo.org/transfer" elementFormDefault="qualified">
+
+	<annotation>
+		<appinfo></appinfo>
+		<documentation>
+			标题：转单模型Schema
+			版本：v1.0
+			创建者：SuJianFeng
+			创建时间： 2013-05-16
+			最后更新者：SuJianFeng
+			最后更新时间： 2013-05-20					
+		</documentation>
+	</annotation>
+
+	<!-- 转单模型 -->
+	<element name="transfer">
+		<complexType>
+			<sequence>
+				<element name="id" type="string" />
+				<element name="displayName" type="string" />
+				<element name="srcDataSourceId" type="string" />
+				<element name="destDataSourceId" type="string" />
+				<element name="transWhereExpr" type="string" />				
+				<element name="srcEnterParams">
+					<complexType>
+						<sequence>
+							<!-- 格式：orgId="001",billType="123" 表示：组织为001，单据类型为123 -->
+							<element name="param" type="string" maxOccurs="unbounded"/>
+						</sequence>
+					</complexType>				
+				</element>				
+				<element name="destEnterParams">
+					<complexType>
+						<sequence>
+							<!-- 格式：orgId="001",billType="123" 表示：组织为001，单据类型为123 -->
+							<element name="param" type="string" maxOccurs="unbounded"/>
+						</sequence>
+					</complexType>				
+				</element>								
+				<element name="field" maxOccurs="unbounded">
+					<complexType>
+						<sequence>
+							<element name="srcExpr" type="string" />
+							<element name="destDatasetId" type="string" />
+							<element name="destField" type="string" />
+							<element name="canEditAfterTran" type="boolean" />
+							<element name="srcValueField" type="string" default=""/>
+							<element name="srcRemainField" type="string" default=""/>
+							<!-- 超转控制（CAN_OVER_TRY("可以超转"),CAN_NOT_OVER_TRY("不可超转"),OVER_TRY_ONCE("只转一次"),NOTIFY_USER("提示用户是否可以超转")） -->
+							<element name="transOverStyle">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="CAN_OVER_TRY" />
+										<enumeration value="CAN_NOT_OVER_TRY" />
+										<enumeration value="OVER_TRY_ONCE" />
+										<enumeration value="NOTIFY_USER" />
+									</restriction>
+								</simpleType>
+							</element>
+						</sequence>
+					</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+
+</schema>

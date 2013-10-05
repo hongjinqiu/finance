@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<platform>
+
+	<!-- 系统模型配置文件 -->
+	<system-model resource="/platform/pc_systems.xml" />
+	
+	<!-- 数据源模型配置文件 -->
+	<datasource-model resource="/platform/pc_datasources.xml" />
+	
+	<!-- 转单模型配置文件 -->
+	<transfer-model resource="/platform/pc_transfers.xml" />
+	
+	<!-- 关联模型配置文件 -->
+	<relation-model resource="/platform/pc_relations.xml" />
+	
+	<!-- 商业脚本模型配置文件 -->
+	<script-model resource="/platform/pc_scripts.xml" />
+
+</platform>

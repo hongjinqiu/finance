@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>currencytype</id>
+	<displayName>币别</displayName>
+	<systemId>COMM</systemId>
+	<codeFieldName>CURRENCY_TYPE_CODE</codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField></orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>true</inUsedDenyEdit>
+	<inUsedDenyUnAudit></inUsedDenyUnAudit>
+	<inUsedDenyUnCancel></inUsedDenyUnCancel>
+	<actionNameSpace>/pub/basedata/currencytype</actionNameSpace>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams />
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>true</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<fixFieldTableName>PUB_CURRENCY_TYPE</fixFieldTableName>
+		<listUrl>/component/schema.go?@name=PL_DATASOURCE_MODEL_LIST</listUrl>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>CURRENCY_TYPE_ID</fieldName>
+				<displayName>币别id</displayName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY">
+			</CREATE_BY>
+			<CREATE_TIME extends="CREATE_TIME">
+			</CREATE_TIME>
+			<CREATE_UNIT extends="CREATE_UNIT">
+			</CREATE_UNIT>
+			<CREATE_DEPT extends="CREATE_DEPT">
+			</CREATE_DEPT>
+			<MODIFY_BY extends="MODIFY_BY">
+			</MODIFY_BY>
+			<MODIFY_TIME extends="MODIFY_TIME">
+			</MODIFY_TIME>
+			<AUDIT_STATUS extends="AUDIT_STATUS">
+			</AUDIT_STATUS>
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS">
+			</HANDLE_AUDIT_STATUS>
+			<AUDIT_BY extends="AUDIT_BY">
+			</AUDIT_BY>
+			<AUDIT_TIME extends="AUDIT_TIME">
+			</AUDIT_TIME>
+			<BILL_STATUS extends="BILL_STATUS">
+			</BILL_STATUS>
+			<ATTACH_COUNT extends="ATTACH_COUNT">
+			</ATTACH_COUNT>
+			<IS_INITBILL extends="IS_INITBILL">
+			</IS_INITBILL>
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN">
+			</IS_AUDIT_SIGN>
+			<REMARK extends="REMARK">
+			</REMARK>
+		</fixField>
+		<bizField>
+			<field id="CURRENCY_TYPE_CODE" extends="CODE_FIELD">
+				<fieldName>CURRENCY_TYPE_CODE</fieldName>
+				<displayName>代码</displayName>
+				<tableName>PUB_CURRENCY_TYPE</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+				<fixReadOnly>false</fixReadOnly>
+				<allowEmpty>false</allowEmpty>
+			</field>
+			<field id="CURRENCY_TYPE_NAME" extends="NAME_FIELD">
+				<fieldName>CURRENCY_TYPE_NAME</fieldName>
+				<displayName>名称</displayName>
+				<tableName>PUB_CURRENCY_TYPE</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+				<fixReadOnly>false</fixReadOnly>
+				<allowEmpty>false</allowEmpty>
+			</field>
+			<field id="CURRENCY_TYPE_SIGN" extends="STRING_FIELD">
+				<fieldName>CURRENCY_TYPE_SIGN</fieldName>
+				<displayName>符号</displayName>
+				<fieldInList>true</fieldInList>
+				<tableName>PUB_CURRENCY_TYPE</tableName>
+			</field>
+			<field id="ROUNDING_WAY" extends="STRING_FIELD">
+				<fieldName>ROUNDING_WAY</fieldName>
+				<displayName>舍入方式</displayName>
+				<fieldInList>true</fieldInList>
+				<dictionary>D_ROUNDING_WAY_TYPE</dictionary>
+				<tableName>PUB_CURRENCY_TYPE</tableName>
+				<allowEmpty>false</allowEmpty>
+			</field>
+			<field id="AMT_DECIMALS" extends="STRING_FIELD">
+				<fieldName>AMT_DECIMALS</fieldName>
+				<displayName>金额小数位数</displayName>
+				<fieldInList>true</fieldInList>
+				<dictionary>D_AMT_DECIMALS_TYPE</dictionary>
+				<tableName>PUB_CURRENCY_TYPE</tableName>
+				<allowEmpty>false</allowEmpty>
+			</field>
+			
+			<field id="UP_DECIMALS" extends="STRING_FIELD">
+				<fieldName>UP_DECIMALS</fieldName>
+				<displayName>单价小数位数</displayName>
+				<fieldInList>true</fieldInList>
+				<dictionary>D_UP_DECIMALS_TYPE</dictionary>	
+				<tableName>PUB_CURRENCY_TYPE</tableName>
+				<allowEmpty>false</allowEmpty>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

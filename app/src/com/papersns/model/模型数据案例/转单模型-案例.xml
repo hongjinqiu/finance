@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 采购单转到付款支票 -->
+<crmPurchase_cashPayInvoice Id="" TranCode="" DisplayName="" SrcProgId="" DescProgId="">	
+	<!-- 采购单转入的条件 -->
+	<TransWhereExpr>[A.BILL_STATUS]=2</TransWhereExpr>	
+	<TransFields>
+		<!-- 付款对象直接控制为常数——供应商 -->
+		<Field SrcExpr="1" DestDsId="A" DestField="InvoiceObject" CanEditAfterTran="false" 
+			SrcValueField=""  SrcRemainField="" TransOverStyle="0"/>
+		<!-- 采购供应商转入付款支票付款对象 -->
+		<Field SrcExpr="[A.FactoryId]" DestDsId="A" DestField="InvoiceObjectId" CanEditAfterTran="false" 
+			SrcValueField=""  SrcRemainField="" TransOverStyle="0"/>
+		<!-- 付款支票的来源数据源赋值为采购订单的ProgId，用单引号括起来，表示字符串常量 -->
+		<Field SrcExpr="'crmPurchase'" DestDsId="B" DestField="SRC_PROG_ID" CanEditAfterTran="false" 
+			SrcValueField=""  SrcRemainField="" TransOverStyle="0"/>			
+		<!-- 采购单单号转入付款支票的来源单id -->
+		<Field SrcExpr="[A.PURCHASE_ID]" DestDsId="B" DestField="SRC_ID" CanEditAfterTran="false" 
+			SrcValueField=""  SrcRemainField="" TransOverStyle="0"/>			
+		<!-- 来源采购数量 转入 付款支票的来源分录的数量，控制不可超转 -->	
+		<Field SrcExpr="[B.Quantity]" DestDsId="B" DestField="Quantity" CanEditAfterTran="true" 
+			SrcValueField="[B.Quantity]" SrcRemainField="[B.RemainQty]" TransOverStyle="1"/>			
+	</TransFields>
+</crmPurchase_cashPayInvoice>
+
+

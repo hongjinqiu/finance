@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>organ</id>
+	<displayName>组织</displayName>
+	<systemId>HR</systemId>
+	<codeFieldName>UNIT_CODE</codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField></orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace></actionNameSpace>
+	<listUrl>/component/schema.go?@name=PL_DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams />
+	<listSortFields>
+		<field>
+			<fieldId>UNIT_CODE</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+	</listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>组织信息</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>false</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>pub_unit</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>UNIT_ID</fieldName>
+				<displayName>组织id</displayName>
+				<tableName>PUB_UNIT</tableName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY">
+				<tableName>PUB_UNIT</tableName>
+			</CREATE_BY>
+			<CREATE_TIME extends="CREATE_TIME">
+				<tableName>PUB_UNIT</tableName>
+			</CREATE_TIME>
+			<CREATE_UNIT extends="CREATE_UNIT">
+				<tableName>PUB_UNIT</tableName>
+			</CREATE_UNIT>
+			<CREATE_DEPT extends="CREATE_DEPT">
+				<tableName>PUB_UNIT</tableName>
+			</CREATE_DEPT>
+			<MODIFY_BY extends="MODIFY_BY">
+				<tableName>PUB_UNIT</tableName>
+			</MODIFY_BY>
+			<MODIFY_UNIT extends="MODIFY_UNIT">
+				<tableName>PUB_UNIT</tableName>
+			</MODIFY_UNIT>
+			<MODIFY_TIME extends="MODIFY_TIME">
+				<tableName>PUB_UNIT</tableName>
+			</MODIFY_TIME>
+		</fixField>
+		<bizField>
+			<field id="UNIT_CODE" extends="CODE_FIELD">
+				<fieldName>UNIT_CODE</fieldName>
+				<displayName>组织代码</displayName>
+				<tableName>PUB_UNIT</tableName>
+				<fieldInList>true</fieldInList>
+			</field>
+			<field id="UNIT_ANAME" extends="NAME_FIELD">
+				<fieldName>UNIT_ANAME</fieldName>
+				<displayName>组织名称</displayName>
+				<tableName>PUB_UNIT</tableName>
+				<fieldInList>true</fieldInList>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

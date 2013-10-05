@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource-models>
+	<!-- 银行资料 -->	
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_comm_bank.xml" />
+	
+	<datasource-model resource="com/geeboo/commons/platform/schema/datasource-demo.xml"></datasource-model>
+	
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_employee.xml"></datasource-model>
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_组织.xml"></datasource-model>
+	
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_org.xml"></datasource-model><!-- 这个组织临时用于测试 -->
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_department.xml"></datasource-model>
+	<!-- 出纳系统参数 -->
+	<datasource-model resource="com/geeboo/finance/basedata/tellersystem/pc_ds_tellersystem.xml"></datasource-model>
+	
+	<!-- 币别 -->
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_currencytype.xml" />
+	<!-- 汇率类别 -->
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_exchange_rate.xml" />
+	
+	
+	<!-- 往来对象 -->
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_current_object.xml" />
+	<!-- 供应商 -->
+	<datasource-model resource="com/geeboo/pub/basedata/platform/datasource/pc_ds_pub_basedata_provider.xml" />
+	<!-- 资金管理 -->
+	<!-- 会计期 -->
+	<datasource-model resource="com/geeboo/finance/platform/basedata/accountingperiod/pc_ds_fin_basedata_accountingperiodtype.xml" />	
+	<datasource-model resource="com/geeboo/finance/platform/basedata/accountingperiod/pc_ds_fin_basedata_accountingperiod.xml" />	
+	<!--  
+	<datasource-model resource="com/geeboo/finance/platform/basedata/accountingperiod/pc_ds_fin_basedata_accountingperiodcontrol.xml" />
+	-->	
+	
+	<!-- 单据类型 -->
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_billtype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_billpaymenttype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_advanceapplytype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_costexpensetype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_presentlisttype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_cashdeposittype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_samecurrencybillstype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_costbalancelisttype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_cashchecktype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_cashchequetype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_paychecktype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_collectingbillstype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_paydrafttype.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtype/pc_ds_bankreconciletype.xml" />
+	<!-- 单据类型参数 -->
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_billtypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_billpaymenttypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_advanceapplytypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_costexpensetypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_presentlisttypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_cashdeposittypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_samecurrencybillstypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_costbalancelisttypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_cashchequetypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_paychecktypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_collectingbillstypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_paydrafttypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_cashchecktypeparameter.xml" />
+	<datasource-model resource="com/geeboo/finance/platform/cash/billtypeparameter/pc_ds_bankreconciletypeparameter.xml" />
+
+
+</datasource-models>

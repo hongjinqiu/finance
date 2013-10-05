@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<relationDS xmlns="http://www.geeboo.org/relation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.org/relation http://www.geeboo.org/relation ">
+	<id>rl_currency_type</id>
+	<displayName>币别</displayName>
+	<dataSourceId>currencytype</dataSourceId>
+	<selectWhereExpr></selectWhereExpr>
+	<detailRowMutilSelect>true</detailRowMutilSelect>
+	<copyFieldSet />
+	<relationFields>
+		<codeField>
+			<id>BASE_CURRENCY_TYPE_CODE</id>
+			<srcField>[$F{CURRENCY_TYPE_CODE}]</srcField>
+			<displayName>币别代码</displayName>
+			<fieldInList>false</fieldInList>
+			<listWhereField>false</listWhereField>
+		</codeField>
+		<displayField>
+			<id>BASE_CURRENCY_TYPE_NAME</id>
+			<displayExpr>[$F{CURRENCY_TYPE_NAME}]</displayExpr>
+			<displayName>币别名称</displayName>
+			<fieldInList>false</fieldInList>
+			<listWhereField>false</listWhereField>
+		</displayField>
+	</relationFields>
+</relationDS>

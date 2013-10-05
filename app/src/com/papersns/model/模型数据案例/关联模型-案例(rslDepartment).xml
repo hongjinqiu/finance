@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RlsDepartment Id="RlsDepartment" Code="RlsDepartment" DisplayName="关联部门" RelationDS="comDepartment" 
+	CodeFieldName="DepartCode" DetailRowMutilSelect="true">
+	<!-- 这里的显示表达式用于在来源数集中对部门进行显示的内容，Alias用于创建关联语法时，存放显示内容虚字段的别名 -->
+	<DisplayExpr Alias="DepartName">[A.DepartCode]+','+[A.DepartName]</DisplayExpr>
+	<!-- 单多选条件：过滤停用部门 -->
+	<SelectWhereExpr>[A.IsStop]=0</SelectWhereExpr>
+	<CopyFieldSet>
+		<!-- 将部门的归属组织带到来源数据源 -->
+		<Field SrcExpr="[A.OrgId]" DestExpr="[A.OrgId]"/>
+	</CopyFieldSet>
+	<RelationFields>
+		<!-- 将编制人数带到来源数据源，作为关联字段显示出来 -->
+		<Field RlsField="[A.HunmanCount]" Alias="" DisplayName="编制人数"/>
+		<!-- 将部门对应主管姓名（主管关联到人员资料）带到来源数据源，作为关联字段显示出来 -->
+		<Field RlsField="[A.DepartId.LeaderId.RlsPerson.PersonName]" Alias="DepartLeader" DisplayName="部门主管姓名"/>
+	</RelationFields>
+</RlsDepartment>

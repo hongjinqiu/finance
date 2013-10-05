@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldTemplet Id="FieldTemplet.CREATE_BY" FieldName="CREATE_BY" TableName="" FieldIndex="0" DisplayName="制单人" 
+	FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+	FieldLength="10" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+	IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+	FieldModuleId="">
+	<!-- 预设为当前登录用户 -->
+	<DefaultValueExpr>[@LonginUserId]</DefaultValueExpr>
+	<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+	<AllowDuplicateExpr>true</AllowDuplicateExpr>
+	<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+	<CalcValueExpr></CalcValueExpr>
+	<RelationDS>
+		<Relation Condition="true" ProgId="RlsPerson"/>
+	</RelationDS>
+	<Dictionary></Dictionary>
+	<DictionaryWhere></DictionaryWhere>
+</FieldTemplet>

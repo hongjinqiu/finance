@@ -5,17 +5,18 @@ import (
 )
 
 type ListTemplate struct {
-	XMLName      xml.Name     `xml:"list-template"`
-	ListId       string       `xml:"list-id"`
-	SelectorId   string       `xml:"selector-id"`
-	Adapter      Adapter      `xml:"adapter"`
-	Description  string       `xml:"description"`
-	Scripts      string       `xml:"scripts"`
-	ViewTemplate ViewTemplate `xml:"view-template"`
-	Toolbar      Toolbar      `xml:"toolbar"`
-	Security     Security     `xml:"security"`
-	BeforeBuildQuery string `xml:"before-build-query"`
-	AfterQueryData   string `xml:"after-query-data"`
+	XMLName             xml.Name            `xml:"list-template"`
+	ListId              string              `xml:"list-id"`
+	SelectorId          string              `xml:"selector-id"`
+	Adapter             Adapter             `xml:"adapter"`
+	Description         string              `xml:"description"`
+	Scripts             string              `xml:"scripts"`
+	ViewTemplate        ViewTemplate        `xml:"view-template"`
+	Toolbar             Toolbar             `xml:"toolbar"`
+	Security            Security            `xml:"security"`
+	BeforeBuildQuery    string              `xml:"before-build-query"`
+	AfterBuildQuery     string              `xml:"after-build-query"`
+	AfterQueryData      string              `xml:"after-query-data"`
 	DataProvider        DataProvider        `xml:"data-provider"`
 	ColumnModel         ColumnModel         `xml:"column-model"`
 	QueryParameterGroup QueryParameterGroup `xml:"query-parameters"`

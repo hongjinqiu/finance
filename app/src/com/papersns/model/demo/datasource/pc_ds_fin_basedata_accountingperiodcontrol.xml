@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>demoDataSource</id>
+	<displayName>demo数据源名称</displayName>
+	<systemId>systemId</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField>ORG_ID</orgIdField>
+	<account>false</account>
+	<departIdField>DEPART_ID</departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace>actionNameSpace</actionNameSpace>
+	<listUrl>/component/schema.go?@name=DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams />
+	<listSortFields>
+		<field>
+			<fieldId>fieldId</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+	</listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>true</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>demoDataSource</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>DEMO_ID</fieldName>
+				<displayName>主键</displayName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY" />
+			<CREATE_TIME extends="CREATE_TIME" />
+			<CREATE_UNIT extends="CREATE_UNIT"/>
+			<CREATE_DEPT extends="CREATE_DEPT"/>
+			<MODIFY_BY extends="MODIFY_BY" />
+			<MODIFY_UNIT extends="MODIFY_UNIT" />
+			<MODIFY_TIME extends="MODIFY_TIME" />
+			<AUDIT_STATUS extends="AUDIT_STATUS" />
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS" />
+			<AUDIT_BY extends="AUDIT_BY" />
+			<AUDIT_TIME extends="AUDIT_TIME"/>
+			<BILL_STATUS extends="BILL_STATUS" />
+			<ATTACH_COUNT extends="ATTACH_COUNT"/>
+			<IS_INITBILL extends="IS_INITBILL"/>
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN"/>
+			<REMARK extends="REMARK"/>
+		</fixField>
+		<bizField>
+			<field id="DEMO_CODE" extends="STRING_FIELD">
+				<fieldName>DEMO_CODE</fieldName>
+				<displayName>代码</displayName>
+				<tableName>demoDataSource</tableName>
+			</field>
+			<field id="DEMO_NAME" extends="STRING_FIELD">
+				<fieldName>DEMO_NAME</fieldName>
+				<displayName>名称</displayName>
+				<tableName>demoDataSource</tableName>
+			</field>
+		</bizField>
+	</masterData>
+	<detailData>
+		<id>B</id>
+		<displayName>分录数据集</displayName>
+		<parentId>A</parentId>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowEmptyRow>false</allowEmptyRow>
+		<allowCopy>true</allowCopy>
+		<readonly>false</readonly>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>BILL_ID</billIdField>
+		<parentIdField>PARENT_ID</parentIdField>
+		<fixFieldTableName>demoDataSourceSub</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY"/>
+			<BILL_ID extends="BILL_ID"/> 				
+			<PARENT_ID extends="PARENT_ID"/>
+			<DATASET_ID extends="DATASET_ID"/>
+			<TRANSFER_IN_ID extends="TRANSFER_IN_ID"/>
+			<TRANSFER_OUT_ID extends="TRANSFER_OUT_ID"/>
+			<SRC_DATASOURCE_ID extends="SRC_DATASOURCE_ID"/>
+			<SRC_DATASET_ID extends="SRC_DATASET_ID"/>
+			<SRC_BILL_ID extends="SRC_BILL_ID"/>
+			<SRC_DETAIL_ID extends="SRC_DETAIL_ID"/>
+			<CREATE_BY extends="CREATE_BY"/>
+			<CREATE_TIME extends="CREATE_TIME"/>
+			<CREATE_UNIT extends="CREATE_UNIT"/>
+			<CREATE_DEPT extends="CREATE_DEPT" />
+			<MODIFY_BY extends="MODIFY_BY"/>
+			<MODIFY_UNIT extends="MODIFY_UNIT"/>
+			<MODIFY_TIME extends="MODIFY_TIME"/>
+			<ATTACH_COUNT extends="ATTACH_COUNT"/>
+			<REMARK extends="REMARK"/>
+		</fixField>
+		<bizField>
+			<field id="field1" extends="STRING_FIELD">
+				<fieldName>FIELD1</fieldName>
+				<displayName>分录字段1</displayName>
+				<tableName>demoDataSourceSub</tableName>			
+			</field>
+			<field id="field2" extends="DATE_FIELD">
+				<fieldName>FIELD2</fieldName>
+				<displayName>分录字段2</displayName>
+				<tableName>demoDataSourceSub</tableName>
+			</field>			
+		</bizField>
+	</detailData>
+</datasource>

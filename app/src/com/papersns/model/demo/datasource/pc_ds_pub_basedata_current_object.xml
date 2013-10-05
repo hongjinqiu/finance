@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>currentobject</id>
+	<displayName>往来对象</displayName>
+	<systemId>COMM</systemId>
+	<codeFieldName>CURRENT_OBJECT</codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField>CREATE_UNIT</orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace>/pub/basedata/currentobject</actionNameSpace>
+	<listUrl>/component/schema.go?@name=DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams />
+	<listSortFields>
+		<field>
+			<fieldId>PRIMARY_KEY</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+	</listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>false</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>PUB_CURRENT_OBJECT</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>CURRENT_OBJECT_ID</fieldName>
+				<displayName>往来对象ID</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY">
+			</CREATE_BY>
+			<CREATE_TIME extends="CREATE_TIME">
+			</CREATE_TIME>
+			<CREATE_UNIT extends="CREATE_UNIT">
+			</CREATE_UNIT>
+			<CREATE_DEPT extends="CREATE_DEPT">
+			</CREATE_DEPT>
+			<MODIFY_BY extends="MODIFY_BY">
+			</MODIFY_BY>
+			<MODIFY_TIME extends="MODIFY_TIME">
+			</MODIFY_TIME>
+			<AUDIT_STATUS extends="AUDIT_STATUS">
+			</AUDIT_STATUS>
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS">
+			</HANDLE_AUDIT_STATUS>
+			<AUDIT_BY extends="AUDIT_BY">
+			</AUDIT_BY>
+			<AUDIT_TIME extends="AUDIT_TIME">
+			</AUDIT_TIME>
+			<BILL_STATUS extends="BILL_STATUS">
+			</BILL_STATUS>
+			<ATTACH_COUNT extends="ATTACH_COUNT">
+			</ATTACH_COUNT>
+			<IS_INITBILL extends="IS_INITBILL">
+			</IS_INITBILL>
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN">
+			</IS_AUDIT_SIGN>
+			<REMARK extends="REMARK">
+			</REMARK>
+		</fixField>
+		<bizField>
+			<field id="CURRENT_OBJECT_CODE" extends="STRING_FIELD">
+				<fieldName>CURRENT_OBJECT_CODE</fieldName>
+				<displayName>代码</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="CURRENT_OBJECT_NAME" extends="STRING_FIELD">
+				<fieldName>CURRENT_OBJECT_NAME</fieldName>
+				<displayName>名称</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="START_DATE" extends="DATE_FIELD">
+				<fieldName>START_DATE</fieldName>
+				<displayName>有效期从</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="END_DATE" extends="DATE_FIELD">
+				<fieldName>END_DATE</fieldName>
+				<displayName>有效期到</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="COUNTRY_AREA_ID" extends="INT_FIELD">
+				<fieldName>COUNTRY_AREA_ID</fieldName>
+				<displayName>国家/地区</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="PROID" extends="INT_FIELD">
+				<fieldName>PROID</fieldName>
+				<displayName>省份</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="OFFICE_PHONE" extends="STRING_FIELD">
+				<fieldName>OFFICE_PHONE</fieldName>
+				<displayName>办公电话</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="FAX" extends="STRING_FIELD">
+				<fieldName>FAX</fieldName>
+				<displayName>传真号</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="ADDRESS" extends="STRING_FIELD">
+				<fieldName>ADDRESS</fieldName>
+				<displayName>联系地址</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="QQ" extends="STRING_FIELD">
+				<fieldName>QQ</fieldName>
+				<displayName>QQ</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="ZIP_CODE" extends="STRING_FIELD">
+				<fieldName>ZIP_CODE</fieldName>
+				<displayName>邮政编码</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="EMAIL" extends="STRING_FIELD">
+				<fieldName>EMAIL</fieldName>
+				<displayName>电子邮件</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="URL" extends="STRING_FIELD">
+				<fieldName>URL</fieldName>
+				<displayName>网址</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="UNIT_ID" extends="FOREIGN_KEY">
+				<fieldName>UNIT_ID</fieldName>
+				<displayName>集团内公司</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+				<relationDS>
+					<relationItem>
+						<id>R</id>
+						<relationExpr>1</relationExpr>
+						<relationModelId>rl_org</relationModelId>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="ATTRIBUTE" extends="STRING_FIELD">
+				<fieldName>ATTRIBUTE</fieldName>
+				<displayName>往来对象属性</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="CORPORATION" extends="STRING_FIELD">
+				<fieldName>CORPORATION</fieldName>
+				<displayName>法定代表人</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="TAX_REG_NO" extends="STRING_FIELD">
+				<fieldName>TAX_REG_NO</fieldName>
+				<displayName>税务登记证号</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="CORP_NAME" extends="STRING_FIELD">
+				<fieldName>CORP_NAME</fieldName>
+				<displayName>企业名称</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="CORP_TYPE" extends="STRING_FIELD">
+				<fieldName>CORP_TYPE</fieldName>
+				<displayName>企业类型</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="REG_ADDRESS" extends="STRING_FIELD">
+				<fieldName>REG_ADDRESS</fieldName>
+				<displayName>注册地址</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="REG_CAPITAL" extends="STRING_FIELD">
+				<fieldName>REG_CAPITAL</fieldName>
+				<displayName>注册资本</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="MANAGE_TIME_LIMIT" extends="INT_FIELD">
+				<fieldName>MANAGE_TIME_LIMIT</fieldName>
+				<displayName>经营期限</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="SEND_ORG" extends="STRING_FIELD">
+				<fieldName>SEND_ORG</fieldName>
+				<displayName>发证机关</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="SEND_DATE" extends="DATE_FIELD">
+				<fieldName>SEND_DATE</fieldName>
+				<displayName>发证日期</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="MANAGE_AREA" extends="STRING_FIELD">
+				<fieldName>MANAGE_AREA</fieldName>
+				<displayName>经营范围</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="CORP_NAME1" extends="STRING_FIELD">
+				<fieldName>CORP_NAME</fieldName>
+				<displayName>企业名称</displayName>
+				<virtual>true</virtual>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="LICENSE_NO" extends="STRING_FIELD">
+				<fieldName>LICENSE_NO</fieldName>
+				<displayName>营业执照编号</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="FOUND_DATE" extends="DATE_FIELD">
+				<fieldName>FOUND_DATE</fieldName>
+				<displayName>成立日期</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="ABODE" extends="STRING_FIELD">
+				<fieldName>ABODE</fieldName>
+				<displayName>住所</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="REG_NO" extends="STRING_FIELD">
+				<fieldName>REG_NO</fieldName>
+				<displayName>注册号</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="REG_ORG" extends="STRING_FIELD">
+				<fieldName>REG_ORG</fieldName>
+				<displayName>登记机关</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="BRANCN_ORG" extends="STRING_FIELD">
+				<fieldName>BRANCN_ORG</fieldName>
+				<displayName>分支机构</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+			<field id="REG_DATE" extends="DATE_FIELD">
+				<fieldName>REG_DATE</fieldName>
+				<displayName>登记日期</displayName>
+				<tableName>PUB_CURRENT_OBJECT</tableName>
+			</field>
+
+		</bizField>
+	</masterData>
+</datasource>

@@ -227,12 +227,19 @@ function(key, values) {
 
 func (c Component) ScriptTest() revel.Result {
 	o := ExpressionParser{}
-	classMethod := "SysUser.beforeBuildQuery"
-	result := o.ParseClass(classMethod)
+//	classMethod := "SysUser.beforeBuildQuery"
+//	paramMap := map[string]string{
+//		"age": "20",
+//	}
+//	result := o.ParseBeforeBuildQuery(classMethod, paramMap)
+	classMethod := "SysUser.afterBuildQuery"
+	queryLi := []map[string]interface{}{
+		map[string]interface{}{"name": "test"},
+		map[string]interface{}{"nick": "测试"},
+	}
+	result := o.ParseAfterBuildQuery(classMethod, queryLi)
 	c.Response.ContentType = "application/json; charset=utf-8"
-	return c.RenderJson(map[string]string{
-		"result": result,
-	})
+	return c.RenderJson(result)
 }
 
 func (c Component) MongoTest() revel.Result {

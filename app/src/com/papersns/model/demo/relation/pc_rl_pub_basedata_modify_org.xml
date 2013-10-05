@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<relationDS xmlns="http://www.geeboo.org/relation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.org/relation http://www.geeboo.org/relation ">
+	<id>rl_modify_org</id>
+	<displayName>修改组织</displayName>
+	<dataSourceId>organ</dataSourceId>
+	<selectWhereExpr></selectWhereExpr>
+	<detailRowMutilSelect>true</detailRowMutilSelect>
+	<copyFieldSet />
+	<relationFields>
+		<codeField>
+			<id>MODIFY_UNIT_CODE</id>
+			<srcField>[$F{UNIT_CODE}]</srcField>
+			<displayName>创建组织代码</displayName>
+			<fieldInList>false</fieldInList>
+			<listWhereField>false</listWhereField>
+		</codeField>
+		<displayField>
+			<id>MODIFY_UNIT_ANAME</id>
+			<displayExpr>[$F{UNIT_ANAME}]</displayExpr>
+			<displayName>创建组织名称</displayName>
+			<fieldInList>false</fieldInList>
+			<listWhereField>false</listWhereField>
+		</displayField>
+	</relationFields>
+</relationDS>

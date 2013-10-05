@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.geeboo.org/script"
+	xmlns:tns="http://www.geeboo.org/script" elementFormDefault="qualified">
+	<annotation>
+		<appinfo></appinfo>
+		<documentation>
+			标题：商业脚本Schema
+			版本：v1.0
+			创建者：SuJianFeng
+			创建时间： 2013-05-23
+			最后更新者：SuJianFeng
+			最后更新时间： 2013-05-23					
+		</documentation>
+	</annotation>
+	
+	<element name="script">
+		<complexType>
+			<sequence>				
+				<element name="id" type="string" />
+				<element name="displayName" type="string" />
+				<element name="dataSourceId" type="string" />
+				<element name="datasetId" type="string" />
+				<element name="fieldId" type="string" />				
+				<!-- 执行时机点 -->
+				<element name="opportunity">
+					<simpleType>
+						<restriction base="string">
+							<!-- 字段值验证时 -->
+							<enumeration value="onFieldValidate" />
+							<!-- 字段值改变时 -->
+							<enumeration value="onFieldChange" />
+							<!-- 行新增前 -->
+							<enumeration value="onRowBeforeNew" />
+							<!-- 行新增后 -->
+							<enumeration value="onRowAfterNew" />
+							<!-- 行编辑前 -->
+							<enumeration value="onRowBeforeEdit" />
+							<!-- 行编辑后 -->
+							<enumeration value="onRowAfterEdit" />
+							<!-- 行提交后 -->
+							<enumeration value="onRowPost" />
+							<!-- 行删除前 -->
+							<enumeration value="onRowBeforeDelete" />
+							<!-- 行删除后 -->
+							<enumeration value="onRowAfterDelete" />
+							<!-- 表单开启前 -->
+							<enumeration value="onBillBeforeFormLoad" />
+							<!-- 表单开启后 -->
+							<enumeration value="onBillAfterFormLoad" />
+							<!-- 表单关闭前 -->
+							<enumeration value="onBillBeforeFormClose" />
+							<!-- 表单关闭后 -->
+							<enumeration value="onBillAfterFormClose" />
+							<!-- 清单取数时 -->
+							<enumeration value="onBillGetListData" />
+							<!-- 表单取数时 -->
+							<enumeration value="onBillGetBillData" />
+							<!-- 单据新增前 -->
+							<enumeration value="onBillBeforeAddNew" />
+							<!-- 单据新增后 -->
+							<enumeration value="onBillAfterAddNew" />
+							<!-- 单据修改前 -->
+							<enumeration value="onBillBeforeEdit" />
+							<!-- 单据修改后 -->
+							<enumeration value="onBillAfterEdit" />
+							<!-- 单据保存前 -->
+							<enumeration value="onBillBeforeSave" />
+							<!-- 单据保存后 -->
+							<enumeration value="onBillAfterSave" />
+							<!-- 单据删除前 -->
+							<enumeration value="onBillBeforeDelete" />
+							<!-- 单据删除后 -->
+							<enumeration value="onBillAfterDelete" />
+							<!-- 单据提交前 -->
+							<enumeration value="onBillBeforeSubmit" />
+							<!-- 单据提交后 -->
+							<enumeration value="onBillAfterSubmit" />
+							<!-- 单据审核前 -->
+							<enumeration value="onBillBeforeAudit" />
+							<!-- 单据审核后 -->
+							<enumeration value="onBillAfterAudit" />
+							<!-- 单据反审核前 -->														
+							<enumeration value="onBillBeforeUnAudit" />
+							<!-- 单据反审核后 -->
+							<enumeration value="onBillAfterUnAudit" />
+							<!-- 单据作废前 -->
+							<enumeration value="onBillBeforeCancel" />
+							<!-- 单据作废后 -->
+							<enumeration value="onBillAfterCancel" />
+							<!-- 单据反作废前 -->														
+							<enumeration value="onBillBeforeUnCancel" />
+							<!-- 单据反作废后 -->
+							<enumeration value="onBillAfterUnCancel" />
+							<!-- 单据结案前 -->
+							<enumeration value="onBillBeforeClose" />
+							<!-- 单据结案后 -->
+							<enumeration value="onBillAfterClose" />
+							<!-- 单据反结案前 -->														
+							<enumeration value="onBillBeforeUnClose" />
+							<!-- 单据反结案后 -->
+							<enumeration value="onBillAfterUnClose" />
+							<!-- 单据转单转出前 -->
+							<enumeration value="onBillBeforeTransOut" />
+							<!-- 单据转单转出后 -->
+							<enumeration value="onBillAfterTransOut" />
+							<!-- 单据转单转入前 -->
+							<enumeration value="onBillBeforeTransIn" />
+							<!-- 单据转单转入后 -->
+							<enumeration value="onBillAfterTransIn" />														
+						</restriction>
+					</simpleType>
+				</element>
+				<element name="scriptContext" type="string" />
+				<!-- 脚本类型 -->
+				<element name="scriptType">
+					<simpleType>
+						<restriction base="string" >
+							<!-- java脚本 -->
+							<enumeration value="java" />
+							<!-- javascript脚本 -->
+							<enumeration value="javascript" />
+						</restriction>
+					</simpleType>
+				</element>
+				<element name="stop" type="boolean" default="false"/>
+			</sequence>
+		</complexType>
+	</element>
+
+</schema>

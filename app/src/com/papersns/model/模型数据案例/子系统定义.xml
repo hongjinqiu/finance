@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemRoot>
+	<System Id="SYSTEM" DisplayName="基础系统">
+	</System>
+	<System Id="HR" DisplayName="人力资源">
+	</System>
+	<System Id="ACCNT" DisplayName="财务系统">
+		<System Id="CASH" DisplayName="出纳" />
+		<System Id="GL" DisplayName="总账" />
+		<System Id="FUND" DisplayName="帐款" />
+		<System Id="INVOICE" DisplayName="票据" />
+		<System Id="UNITE" DisplayName="集团财务" />
+	</System>			
+</SystemRoot>
+

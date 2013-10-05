@@ -9,6 +9,9 @@ import (
 type TemplateManager struct{}
 
 func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
+	expressionParser := ExpressionParser{}
+	paramMap = expressionParser.ParseBeforeBuildQuery(listTemplate.BeforeBuildQuery, paramMap)
+
 	queryMap := map[string]interface{}{}
 	queryLi := []map[string]interface{}{}
 
@@ -36,6 +39,8 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 			}
 		}
 	}
+	
+	queryLi = expressionParser.ParseAfterBuildQuery(listTemplate.AfterBuildQuery, queryLi)
 
 	querySupport := QuerySupport{}
 	queryMap["$and"] = queryLi
@@ -49,19 +54,29 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	}
 	if mapStr == "" {
 		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte))
-	
-		return querySupport.Index(collection, queryMap, pageNo, pageSize)
+		result := querySupport.Index(collection, queryMap, pageNo, pageSize)
+		items := result["items"].([]interface{})
+		result["items"] = expressionParser.ParseAfterQueryData(listTemplate.AfterQueryData, items)
+		return result
 	}
 	mapReduce := mgo.MapReduce{
 		Map: mapStr,
 		Reduce: reduce,
 	}
+	
+	mapReduceByte, err := json.MarshalIndent(mapReduce, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	
+	log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) + ",mapReduce:" + string(mapReduceByte))
 	mapReduceLi := querySupport.MapReduceAll(collection, queryMap, mapReduce)
 	items := []interface{}{}
 	for _, item := range mapReduceLi {
 		item["id"] = item["_id"]
 		items = append(items, item)
 	}
+	items = expressionParser.ParseAfterQueryData(listTemplate.AfterQueryData, items)
 	return map[string]interface{}{
 		"totalResults": len(mapReduceLi),
 		"items":        items,

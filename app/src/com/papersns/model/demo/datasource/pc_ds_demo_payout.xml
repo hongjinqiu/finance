@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>demoPayout</id>
+	<displayName>报销单(demo)</displayName>
+	<systemId>DEMO</systemId>
+	<codeFieldName>BILL_NO</codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField>ORG_ID</orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BILL</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace>/finance/cash/payout</actionNameSpace>
+	<listUrl>/component/schema.go?@name=PL_DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField>BILL_TYPE_ID</billTypeField>
+	<billTypeParamDataSource>demoPayoutTypeParam</billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams>
+		<fieldId>ORG_ID</fieldId>
+		<fieldId>BILL_TYPE_ID</fieldId>
+	</enterParams>
+	<listSortFields>
+		<field>
+			<fieldId>BILL_DATE</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+		<field>
+			<fieldId>BILL_NO</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+	</listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>true</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>DEMO_PAYOUT</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>DEMO_ID</fieldName>
+				<displayName>主键</displayName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY" />
+			<CREATE_TIME extends="CREATE_TIME" />
+			<CREATE_UNIT extends="CREATE_UNIT" />
+			<CREATE_DEPT extends="CREATE_DEPT" />
+			<MODIFY_BY extends="MODIFY_BY" />
+			<MODIFY_UNIT extends="MODIFY_UNIT" />
+			<MODIFY_TIME extends="MODIFY_TIME" />
+			<AUDIT_STATUS extends="AUDIT_STATUS" />
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS" />
+			<AUDIT_BY extends="AUDIT_BY" />
+			<AUDIT_TIME extends="AUDIT_TIME" />
+			<BILL_STATUS extends="BILL_STATUS" />
+			<ATTACH_COUNT extends="ATTACH_COUNT" />
+			<IS_INITBILL extends="IS_INITBILL" />
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN" />
+			<REMARK extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="BILL_NO" extends="CODE_FIELD">
+				<fieldName>BILL_NO</fieldName>
+				<displayName>单据编号</displayName>
+				<tableName>DEMO_PAYOUT</tableName>
+			</field>
+			<field id="BILL_DATE" extends="DATE_FIELD">
+				<fieldName>BILL_DATE</fieldName>
+				<displayName>单据日期</displayName>
+				<tableName>DEMO_PAYOUT</tableName>
+			</field>
+			<field id="ORG_ID" extends="FOREIGN_KEY">
+				<fieldName>ORG_ID</fieldName>
+				<displayName>公司</displayName>
+				<tableName>DEMO_PAYOUT</tableName>
+				<!--<relationDS>
+					<relationItem>
+						<id>R</id>
+						<relationExpr>1</relationExpr>
+						<relationModelId>xxx</relationModelId>
+					</relationItem>
+				</relationDS>-->			
+			</field>
+			<field id="BILL_TYPE_ID" extends="FOREIGN_KEY">
+				<fieldName>BILL_TYPE_ID</fieldName>
+				<displayName>单据类型</displayName>
+				<tableName>DEMO_PAYOUT</tableName>
+				<!--<relationDS>
+					<relationItem>
+						<id>R</id>
+						<relationExpr>1</relationExpr>
+						<relationModelId>xxx</relationModelId>
+					</relationItem>
+				</relationDS>-->			
+			</field>
+			
+			<field id="PERSON_ID" extends="FOREIGN_KEY">
+				<fieldName>PERSON_ID</fieldName>
+				<displayName>报销人</displayName>
+				<tableName>DEMO_PAYOUT</tableName>
+				<!--<relationDS>
+					<relationItem>
+						<id>R</id>
+						<relationExpr>1</relationExpr>
+						<relationModelId>xxx</relationModelId>
+					</relationItem>
+				</relationDS>-->			
+			</field>				
+			<field id="AMT_PAYOUT" extends="AMOUNT_FIELD">
+				<fieldName>AMT_PAYOUT</fieldName>
+				<displayName>报销金额</displayName>
+				<tableName>DEMO_PAYOUT</tableName>
+			</field>									
+		</bizField>
+	</masterData>
+	<detailData>
+		<id>B</id>
+		<displayName>分录数据集</displayName>
+		<parentId>A</parentId>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowEmptyRow>false</allowEmptyRow>
+		<allowCopy>true</allowCopy>
+		<readonly>false</readonly>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>BILL_ID</billIdField>
+		<parentIdField>PARENT_ID</parentIdField>
+		<fixFieldTableName>DEMO_PAYOUT_ITEM</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY"/>
+			<BILL_ID extends="BILL_ID"/> 				
+			<PARENT_ID extends="PARENT_ID"/>
+			<DATASET_ID extends="DATASET_ID"/>
+			<TRANSFER_IN_ID extends="TRANSFER_IN_ID"/>
+			<TRANSFER_OUT_ID extends="TRANSFER_OUT_ID"/>
+			<SRC_DATASOURCE_ID extends="SRC_DATASOURCE_ID"/>
+			<SRC_DATASET_ID extends="SRC_DATASET_ID"/>
+			<SRC_BILL_ID extends="SRC_BILL_ID"/>
+			<SRC_DETAIL_ID extends="SRC_DETAIL_ID"/>
+			<CREATE_BY extends="CREATE_BY"/>
+			<CREATE_TIME extends="CREATE_TIME"/>
+			<CREATE_UNIT extends="CREATE_UNIT"/>
+			<CREATE_DEPT extends="CREATE_DEPT" />
+			<MODIFY_BY extends="MODIFY_BY"/>
+			<MODIFY_UNIT extends="MODIFY_UNIT"/>
+			<MODIFY_TIME extends="MODIFY_TIME"/>
+			<ATTACH_COUNT extends="ATTACH_COUNT"/>
+			<REMARK extends="REMARK"/>
+		</fixField>
+		
+		<bizField>		
+			<field id="PERSON_ID" extends="FOREIGN_KEY">
+				<fieldName>PERSON_ID</fieldName>
+				<displayName>预支人员</displayName>
+				<tableName>DEMO_PAYOUT_ITEM</tableName>
+				<!--<relationDS>
+					<relationItem>
+						<id>R</id>
+						<relationExpr>1</relationExpr>
+						<relationModelId>xxx</relationModelId>
+					</relationItem>
+				</relationDS>-->			
+			</field>				
+			<field id="AMT_USE" extends="AMOUNT_FIELD">
+				<fieldName>AMT_USE</fieldName>
+				<displayName>取用金额</displayName>
+				<tableName>DEMO_PAYOUT_ITEM</tableName>
+			</field>									
+		</bizField>
+		
+	</detailData>
+</datasource>

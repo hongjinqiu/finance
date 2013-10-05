@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>accountingperiod</id>
+	<displayName>会计期</displayName>
+	<systemId>CASH</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField></orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace>/finance/basedata/accountingperiod</actionNameSpace>
+	<listUrl>/component/schema.go?@name=DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams />
+	<listSortFields>
+		<field>
+			<fieldId>PRIMARY_KEY</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+	</listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>true</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>FIN_ACCOUNTING_PERIOD</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>ACCOUNTING_PERIOD_ID</fieldName>
+				<displayName>主键</displayName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY" />
+			<CREATE_TIME extends="CREATE_TIME" />
+			<CREATE_UNIT extends="CREATE_UNIT"/>
+			<CREATE_DEPT extends="CREATE_DEPT"/>
+			<MODIFY_BY extends="MODIFY_BY" />
+			<MODIFY_UNIT extends="MODIFY_UNIT" />
+			<MODIFY_TIME extends="MODIFY_TIME" />
+			<AUDIT_STATUS extends="AUDIT_STATUS" />
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS" />
+			<AUDIT_BY extends="AUDIT_BY" />
+			<AUDIT_TIME extends="AUDIT_TIME"/>
+			<BILL_STATUS extends="BILL_STATUS" />
+			<ATTACH_COUNT extends="ATTACH_COUNT"/>
+			<IS_INITBILL extends="IS_INITBILL"/>
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN"/>
+			<REMARK extends="REMARK"/>
+		</fixField>
+		<bizField>
+			<field id="ACCOUNTING_PERIOD_TYPE_ID" extends="INT_FIELD">
+				<fieldName>ACCOUNTING_PERIOD_TYPE_ID</fieldName>
+				<displayName>会计期类别</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+				  <relationItem>
+                     <id>R</id>
+                     <relationExpr>1==1</relationExpr>
+                     <relationModelId>rl_accountingperiodtype</relationModelId>
+                  </relationItem>
+				</relationDS>
+				<tableName>FIN_ACCOUNTING_PERIOD</tableName>
+			</field>
+			<field id="IS_USE_ADJUSTMENT" extends="INT_FIELD">
+				<fieldName>IS_USE_ADJUSTMENT</fieldName>
+				<displayName>使用调整期</displayName>
+				<defaultValueExpr>1</defaultValueExpr>
+				<allowEmpty>false</allowEmpty>
+				<fieldInList>true</fieldInList>
+				<tableName>FIN_ACCOUNTING_PERIOD</tableName>
+			</field>
+			<field id="ACCOUNTING_YEAR" extends="INT_FIELD">
+				<fieldName>ACCOUNTING_YEAR</fieldName>
+				<displayName>会计年度</displayName>
+				<fieldInList>true</fieldInList>
+				<allowEmpty>false</allowEmpty>
+				<tableName>FIN_ACCOUNTING_PERIOD</tableName>
+			</field>
+			<field id="NUM_ACCOUNTING_PERIOD" extends="INT_FIELD">
+				<fieldName>NUM_ACCOUNTING_PERIOD</fieldName>
+				<displayName>会计期总数</displayName>
+				<fieldInList>true</fieldInList>
+				<allowEmpty>false</allowEmpty>
+				<tableName>FIN_ACCOUNTING_PERIOD</tableName>
+			</field>
+		</bizField>
+	</masterData>
+	<detailData>
+		<id>B</id>
+		<displayName>分录数据集</displayName>
+		<parentId>A</parentId>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowEmptyRow>false</allowEmptyRow>
+		<allowCopy>true</allowCopy>
+		<readonly>false</readonly>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>BILL_ID</billIdField>
+		<parentIdField>PARENT_ID</parentIdField>
+		<fixFieldTableName>FIN_ACCOUNTING_PERIOD_ITEM</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>ACCOUNTING_PERIOD_ITEM_ID</fieldName>
+				<displayName>主键</displayName>
+			</PRIMARY_KEY>
+			<BILL_ID extends="BILL_ID"/> 				
+			<PARENT_ID extends="PARENT_ID"/>
+			<DATASET_ID extends="DATASET_ID"/>
+			<TRANSFER_IN_ID extends="TRANSFER_IN_ID"/>
+			<TRANSFER_OUT_ID extends="TRANSFER_OUT_ID"/>
+			<SRC_DATASOURCE_ID extends="SRC_DATASOURCE_ID"/>
+			<SRC_DATASET_ID extends="SRC_DATASET_ID"/>
+			<SRC_BILL_ID extends="SRC_BILL_ID"/>
+			<SRC_DETAIL_ID extends="SRC_DETAIL_ID"/>
+			<CREATE_BY extends="CREATE_BY"/>
+			<CREATE_TIME extends="CREATE_TIME"/>
+			<CREATE_UNIT extends="CREATE_UNIT"/>
+			<CREATE_DEPT extends="CREATE_DEPT" />
+			<MODIFY_BY extends="MODIFY_BY"/>
+			<MODIFY_UNIT extends="MODIFY_UNIT"/>
+			<MODIFY_TIME extends="MODIFY_TIME"/>
+			<ATTACH_COUNT extends="ATTACH_COUNT"/>
+			<REMARK extends="REMARK"/>
+		</fixField>
+		<bizField>
+			<field id="SEQUENCE_NO" extends="INT_FIELD">
+				<fieldName>SEQUENCE_NO</fieldName>
+				<displayName>会计期</displayName>
+				<fieldInList>true</fieldInList>
+				<tableName>FIN_ACCOUNTING_PERIOD_ITEM</tableName>			
+			</field>
+			<field id="START_DATE" extends="DATE_FIELD">
+				<fieldName>START_DATE</fieldName>
+				<displayName>开始日期</displayName>
+				<fieldInList>true</fieldInList>
+				<tableName>FIN_ACCOUNTING_PERIOD_ITEM</tableName>
+			</field>
+			<field id="END_DATE" extends="DATE_FIELD">
+				<fieldName>START_DATE</fieldName>
+				<displayName>结束日期</displayName>
+				<fieldInList>true</fieldInList>
+				<tableName>FIN_ACCOUNTING_PERIOD_ITEM</tableName>
+			</field>
+			<field id="ACCOUNTING_PERIOD_ID" extends="INT_FIELD">
+				<fieldName>ACCOUNTING_PERIOD_ID</fieldName>
+				<displayName>所属会计期</displayName>
+				<fieldInList>true</fieldInList>
+				<tableName>FIN_ACCOUNTING_PERIOD_ITEM</tableName>
+			</field>				
+		</bizField>
+	</detailData>
+</datasource>

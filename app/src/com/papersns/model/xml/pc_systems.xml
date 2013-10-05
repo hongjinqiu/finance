@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system xmlns="http://www.geeboo.org/systemDefine" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.org/systemDefine http://www.geeboo.org/systemDefine ">
+	<id>0</id>
+	<displayName>信息化系统</displayName>
+	<system>
+		<id>DEMO</id>
+		<displayName>演示</displayName>
+	</system>
+	<system>
+		<id>COMM</id>
+		<displayName>共用系统</displayName>
+	</system>
+	<system>
+		<id>HR</id>
+		<displayName>人力系统</displayName>
+	</system>
+	<system>
+		<id>AD</id>
+		<displayName>行政系统</displayName>
+	</system>
+	<system>
+		<id>OA</id>
+		<displayName>办公系统</displayName>
+	</system>
+	<system>
+		<id>CASH</id>
+		<displayName>出纳系统</displayName>
+	</system>
+	<system>
+		<id>FUND</id>
+		<displayName>账款系统</displayName>
+	</system>
+	<system>
+		<id>FA</id>
+		<displayName>总账系统</displayName>
+	</system>	
+</system>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 数据源模型 -->
+<DataSource Id="comPerson" ProgId="comPerson" DisplayName="人员资料" SystemId="HR" CodeFieldName="PersonCode"
+	BusinessDateField="" OrgIdField="OrgId" IsAccount="true" DepartIdField="DepartId" IsAdvancedPermittion="true"
+	ProgType="ProgType.MasterData" EnterParams="" InUsedDenyDelete="true" InUsedDenyEdit="false" 
+	InUsedDenyUnAudit="false" InUsedDenyUnCancel="false">
+	
+	<!-- 主数据集 -->
+	<MasterData Id="A" DatasetIndex="0" DisplayName="主数据集" ParentId="" CurrIdField="" LocalCurrField="" AllowEmptyRow="false"
+		AllowCopy="false" IsReadonly="false">
+		
+		<!-- 固定字段 -->
+		<FixField>
+		
+		</FixField>		
+		
+		
+		<!-- 业务字段 -->		
+		<BizField>					
+			<Field Id="PersonCode" FieldName="PersonCode" TableName="comPerson" FieldIndex="0" DisplayName="人员编号" 
+				FieldDataType="String" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="10" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.PersonCode" DefaultValueExpr="">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+			
+			<Field Id="PersonName" FieldName="PersonName" TableName="comPerson" FieldIndex="0" DisplayName="人员姓名" 
+				FieldDataType="String" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.PersonName">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS></RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+				
+			<Field Id="OrgId" FieldName="OrgId" TableName="comPerson" FieldIndex="0" DisplayName="归属组织" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS>
+					<Relation Condition="true" RelationId="RlsOrg"/>
+				</RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+			
+			<Field Id="DepartId" FieldName="DepartId" TableName="comPerson" FieldIndex="0" DisplayName="归属部门" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="FieldTemplet.SysId">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS>
+					<Relation Condition="true" RelationId="RlsDepartment"/>
+				</RelationDS>
+				<Dictionary></Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>
+			
+			<Field Id="Sex" FieldName="Sex" TableName="comPerson" FieldIndex="0" DisplayName="性别" 
+				FieldDataType="int" FieldNumberType="FieldNumberType.unDefine"
+				FieldLength="20" CheckInUsed="true" FixHide="false" FixReadOnly="false" DenyEditInUsed="false" 
+				IsVirtual="false" IsAdvancedPermittion="true" ZeroShowEmpty="false" IsLocalCurr="false" 
+				FieldModuleId="">
+				<DefaultValueExpr></DefaultValueExpr>
+				<DefaultReadOnlyExpr>false</DefaultReadOnlyExpr>			
+				<AllowDuplicateExpr>true</AllowDuplicateExpr>
+				<AllowDuplicateInOrgExpr>false</AllowDuplicateInOrgExpr>
+				<CalcValueExpr></CalcValueExpr>
+				<RelationDS>
+					<Relation Condition="true" RelationId="RlsDepartment"/>
+				</RelationDS>
+				<Dictionary>Sex</Dictionary>
+				<DictionaryWhere></DictionaryWhere>
+			</Field>		
+		</BizField>
+		
+	</MasterData>
+		
+</DataSource>
+
+<!--
+ 	/*
+		这个案例是一个简单且典型的关联逻辑，
+		人员资料的【归属部门】关联到部门资料；
+		关联部门的关联模型设置了RelationFields的【部门主管姓名】;
+		部门资料的【部门主管】关联了人员资料，部门主管姓名从人员资料上带出；
+		自动产生的取人员资料主数据的语法（系统固定字段同理，这里不显示）：
+	*/
+	
+	Select A.PERSON_ID, A.PersonCode, A.PersonName, /*内部Id，人员编号，人员姓名*/
+		   A.OrgId, A_3_0.OrgCode, A_3_0.OrgName, /*组织Id，组织代码，组织名称*/
+		   A.DepartId, A_4_0.DepartCode, A_4_0.DepartName, /*部门Id，部门代码，部门名称*/
+		   A_4_0_5_0.PersonName DepartLeader /*部门主管姓名*/		   
+	From comPerson A
+	Left Join comOrg A_3_0 on A.OrgId = A_3_0.OrgId
+	Left Join comDepartment A_4_0 on A.DepartId = A_4_0.DepartId
+	Left Join comPerson A_4_0_5_0 on A_4_0.LeaderId = A_4_0_5_0.PersonId 
+	where A.PERSON_ID = 'XXX'
+	
+	/*
+		别名 A_3_0 含义： 
+			A: 人员资料的主数据集的代码
+			3: 人员资料的组织id字段序号为3
+			0: 组织字段RelationDS的第一个关联模型（关联组织）
+			
+		别名A_4_0_5_0含义： 
+			A: 人员资料的主数据集的代码
+			4: 人员字段的部门id字段序号为4
+			0: 部门字段RelationDS的第一个关联模型（关联部门）
+			5: 部门资料的主管id字段序号为5
+			0: 主管字段RelationDS的第一个关联模型（关联人员）
+	*/
+	
+	
+	
+ -->
+ 
+
+

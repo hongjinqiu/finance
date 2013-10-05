@@ -4,6 +4,7 @@ import (
 	"github.com/sbinet/go-python"
 	"strings"
 	"sync"
+	"encoding/json"
 )
 
 var rwlock sync.RWMutex = sync.RWMutex{}
@@ -126,10 +127,52 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	return strings.ToLower(execResult) == "true"
 }
 
-func (o ExpressionParser) ParseClass(classMethod string) string {
+func (o ExpressionParser) ParseBeforeBuildQuery(classMethod string, paramMap map[string]string) map[string]string {
 	if strings.TrimSpace(classMethod) == "" {
-		return ""
+		return paramMap
 	}
+	
+	execResult := o.parseClassMethod(classMethod, paramMap)
+	
+	result := map[string]string{}
+	err := json.Unmarshal([]byte(execResult), &result)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+func (o ExpressionParser) ParseAfterBuildQuery(classMethod string, queryLi []map[string]interface{}) []map[string]interface{} {
+	if strings.TrimSpace(classMethod) == "" {
+		return queryLi
+	}
+	
+	execResult := o.parseClassMethod(classMethod, queryLi)
+	
+	result := []map[string]interface{}{}
+	err := json.Unmarshal([]byte(execResult), &result)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+func (o ExpressionParser) ParseAfterQueryData(classMethod string, items []interface{}) []interface{} {
+	if strings.TrimSpace(classMethod) == "" {
+		return items
+	}
+
+	execResult := o.parseClassMethod(classMethod, items)
+	
+	result := []interface{}{}
+	err := json.Unmarshal([]byte(execResult), &result)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+func (o ExpressionParser) parseClassMethod(classMethod string, obj interface{}) string {
 	if !isEnvInit() {
 		InitPythonEnv()
 	}
@@ -150,7 +193,14 @@ func (o ExpressionParser) ParseClass(classMethod string) string {
 		panic("get method:" + methodName + " return nil")
 	}
 
-	strargs := python.PyTuple_New(0)
+	jsonStringByte, err := json.Marshal(&obj)
+	if err != nil {
+		panic(err)
+	}
+	
+	strargs := python.PyTuple_New(1)
+	args1 := python.PyString_FromString(string(jsonStringByte))
+	python.PyTuple_SET_ITEM(strargs, 0, args1)
 	
 	strret := method.CallObject(strargs)
 	if strret == nil {
@@ -160,7 +210,6 @@ func (o ExpressionParser) ParseClass(classMethod string) string {
 	python.PyErr_Print()
 	python.PyErr_Clear()
 
-	execResult := python.PyString_AS_STRING(strret)
-	return execResult
+	return python.PyString_AS_STRING(strret)
 }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RlsPerson Id="RlsPerson" Code="RlsPerson" DisplayName="关联人员" RelationDS="comPerson" 
+	CodeFieldName="PersonCode" DetailRowMutilSelect="true">
+	<!-- 这里的显示表达式用于在来源数集中对部门进行显示的内容，Alias用于创建关联语法时，存放显示内容虚字段的别名 -->
+	<DisplayExpr Alias="PersonName">[A.PersonName]</DisplayExpr>
+	<!-- 单多选条件：过滤离职人员 -->
+	<SelectWhereExpr>[A.IsDimission]=0</SelectWhereExpr>
+	<CopyFieldSet>
+	</CopyFieldSet>
+	<RelationFields>
+		<!-- 将人员性别带到来源数据源，作为关联字段显示出来 -->
+		<Field RlsField="[A.Sex]" Alias="" DisplayName="性别"/>
+	</RelationFields>
+</RlsPerson>

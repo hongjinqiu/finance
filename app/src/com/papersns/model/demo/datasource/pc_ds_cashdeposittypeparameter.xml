@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>cashDepositTypeParameter</id>
+	<displayName>现金存款单类型参数</displayName>
+	<systemId>CASH</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField></orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BILLTYPEPARAM</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace>/finance/cash/billtypeparameter</actionNameSpace>
+	<listUrl>/component/schema.go?@name=PL_DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams />
+	<listSortFields>
+		<field>
+			<fieldId>UNIT_ID</fieldId>
+			<sortType>ASC</sortType>
+		</field>
+		<field>
+			<fieldId>CASH_DEPOSIT_TYPE_ID</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+	</listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>true</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>FIN_CASH_DEPOSIT_TYPE_PARAMETER</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>CASH_DEPOSIT_TYPE_PARAMETER_ID</fieldName>
+				<displayName>主键</displayName>
+				<fieldInList>false</fieldInList>
+				<listWhereField>false</listWhereField>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY" />
+			<CREATE_TIME extends="CREATE_TIME" />
+			<CREATE_UNIT extends="CREATE_UNIT"/>
+			<CREATE_DEPT extends="CREATE_DEPT"/>
+			<MODIFY_BY extends="MODIFY_BY" />
+			<MODIFY_UNIT extends="MODIFY_UNIT" />
+			<MODIFY_TIME extends="MODIFY_TIME" />
+			<AUDIT_STATUS extends="AUDIT_STATUS" />
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS" />
+			<AUDIT_BY extends="AUDIT_BY" />
+			<AUDIT_TIME extends="AUDIT_TIME"/>
+			<BILL_STATUS extends="BILL_STATUS" />
+			<ATTACH_COUNT extends="ATTACH_COUNT"/>
+			<IS_INITBILL extends="IS_INITBILL"/>
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN"/>
+			<REMARK extends="REMARK"/>
+		</fixField>
+		<bizField>
+			<field id="UNIT_ID" extends="INT_FIELD">
+				<fieldName>UNIT_ID</fieldName>
+				<displayName>公司</displayName>
+				<fieldNumberType>UNDEFINE</fieldNumberType>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+				<tableName>FIN_CASH_DEPOSIT_TYPE_PARAMETER</tableName>
+			</field>
+			<field id="CASH_DEPOSIT_TYPE_ID" extends="INT_FIELD">
+				<fieldName>CASH_DEPOSIT_TYPE_ID</fieldName>
+				<displayName>单据类型</displayName>
+				<fieldNumberType>UNDEFINE</fieldNumberType>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+				<tableName>FIN_CASH_DEPOSIT_TYPE_PARAMETER</tableName>
+			</field>
+			<field id="CREATE_STATUS" extends="STRING_FIELD">
+				<fieldName>CREATE_STATUS</fieldName>
+				<displayName>创建状态</displayName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+				<tableName>FIN_CASH_DEPOSIT_TYPE_PARAMETER</tableName>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

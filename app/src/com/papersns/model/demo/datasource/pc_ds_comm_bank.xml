@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.geeboo.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+	<id>tellerBank</id>
+	<displayName>银行资料</displayName>
+	<systemId>COMM</systemId>
+	<codeFieldName>TELLER_BANK</codeFieldName>
+	<businessDateField></businessDateField>
+	<orgIdField>CREATE_UNIT</orgIdField>
+	<account>false</account>
+	<departIdField></departIdField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
+	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
+	<actionNameSpace>/pub/basedata/bank</actionNameSpace>
+	<listUrl>/component/schema.go?@name=PL_DATASOURCE_MODEL_LIST</listUrl>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<enterParams>
+		<fieldId>CREATE_UNIT</fieldId>
+	</enterParams>
+	<listSortFields>
+		<field>
+			<fieldId>CREATE_TIME</fieldId>
+			<sortType>DESC</sortType>
+		</field>
+		<field>
+			<fieldId>TELLER_BANK</fieldId>
+			<sortType>DESC</sortType>
+		</field>		
+	</listSortFields>	
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<currencyIdField></currencyIdField>
+		<nativeCurrencyIdField></nativeCurrencyIdField>
+		<allowCopy>true</allowCopy>
+		<primaryKey>PRIMARY_KEY</primaryKey>
+		<billIdField>PRIMARY_KEY</billIdField>
+		<parentIdField></parentIdField>
+		<fixFieldTableName>PUB_TELLER_BANK</fixFieldTableName>
+		<fixField>
+			<PRIMARY_KEY extends="PRIMARY_KEY">
+				<fieldName>TELLER_BANK_ID</fieldName>
+				<displayName>主键</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+			</PRIMARY_KEY>
+			<CREATE_BY extends="CREATE_BY">
+			</CREATE_BY>
+			<CREATE_TIME extends="CREATE_TIME">
+			</CREATE_TIME>
+			<CREATE_UNIT extends="CREATE_UNIT">
+			</CREATE_UNIT>
+			<CREATE_DEPT extends="CREATE_DEPT">
+			</CREATE_DEPT>
+			<MODIFY_BY extends="MODIFY_BY">
+			</MODIFY_BY>
+			<MODIFY_TIME extends="MODIFY_TIME">
+			</MODIFY_TIME>
+			<AUDIT_STATUS extends="AUDIT_STATUS">
+			</AUDIT_STATUS>
+			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS">
+			</HANDLE_AUDIT_STATUS>
+			<AUDIT_BY extends="AUDIT_BY">
+			</AUDIT_BY>
+			<AUDIT_TIME extends="AUDIT_TIME">
+			</AUDIT_TIME>
+			<BILL_STATUS extends="BILL_STATUS">
+			</BILL_STATUS>
+			<ATTACH_COUNT extends="ATTACH_COUNT">
+			</ATTACH_COUNT>
+			<IS_INITBILL extends="IS_INITBILL">
+			</IS_INITBILL>
+			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN">
+			</IS_AUDIT_SIGN>
+			<REMARK extends="REMARK">
+			</REMARK>
+		</fixField>
+		<bizField>
+			<field id="TELLER_BANK" extends="STRING_FIELD">
+				<fieldName>TELLER_BANK</fieldName>
+				<displayName>代码</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="DATA_NAME" extends="STRING_FIELD">
+				<fieldName>DATA_NAME</fieldName>
+				<displayName>名称</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>30</fieldLength>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="BANK_SHORT" extends="STRING_FIELD">
+				<fieldName>BANK_SHORT</fieldName>
+				<displayName>银行简称</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>30</fieldLength>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="LINKMAN" extends="STRING_FIELD">
+				<fieldName>LINKMAN</fieldName>
+				<displayName>主要联系人</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>40</fieldLength>
+				<fieldInList>true</fieldInList>
+				<listWhereField>true</listWhereField>
+			</field>
+			<field id="BANK_URL" extends="STRING_FIELD">
+				<fieldName>BANK_URL</fieldName>
+				<displayName>银行网址</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>100</fieldLength>
+				<fieldInList>true</fieldInList>
+			</field>
+			<field id="LINK_PHONE" extends="STRING_FIELD">
+				<fieldName>LINK_PHONE</fieldName>
+				<displayName>联系电话</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>50</fieldLength>
+				<fieldInList>true</fieldInList>
+			</field>
+			<field id="CUS_PHONE" extends="STRING_FIELD">
+				<fieldName>CUS_PHONE</fieldName>
+				<displayName>客服电话</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>50</fieldLength>
+				<fieldInList>true</fieldInList>
+			</field>
+			<field id="COMPLAIN_PHONE" extends="STRING_FIELD">
+				<fieldName>COMPLAIN_PHONE</fieldName>
+				<displayName>投诉电话</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>50</fieldLength>
+				<fieldInList>true</fieldInList>
+			</field>
+			<field id="BANK_ADDRESS" extends="STRING_FIELD">
+				<fieldName>BANK_ADDRESS</fieldName>
+				<displayName>银行地址</displayName>
+				<tableName>PUB_TELLER_BANK</tableName>
+				<fieldLength>100</fieldLength>
+				<fieldInList>true</fieldInList>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>
