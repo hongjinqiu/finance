@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.geeboo.com/datasource" xmlns:tns="http://www.geeboo.com/datasource" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.papersns.com/datasource" xmlns:tns="http://www.papersns.com/datasource" elementFormDefault="qualified">
 	<annotation>
 		<appinfo></appinfo>
 		<documentation>
@@ -36,6 +36,8 @@
 				<element name="codeFieldName" type="string" default="" />
 				<!-- 业务日期字段 -->
 				<element name="businessDateField" type="string" default="" />
+				<!-- 总账帐簿 -->
+				<element name="accountBookIdField" type="string" default="" />
 				<!-- 数据源类型 -->
 				<element name="modelType">
 					<simpleType>
@@ -59,6 +61,8 @@
 				<element name="actionNameSpace" type="string" />
 				<!-- 清单URL -->
 				<element name="listUrl" type="string" default="/component/schema.go?@name=DATASOURCE_MODEL_LIST" />
+				<!-- collectionName -->
+				<element name="collectionName" type="string" default="" />
 				<!-- 单据类型字段id -->
 				<element name="billTypeField" type="string" default="" />
 				<!-- 单据类型参数数据源模型id -->
@@ -124,6 +128,12 @@
 								<complexType>
 									<group ref="tns:field-group"></group>
 									<attribute name="extends" default="CREATE_UNIT" />
+								</complexType>
+							</element>
+							<element name="modifyBy" minOccurs="1" maxOccurs="1">
+								<complexType>
+									<group ref="tns:field-group"></group>
+									<attribute name="extends" default="MODIFY_BY" />
 								</complexType>
 							</element>
 							<element name="modifyUnit" minOccurs="1" maxOccurs="1">

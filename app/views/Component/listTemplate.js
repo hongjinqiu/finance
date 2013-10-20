@@ -1,3 +1,39 @@
+var yInst;
+var dtInst;
+
+//--------------测试函数区----------------
+function doEdit(o) {
+	console.log(o);
+	console.log(o.toJSON());
+}
+
+function test() {
+	console.log(getSelectRecordLi());
+}
+//------------------------------
+
+function getCheckboxCssSelector() {
+	return yInst.Lang.sub(".yui3-datatable-data .yui3-datatable-col-{select} input",{
+		"select": listTemplate.ColumnModel.CheckboxColumn.Name
+	});
+}
+
+function getSelectRecordLi() {
+	var li = yInst.all(getCheckboxCssSelector());
+	var result = [];
+	li.each(function(item){
+		if (item.get("checked")) {
+			result.push(dtInst.getRecord(item));
+		}
+	});
+	return result;
+}
+
+function doVirtualColumnBtnAction(elem, fn){
+	var o = dtInst.getRecord(yInst.one(elem));
+	fn(o);
+}
+
 function getQueryString(Y) {
 	var form = Y.one('#queryForm'), query;
   
@@ -105,59 +141,353 @@ YUI.add('listtemplate-paginator', function (Y) {
 	Y.Base.mix(Y.DataTable, [Y.DataTable.Paginator]);
 }, 'gallery-2013.01.16-21-05', {"requires": ["datatable-base", "base-build", "datatype", "json", "gallery-datatable-paginator"]});
 
-function getColumns(listTemplate, Y) {
-	var columns = [];
-	columns.push({
-		key:        'select',
-		allowHTML:  true, // to avoid HTML escaping
-		label:      '<input type="checkbox" class="protocol-select-all" title="全部选中"/>',
-		formatter:      '<input type="checkbox" />'
-		//,emptyCellValue: '<input type="checkbox"/>'
+function currencyFormatFunc(o) {
+	var formatConfig = null;
+	var currencyField = o.column.currencyField;
+	if (currencyField != "") {
+		var prefix = null;
+		var decimalPlaces = null;
+		if (o.column.isMoney == "true") {// 是否金额
+			if (sysParam[currencyField]) {// 本位币
+				prefix = sysParam[currencyField]["prefix"];
+				decimalPlaces = sysParam[currencyField]["decimalPlaces"];
+			}
+			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
+				prefix = o.data[currencyField]["prefix"];
+				decimalPlaces = o.data[currencyField]["decimalPlaces"];
+			}
+		} else if (o.column.isUnitPrice == "true") {// 单价
+			if (sysParam[currencyField]) {// 本位币
+				prefix = sysParam[currencyField]["prefix"];
+				decimalPlaces = sysParam[currencyField]["unitPriceDecimalPlaces"];
+			}
+			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
+				prefix = o.data[currencyField]["prefix"];
+				decimalPlaces = o.data[currencyField]["unitPriceDecimalPlaces"];
+			}
+		} else if (o.column.isCost == "true") {// 成本
+			if (sysParam[currencyField]) {// 本位币
+				prefix = sysParam[currencyField]["prefix"];
+				decimalPlaces = sysParam["unitCostDecimalPlaces"];
+			}
+			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
+				prefix = o.data[currencyField]["prefix"];
+				decimalPlaces = sysParam["unitCostDecimalPlaces"];
+			}
+		} else {// 是否金额
+			if (sysParam[currencyField]) {// 本位币
+				prefix = sysParam[currencyField]["prefix"];
+				decimalPlaces = sysParam[currencyField]["decimalPlaces"];
+			}
+			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
+				prefix = o.data[currencyField]["prefix"];
+				decimalPlaces = o.data[currencyField]["decimalPlaces"];
+			}
+		}
+		
+		if (prefix !== null) {
+			return yInst.DataType.Number.format(o.value, {
+				prefix: prefix,
+				decimalPlaces: decimalPlaces,
+				decimalSeparator: ".",
+				thousandsSeparator: sysParam.thousandsSeparator,
+				suffix: ""
+			});
+		} else {
+			console.log(o);
+			console.log("在系统参数和本行记录中,没有找到currencyField:" + currencyField);
+		}
+	} else if (o.column.isPercent == "true") {// 本位币
+		return yInst.DataType.Number.format(o.value, {
+			prefix: "",
+			decimalPlaces: sysParam["percentDecimalPlaces"],
+			decimalSeparator: ".",
+			thousandsSeparator: sysParam.thousandsSeparator,
+			suffix: "%"	
+		});
+	}
+	return yInst.DataType.Number.format(o.value, {
+//    	prefix            : o.column.prefix     || '￥',
+//		decimalPlaces     : o.column.decimalPlaces      || 2,
+//		decimalSeparator  : o.column.decimalSeparator   || '.',
+//		thousandsSeparator: o.column.thousandsSeparator || ',',
+//		suffix            : o.column.suffix || ''
+		prefix            : o.column.prefix,
+		decimalPlaces     : o.column.decimalPlaces,
+		decimalSeparator  : o.column.decimalSeparator,
+		thousandsSeparator: o.column.thousandsSeparator,
+		suffix            : o.column.suffix
 	});
+}
+
+function createIdColumn(listTemplate) {
 	if (listTemplate.ColumnModel.IdColumn.Hideable != "true") {
-		columns.push({
+		return {
 			key: listTemplate.ColumnModel.IdColumn.Name,
 			label: listTemplate.ColumnModel.IdColumn.Text
-		});
+		};
+	}
+	return null;
+}
+
+function createCheckboxColumn(listTemplate) {
+	if (listTemplate.ColumnModel.CheckboxColumn.Hideable != "true") {
+		var key = listTemplate.ColumnModel.CheckboxColumn.Name;
+		if (listTemplate.ColumnModel.SelectionMode == "radio") {
+			return {
+				key:        key,
+				allowHTML:  true, // to avoid HTML escaping
+				label:      '选择',
+				//formatter:      '<input type="radio" name="' + key + '" />'
+				formatter:function(o) {
+					if (o.value) {
+						return '<input type="radio" name="' + key + '" />';
+					}
+					return "";
+				}
+				//,emptyCellValue: '<input type="checkbox"/>'
+			};
+		} else {
+			return {
+				key:        key,
+				allowHTML:  true, // to avoid HTML escaping
+				label:      '<input type="checkbox" class="protocol-select-all" title="全部选中"/>',
+				//formatter:      '<input type="checkbox" />'
+				formatter:function(o) {
+					if (o.value) {
+						return '<input type="checkbox" />';
+					}
+					return "";
+				}
+				//,emptyCellValue: '<input type="checkbox"/>'
+			};
+		}
+	}
+	return null;
+}
+
+function createVirtualColumn(listTemplate, columnIndex) {
+	var i = columnIndex;
+	if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
+		var virtualColumn = listTemplate.ColumnModel.ColumnLi[i];
+		return {
+			key: listTemplate.ColumnModel.ColumnLi[i].Name,
+			label: listTemplate.ColumnModel.ColumnLi[i].Text,
+			allowHTML:  true, // to avoid HTML escaping
+			formatter:      function(virtualColumn){
+				return function(o){
+					var htmlLi = [];
+					var buttonBoLi = o.value[virtualColumn.Buttons.XMLName.Local];
+					for (var j = 0; j < virtualColumn.Buttons.ButtonLi.length; j++) {
+						var btnTemplate = null;
+						if (virtualColumn.Buttons.ButtonLi[j].Mode == "fn") {
+							btnTemplate = "<input type='button' value='{value}' onclick='doVirtualColumnBtnAction(this, {handler})' class='{class}' />";
+						} else if (virtualColumn.Buttons.ButtonLi[j].Mode == "url") {
+							btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
+						} else {
+							btnTemplate = "<input type='button' value='{value}' onclick='showModalDialog(\"{href}\")' class='{class}' />";
+						}
+						if (buttonBoLi[j]["isShow"]) {
+							// handler进行值的预替换,
+							var handler = virtualColumn.Buttons.ButtonLi[j].Handler;
+							handler = yInst.Lang.sub(handler, o.data);
+							htmlLi.push(yInst.Lang.sub(btnTemplate, {
+								value: virtualColumn.Buttons.ButtonLi[j].Text,
+								handler: handler,
+								"class": virtualColumn.Buttons.ButtonLi[j].IconCls,
+								href: handler
+							}));
+						}
+					}
+					return htmlLi.join("");
+				}
+			}(virtualColumn)
+		};
+	}
+	return null;
+}
+
+function createNumberColumn(listTemplate, columnIndex) {
+	var i = columnIndex;
+	var decimalPlaces = 2;
+	if (listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces) {
+		decimalPlaces = parseInt(listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces);
+	}
+	var isFormatter = listTemplate.ColumnModel.ColumnLi[i].Prefix != "";
+	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces != "";
+	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalSeparator != "";
+	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].ThousandsSeparator != "";
+	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
+	
+	// 财务相关字段的判断,以决定是否用 formatter 函数,
+	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].CurrencyField != "";
+	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].IsPercent != "";
+	
+	if (isFormatter) {
+		return {
+			key: listTemplate.ColumnModel.ColumnLi[i].Name,
+			label: listTemplate.ColumnModel.ColumnLi[i].Text,
+			formatter: currencyFormatFunc,
+			
+			prefix: listTemplate.ColumnModel.ColumnLi[i].Prefix,
+			decimalPlaces: decimalPlaces,
+			decimalSeparator: listTemplate.ColumnModel.ColumnLi[i].DecimalSeparator,
+			thousandsSeparator: listTemplate.ColumnModel.ColumnLi[i].ThousandsSeparator,
+			suffix: listTemplate.ColumnModel.ColumnLi[i].Suffix,
+			
+			currencyField: listTemplate.ColumnModel.ColumnLi[i].CurrencyField,
+			isPercent: listTemplate.ColumnModel.ColumnLi[i].IsPercent,
+			isMoney: listTemplate.ColumnModel.ColumnLi[i].IsMoney,
+			isUnitPrice: listTemplate.ColumnModel.ColumnLi[i].IsUnitPrice,
+			isCost: listTemplate.ColumnModel.ColumnLi[i].IsCost
+		};
+	}
+	return {
+		key: listTemplate.ColumnModel.ColumnLi[i].Name,
+		label: listTemplate.ColumnModel.ColumnLi[i].Text
+	};
+}
+
+/*
+	DisplayPattern string `xml:"displayPattern,attr"`
+	DbPattern      string `xml:"dbPattern,attr"`
+ */
+function createDateColumn(listTemplate, columnIndex) {
+	var i = columnIndex;
+	var dbPattern = listTemplate.ColumnModel.ColumnLi[i].DbPattern;
+	var displayPattern = listTemplate.ColumnModel.ColumnLi[i].DisplayPattern;
+	if (dbPattern && displayPattern) {
+		return {
+			key: listTemplate.ColumnModel.ColumnLi[i].Name,
+			label: listTemplate.ColumnModel.ColumnLi[i].Text,
+			dbPattern: dbPattern,
+			displayPattern: displayPattern,
+			formatter: function(o) {
+				if (o.value !== undefined && o.value !== null) {
+					var date = new Date();
+					var value = o.value + "";
+					if (o.column.dbPattern.indexOf("yyyy") > -1) {
+						var start = o.column.dbPattern.indexOf("yyyy");
+						var end = o.column.dbPattern.indexOf("yyyy") + "yyyy".length;
+						var yyyy = value.substring(start, end);
+						date.setYear(parseInt(yyyy));
+					}
+					if (o.column.dbPattern.indexOf("MM") > -1) {
+						var start = o.column.dbPattern.indexOf("MM");
+						var end = o.column.dbPattern.indexOf("MM") + "MM".length;
+						var mm = value.substring(start, end);
+						date.setMonth(parseInt(mm) - 1);
+					}
+					if (o.column.dbPattern.indexOf("dd") > -1) {
+						var start = o.column.dbPattern.indexOf("dd");
+						var end = o.column.dbPattern.indexOf("dd") + "dd".length;
+						var dd = value.substring(start, end);
+						date.setDate(parseInt(dd));
+					}
+					if (o.column.dbPattern.indexOf("HH") > -1) {
+						var start = o.column.dbPattern.indexOf("HH");
+						var end = o.column.dbPattern.indexOf("HH") + "HH".length;
+						var hh = value.substring(start, end);
+						date.setHours(parseInt(hh));
+					}
+					if (o.column.dbPattern.indexOf("mm") > -1) {
+						var start = o.column.dbPattern.indexOf("mm");
+						var end = o.column.dbPattern.indexOf("mm") + "mm".length;
+						var mm = value.substring(start, end);
+						date.setMinutes(mm);
+					}
+					if (o.column.dbPattern.indexOf("ss") > -1) {
+						var start = o.column.dbPattern.indexOf("ss");
+						var end = o.column.dbPattern.indexOf("ss") + "ss".length;
+						var ss = value.substring(start, end);
+						date.setSeconds(ss);
+					}
+					// js格式参考 http://yuilibrary.com/yui/docs/api/classes/Date.html#method_format
+					var displayPattern = o.column.displayPattern;
+					displayPattern = displayPattern.replace("yyyy", "%G");
+					displayPattern = displayPattern.replace("MM", "%m");
+					displayPattern = displayPattern.replace("dd", "%d");
+					displayPattern = displayPattern.replace("HH", "%H");
+					displayPattern = displayPattern.replace("mm", "%M");
+					displayPattern = displayPattern.replace("ss", "%S");
+					return yInst.DataType.Date.format(date, {
+						format: displayPattern
+					});
+				}
+				return o.value;
+			}
+		};
+	} else {
+		console.log(listTemplate.ColumnModel.ColumnLi[i]);
+		console.log("日期字段未同时配置dbPattern和displayPattern");
+	}
+	return {
+		key: listTemplate.ColumnModel.ColumnLi[i].Name,
+		label: listTemplate.ColumnModel.ColumnLi[i].Text
+	};
+}
+
+function createBooleanColumn(listTemplate, columnIndex) {
+	var i = columnIndex;
+	return {
+		key: listTemplate.ColumnModel.ColumnLi[i].Name,
+		label: listTemplate.ColumnModel.ColumnLi[i].Text,
+		formatter: function(o) {
+			if (o.value + "" == "true") {
+				return "是";
+			} else if (o.value + "" == "false") {
+				return "否";
+			}
+			return o.value;
+		}
+	};
+}
+
+function createColumn(listTemplate, columnIndex) {
+	var i = columnIndex;
+	if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local != "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
+		if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "number-column") {
+			return createNumberColumn(listTemplate, columnIndex);
+		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "date-column") {
+			return createDateColumn(listTemplate, columnIndex);
+		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "boolean-column") {
+			return createBooleanColumn(listTemplate, columnIndex);
+		}
+		return {
+			key: listTemplate.ColumnModel.ColumnLi[i].Name,
+			label: listTemplate.ColumnModel.ColumnLi[i].Text
+		};
+	}
+	return null;
+}
+
+function getColumns(listTemplate, Y) {
+	var columns = [];
+	var checkboxColumn = createCheckboxColumn(listTemplate);
+	if (checkboxColumn) {
+		columns.push(checkboxColumn);
+	}
+	var idColumn = createIdColumn(listTemplate);
+	if (idColumn) {
+		columns.push(idColumn);
 	}
 	
 	for (var i = 0; i < listTemplate.ColumnModel.ColumnLi.length; i++) {
-		if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local != "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
-			columns.push({
-				key: listTemplate.ColumnModel.ColumnLi[i].Name,
-				label: listTemplate.ColumnModel.ColumnLi[i].Text
-			});
-		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
-			var virtualColumn = listTemplate.ColumnModel.ColumnLi[i];
-			columns.push({
-				key: listTemplate.ColumnModel.ColumnLi[i].Name,
-				label: listTemplate.ColumnModel.ColumnLi[i].Text,
-				allowHTML:  true, // to avoid HTML escaping
-				formatter:      function(virtualColumn){
-					return function(o){
-//						console.log(o);
-						var htmlLi = [];
-						var btnTemplate = "<input type='button' value='{value}' />";
-						var buttonBoLi = o.value[virtualColumn.Buttons.XMLName.Local];
-						for (var j = 0; j < virtualColumn.Buttons.ButtonLi.length; j++) {
-							if (buttonBoLi[j]["isShow"]) {
-								htmlLi.push(Y.Lang.sub(btnTemplate, {
-									value: virtualColumn.Buttons.ButtonLi[j].Text
-								}));
-							}
-						}
-						return htmlLi.join("");
-					}
-				}(virtualColumn)
-			});
+		var column = createColumn(listTemplate, i);
+		if (column) {
+			columns.push(column);
+		} else {
+			var virtualColumn = createVirtualColumn(listTemplate, i);
+			if (virtualColumn) {
+				columns.push(virtualColumn);
+			}
 		}
 	}
 	return columns;
 }
 YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',  "gallery-datatable-paginator", 'gallery-paginator-view', "listtemplate-paginator", function(Y) {
 	Y.on("domready", function(e) {
-		var dataBo = Y.JSON.parse(dataBoJson);
-		var listTemplate = Y.JSON.parse(listTemplateJson);
+		yInst = Y;
 		var columns = getColumns(listTemplate, Y);
 		var data = dataBo.items;
 
@@ -213,6 +543,7 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 
             paginatorResize: true   // this is now a DT attribute (no longer a PaginatorView attribute)
 		});
+		dtInst = dt;
 		dt.plug(Y.Plugin.DataTableDataSource, { datasource: dataSource });
 		dt.render("#columnModel");
 		//dt.datasource.load({ request: "pageNo=1" });
@@ -221,11 +552,11 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 		
 		dt.delegate("click", function(e){
 			var checked = e.target.get('checked') || undefined;
-			Y.all(".yui3-datatable-data .yui3-datatable-col-select input").set("checked", checked ? "checked" : "");
+			Y.all(getCheckboxCssSelector()).set("checked", checked ? "checked" : "");
 		}, ".protocol-select-all", dt);
 		
 		dt.delegate("click", function(e){
-			var checkLi = Y.all(".yui3-datatable-data .yui3-datatable-col-select input").get("checked");
+			var checkLi = Y.all(getCheckboxCssSelector()).get("checked");
 			var isAllSelect = true;
 			var i = 0;
 			for(; i < checkLi.length; i++) {
@@ -234,8 +565,11 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 					break;
 				}
 			}
-			Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
-		}, ".yui3-datatable-data .yui3-datatable-col-select input", dt);
+			// 单选没有全部选中的按钮
+			if (Y.one(".protocol-select-all")) {
+				Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
+			}
+		}, getCheckboxCssSelector(), dt);
 		
 		Y.one("#queryBtn").on("click", function(e){
 			var pagModel = dt.get('paginator').get('model');

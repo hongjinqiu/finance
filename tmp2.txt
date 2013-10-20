@@ -1,0 +1,6 @@
+virtual-column
+string-column
+number-column
+date-column
+boolean-column
+dictionary-column

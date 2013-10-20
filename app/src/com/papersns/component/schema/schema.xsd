@@ -87,24 +87,24 @@
 				<element ref="tns:view-template" minOccurs="0" />
 				<element ref="tns:toolbar" minOccurs="0" />
 				<element ref="tns:security" minOccurs="0" />
-				
+
 				<element ref="tns:before-build-query" minOccurs="0" />
 				<element ref="tns:after-build-query" minOccurs="0" />
 				<element ref="tns:after-query-data" minOccurs="0" />
-				
+
 				<element ref="tns:data-provider" />
 				<element ref="tns:column-model" />
 				<element ref="tns:query-parameters" minOccurs="0" />
 			</sequence>
 		</complexType>
 	</element>
-	
+
 	<element name="list-id">
 		<annotation>
 			<documentation>清单ID</documentation>
 		</annotation>
 	</element>
-	
+
 	<element name="selector-id">
 		<annotation>
 			<documentation>开窗选择器ID</documentation>
@@ -116,19 +116,19 @@
 			<attribute name="name"></attribute>
 		</complexType>
 	</element>
-	
+
 	<element name="description">
 		<annotation>
 			<documentation>描述</documentation>
 		</annotation>
 	</element>
-	
+
 	<element name="scripts">
 		<annotation>
 			<documentation>js脚本</documentation>
 		</annotation>
 	</element>
-	
+
 	<element name="view-template">
 		<annotation>
 			<documentation>模版</documentation>
@@ -141,7 +141,7 @@
 			</attribute>
 		</complexType>
 	</element>
-	
+
 	<element name="toolbar">
 		<complexType>
 			<choice minOccurs="0">
@@ -177,7 +177,7 @@
 				<element ref="tns:button" maxOccurs="unbounded" />
 				<element ref="tns:split-button" />
 			</choice>
-			<attribute name="export" default="true" type="boolean"></attribute> 
+			<attribute name="export" default="true" type="boolean"></attribute>
 			<attribute name="exporter"></attribute>
 			<attribute name="exportParam" default="false" type="boolean"></attribute>
 			<attribute name="freezedHeader" default="true" type="boolean"></attribute>
@@ -203,7 +203,7 @@
 			</attribute>
 		</complexType>
 	</element>
-	
+
 	<element name="button">
 		<complexType>
 			<sequence>
@@ -218,7 +218,7 @@
 			<attributeGroup ref="tns:button-attribute" />
 		</complexType>
 	</element>
-	
+
 	<element name="split-button">
 		<complexType>
 			<attributeGroup ref="tns:button-attribute" />
@@ -272,7 +272,7 @@
 			</simpleType>
 		</attribute>
 	</attributeGroup>
-	
+
 	<element name="security">
 		<complexType>
 			<attribute name="functionId" type="long" use="required"></attribute>
@@ -291,7 +291,7 @@
 			</attribute>
 		</complexType>
 	</element>
-	
+
 	<element name="before-build-query">
 		<annotation>
 			<documentation>将查询参数进行mongoDB查询转化之前,传给python的值是{key:value,...}</documentation>
@@ -303,7 +303,7 @@
 			<documentation>将查询参数进行mongoDB查询转化之后,传给python的值是[{key:value},...]</documentation>
 		</annotation>
 	</element>
-	
+
 	<element name="after-query-data">
 		<annotation>
 			<documentation>查询出数据之后,传给python的值是[{key:value, ...}, ...]</documentation>
@@ -315,73 +315,29 @@
 
 			<sequence>
 				<choice>
-					<!-- 
-					<element name="table" />
-					<element name="sql" />
-					<element name="class" />
-					 -->
+					<!-- <element name="table" /> <element name="sql" /> <element name="class" /> -->
 					<element name="collection" />
 				</choice>
 				<element name="fix-bson-query" minOccurs="0" maxOccurs="1" type="string" />
 				<element name="map" minOccurs="0" maxOccurs="1" type="string" />
 				<element name="reduce" minOccurs="0" maxOccurs="1" type="string" />
-				<!-- 
-				<element name="template-sql" minOccurs="0" maxOccurs="unbounded">
-					<complexType>
-						<sequence>
-							<element name="sql" />
-						</sequence>
-						<attribute name="name" use="required"></attribute>
-						<attribute name="template"></attribute>
-					</complexType>
-				</element>
-				<element name="summary-sql" minOccurs="0" maxOccurs="unbounded">
-					<complexType>
-						<sequence>
-							<element name="sql" />
-						</sequence>
-						<attribute name="name" use="required"></attribute>
-						<attribute name="template"></attribute>
-						<attribute name="position">
-							<simpleType>
-								<restriction base="string">
-									<enumeration value="top"></enumeration>
-									<enumeration value="bottom"></enumeration>
-								</restriction>
-							</simpleType>
-						</attribute>
-						<attribute name="security" type="boolean"></attribute>
-					</complexType>
-				</element>
-				 -->
+				<!-- <element name="template-sql" minOccurs="0" maxOccurs="unbounded"> <complexType> <sequence> <element name="sql" /> </sequence> <attribute name="name" use="required"></attribute> 
+					<attribute name="template"></attribute> </complexType> </element> <element name="summary-sql" minOccurs="0" maxOccurs="unbounded"> <complexType> <sequence> <element name="sql" /> </sequence> 
+					<attribute name="name" use="required"></attribute> <attribute name="template"></attribute> <attribute name="position"> <simpleType> <restriction base="string"> <enumeration value="top"></enumeration> 
+					<enumeration value="bottom"></enumeration> </restriction> </simpleType> </attribute> <attribute name="security" type="boolean"></attribute> </complexType> </element> -->
 			</sequence>
 			<attribute name="size" type="int">
 				<annotation>
 					<documentation>每页大小</documentation>
 				</annotation>
 			</attribute>
-			<!-- 
-			<attribute name="dialect">
-				<annotation>
-					<documentation>数据库方言</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="oracle" />
-						<enumeration value="mysql" />
-						<enumeration value="hsql" />
-						<enumeration value="sqlserver" />
-						<enumeration value="sqlite" />
-					</restriction>
-				</simpleType>
-			</attribute>
-			<attribute name="dataSource" />
-			<attribute name="sqlIntercept" />
-			 -->
+			<!-- <attribute name="dialect"> <annotation> <documentation>数据库方言</documentation> </annotation> <simpleType> <restriction base="string"> <enumeration value="oracle" /> <enumeration 
+				value="mysql" /> <enumeration value="hsql" /> <enumeration value="sqlserver" /> <enumeration value="sqlite" /> </restriction> </simpleType> </attribute> <attribute name="dataSource" 
+				/> <attribute name="sqlIntercept" /> -->
 			<attribute name="bsonIntercept" />
 		</complexType>
 	</element>
-	
+
 	<element name="column-model">
 		<annotation>
 			<documentation>列模型</documentation>
@@ -414,7 +370,19 @@
 								<element ref="tns:editor" minOccurs="0"></element>
 							</sequence>
 							<attributeGroup ref="tns:column-attributes" />
-							<attribute name="format"></attribute>
+							<!-- 财务专用字段begin -->
+							<attribute name="currencyField"></attribute><!-- 币别字段 -->
+							<attribute name="isMoney" type="boolean"></attribute>
+							<attribute name="isUnitPrice" type="boolean"></attribute>
+							<attribute name="isCost" type="boolean"></attribute>
+							<attribute name="isPercent" type="boolean"></attribute>
+							<!-- 财务专用字段end -->
+							
+							<attribute name="prefix"></attribute>
+							<attribute name="decimalPlaces"></attribute>
+							<attribute name="decimalSeparator"></attribute>
+							<attribute name="thousandsSeparator"></attribute>
+							<attribute name="suffix"></attribute>
 						</complexType>
 					</element>
 					<element name="date-column">
@@ -442,7 +410,7 @@
 									</restriction>
 								</simpleType>
 							</attribute>
-							<attribute name="dbPartern">
+							<attribute name="dbPattern">
 								<annotation>
 									<documentation>数据库中存储的日期格式</documentation>
 								</annotation>
@@ -509,9 +477,7 @@
 								<element name="expression" minOccurs="0"></element>
 							</choice>
 							<attributeGroup ref="tns:column-attributes" />
-							<!-- 
-							<attribute name="flowId" type="long"></attribute>
-							 -->
+							<!-- <attribute name="flowId" type="long"></attribute> -->
 						</complexType>
 					</element>
 				</choice>
@@ -519,7 +485,7 @@
 			<attributeGroup ref="tns:column-model-attribute" />
 		</complexType>
 	</element>
-	
+
 	<element name="id-column">
 		<annotation>
 			<documentation>主键列</documentation>
@@ -528,17 +494,17 @@
 			<attributeGroup ref="tns:column-attributes" />
 		</complexType>
 	</element>
-	
+
 	<element name="checkbox-column">
 		<complexType>
 			<sequence>
 				<element name="expression" minOccurs="0"></element>
 				<element ref="tns:column-attribute" minOccurs="0" maxOccurs="unbounded"></element>
 			</sequence>
-			<attribute name="hideable" type="boolean" use="required">
-			</attribute>
+			<attribute name="hideable" type="boolean" use="required"></attribute>
+			<attribute name="name" use="required"></attribute>
 		</complexType>
-	</element>	
+	</element>
 	
 	<element name="column-attribute">
 		<complexType>
@@ -546,7 +512,7 @@
 			<attribute name="value" use="required"></attribute>
 		</complexType>
 	</element>
-	
+
 	<attributeGroup name="column-attributes">
 		<annotation>
 			<documentation>列属性</documentation>
@@ -556,25 +522,13 @@
 				<documentation>列名称</documentation>
 			</annotation>
 		</attribute>
-		<!-- 
-		<attribute name="outName">
-			<annotation>
-				<documentation>输出列表字段别名</documentation>
-			</annotation>
-		</attribute>
-		 -->
+		<!-- <attribute name="outName"> <annotation> <documentation>输出列表字段别名</documentation> </annotation> </attribute> -->
 		<attribute name="bson">
 			<annotation>
 				<documentation>字段名称或SQL语句</documentation>
 			</annotation>
 		</attribute>
-		<!-- 
-		<attribute name="sql">
-			<annotation>
-				<documentation>字段名称或SQL语句</documentation>
-			</annotation>
-		</attribute>
-		 -->
+		<!-- <attribute name="sql"> <annotation> <documentation>字段名称或SQL语句</documentation> </annotation> </attribute> -->
 		<attribute name="text">
 			<annotation>
 				<documentation>列标题</documentation>
@@ -667,7 +621,7 @@
 			</annotation>
 		</attribute>
 	</attributeGroup>
-	
+
 	<element name="editor">
 		<complexType>
 			<sequence>
@@ -681,7 +635,7 @@
 			<attribute name="name"></attribute>
 		</complexType>
 	</element>
-	
+
 	<attributeGroup name="boolean-column-attributes">
 		<annotation>
 			<documentation>布尔列属性组</documentation>
@@ -702,7 +656,7 @@
 			</annotation>
 		</attribute>
 	</attributeGroup>
-	
+
 	<attributeGroup name="column-model-attribute">
 		<annotation>
 			<documentation>列模型属性</documentation>
@@ -783,19 +737,13 @@
 				<documentation>是否是选择器</documentation>
 			</annotation>
 		</attribute>
-		
+
 		<attribute name="groupField">
 			<annotation>
 				<documentation>分组显示字组</documentation>
 			</annotation>
 		</attribute>
-		<!-- 
-		<attribute name="sqlOrderBy">
-			<annotation>
-				<documentation>SQL排序语句</documentation>
-			</annotation>
-		</attribute>
-		 -->
+		<!-- <attribute name="sqlOrderBy"> <annotation> <documentation>SQL排序语句</documentation> </annotation> </attribute> -->
 		<attribute name="bsonOrderBy">
 			<annotation>
 				<documentation>bson排序语句</documentation>
@@ -816,7 +764,7 @@
 		<attribute name="selectionTemplate"></attribute>
 		<attribute name="selectionTitle"></attribute>
 	</attributeGroup>
-	
+
 	<element name="query-parameters">
 		<complexType>
 			<choice maxOccurs="unbounded">
@@ -863,7 +811,7 @@
 			<attribute name="enableEnterParam" type="boolean"></attribute>
 		</complexType>
 	</element>
-	
+
 	<attributeGroup name="query-param-attributes">
 		<attribute name="name" use="required"></attribute>
 		<attribute name="text" use="required"></attribute>
@@ -902,8 +850,7 @@
 					<enumeration value="not_null"></enumeration>
 					<enumeration value="exist"></enumeration>
 					<enumeration value="not_exist"></enumeration>
-					<!-- <enumeration value="between"></enumeration>
-					<enumeration value="not_between"></enumeration> -->
+					<!-- <enumeration value="between"></enumeration> <enumeration value="not_between"></enumeration> -->
 					<enumeration value="in"></enumeration>
 					<enumeration value="not_in"></enumeration>
 					<enumeration value="like"></enumeration>

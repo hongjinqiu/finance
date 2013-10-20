@@ -95,7 +95,8 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTem
 		recordJson := string(recordJsonByte)
 
 		loopItem := map[string]interface{}{}
-		loopItem["isShowCheckbox"] = expressionParser.Parse(recordJson, listTemplate.ColumnModel.CheckboxColumn.Expression)
+		loopItem[listTemplate.ColumnModel.CheckboxColumn.Name] = expressionParser.Parse(recordJson, listTemplate.ColumnModel.CheckboxColumn.Expression)
+		loopItem[listTemplate.ColumnModel.IdColumn.Name] = record[listTemplate.ColumnModel.IdColumn.Name]
 		loopItem["id"] = record[listTemplate.ColumnModel.IdColumn.Name]
 		loopItem["_id"] = record[listTemplate.ColumnModel.IdColumn.Name]
 		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {

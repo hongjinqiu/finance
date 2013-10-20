@@ -1,65 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<datasource xmlns="http://www.geeboo.com/datasource"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.geeboo.com/datasource http://www.geeboo.com/datasource ">
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
 	<id>billType</id>
 	<displayName>收款单类型</displayName>
 	<systemId>CASH</systemId>
 	<codeFieldName></codeFieldName>
 	<businessDateField></businessDateField>
-	<orgIdField></orgIdField>
-	<account>false</account>
-	<departIdField></departIdField>
 	<accountBookIdField></accountBookIdField>
 	<modelType>BILLTYPE</modelType>
 	<inUsedDenyEdit>false</inUsedDenyEdit>
-	<inUsedDenyUnAudit>false</inUsedDenyUnAudit>
-	<inUsedDenyUnCancel>false</inUsedDenyUnCancel>
 	<actionNameSpace>/finance/cash/billtype</actionNameSpace>
 	<listUrl>/component/schema.go?@name=PL_DATASOURCE_MODEL_LIST</listUrl>
+	<collectionName></collectionName>
 	<billTypeField></billTypeField>
 	<billTypeParamDataSource></billTypeParamDataSource>
 	<hasCheckField></hasCheckField>
-	<enterParams />
 	<listSortFields>
-		<field>
-			<fieldId>BILL_TYPE_CODE</fieldId>
-			<sortType>DESC</sortType>
-		</field>
 	</listSortFields>
 	<masterData>
 		<id>A</id>
 		<displayName>主数据集</displayName>
-		<currencyIdField></currencyIdField>
-		<nativeCurrencyIdField></nativeCurrencyIdField>
 		<allowCopy>true</allowCopy>
 		<primaryKey>PRIMARY_KEY</primaryKey>
-		<billIdField>PRIMARY_KEY</billIdField>
-		<parentIdField></parentIdField>
-		<fixFieldTableName>FIN_BILL_TYPE</fixFieldTableName>
 		<fixField>
-			<PRIMARY_KEY extends="PRIMARY_KEY">
+			<primaryKey extends="PRIMARY_KEY">
 				<fieldName>BILL_TYPE_ID</fieldName>
 				<displayName>主键</displayName>
 				<fieldInList>false</fieldInList>
 				<listWhereField>false</listWhereField>
-			</PRIMARY_KEY>
-			<CREATE_BY extends="CREATE_BY" />
-			<CREATE_TIME extends="CREATE_TIME" />
-			<CREATE_UNIT extends="CREATE_UNIT" />
-			<CREATE_DEPT extends="CREATE_DEPT" />
-			<MODIFY_BY extends="MODIFY_BY" />
-			<MODIFY_UNIT extends="MODIFY_UNIT" />
-			<MODIFY_TIME extends="MODIFY_TIME" />
-			<AUDIT_STATUS extends="AUDIT_STATUS" />
-			<HANDLE_AUDIT_STATUS extends="HANDLE_AUDIT_STATUS" />
-			<AUDIT_BY extends="AUDIT_BY" />
-			<AUDIT_TIME extends="AUDIT_TIME" />
-			<BILL_STATUS extends="BILL_STATUS" />
-			<ATTACH_COUNT extends="ATTACH_COUNT" />
-			<IS_INITBILL extends="IS_INITBILL" />
-			<IS_AUDIT_SIGN extends="IS_AUDIT_SIGN" />
-			<REMARK extends="REMARK" />
+			</primaryKey>
+			<createBy extends="CREATE_BY" />
+			<createTime extends="CREATE_TIME" />
+			<createUnit extends="CREATE_UNIT" />
+			<modifyBy extends="MODIFY_BY" />
+			<modifyUnit extends="MODIFY_UNIT" />
+			<modifyTime extends="MODIFY_TIME" />
+			<billStatus extends="BILL_STATUS" />
+			<attachCount extends="ATTACH_COUNT" />
+			<remark extends="REMARK" />
 		</fixField>
 		<bizField>
 			<field id="BILL_TYPE_CODE" extends="CODE_FIELD">
@@ -69,7 +46,6 @@
 				<fieldLength>20</fieldLength>
 				<fieldInList>true</fieldInList>
 				<listWhereField>true</listWhereField>
-				<tableName>FIN_BILL_TYPE</tableName>
 			</field>
 			<field id="BILL_TYPE_NAME" extends="NAME_FIELD">
 				<fieldName>BILL_TYPE_NAME</fieldName>
@@ -78,21 +54,18 @@
 				<fieldLength>40</fieldLength>
 				<fieldInList>true</fieldInList>
 				<listWhereField>true</listWhereField>
-				<tableName>FIN_BILL_TYPE</tableName>
 			</field>
 			<field id="START_DATE" extends="DATE_FIELD">
 				<fieldName>START_DATE</fieldName>
 				<displayName>有效期从</displayName>
 				<fieldInList>true</fieldInList>
 				<listWhereField>true</listWhereField>
-				<tableName>FIN_BILL_TYPE</tableName>
 			</field>
 			<field id="END_DATE" extends="DATE_FIELD">
 				<fieldName>END_DATE</fieldName>
 				<displayName>有效期至</displayName>
 				<fieldInList>true</fieldInList>
 				<listWhereField>true</listWhereField>
-				<tableName>FIN_BILL_TYPE</tableName>
 			</field>
 		</bizField>
 	</masterData>

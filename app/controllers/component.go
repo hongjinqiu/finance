@@ -7,12 +7,13 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"html/template"
 	"io/ioutil"
+	"labix.org/v2/mgo"
 	"net/http"
 	"os"
-	"strings"
 	"strconv"
-	"labix.org/v2/mgo"
+	"strings"
 )
 
 func init() {
@@ -130,19 +131,19 @@ func (c Component) ListTemplate() revel.Result {
 	pageNo := 1
 	pageSize := 10
 	if c.Params.Get("pageNo") != "" {
-		pageNoInt,_ := strconv.ParseInt(c.Params.Get("pageNo"), 10, 0)
+		pageNoInt, _ := strconv.ParseInt(c.Params.Get("pageNo"), 10, 0)
 		if pageNoInt > 1 {
 			pageNo = int(pageNoInt)
 		}
 	}
 	if c.Params.Get("pageSize") != "" {
-		pageSizeInt,_ := strconv.ParseInt(c.Params.Get("pageSize"), 10, 0)
+		pageSizeInt, _ := strconv.ParseInt(c.Params.Get("pageSize"), 10, 0)
 		if pageSizeInt > 10 {
 			pageSize = int(pageSizeInt)
 		}
 	}
 	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
-	
+
 	//	columns := templateManager.GetColumns(&listTemplate)
 
 	//	columnsByte, err := json.Marshal(columns)
@@ -162,9 +163,9 @@ func (c Component) ListTemplate() revel.Result {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	
+
 	format := c.Params.Get("format")
-	if (strings.ToLower(format) == "json") {
+	if strings.ToLower(format) == "json" {
 		callback := c.Params.Get("callback")
 		if callback == "" {
 			c.Response.ContentType = "application/json; charset=utf-8"
@@ -173,16 +174,16 @@ func (c Component) ListTemplate() revel.Result {
 		c.Response.ContentType = "text/javascript; charset=utf-8"
 		return c.RenderText(callback + "(" + string(dataBoByte) + ");")
 	} else {
-	// 1.query data,
-	// from data-provider
-	// from query-parameters
+		// 1.query data,
+		// from data-provider
+		// from query-parameters
 		result := map[string]interface{}{
 			"listTemplate": listTemplate,
 			"toolbarBo":    toolbarBo,
-	//		"dataBo":       dataBo,
+			//		"dataBo":       dataBo,
 			//		"columns":       columns,
-			"dataBoJson":       string(dataBoByte),
-			"listTemplateJson": string(listTemplateByte),
+			"dataBoJson":       template.JS(string(dataBoByte)),
+			"listTemplateJson": template.JS(string(listTemplateByte)),
 			//		"columnsJson":   string(columnsByte),
 		}
 		return c.Render(result)
@@ -227,11 +228,11 @@ function(key, values) {
 
 func (c Component) ScriptTest() revel.Result {
 	o := ExpressionParser{}
-//	classMethod := "SysUser.beforeBuildQuery"
-//	paramMap := map[string]string{
-//		"age": "20",
-//	}
-//	result := o.ParseBeforeBuildQuery(classMethod, paramMap)
+	//	classMethod := "SysUser.beforeBuildQuery"
+	//	paramMap := map[string]string{
+	//		"age": "20",
+	//	}
+	//	result := o.ParseBeforeBuildQuery(classMethod, paramMap)
 	classMethod := "SysUser.afterBuildQuery"
 	queryLi := []map[string]interface{}{
 		map[string]interface{}{"name": "test"},

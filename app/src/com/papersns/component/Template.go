@@ -2,6 +2,7 @@ package component
 
 import (
 	"encoding/xml"
+	"html/template"
 )
 
 type ListTemplate struct {
@@ -80,9 +81,10 @@ type ColumnModel struct {
 type CheckboxColumn struct {
 	XMLName xml.Name `xml:"checkbox-column"`
 
-	ColumnAttribute ColumnAttribute `xml:"column-attribute"`
-	Expression      string          `xml:"expression"`
-	Hideable        string          `xml:"hideable,attr"`
+	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
+	Expression        string            `xml:"expression"`
+	Hideable          string            `xml:"hideable,attr"`
+	Name              string            `xml:"name,attr"`
 }
 
 type ColumnAttribute struct {
@@ -147,13 +149,13 @@ type ColumnAttributeGroup struct {
 }
 
 type Column struct {
-	XMLName xml.Name `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,
-	Name    string   `xml:"name,attr"`
-	ColumnAttribute
+	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,
+	Name              string            `xml:"name,attr"`
+	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor
 	ColumnAttributeGroup
 
-	Format         string `xml:"format,attr"`
+//	Format         string `xml:"format,attr"`
 	DisplayPattern string `xml:"displayPattern,attr"`
 	DbPattern      string `xml:"dbPattern,attr"`
 	BooleanColumnAttributeGroup
@@ -161,7 +163,19 @@ type Column struct {
 	Dictionary string `xml:"dictionary,attr"`
 	Complex    string `xml:"complex,attr"`
 
-	Buttons Buttons `xml:"buttons"`
+	Buttons            Buttons `xml:"buttons"`
+	Prefix             string  `xml:"prefix,attr"`
+	DecimalPlaces      string  `xml:"decimalPlaces,attr"`
+	DecimalSeparator   string  `xml:"decimalSeparator,attr"`
+	ThousandsSeparator string  `xml:"thousandsSeparator,attr"`
+	Suffix             string  `xml:"suffix,attr"`
+
+	// 财务格式化字段
+	CurrencyField string `xml:"currencyField,attr"`// 币别字段
+	IsMoney       string `xml:"isMoney,attr"`// 是否金额
+	IsUnitPrice   string `xml:"isUnitPrice,attr"`// 是否单价
+	IsCost        string `xml:"isCost,attr"`// 是否成本
+	IsPercent     string `xml:"isPercent,attr"`// 是否百分比
 }
 
 type Editor struct {
@@ -254,16 +268,16 @@ type ButtonAttribute struct {
 }
 
 type ButtonAttributeGroup struct {
-	Xtype      string `xml:"xtype,attr"`
-	Name       string `xml:"name,attr"`
-	Text       string `xml:"text,attr"`
-	IconCls    string `xml:"iconCls,attr"`
-	IconAlign  string `xml:"iconAlign,attr"`
-	Disabled   string `xml:"disabled,attr"`
-	Hidden     string `xml:"hidden,attr"`
-	ArrowAlign string `xml:"arrowAlign,attr"`
-	Scale      string `xml:"scale,attr"`
-	Rowspan    string `xml:"rowspan,attr"`
-	Handler    string `xml:"handler,attr"`
-	Mode       string `xml:"mode,attr"`
+	Xtype      string      `xml:"xtype,attr"`
+	Name       string      `xml:"name,attr"`
+	Text       string      `xml:"text,attr"`
+	IconCls    string      `xml:"iconCls,attr"`
+	IconAlign  string      `xml:"iconAlign,attr"`
+	Disabled   string      `xml:"disabled,attr"`
+	Hidden     string      `xml:"hidden,attr"`
+	ArrowAlign string      `xml:"arrowAlign,attr"`
+	Scale      string      `xml:"scale,attr"`
+	Rowspan    string      `xml:"rowspan,attr"`
+	Handler    template.JS `xml:"handler,attr"`
+	Mode       string      `xml:"mode,attr"`
 }

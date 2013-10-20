@@ -39,8 +39,26 @@
 </script>
 <script src="/public/js/yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
 <script type="text/javascript">
-	var dataBoJson = {{.result.dataBoJson}};
-	var listTemplateJson = {{.result.listTemplateJson}};
+	var dataBo = {{.result.dataBoJson}};
+	var listTemplate = {{.result.listTemplateJson}};
+	/*
+var isFormatter = listTemplate.ColumnModel.ColumnLi[i].Prefix != "";
+isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces != "";
+isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalSeparator != "";
+isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].ThousandsSeparator != "";
+isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
+	*/
+	// 系统参数
+	var sysParam = {
+		localCurrency: {
+			prefix: "￥",
+			decimalPlaces: 3,// 金额小数位数
+			unitPriceDecimalPlaces: 4// 单价小数位数
+		},
+		unitCostDecimalPlaces: 5,// 单位成本小数位数
+		percentDecimalPlaces: 1,// 百分比小数位数
+		thousandsSeparator: ","
+	};
 </script>
 <script type="text/javascript" src="/app/comboview?Component/listTemplate.js"></script>
 </head>
@@ -98,12 +116,19 @@
 			{{range $subIndex,$subValue := $toolbarBo}}
 				{{if eq $index $subIndex}}
 					{{if $subValue.isShow}}
-						<input type="button" value="{{$value.Text}}" />
+						{{if eq $value.Mode "fn"}}
+							<input type="button" value="{{$value.Text}}" class="{{$value.IconCls}}" onclick="{{$value.Handler}}()"/>
+						{{end}}
+						{{if eq $value.Mode "url"}}
+							<input type="button" value="{{$value.Text}}" class="{{$value.IconCls}}" onclick="location.href='{{$value.Handler}}'"/>
+						{{end}}
+						{{if eq $value.Mode "url^"}}
+							<input type="button" value="{{$value.Text}}" class="{{$value.IconCls}}" onclick="alert('需要用弹出{{$value.Handler}}')"/>
+						{{end}}
 					{{end}}
 				{{end}}
 			{{end}}
 		{{end}}
-		<input type="button" value="test" id="testBtn" />
 	</div>
 	<div id="columnModel">
 	
@@ -117,11 +142,5 @@
 		<img src="/public/img/glyphicons_178_step_forward.png" class="pgControls {pageLinkClass}" data-pglink="last" title="Last Page" border="0" />
 		<span style="float:right;margin-right:50px;">Rows per Page: {selectRowsPerPage}</span>
 	</script>
-	<!-- <div id="columnModel">
-		{{.result.dataBo}}<br />
-		{{.result.columns}}<br />
-		{{.result.dataBoJson}}<br />
-		{{.result.columnsJson}}<br />
-	</div> -->
 </body>
 </html>

@@ -10,7 +10,7 @@
 	<view-template view="component/template.ui.ftl" />
 
 	<toolbar export="true">
-		<button text="新增" mode="fn" handler="doSave" rowspan="2">
+		<button text="新增" mode="fn" handler="doSave" iconCls="test">
 			<expression>test_expression</expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
@@ -21,9 +21,12 @@
 			<button-attribute name="functionId" value="50010" />
 		</button>
 
-		<button text="导出" mode="fn" handler="doExport">
+		<button text="导出" mode="url" handler="doExport">
 			<button-attribute name="code" value="U" />
 			<button-attribute name="functionId" value="10018" />
+		</button>
+		
+		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
 		</button>
 	</toolbar>
 
@@ -32,8 +35,8 @@
 	<!-- 
 	<before-build-query>SysUser.beforeBuildQuery</before-build-query>
 	<after-build-query>SysUser.afterBuildQuery</after-build-query>
-	<after-query-data>SysUser.afterQueryData</after-query-data>
 	 -->
+	<after-query-data>SysUser.afterQueryData</after-query-data>
 
 	<data-provider size="10">
 		<collection>SysUser</collection><!-- mongoDB collection name -->
@@ -63,8 +66,8 @@ function(key, values) {
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
-	<column-model rownumber="true" bsonOrderBy="">
-		<checkbox-column hideable="true">
+	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="">
+		<checkbox-column name="checkboxSelect" hideable="false">
 			<!-- 
 			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression>
 			 -->
@@ -80,20 +83,24 @@ function(key, values) {
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={EMPEGRESS_ID}" >
+				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={id}" >
 					<expression>1 == 1</expression>
 				</button>
 			</buttons>
 		</virtual-column>
 		<string-column name="id" text="ID" />
 		<string-column name="nick" text="昵称" />
-		<string-column name="CREATE_UNIT" text="创建单位" hideable="true" />
-		<string-column name="CREATE_BY" text="创建单位" hideable="true" />
-
-		<string-column name="UNIT_NAME" text="单位" />
-
-		<string-column name="DEPT_NAME" text="部门" />
-
+		<number-column name="numTest" text="金额" prefix="￥" decimalPlaces="2" decimalSeparator="." thousandsSeparator="," suffix=""></number-column>
+		<number-column name="numTest1" text="金额1" currencyField="localCurrency" isMoney="true"></number-column>
+		<number-column name="numTest2" text="金额2" currencyField="currency" isMoney="true"></number-column>
+		<number-column name="currency" text="币别测试" hideable="true"></number-column>
+		
+		<date-column name="dateTest" text="日期" dbPattern="yyyyMMdd" displayPattern="yyyy-MM-dd"></date-column>
+		<date-column name="dateTimeTest" text="日期时间" dbPattern="yyyyMMddHHmmss" displayPattern="yyyy-MM-dd HH:mm"></date-column>
+		
+		<boolean-column name="boolTest" text="是布尔测试" />
+		<boolean-column name="boolTest2" text="否布尔测试" />
+		
 		<string-column name="APP_NAME" text="申请人" editable="true">
 			<editor name="text"></editor>
 		</string-column>

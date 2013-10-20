@@ -12,7 +12,7 @@ type DataSource struct {
 	CodeFieldName           string       `xml:"codeFieldName"`
 	BusinessDateField       string       `xml:"businessDateField"`
 	ModelType               string       `xml:"modelType"`
-	InUsedDenyEdit          bool         `xml:"inUsedDenyEdit"`
+	InUsedDenyEdit          string       `xml:"inUsedDenyEdit"`
 	ActionNameSpace         string       `xml:"actionNameSpace"`
 	ListUrl                 string       `xml:"listUrl"`
 	BillTypeField           string       `xml:"billTypeField"`
@@ -20,14 +20,14 @@ type DataSource struct {
 	HasCheckField           string       `xml:"hasCheckField"`
 	ListSortFields          string       `xml:"listSortFields"`
 	MasterData              MasterData   `xml:"masterData"`
-	DetailData              []DetailData `xml:"detailData"`
+	DetailDataLi            []DetailData `xml:"detailData"`
 }
 
 type MasterData struct {
 	XMLName     xml.Name `xml:"masterData"`
 	Id          string   `xml:"id"`
 	DisplayName string   `xml:"displayName"`
-	AllowCopy   bool     `xml:"allowCopy"`
+	AllowCopy   string   `xml:"allowCopy"`
 	PrimaryKey  string   `xml:"primaryKey"`
 	FixField    FixField `xml:"fixField"`
 	BizField    BizField `xml:"bizField"`
@@ -38,9 +38,9 @@ type DetailData struct {
 	Id            string   `xml:"id"`
 	DisplayName   string   `xml:"displayName"`
 	ParentId      string   `xml:"parentId"`
-	AllowEmptyRow bool     `xml:"allowEmptyRow"`
-	AllowCopy     bool     `xml:"allowCopy"`
-	Readonly      bool     `xml:"readonly"`
+	AllowEmptyRow string   `xml:"allowEmptyRow"`
+	AllowCopy     string   `xml:"allowCopy"`
+	Readonly      string   `xml:"readonly"`
 	PrimaryKey    string   `xml:"primaryKey"`
 	FixField      FixField `xml:"fixField"`
 	BizField      BizField `xml:"bizField"`
@@ -61,7 +61,7 @@ type FixField struct {
 
 type BizField struct {
 	XMLName xml.Name `xml:"bizField"`
-	Field   []Field  `xml:"field"`
+	FieldLi []Field  `xml:"field"`
 }
 
 type PrimaryKey struct {
@@ -110,6 +110,11 @@ type Remark struct {
 	FieldGroup
 }
 
+type Fields struct {
+	XMLName xml.Name `xml:"fields"`
+	FieldLi []Field  `xml:"field"`
+}
+
 type Field struct {
 	XMLName xml.Name `xml:"field"`
 	Id      string   `xml:"id,attr"`
@@ -118,31 +123,31 @@ type Field struct {
 }
 
 type FieldGroup struct {
-	FieldName         string `xml:"fieldName,attr"`
-	DisplayName       string `xml:"displayName,attr"`
-	FieldDataType     string `xml:"fieldDataType,attr"`
-	FieldNumberType   string `xml:"fieldNumberType,attr"`
-	FieldLength       string `xml:"fieldLength,attr"`
-	DefaultValueExpr  string `xml:"defaultValueExpr,attr"`
-	CheckInUsed       bool   `xml:"checkInUsed,attr"`
-	FixHide           bool   `xml:"fixHide,attr"`
-	FixReadOnly       bool   `xml:"fixReadOnly,attr"`
-	AllowDuplicate    bool   `xml:"allowDuplicate,attr"`
-	DenyEditInUsed    bool   `xml:"denyEditInUsed,attr"`
-	AllowEmpty        bool   `xml:"allowEmpty,attr"`
-	LimitOption       bool   `xml:"limitOption,attr"`
-	LimitMax          string `xml:"limitMax,attr"`
-	LimitMin          string `xml:"limitMin,attr"`
-	ValidateExpr      string `xml:"validateExpr,attr"`
-	ValidateMessage   string `xml:"validateMessage,attr"`
-	Dictionary        string `xml:"dictionary,attr"`
-	DictionaryWhere   string `xml:"dictionaryWhere,attr"`
-	CalcValueExpr     string `xml:"calcValueExpr,attr"`
-	Virtual           bool   `xml:"virtual,attr"`
-	ZeroShowEmpty     bool   `xml:"zeroShowEmpty,attr"`
-	LocalCurrencyency bool   `xml:"localCurrencyency,attr"`
-	FieldInList       bool   `xml:"fieldInList,attr"`
-	ListWhereField    bool   `xml:"listWhereField,attr"`
-	FormatExpr        string `xml:"formatExpr,attr"`
-	RelationDS        string `xml:"relationDS,attr"`
+	FieldName         string `xml:"fieldName"`
+	DisplayName       string `xml:"displayName"`
+	FieldDataType     string `xml:"fieldDataType"`
+	FieldNumberType   string `xml:"fieldNumberType"`
+	FieldLength       string `xml:"fieldLength"`
+	DefaultValueExpr  string `xml:"defaultValueExpr"`
+	CheckInUsed       string `xml:"checkInUsed"`
+	FixHide           string `xml:"fixHide"`
+	FixReadOnly       string `xml:"fixReadOnly"`
+	AllowDuplicate    string `xml:"allowDuplicate"`
+	DenyEditInUsed    string `xml:"denyEditInUsed"`
+	AllowEmpty        string `xml:"allowEmpty"`
+	LimitOption       string `xml:"limitOption"`
+	LimitMax          string `xml:"limitMax"`
+	LimitMin          string `xml:"limitMin"`
+	ValidateExpr      string `xml:"validateExpr"`
+	ValidateMessage   string `xml:"validateMessage"`
+	Dictionary        string `xml:"dictionary"`
+	DictionaryWhere   string `xml:"dictionaryWhere"`
+	CalcValueExpr     string `xml:"calcValueExpr"`
+	Virtual           string `xml:"virtual"`
+	ZeroShowEmpty     string `xml:"zeroShowEmpty"`
+	LocalCurrencyency string `xml:"localCurrencyency"`
+	FieldInList       string `xml:"fieldInList"`
+	ListWhereField    string `xml:"listWhereField"`
+	FormatExpr        string `xml:"formatExpr"`
+	RelationDS        string `xml:"relationDS"`
 }
