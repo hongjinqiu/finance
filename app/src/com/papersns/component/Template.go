@@ -149,7 +149,7 @@ type ColumnAttributeGroup struct {
 }
 
 type Column struct {
-	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,
+	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,script-column
 	Name              string            `xml:"name,attr"`
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor
@@ -176,6 +176,8 @@ type Column struct {
 	IsUnitPrice   string `xml:"isUnitPrice,attr"`// 是否单价
 	IsCost        string `xml:"isCost,attr"`// 是否成本
 	IsPercent     string `xml:"isPercent,attr"`// 是否百分比
+	
+	Script             string  `xml:"script,attr"`
 }
 
 type Editor struct {

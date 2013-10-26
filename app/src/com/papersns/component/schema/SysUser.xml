@@ -38,7 +38,7 @@
 	 -->
 	<after-query-data>SysUser.afterQueryData</after-query-data>
 
-	<data-provider size="10">
+	<data-provider size="20">
 		<collection>SysUser</collection><!-- mongoDB collection name -->
 		<fix-bson-query>{"_id": {"$gte": 15}}</fix-bson-query><!-- mongoDB fix query, json format -->
 		<!-- 
@@ -66,7 +66,7 @@ function(key, values) {
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
-	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="">
+	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id">
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<!-- 
 			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression>
@@ -91,15 +91,20 @@ function(key, values) {
 		<string-column name="id" text="ID" />
 		<string-column name="nick" text="昵称" />
 		<number-column name="numTest" text="金额" prefix="￥" decimalPlaces="2" decimalSeparator="." thousandsSeparator="," suffix=""></number-column>
+		<!-- 
 		<number-column name="numTest1" text="金额1" currencyField="localCurrency" isMoney="true"></number-column>
 		<number-column name="numTest2" text="金额2" currencyField="currency" isMoney="true"></number-column>
+		 -->
 		<number-column name="currency" text="币别测试" hideable="true"></number-column>
 		
 		<date-column name="dateTest" text="日期" dbPattern="yyyyMMdd" displayPattern="yyyy-MM-dd"></date-column>
 		<date-column name="dateTimeTest" text="日期时间" dbPattern="yyyyMMddHHmmss" displayPattern="yyyy-MM-dd HH:mm"></date-column>
 		
 		<boolean-column name="boolTest" text="是布尔测试" />
-		<boolean-column name="boolTest2" text="否布尔测试" />
+		
+		<dictionary-column name="dictTest" text="字典测试" dictionary="D_DICTTEST"></dictionary-column>
+		
+		<script-column name="scriptTest" text="脚本列测试" script="str(record.get('id') or '') + ',' + str(record.get('boolTest') or '')"/>
 		
 		<string-column name="APP_NAME" text="申请人" editable="true">
 			<editor name="text"></editor>

@@ -443,6 +443,23 @@ function createBooleanColumn(listTemplate, columnIndex) {
 	};
 }
 
+function createDictionaryColumn(listTemplate, columnIndex) {
+	var i = columnIndex;
+	return {
+		key: listTemplate.ColumnModel.ColumnLi[i].Name,
+		label: listTemplate.ColumnModel.ColumnLi[i].Text,
+		formatter: function(o) {
+			var dictionaryValue = o.data[listTemplate.ColumnModel.ColumnLi[i].Name + "_DICTIONARY_NAME"];
+			if (dictionaryValue !== undefined && dictionaryValue !== null) {
+				return dictionaryValue;
+			}
+			console.log(listTemplate.ColumnModel.ColumnLi[i]);
+			console.log("字典字段没找到_DICTIONARY_NAME,code:" + o.value);
+			return o.value;
+		}
+	};
+}
+
 function createColumn(listTemplate, columnIndex) {
 	var i = columnIndex;
 	if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local != "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
@@ -452,6 +469,8 @@ function createColumn(listTemplate, columnIndex) {
 			return createDateColumn(listTemplate, columnIndex);
 		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "boolean-column") {
 			return createBooleanColumn(listTemplate, columnIndex);
+		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "dictionary-column") {
+			return createDictionaryColumn(listTemplate, columnIndex);
 		}
 		return {
 			key: listTemplate.ColumnModel.ColumnLi[i].Name,

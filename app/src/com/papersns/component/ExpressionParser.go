@@ -81,8 +81,20 @@ func exitEnv() {
 type ExpressionParser struct{}
 
 func (o ExpressionParser) Parse(recordJson, expression string) bool {
+	methodName := "trueOrFalse"
+	execResult := o.parseExpression(methodName, recordJson, expression)
+	return strings.ToLower(execResult) == "true"
+}
+
+func (o ExpressionParser) ParseString(recordJson, expression string) string {
+	methodName := "parseString"
+	execResult := o.parseExpression(methodName, recordJson, expression)
+	return execResult
+}
+
+func (o ExpressionParser) parseExpression(methodName, recordJson, expression string) string {
 	if strings.TrimSpace(expression) == "" {
-		return true
+		return ""
 	}
 	if !isEnvInit() {
 		InitPythonEnv()
@@ -99,7 +111,7 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	}
 	*/
 
-	strfunc := getExpressionMod().GetAttrString("trueOrFalse")
+	strfunc := getExpressionMod().GetAttrString(methodName)
 	if strfunc == nil {
 		panic("get function return null")
 	}
@@ -124,7 +136,7 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	python.PyErr_Clear()
 
 	execResult := python.PyString_AS_STRING(strret)
-	return strings.ToLower(execResult) == "true"
+	return execResult
 }
 
 func (o ExpressionParser) ParseBeforeBuildQuery(classMethod string, paramMap map[string]string) map[string]string {

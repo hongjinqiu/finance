@@ -1,0 +1,17 @@
+PubDictionary,
+
+id,自增长ID,pubDictionaryId,
+code,D_CUSTOMERTYPE
+name,
+items: [{
+    code,
+    name,
+    order,
+    items: [{
+    	code,
+    	name,
+    	order,
+    }, ...],
+}, ...]
+
+接口:

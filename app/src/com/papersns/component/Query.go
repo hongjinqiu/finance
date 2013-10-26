@@ -1,16 +1,18 @@
 package component
 
 import (
-	. "com/papersns/mongo"
+	"com/papersns/mongo"
 	"encoding/json"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"strings"
 )
 
 type QuerySupport struct{}
 
 func (qb QuerySupport) Find(collection string, query string) (result map[string]interface{}, found bool) {
-	session, db := MongoDBFactory.GetConnection()
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 
 	c := db.C(collection)
@@ -30,14 +32,21 @@ func (qb QuerySupport) Find(collection string, query string) (result map[string]
 	return result, true
 }
 
-func (qb QuerySupport) Index(collection string, query map[string]interface{}, pageNo int, pageSize int) (result map[string]interface{}) {
-	session, db := MongoDBFactory.GetConnection()
+func (qb QuerySupport) Index(collection string, query map[string]interface{}, pageNo int, pageSize int, orderBy string) (result map[string]interface{}) {
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 
 	c := db.C(collection)
 
 	items := []interface{}{}
-	err := c.Find(query).Limit(pageSize).Skip((pageNo - 1) * pageSize).All(&items)
+	var err error
+	if orderBy != "" {
+		fieldLi := strings.Split(orderBy, ",")
+		err = c.Find(query).Sort(fieldLi...).Limit(pageSize).Skip((pageNo - 1) * pageSize).All(&items)
+	} else {
+		err = c.Find(query).Limit(pageSize).Skip((pageNo - 1) * pageSize).All(&items)
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +72,8 @@ func (qb QuerySupport) Index(collection string, query map[string]interface{}, pa
 }
 
 func (qb QuerySupport) MapReduceAll(collection string, query map[string]interface{}, mapReduce mgo.MapReduce) (result []map[string]interface{}) {
-	session, db := MongoDBFactory.GetConnection()
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 	
 	result = []map[string]interface{}{}
@@ -76,7 +86,8 @@ func (qb QuerySupport) MapReduceAll(collection string, query map[string]interfac
 }
 
 func (qb QuerySupport) MapReduce(collection string, query map[string]interface{}, mapReduce mgo.MapReduce, pageNo int, pageSize int) (result []map[string]interface{}) {
-	session, db := MongoDBFactory.GetConnection()
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 	
 	result = []map[string]interface{}{}

@@ -461,6 +461,21 @@
 							</attribute>
 						</complexType>
 					</element>
+					<element name="script-column">
+						<annotation>
+							<documentation>脚本列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:column-attribute" minOccurs="0" maxOccurs="unbounded"></element>
+								<element ref="tns:editor" minOccurs="0">
+								</element>
+								<element ref="tns:column-model" minOccurs="0" />
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+							<attribute name="script" />
+						</complexType>
+					</element>
 					<element name="virtual-column">
 						<annotation>
 							<documentation>虚拟列</documentation>

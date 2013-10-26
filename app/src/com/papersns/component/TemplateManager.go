@@ -1,9 +1,11 @@
 package component
 
 import (
+	"com/papersns/dictionary"
 	"encoding/json"
-	"log"
+	"fmt"
 	"labix.org/v2/mgo"
+	"log"
 )
 
 type TemplateManager struct{}
@@ -39,7 +41,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 			}
 		}
 	}
-	
+
 	queryLi = expressionParser.ParseAfterBuildQuery(listTemplate.AfterBuildQuery, queryLi)
 
 	querySupport := QuerySupport{}
@@ -53,22 +55,23 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		panic(err)
 	}
 	if mapStr == "" {
-		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte))
-		result := querySupport.Index(collection, queryMap, pageNo, pageSize)
+		orderBy := listTemplate.ColumnModel.BsonOrderBy
+		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) +",orderBy is:" + orderBy)
+		result := querySupport.Index(collection, queryMap, pageNo, pageSize, orderBy)
 		items := result["items"].([]interface{})
 		result["items"] = expressionParser.ParseAfterQueryData(listTemplate.AfterQueryData, items)
 		return result
 	}
 	mapReduce := mgo.MapReduce{
-		Map: mapStr,
+		Map:    mapStr,
 		Reduce: reduce,
 	}
-	
+
 	mapReduceByte, err := json.MarshalIndent(mapReduce, "", "\t")
 	if err != nil {
 		panic(err)
 	}
-	
+
 	log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) + ",mapReduce:" + string(mapReduceByte))
 	mapReduceLi := querySupport.MapReduceAll(collection, queryMap, mapReduce)
 	items := []interface{}{}
@@ -102,6 +105,8 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTem
 		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
 			if columnItem.XMLName.Local != "virtual-column" {
 				loopItem[columnItem.Name] = record[columnItem.Name]
+				o.ApplyDictionaryColumnData(&loopItem, columnItem)
+				o.ApplyScriptColumnData(&loopItem, record, columnItem)
 			} else {
 				if loopItem[columnItem.Name] == nil {
 					virtualColumn := map[string]interface{}{}
@@ -125,6 +130,38 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTem
 	}
 
 	return columnModelItems
+}
+
+func (o TemplateManager) ApplyDictionaryColumnData(loopItem *map[string]interface{}, columnItem Column) {
+	dictionaryManager := dictionary.GetInstance()
+	if columnItem.XMLName.Local == "dictionary-column" {
+		dictionaryItem := dictionaryManager.GetDictionary(columnItem.Dictionary)
+		items := dictionaryItem["items"]
+		if items != nil {
+			itemsLi := items.([]map[string]interface{})
+			columnValue := fmt.Sprint((*loopItem)[columnItem.Name])
+			for _, codeNameItem := range itemsLi {
+				code := fmt.Sprint(codeNameItem["code"])
+				if code == columnValue {
+					(*loopItem)[columnItem.Name+"_DICTIONARY_NAME"] = codeNameItem["name"]
+					break
+				}
+			}
+		}
+	}
+}
+
+func (o TemplateManager) ApplyScriptColumnData(loopItem *map[string]interface{}, record map[string]interface{}, columnItem Column) {
+	if columnItem.XMLName.Local == "script-column" {
+		data, err := json.Marshal(record)
+		if err != nil {
+			panic(err)
+		}
+		
+		expressionParser := ExpressionParser{}
+		scriptValue := expressionParser.ParseString(string(data), columnItem.Script)
+		(*loopItem)[columnItem.Name] = scriptValue
+	}
 }
 
 func (o TemplateManager) GetToolbarForListTemplate(listTemplate *ListTemplate) []interface{} {

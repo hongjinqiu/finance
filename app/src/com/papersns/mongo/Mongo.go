@@ -5,11 +5,13 @@ import (
 	"labix.org/v2/mgo"
 )
 
-var MongoDBFactory connectionFactory
+func GetInstance() ConnectionFactory {
+	return ConnectionFactory{}
+}
 
-type connectionFactory struct {}
+type ConnectionFactory struct {}
 
-func (c connectionFactory) GetConnection() (*mgo.Session, *mgo.Database) {
+func (c ConnectionFactory) GetConnection() (*mgo.Session, *mgo.Database) {
 	session, err := mgo.Dial(revel.Config.StringDefault("MONGODB_ADDRESS", "localhost:27017"))
 	if err != nil {
 		panic(err)

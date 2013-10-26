@@ -3,6 +3,7 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	. "com/papersns/component"
+	"com/papersns/dictionary"
 	//	"github.com/sbinet/go-python"
 	"encoding/json"
 	"encoding/xml"
@@ -130,6 +131,13 @@ func (c Component) ListTemplate() revel.Result {
 	}
 	pageNo := 1
 	pageSize := 10
+	if listTemplate.DataProvider.Size != "" {
+		pageSizeInt, err := strconv.Atoi(listTemplate.DataProvider.Size)
+		if err !=  nil {
+			panic(err)
+		}
+		pageSize = pageSizeInt
+	}
 	if c.Params.Get("pageNo") != "" {
 		pageNoInt, _ := strconv.ParseInt(c.Params.Get("pageNo"), 10, 0)
 		if pageNoInt > 1 {
@@ -267,7 +275,8 @@ func (c Component) IndexTest() revel.Result {
 	query := map[string]interface{}{}
 	pageNo := 1
 	pageSize := 10
-	result := querySupport.Index(collection, query, pageNo, pageSize)
+	orderBy := ""
+	result := querySupport.Index(collection, query, pageNo, pageSize, orderBy)
 
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
@@ -455,4 +464,11 @@ func (c Component) YUI() revel.Result {
 
 func (c Component) Layout() revel.Result {
 	return c.Render()
+}
+
+func (c Component) Dicttest() revel.Result {
+	dictionaryManager := dictionary.GetInstance()
+	result := dictionaryManager.GetDictionary("D_DICTTEST")
+	c.Response.ContentType = "application/json; charset=utf-8"
+	return c.RenderJson(result)
 }

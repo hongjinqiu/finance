@@ -20,7 +20,7 @@ class SysUser():
     def afterQueryData(self, jsonString):
         items = json.loads(jsonString)
         for item in items:
-            item["nick"] = u'测试 by python'
+#            item["nick"] = u'测试 by python'
             item['UNIT_NAME'] = u'单位名称aaa'
             item['numTest'] = 1000 * 1000 + 0.12345678901
             item['numTest1'] = 1000 * 1000 + 0.12345678901
@@ -59,7 +59,7 @@ class SysUser():
         for item in items:
             item['boolTest'] = True
             item['boolTest2'] = False
-
+            
         return json.dumps(items)    
 
 if __name__ == '__main__':
