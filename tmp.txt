@@ -114,6 +114,26 @@ gallery-2013.09.18-18-49/build/gallery-nodelist-extras2/gallery-nodelist-extras2
 
 
 
+gallery-2013.09.18-18-49/build/gallery-aui-overlay-manager/gallery-aui-overlay-manager-min.js
+gallery-2013.09.18-18-49/build/gallery-aui-delayed-task/gallery-aui-delayed-task-min.js
+gallery-2013.09.18-18-49/build/gallery-aui-node-base/gallery-aui-node-base-min.js
+gallery-2013.09.18-18-49/build/gallery-aui-component/gallery-aui-component-min.js
+gallery-2013.09.18-18-49/build/gallery-aui-selector/gallery-aui-selector-min.js
+
+
+
+
+gallery-2013.09.18-18-49/build/gallery-aui-overlay-base/gallery-aui-overlay-base-min.js
+
+cp -R /home/hongjinqiu/soft/js/yui/ /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+
+cp -R /home/hongjinqiu/soft/js/yui/build/widget-stdmod /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R /home/hongjinqiu/soft/js/yui/build/widget-position /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R /home/hongjinqiu/soft/js/yui/build/widget-position-align /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R /home/hongjinqiu/soft/js/yui/build/widget-stack /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R /home/hongjinqiu/soft/js/yui/build/widget-position-constrain /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+cp -R /home/hongjinqiu/soft/js/yui/build/overlay /home/hongjinqiu/goworkspace/src/finance/public/js/yui.3.12.0/
+
 
 
 
@@ -223,4 +243,6 @@ http://yui.yahooapis.com/combo?
 
 
 
+http://yui.yahooapis.com/gallery-2012.12.05-21-01/gallery-aui-skin-base/images/icon_sprite.png
+http://yui.yahooapis.com/gallery-2012.12.05-21-01/gallery-aui-skin-classic/images/common/state_default_bg.png
 

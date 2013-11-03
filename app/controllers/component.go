@@ -146,7 +146,7 @@ func (c Component) ListTemplate() revel.Result {
 	}
 	if c.Params.Get("pageSize") != "" {
 		pageSizeInt, _ := strconv.ParseInt(c.Params.Get("pageSize"), 10, 0)
-		if pageSizeInt > 10 {
+		if pageSizeInt >= 10 {
 			pageSize = int(pageSizeInt)
 		}
 	}
@@ -182,12 +182,14 @@ func (c Component) ListTemplate() revel.Result {
 		c.Response.ContentType = "text/javascript; charset=utf-8"
 		return c.RenderText(callback + "(" + string(dataBoByte) + ");")
 	} else {
-		// 1.query data,
-		// from data-provider
-		// from query-parameters
+		showParameterLi := templateManager.GetShowParameterLiForListTemplate(&listTemplate)
+		hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(&listTemplate)
 		result := map[string]interface{}{
+			"pageSize": pageSize,
 			"listTemplate": listTemplate,
 			"toolbarBo":    toolbarBo,
+			"showParameterLi":    showParameterLi,
+			"hiddenParameterLi":    hiddenParameterLi,
 			//		"dataBo":       dataBo,
 			//		"columns":       columns,
 			"dataBoJson":       template.JS(string(dataBoByte)),

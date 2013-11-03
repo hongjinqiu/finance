@@ -4,8 +4,20 @@
 <head>
 <title>layout test</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css" />
+<script type="text/javascript">
+	YUI_config = {
+		debug : true,
+		combine : true,
+		comboBase : '/app/combo?',
+		root : 'yui.3.12.0/',
+		gallery: 'gallery-2013.09.18-18-49'
+	};
+</script>
+<link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css&gallery-2013.09.18-18-49/build/gallery-aui-skin-classic/css/gallery-aui-skin-classic-min.css&gallery-2013.09.18-18-49/build/gallery-aui-skin-base/css/gallery-aui-skin-base-min.css" />
 <style type="text/css">
+body {
+	font-size: 12px;
+}
 #pagContC {
     font-size:  12px;
     vertical-align: middle;
@@ -28,26 +40,11 @@
 	width: 30px;
 }
 </style>
-<script type="text/javascript">
-	YUI_config = {
-		debug : true,
-		combine : true,
-		comboBase : '/app/combo?',
-		root : 'yui.3.12.0/',
-		gallery: 'gallery-2013.09.18-18-49'
-	};
-</script>
 <script src="/public/js/yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
 <script type="text/javascript">
 	var dataBo = {{.result.dataBoJson}};
 	var listTemplate = {{.result.listTemplateJson}};
-	/*
-var isFormatter = listTemplate.ColumnModel.ColumnLi[i].Prefix != "";
-isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces != "";
-isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalSeparator != "";
-isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].ThousandsSeparator != "";
-isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
-	*/
+	var DATA_PROVIDER_SIZE = {{.result.pageSize}} || 10;
 	// 系统参数
 	var sysParam = {
 		localCurrency: {
@@ -67,10 +64,13 @@ isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
 	<div id="queryParameters">
 		<div class="queryParameters-title">查询参数</div>
 		<form action="/component/listtemplate" method="post" name="queryForm" id="queryForm">
+			{{range $index, $item := .result.hiddenParameterLi}}
+				<input type="hidden" name="{{$item.Name}}" value="{{$item.Value}}" />
+			{{end}}
 			<div class="queryParameters-content">
 				<table>
-				{{$parameterLen := len .result.listTemplate.QueryParameterGroup.QueryParameterLi}}
-				{{range $index, $queryParameter := .result.listTemplate.QueryParameterGroup.QueryParameterLi}}
+				{{$parameterLen := len .result.showParameterLi}}
+				{{range $index, $queryParameter := .result.showParameterLi}}
 					{{if residue $index 2 0}}
 					<tr>
 					{{end}}
@@ -78,7 +78,48 @@ isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
 						{{$queryParameter.Text}}
 					</td>
 					<td>
-						<input type="text" name="{{$queryParameter.Name}}" />
+						{{if eq $queryParameter.Editor "textfield"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "textarea"}}
+						<textarea id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}">{{$queryParameter.Value}}</textarea>
+						{{end}}
+						{{if eq $queryParameter.Editor "numberfield"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "datefield"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "combo"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "combotree"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "displayfield"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "hidden"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "htmleditor"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "checkbox"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "checkboxgroup"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "radio"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "radiogroup"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
+						{{if eq $queryParameter.Editor "trigger"}}
+						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+						{{end}}
 					</td>
 					{{if lte $parameterLen 2}}
 						{{if last $parameterLen $index}}
@@ -103,6 +144,10 @@ isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
 							</td>
 							{{end}}
 							</tr>
+						{{else}}
+							{{if last $parameterLen $index}}
+							</tr>
+							{{end}}
 						{{end}}
 					{{end}}
 				{{end}}

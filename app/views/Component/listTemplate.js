@@ -348,6 +348,16 @@ function createNumberColumn(listTemplate, columnIndex) {
 	};
 }
 
+function convertDate2DisplayPattern(displayPattern) {
+	displayPattern = displayPattern.replace("yyyy", "%G");
+	displayPattern = displayPattern.replace("MM", "%m");
+	displayPattern = displayPattern.replace("dd", "%d");
+	displayPattern = displayPattern.replace("HH", "%H");
+	displayPattern = displayPattern.replace("mm", "%M");
+	displayPattern = displayPattern.replace("ss", "%S");
+	return displayPattern;
+}
+
 /*
 	DisplayPattern string `xml:"displayPattern,attr"`
 	DbPattern      string `xml:"dbPattern,attr"`
@@ -403,13 +413,7 @@ function createDateColumn(listTemplate, columnIndex) {
 						date.setSeconds(ss);
 					}
 					// js格式参考 http://yuilibrary.com/yui/docs/api/classes/Date.html#method_format
-					var displayPattern = o.column.displayPattern;
-					displayPattern = displayPattern.replace("yyyy", "%G");
-					displayPattern = displayPattern.replace("MM", "%m");
-					displayPattern = displayPattern.replace("dd", "%d");
-					displayPattern = displayPattern.replace("HH", "%H");
-					displayPattern = displayPattern.replace("mm", "%M");
-					displayPattern = displayPattern.replace("ss", "%S");
+					var displayPattern = convertDate2DisplayPattern(o.column.displayPattern);
 					return yInst.DataType.Date.format(date, {
 						format: displayPattern
 					});
@@ -460,6 +464,19 @@ function createDictionaryColumn(listTemplate, columnIndex) {
 	};
 }
 
+function createRowIndexColumn(listTemplate) {
+	if (listTemplate.ColumnModel.Rownumber == "true") {
+		return {
+			key: "",
+			label: "序号",
+			formatter: function(o) {
+				return o.rowIndex + 1;
+			}
+		};
+	}
+	return null;
+}
+
 function createColumn(listTemplate, columnIndex) {
 	var i = columnIndex;
 	if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local != "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
@@ -490,6 +507,10 @@ function getColumns(listTemplate, Y) {
 	if (idColumn) {
 		columns.push(idColumn);
 	}
+	var rowIndexColumn = createRowIndexColumn(listTemplate);
+	if (rowIndexColumn) {
+		columns.push(rowIndexColumn);
+	}
 	
 	for (var i = 0; i < listTemplate.ColumnModel.ColumnLi.length; i++) {
 		var column = createColumn(listTemplate, i);
@@ -504,97 +525,170 @@ function getColumns(listTemplate, Y) {
 	}
 	return columns;
 }
-YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',  "gallery-datatable-paginator", 'gallery-paginator-view', "listtemplate-paginator", function(Y) {
-	Y.on("domready", function(e) {
-		yInst = Y;
-		var columns = getColumns(listTemplate, Y);
-		var data = dataBo.items;
 
-		var url = "/component/listtemplate?format=json";
-		//var dataSource = new Y.DataSource.Get({ source: url });
-		var dataSource = new Y.DataSource.IO({ 
-			source: url,
-			ioConfig: {
-		        method: "POST"
+function createDataGrid() {
+	var Y = yInst;
+	var columns = getColumns(listTemplate, Y);
+	var data = dataBo.items;
+
+	var url = "/component/listtemplate?format=json";
+	//var dataSource = new Y.DataSource.Get({ source: url });
+	var dataSource = new Y.DataSource.IO({ 
+		source: url,
+		ioConfig: {
+	        method: "POST"
+		}
+	});
+	//**{page}**, **{totalItems}**, **{itemsPerPage}**, **{lastPage}**, **{totalPages}**, **{itemIndexStart}**, **{itemIndexEnd}**
+	dataSource.plug(Y.Plugin.DataSourceJSONSchema, {
+	  schema: {
+	      resultListLocator: "items"
+    	  ,metaFields: {
+    		  	page:   'pageNo',
+    		  	itemsPerPage:     'pageSize',
+    		  	totalItems: 'totalResults'
+            }
+	      /* ,resultFields: [
+	          "Title",
+	          "Phone",
+	          {
+	              key: "Rating",
+	              locator: "Rating.AverageRating",
+	              parser: function (val) {
+	                  // YQL is returning "NaN" for unrated restaurants
+	                  return isNaN(val) ? -1 : +val;
+	              }
+	          }
+	      ] */
+	  }
+	});
+	
+	var dt = new Y.DataTable({
+		columns: columns
+		,data: data
+//		,datasource: dataSource
+		,paginationSource: "server"
+		,requestStringTemplate: "pageNo={page}&pageSize={itemsPerPage}"
+		,paginator: new Y.PaginatorView({
+			model:              new Y.PaginatorModel({itemsPerPage:DATA_PROVIDER_SIZE}),
+            container:          '#pagContC',
+            paginatorTemplate:  '#tmpl-bar',
+            pageOptions:        [ 10, 20, 50 ]
+        }),
+        serverPaginationMap: {
+        	//totalItems:     'totalItems',
+            itemsPerPage:   { toServer:'pageSize', fromServer:'pageSize' },
+            page: 'pageNo'
+        },
+
+        paginatorResize: true   // this is now a DT attribute (no longer a PaginatorView attribute)
+	});
+	dtInst = dt;
+	dt.plug(Y.Plugin.DataTableDataSource, { datasource: dataSource });
+	dt.get('paginator').get('model').set('totalItems', dataBo.totalResults);;
+//		dt.resizePaginator();
+	dt.render("#columnModel");
+	//dt.datasource.load({ request: "pageNo=1" });
+//	dt.processPageRequest(1);
+	dt.detach('*:change');
+	
+	dt.delegate("click", function(e){
+		var checked = e.target.get('checked') || undefined;
+		Y.all(getCheckboxCssSelector()).set("checked", checked ? "checked" : "");
+	}, ".protocol-select-all", dt);
+	
+	dt.delegate("click", function(e){
+		var checkLi = Y.all(getCheckboxCssSelector()).get("checked");
+		var isAllSelect = true;
+		var i = 0;
+		for(; i < checkLi.length; i++) {
+			if (!checkLi[i]) {
+				isAllSelect = false;
+				break;
 			}
-		});
-		//**{page}**, **{totalItems}**, **{itemsPerPage}**, **{lastPage}**, **{totalPages}**, **{itemIndexStart}**, **{itemIndexEnd}**
-		dataSource.plug(Y.Plugin.DataSourceJSONSchema, {
-		  schema: {
-		      resultListLocator: "items"
-	    	  ,metaFields: {
-	    		  	page:   'pageNo',
-	    		  	itemsPerPage:     'pageSize',
-	    		  	totalItems: 'totalResults'
-                }
-		      /* ,resultFields: [
-		          "Title",
-		          "Phone",
-		          {
-		              key: "Rating",
-		              locator: "Rating.AverageRating",
-		              parser: function (val) {
-		                  // YQL is returning "NaN" for unrated restaurants
-		                  return isNaN(val) ? -1 : +val;
-		              }
-		          }
-		      ] */
-		  }
-		});
-		
-		var dt = new Y.DataTable({
-			columns: columns
-			//,data: data
-//			,datasource: dataSource
-			,paginationSource: "server"
-			,requestStringTemplate: "pageNo={page}&pageSize={itemsPerPage}"
-			,paginator: new Y.PaginatorView({
-                model:              new Y.PaginatorModel({itemsPerPage:10}),
-                container:          '#pagContC',
-                paginatorTemplate:  '#tmpl-bar',
-                pageOptions:        [ 10, 20, 50 ]
-            }),
-            serverPaginationMap: {
-            	//totalItems:     'totalItems',
-                itemsPerPage:   { toServer:'pageSize', fromServer:'pageSize' },
-                page: 'pageNo'
-            },
+		}
+		// 单选没有全部选中的按钮
+		if (Y.one(".protocol-select-all")) {
+			Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
+		}
+	}, getCheckboxCssSelector(), dt);
+}
 
-            paginatorResize: true   // this is now a DT attribute (no longer a PaginatorView attribute)
-		});
-		dtInst = dt;
-		dt.plug(Y.Plugin.DataTableDataSource, { datasource: dataSource });
-		dt.render("#columnModel");
-		//dt.datasource.load({ request: "pageNo=1" });
-		dt.processPageRequest(1);
-		dt.detach('*:change');
-		
-		dt.delegate("click", function(e){
-			var checked = e.target.get('checked') || undefined;
-			Y.all(getCheckboxCssSelector()).set("checked", checked ? "checked" : "");
-		}, ".protocol-select-all", dt);
-		
-		dt.delegate("click", function(e){
-			var checkLi = Y.all(getCheckboxCssSelector()).get("checked");
-			var isAllSelect = true;
-			var i = 0;
-			for(; i < checkLi.length; i++) {
-				if (!checkLi[i]) {
-					isAllSelect = false;
+function applyQueryParameter() {
+	var Y = yInst;
+	for (var i = 0; i < listTemplate.QueryParameterGroup.QueryParameterLi.length; i++) {
+		var queryParameter = listTemplate.QueryParameterGroup.QueryParameterLi[i];
+		if (queryParameter.Editor == "numberfield") {
+			Y.one("#" + queryParameter.Name).on("keypress", function(e) {
+				if (!(e.keyCode == 9 || e.keyCode == 13 || e.keyCode == 46 || e.keyCode == 116 || e.keyCode == 118 || (e.keyCode >= 48 && e.keyCode <=57))) {// 0-9.,118:ctrl + v, 116:Ctrl + F5,13: enter,9: tab
+					e.preventDefault();
+				}
+			});
+		} else if (queryParameter.Editor == "datefield") {
+			var dateFormat = null;
+			for (var j = 0; j < queryParameter.ParameterAttributeLi.length; j++) {
+				if (queryParameter.ParameterAttributeLi[j].Name == "inFormat") {
+					dateFormat = queryParameter.ParameterAttributeLi[j].Value;
 					break;
 				}
 			}
-			// 单选没有全部选中的按钮
-			if (Y.one(".protocol-select-all")) {
-				Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
+			if (dateFormat) {
+				dateFormat = convertDate2DisplayPattern(dateFormat);
+				var calendar = new Y.Calendar({
+					trigger: "#" + queryParameter.Name,
+					//dates: ['09/14/2009', '09/15/2009'],
+					//dateFormat: '%d/%m/%y %A',
+					dateFormat: dateFormat,
+					setValue: true,
+					selectMultipleDates: false
+				}).render();
 			}
-		}, getCheckboxCssSelector(), dt);
+		}
+	}
+}
+
+function applyDateLocale(Y) {
+	if (!Y.DataType.Date.Locale) {
+		Y.DataType.Date.Locale = {};
+		var YDateEn = {
+				a: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+				A: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+				b: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+				B: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+				c: "%a %d %b %Y %T %Z",
+				p: ["AM", "PM"],
+				P: ["am", "pm"],
+				r: "%I:%M:%S %p",
+				x: "%d/%m/%y",
+				X: "%T"
+		};
+		Y.DataType.Date.Locale["en"] = YDateEn;
+		
+		Y.DataType.Date.Locale["en-US"] = Y.merge(YDateEn, {
+			c: "%a %d %b %Y %I:%M:%S %p %Z",
+			x: "%m/%d/%Y",
+			X: "%I:%M:%S %p"
+		});
+		
+		Y.DataType.Date.Locale["en-GB"] = Y.merge(YDateEn, {
+			r: "%l:%M:%S %P %Z"
+		});
+		Y.DataType.Date.Locale["en-AU"] = Y.merge(YDateEn);
+	}
+}
+
+YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format","gallery-aui-calendar-datepicker-select", function(Y) {
+	Y.on("domready", function(e) {
+		applyDateLocale(Y);
+		yInst = Y;
+		createDataGrid();
+		applyQueryParameter();
 		
 		Y.one("#queryBtn").on("click", function(e){
-			var pagModel = dt.get('paginator').get('model');
+			var pagModel = dtInst.get('paginator').get('model');
 			var page = pagModel.get("page");
 			if (page == 1) {
-				dt.refreshPaginator();
+				dtInst.refreshPaginator();
 			} else {
 				pagModel.set("page", 1);
 			}

@@ -170,10 +170,7 @@ func (o TemplateManager) GetToolbarForListTemplate(listTemplate *ListTemplate) [
 	expressionParser := ExpressionParser{}
 	for _, buttonItem := range listTemplate.Toolbar.ButtonLi {
 		button := map[string]interface{}{}
-		//		button["isShow"] = expressionParser.Parse(buttonItem.Expression)
-		expression := buttonItem.Expression
-		expression = ""
-		button["isShow"] = expressionParser.Parse("", expression)
+		button["isShow"] = expressionParser.Parse("", buttonItem.Expression)
 		toolbar = append(toolbar, button)
 	}
 
@@ -204,4 +201,24 @@ func (o TemplateManager) GetColumns(listTemplate *ListTemplate) []string {
 		fields = append(fields, columnItem.Name)
 	}
 	return fields
+}
+
+func (o TemplateManager) GetShowParameterLiForListTemplate(listTemplate *ListTemplate) []QueryParameter {
+	queryParameterLi := []QueryParameter{}
+	for _, item := range listTemplate.QueryParameterGroup.QueryParameterLi {
+		if item.Editor != "hidden" {
+			queryParameterLi = append(queryParameterLi, item)
+		}
+	}
+	return queryParameterLi
+}
+
+func (o TemplateManager) GetHiddenParameterLiForListTemplate(listTemplate *ListTemplate) []QueryParameter {
+	queryParameterLi := []QueryParameter{}
+	for _, item := range listTemplate.QueryParameterGroup.QueryParameterLi {
+		if item.Editor == "hidden" {
+			queryParameterLi = append(queryParameterLi, item)
+		}
+	}
+	return queryParameterLi
 }

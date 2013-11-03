@@ -38,7 +38,7 @@
 	 -->
 	<after-query-data>SysUser.afterQueryData</after-query-data>
 
-	<data-provider size="20">
+	<data-provider size="10">
 		<collection>SysUser</collection><!-- mongoDB collection name -->
 		<fix-bson-query>{"_id": {"$gte": 15}}</fix-bson-query><!-- mongoDB fix query, json format -->
 		<!-- 
@@ -119,7 +119,7 @@ function(key, values) {
 	</column-model>
 
 	<query-parameters>
-		<query-parameter name="nick" text="昵称" editor="textfield" restriction="like"></query-parameter>
+		<query-parameter name="nick" text="昵称" editor="textfield" restriction="like" value="昵称"></query-parameter>
 		<query-parameter name="dept_id" text="部门" restriction="eq" editor="numberfield"></query-parameter>
 
 		<query-parameter name="type" text="类型" restriction="in"  editor="combotree">
@@ -130,7 +130,7 @@ function(key, values) {
  	 		<parameter-attribute name="queryFormat" value="yyyyMMdd"/>
 		</query-parameter>
 
-		<query-parameter name="createTimeEnd" columnName="createTime" text="申请日期从" restriction="le" editor="datefield">
+		<query-parameter name="createTimeEnd" columnName="createTime" text="申请日期至" restriction="le" editor="datefield">
 			<parameter-attribute name="inFormat" value="yyyyMMdd"/>
  	 		<parameter-attribute name="queryFormat" value="yyyyMMddHHmmss"/>
 		</query-parameter>

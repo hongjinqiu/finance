@@ -81,6 +81,9 @@ func exitEnv() {
 type ExpressionParser struct{}
 
 func (o ExpressionParser) Parse(recordJson, expression string) bool {
+	if recordJson == "" || expression == "" {
+		return true
+	}
 	methodName := "trueOrFalse"
 	execResult := o.parseExpression(methodName, recordJson, expression)
 	return strings.ToLower(execResult) == "true"
