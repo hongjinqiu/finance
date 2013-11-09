@@ -124,7 +124,7 @@ function(key, values) {
 
 		<query-parameter name="type" text="类型" restriction="in"  editor="combotree">
 		</query-parameter>
-
+		
 		<query-parameter name="createTimeBegin" columnName="createTime" text="申请日期从" restriction="ge" editor="datefield">
 			<parameter-attribute name="inFormat" value="yyyy-MM-dd"/>
  	 		<parameter-attribute name="queryFormat" value="yyyyMMdd"/>
@@ -134,6 +134,18 @@ function(key, values) {
 			<parameter-attribute name="inFormat" value="yyyyMMdd"/>
  	 		<parameter-attribute name="queryFormat" value="yyyyMMddHHmmss"/>
 		</query-parameter>
+		
+		<query-parameter name="dictTest" text="字典测试" restriction="eq" editor="combo">
+			<parameter-attribute name="dictionary" value="D_DICTTEST" />
+		</query-parameter>
+		<query-parameter name="treeTest" text="树测试" restriction="eq" editor="combo">
+			<parameter-attribute name="tree" value="SYSUSER_TREE" />
+			<parameter-attribute name="observe" value="treeUrlTest" />
+		</query-parameter>
+		<query-parameter name="treeUrlTest" text="树url测试" restriction="eq" editor="combo">
+			<parameter-attribute name="treeUrl" value="SysUserTest" />
+		</query-parameter>
+		
 		<query-parameter name="_id" text="主键" restriction="eq" editor="hidden">
 		</query-parameter>
 	</query-parameters>

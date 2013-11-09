@@ -121,6 +121,8 @@ func (c Component) ListTemplate() revel.Result {
 
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
+	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
+	templateManager.ApplyTreeForQueryParameter(&listTemplate)
 	toolbarBo := templateManager.GetToolbarForListTemplate(&listTemplate)
 	paramMap := map[string]string{}
 	for k, v := range c.Params.Form {

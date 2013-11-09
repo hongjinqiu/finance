@@ -91,7 +91,21 @@ body {
 						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
 						{{end}}
 						{{if eq $queryParameter.Editor "combo"}}
-						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+							<select name="{{$queryParameter.Name}}" id="{{$queryParameter.Name}}">
+								<option value="">请选择</option>
+								{{range $dictionaryIndex, $dictionaryItem := $queryParameter.Dictionary.items}}
+								<option value="{{$dictionaryItem.code}}">{{$dictionaryItem.name}}</option>
+								{{end}}
+								
+								{{range $treeIndex, $treeItem := $queryParameter.Tree.items}}
+								<option value="{{$treeItem.code}}">{{$treeItem.name}}</option>
+								{{end}}
+							</select>
+							{{if $queryParameter.Value}}
+							<script type="text/javascript">
+								document.getElementById("{{$queryParameter.Name}}").value = "{{$queryParameter.Value}}";
+							</script>
+							{{end}}
 						{{end}}
 						{{if eq $queryParameter.Editor "combotree"}}
 						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />

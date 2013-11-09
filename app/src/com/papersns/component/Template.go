@@ -220,6 +220,8 @@ type QueryParameter struct {
 
 	ParameterAttributeLi []ParameterAttribute `xml:"parameter-attribute"`
 	QueryParamAttributeGroup
+	Dictionary map[string]interface{}
+	Tree map[string]interface{}
 }
 
 type ParameterAttribute struct {

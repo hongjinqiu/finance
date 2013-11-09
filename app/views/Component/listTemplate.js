@@ -644,6 +644,8 @@ function applyQueryParameter() {
 				}).render();
 			}
 		}
+		// TODO observe 的相关操作,在change的时候,如果被观察方是combo,刷新option
+		
 	}
 }
 

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"labix.org/v2/mgo"
 	"log"
+	"com/papersns/mongo"
+	"com/papersns/tree"
 )
 
 type TemplateManager struct{}
@@ -221,4 +223,38 @@ func (o TemplateManager) GetHiddenParameterLiForListTemplate(listTemplate *ListT
 		}
 	}
 	return queryParameterLi
+}
+
+func (o TemplateManager) ApplyDictionaryForQueryParameter(listTemplate *ListTemplate) {
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
+	defer session.Close()
+	
+	dictionaryManager := dictionary.GetInstance()
+	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
+		item :=  &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
+		for _, parameterAttribute := range item.ParameterAttributeLi {
+			if parameterAttribute.Name == "dictionary" {
+				item.Dictionary = dictionaryManager.GetDictionaryBySession(db, parameterAttribute.Value)
+				break
+			}
+		}
+	}
+}
+
+func (o TemplateManager) ApplyTreeForQueryParameter(listTemplate *ListTemplate) {
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
+	defer session.Close()
+	
+	treeManager := tree.GetInstance()
+	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
+		item :=  &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
+		for _, parameterAttribute := range item.ParameterAttributeLi {
+			if parameterAttribute.Name == "tree" {
+				item.Tree = treeManager.GetTreeBySession(db, parameterAttribute.Value)
+				break
+			}
+		}
+	}
 }

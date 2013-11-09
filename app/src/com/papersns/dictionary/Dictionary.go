@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"sort"
+	"labix.org/v2/mgo"
 )
 
 func GetInstance() DictionaryManager {
@@ -55,6 +56,10 @@ func (o DictionaryManager) GetDictionary(code string) map[string]interface{} {
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 	
+	return o.GetDictionaryBySession(db, code)
+}
+
+func (o DictionaryManager) GetDictionaryBySession(db *mgo.Database, code string) map[string]interface{} {
 	collection := "PubDictionary"
 	c := db.C(collection)
 	
