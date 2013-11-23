@@ -292,7 +292,7 @@ func (c Component) IndexTest() revel.Result {
 }
 
 func (c Component) SchemaTest() revel.Result {
-	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/查询示例.xml`)
+	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
@@ -315,23 +315,20 @@ func (c Component) SchemaTest() revel.Result {
 	// 1.query data,
 	// from data-provider
 	// from query-parameters
-
-	xmlDataArray, err := xml.MarshalIndent(listTemplate, "", "\t")
+	xmlDataArray, err := xml.MarshalIndent(&listTemplate, "", "\t")
 	if err != nil {
-		fmt.Printf("error: %v", err)
-		return c.Render(err)
+		panic(err)
 	}
 	println(xmlDataArray)
 
-	jsonArray, err := json.MarshalIndent(listTemplate, "", "\t")
+	jsonArray, err := json.MarshalIndent(&listTemplate, "", "\t")
 	if err != nil {
-		fmt.Printf("error: %v", err)
-		return c.Render(err)
+		panic(err)
 	}
 
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
-	//	return c.RenderText(string(xmlDataArray))
+//	return c.RenderText(string(xmlDataArray))
 	return c.RenderText(string(jsonArray))
 }
 

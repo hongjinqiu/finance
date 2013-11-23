@@ -40,7 +40,15 @@ function getQueryString(Y) {
 	query = Y.QueryString.stringify(Y.Array.reduce(Y.one(form).all('input[name],select[name],textarea[name]')._nodes, {}, function (init, el, index, array) {
 		var isCheckable = (el.type == "checkbox" || el.type == "radio");
 		if ((isCheckable && el.checked) || !isCheckable) {
-			init[el.name] = el.value;
+			if (isCheckable && el.checked) {
+				if (!init[el.name]) {
+					init[el.name] = el.value;
+				} else {
+					init[el.name] += "," + el.value;
+				}
+			} else {
+				init[el.name] = el.value;
+			}
 		}
 		return init;
 	}));
@@ -512,6 +520,10 @@ function getColumns(listTemplate, Y) {
 		columns.push(rowIndexColumn);
 	}
 	
+	var nestColumn = {
+		"label": "聚合测试",
+		"children": []
+	};
 	for (var i = 0; i < listTemplate.ColumnModel.ColumnLi.length; i++) {
 		var column = createColumn(listTemplate, i);
 		if (column) {
@@ -522,7 +534,16 @@ function getColumns(listTemplate, Y) {
 				columns.push(virtualColumn);
 			}
 		}
+		
+		/*
+<dictionary-column name="dictTest" text="字典测试" dictionary="D_DICTTEST"></dictionary-column>
+<script-column name="scriptTest" text="脚本列测试" script="str(record.get('id') or '') + ',' + str(record.get('boolTest') or '')"/>
+		 */
+		if (listTemplate.ColumnModel.ColumnLi[i].Name == "dictTest" || listTemplate.ColumnModel.ColumnLi[i].Name == "scriptTest") {
+			nestColumn.children.push(column);
+		}
 	}
+	columns.push(nestColumn);
 	return columns;
 }
 
@@ -634,6 +655,7 @@ function applyQueryParameter() {
 			}
 			if (dateFormat) {
 				dateFormat = convertDate2DisplayPattern(dateFormat);
+				/*
 				var calendar = new Y.Calendar({
 					trigger: "#" + queryParameter.Name,
 					//dates: ['09/14/2009', '09/15/2009'],
@@ -642,11 +664,68 @@ function applyQueryParameter() {
 					setValue: true,
 					selectMultipleDates: false
 				}).render();
+				*/
 			}
 		}
-		// TODO observe 的相关操作,在change的时候,如果被观察方是combo,刷新option
-		
+		applyQueryParameterObserve(queryParameter);
 	}
+}
+
+function applyQueryParameterObserve(queryParameter) {
+	var Y = yInst;
+	if (queryParameter.ParameterAttributeLi) {
+		for (var j = 0; j < queryParameter.ParameterAttributeLi.length; j++) {
+			if (queryParameter.ParameterAttributeLi[j].Name == "observe") {
+				Y.one("#" + queryParameter.Name).on("change", function(queryParameter, observeAttr){
+					return function(e){
+						var targetQueryParameter = findQueryParameter(listTemplate, observeAttr.Value);
+						if (document.getElementById(queryParameter.Name).value) {
+							var treeUrlAttr = findQueryParameterAttr(targetQueryParameter, "treeUrl");
+							// ajax requeset,
+							var uri = "/tree/" + treeUrlAttr.Value;
+							if (uri.indexOf("?") > -1) {
+								uri += "&parentId=" + document.getElementById(queryParameter.Name).value;
+							} else {
+								uri += "?parentId=" + document.getElementById(queryParameter.Name).value;
+							}
+							function complete(id, o, args) {
+								var id = id; // Transaction ID.
+								var data = Y.JSON.parse(o.responseText);
+								var htmlLi = ['<option value="">请选择</option>'];
+								for (var k = 0; k < data.length; k++) {
+									htmlLi.push(yInst.Lang.sub('<option value="{code}">{name}</option>', data[k]));
+								}
+								yInst.one("#" + targetQueryParameter.Name).setHTML(htmlLi.join(""));
+							};
+							Y.on('io:complete', complete, Y, []);
+							var request = Y.io(uri);
+						} else {
+							yInst.one("#" + targetQueryParameter.Name).setHTML('<option value="">请选择</option>');
+						}
+					}
+				}(queryParameter, queryParameter.ParameterAttributeLi[j]));
+				break;
+			}
+		}
+	}
+}
+
+function findQueryParameter(listTemplate, name) {
+	for (var i = 0; i < listTemplate.QueryParameterGroup.QueryParameterLi.length; i++) {
+		if (listTemplate.QueryParameterGroup.QueryParameterLi[i].Name == name) {
+			return listTemplate.QueryParameterGroup.QueryParameterLi[i];
+		}
+	}
+	return null;
+}
+
+function findQueryParameterAttr(queryParameter, name) {
+	for (var i = 0; i < queryParameter.ParameterAttributeLi.length; i++) {
+		if (queryParameter.ParameterAttributeLi[i].Name == name) {
+			return queryParameter.ParameterAttributeLi[i];
+		}
+	}
+	return null;
 }
 
 function applyDateLocale(Y) {
@@ -679,7 +758,8 @@ function applyDateLocale(Y) {
 	}
 }
 
-YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format","gallery-aui-calendar-datepicker-select", function(Y) {
+YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", function(Y) {
+	//,"gallery-aui-calendar-datepicker-select"
 	Y.on("domready", function(e) {
 		applyDateLocale(Y);
 		yInst = Y;

@@ -120,13 +120,63 @@ body {
 						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
 						{{end}}
 						{{if eq $queryParameter.Editor "checkbox"}}
-						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+							{{range $dictionaryIndex, $dictionaryItem := $queryParameter.Dictionary.items}}
+							<input type="checkbox" id="{{$queryParameter.Name}}_{{$dictionaryIndex}}" name="{{$queryParameter.Name}}" value="{{$dictionaryItem.code}}" />
+							<label for="{{$queryParameter.Name}}_{{$dictionaryIndex}}">{{$dictionaryItem.name}}</label>
+							{{end}}
+							
+							{{range $treeIndex, $treeItem := $queryParameter.Tree.items}}
+							<input type="checkbox" id="{{$queryParameter.Name}}_{{$treeIndex}}" name="{{$queryParameter.Name}}" value="{{$treeItem.code}}" />
+							<label for="{{$queryParameter.Name}}_{{$treeIndex}}">{{$treeItem.name}}</label>
+							{{end}}
+							{{if $queryParameter.Value}}
+							<script type="text/javascript">
+								function initCheckbox() {
+									var valueLi = "{{$queryParameter.Value}}".split(",");
+									var elemLi = document.getElementsByTagName("input");
+									for (var i = 0; i < elemLi.length; i++) {
+										if (elemLi[i].id.indexOf("{{$queryParameter.Name}}_") > -1) {
+											if (elemLi[i].value in valueLi) {
+												elemLi[i].checked = true;
+											}
+										}
+									}
+								}
+								initCheckbox();
+							</script>
+							{{end}}
 						{{end}}
 						{{if eq $queryParameter.Editor "checkboxgroup"}}
 						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
 						{{end}}
 						{{if eq $queryParameter.Editor "radio"}}
-						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />
+							<input type="radio" id="{{$queryParameter.Name}}_A0" name="{{$queryParameter.Name}}" value="" />
+							<label for="{{$queryParameter.Name}}_A0">全部</label>
+							{{range $dictionaryIndex, $dictionaryItem := $queryParameter.Dictionary.items}}
+							<input type="radio" id="{{$queryParameter.Name}}_{{$dictionaryIndex}}" name="{{$queryParameter.Name}}" value="{{$dictionaryItem.code}}" />
+							<label for="{{$queryParameter.Name}}_{{$dictionaryIndex}}">{{$dictionaryItem.name}}</label>
+							{{end}}
+							
+							{{range $treeIndex, $treeItem := $queryParameter.Tree.items}}
+							<input type="radio" id="{{$queryParameter.Name}}_{{$treeIndex}}" name="{{$queryParameter.Name}}" value="{{$treeItem.code}}" />
+							<label for="{{$queryParameter.Name}}_{{$treeIndex}}">{{$treeItem.name}}</label>
+							{{end}}
+							{{if $queryParameter.Value}}
+							<script type="text/javascript">
+								function initRadio() {
+									var value = "{{$queryParameter.Value}}";
+									var elemLi = document.getElementsByTagName("input");
+									for (var i = 0; i < elemLi.length; i++) {
+										if (elemLi[i].id.indexOf("{{$queryParameter.Name}}_") > -1) {
+											if (elemLi[i].value == value) {
+												elemLi[i].checked = true;
+											}
+										}
+									}
+								}
+								initRadio();
+							</script>
+							{{end}}
 						{{end}}
 						{{if eq $queryParameter.Editor "radiogroup"}}
 						<input type="text" id="{{$queryParameter.Name}}" name="{{$queryParameter.Name}}" value="{{$queryParameter.Value}}" />

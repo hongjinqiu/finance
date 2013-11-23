@@ -106,8 +106,11 @@ function(key, values) {
 		
 		<script-column name="scriptTest" text="脚本列测试" script="str(record.get('id') or '') + ',' + str(record.get('boolTest') or '')"/>
 		
-		<string-column name="APP_NAME" text="申请人" editable="true">
-			<editor name="text"></editor>
+		<string-column name="nestTest" text="嵌套测试">
+			<column-model>
+				<script-column name="nest1" text="嵌套1" script="record.get('nick')"></script-column>
+				<script-column name="nest2" text="嵌套2" script="record.get('nick').encode('utf8') + ',2'"></script-column>
+			</column-model>
 		</string-column>
 
 		<date-column name="APP_TIME" text="申请日期" />
@@ -144,6 +147,12 @@ function(key, values) {
 		</query-parameter>
 		<query-parameter name="treeUrlTest" text="树url测试" restriction="eq" editor="combo">
 			<parameter-attribute name="treeUrl" value="SysUserTest" />
+		</query-parameter>
+		<query-parameter name="checkboxTest" text="复选框测试" restriction="in" editor="checkbox">
+			<parameter-attribute name="dictionary" value="D_DICTTEST" />
+		</query-parameter>
+		<query-parameter name="radioTest" text="单选框测试" restriction="in" editor="radio">
+			<parameter-attribute name="dictionary" value="D_DICTTEST" />
 		</query-parameter>
 		
 		<query-parameter name="_id" text="主键" restriction="eq" editor="hidden">

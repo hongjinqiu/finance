@@ -154,8 +154,9 @@ type Column struct {
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor
 	ColumnAttributeGroup
+	ColumnModel ColumnModel `xml:"column-model"`
 
-//	Format         string `xml:"format,attr"`
+	//	Format         string `xml:"format,attr"`
 	DisplayPattern string `xml:"displayPattern,attr"`
 	DbPattern      string `xml:"dbPattern,attr"`
 	BooleanColumnAttributeGroup
@@ -171,13 +172,13 @@ type Column struct {
 	Suffix             string  `xml:"suffix,attr"`
 
 	// 财务格式化字段
-	CurrencyField string `xml:"currencyField,attr"`// 币别字段
-	IsMoney       string `xml:"isMoney,attr"`// 是否金额
-	IsUnitPrice   string `xml:"isUnitPrice,attr"`// 是否单价
-	IsCost        string `xml:"isCost,attr"`// 是否成本
-	IsPercent     string `xml:"isPercent,attr"`// 是否百分比
-	
-	Script             string  `xml:"script,attr"`
+	CurrencyField string `xml:"currencyField,attr"` // 币别字段
+	IsMoney       string `xml:"isMoney,attr"`       // 是否金额
+	IsUnitPrice   string `xml:"isUnitPrice,attr"`   // 是否单价
+	IsCost        string `xml:"isCost,attr"`        // 是否成本
+	IsPercent     string `xml:"isPercent,attr"`     // 是否百分比
+
+	Script string `xml:"script,attr"`
 }
 
 type Editor struct {
@@ -220,8 +221,8 @@ type QueryParameter struct {
 
 	ParameterAttributeLi []ParameterAttribute `xml:"parameter-attribute"`
 	QueryParamAttributeGroup
-	Dictionary map[string]interface{}
-	Tree map[string]interface{}
+	Dictionary map[string]interface{} `xml:"-"`
+	Tree       map[string]interface{} `xml:"-"`
 }
 
 type ParameterAttribute struct {
