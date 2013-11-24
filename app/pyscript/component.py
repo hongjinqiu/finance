@@ -59,6 +59,9 @@ class SysUser():
         for item in items:
             item['boolTest'] = True
             item['boolTest2'] = False
+        
+        for item in items:
+            item['nestDictTest1'] = 1
             
         return json.dumps(items)    
 

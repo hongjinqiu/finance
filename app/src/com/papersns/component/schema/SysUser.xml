@@ -108,8 +108,8 @@ function(key, values) {
 		
 		<string-column name="nestTest" text="嵌套测试">
 			<column-model>
-				<script-column name="nest1" text="嵌套1" script="record.get('nick')"></script-column>
-				<script-column name="nest2" text="嵌套2" script="record.get('nick').encode('utf8') + ',2'"></script-column>
+				<script-column name="nest1" text="嵌套1" script="record.get('nick').encode('utf8')"></script-column>
+				<dictionary-column name="nestDictTest1" text="子字典测试" dictionary="D_DICTTEST"></dictionary-column>
 			</column-model>
 		</string-column>
 

@@ -2,12 +2,12 @@ package component
 
 import (
 	"com/papersns/dictionary"
+	"com/papersns/mongo"
+	"com/papersns/tree"
 	"encoding/json"
 	"fmt"
 	"labix.org/v2/mgo"
 	"log"
-	"com/papersns/mongo"
-	"com/papersns/tree"
 )
 
 type TemplateManager struct{}
@@ -58,7 +58,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	}
 	if mapStr == "" {
 		orderBy := listTemplate.ColumnModel.BsonOrderBy
-		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) +",orderBy is:" + orderBy)
+		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) + ",orderBy is:" + orderBy)
 		result := querySupport.Index(collection, queryMap, pageNo, pageSize, orderBy)
 		items := result["items"].([]interface{})
 		result["items"] = expressionParser.ParseAfterQueryData(listTemplate.AfterQueryData, items)
@@ -105,33 +105,50 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate *ListTem
 		loopItem["id"] = record[listTemplate.ColumnModel.IdColumn.Name]
 		loopItem["_id"] = record[listTemplate.ColumnModel.IdColumn.Name]
 		for _, columnItem := range listTemplate.ColumnModel.ColumnLi {
-			if columnItem.XMLName.Local != "virtual-column" {
-				loopItem[columnItem.Name] = record[columnItem.Name]
-				o.ApplyDictionaryColumnData(&loopItem, columnItem)
-				o.ApplyScriptColumnData(&loopItem, record, columnItem)
-			} else {
-				if loopItem[columnItem.Name] == nil {
-					virtualColumn := map[string]interface{}{}
-					buttons := []interface{}{}
-					virtualColumn["buttons"] = buttons
-					loopItem[columnItem.Name] = virtualColumn
-				}
-
-				for _, buttonItem := range columnItem.Buttons.ButtonLi {
-					button := map[string]interface{}{}
-					button["isShow"] = expressionParser.Parse(recordJson, buttonItem.Expression)
-					virtualColumn := loopItem[columnItem.Name].(map[string]interface{})
-					buttons := virtualColumn["buttons"].([]interface{})
-					buttons = append(buttons, button)
-					virtualColumn["buttons"] = buttons // append will generate a new reference, so must reset value
-				}
-			}
+			o.GetColumnModelDataForColumnItem(columnItem, record, &loopItem)
 		}
 
 		columnModelItems = append(columnModelItems, loopItem)
 	}
 
 	return columnModelItems
+}
+
+func (o TemplateManager) GetColumnModelDataForColumnItem(columnItem Column, record map[string]interface{}, loopItem *map[string]interface{}) {
+	if columnItem.XMLName.Local != "virtual-column" {
+		if columnItem.ColumnModel.ColumnLi != nil {
+			for _, columnItemItem := range columnItem.ColumnModel.ColumnLi {
+				o.GetColumnModelDataForColumnItem(columnItemItem, record, loopItem)
+			}
+		} else {
+			(*loopItem)[columnItem.Name] = record[columnItem.Name]
+			o.ApplyDictionaryColumnData(loopItem, columnItem)
+			o.ApplyScriptColumnData(loopItem, record, columnItem)
+		}
+	} else {
+		if (*loopItem)[columnItem.Name] == nil {
+			virtualColumn := map[string]interface{}{}
+			buttons := []interface{}{}
+			virtualColumn["buttons"] = buttons
+			(*loopItem)[columnItem.Name] = virtualColumn
+		}
+
+		recordJsonByte, err := json.Marshal(record)
+		if err != nil {
+			panic(err)
+		}
+		recordJson := string(recordJsonByte)
+		
+		expressionParser := ExpressionParser{}
+		for _, buttonItem := range columnItem.Buttons.ButtonLi {
+			button := map[string]interface{}{}
+			button["isShow"] = expressionParser.Parse(recordJson, buttonItem.Expression)
+			virtualColumn := (*loopItem)[columnItem.Name].(map[string]interface{})
+			buttons := virtualColumn["buttons"].([]interface{})
+			buttons = append(buttons, button)
+			virtualColumn["buttons"] = buttons // append will generate a new reference, so must reset value
+		}
+	}
 }
 
 func (o TemplateManager) ApplyDictionaryColumnData(loopItem *map[string]interface{}, columnItem Column) {
@@ -159,7 +176,7 @@ func (o TemplateManager) ApplyScriptColumnData(loopItem *map[string]interface{},
 		if err != nil {
 			panic(err)
 		}
-		
+
 		expressionParser := ExpressionParser{}
 		scriptValue := expressionParser.ParseString(string(data), columnItem.Script)
 		(*loopItem)[columnItem.Name] = scriptValue
@@ -229,10 +246,10 @@ func (o TemplateManager) ApplyDictionaryForQueryParameter(listTemplate *ListTemp
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
-	
+
 	dictionaryManager := dictionary.GetInstance()
 	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		item :=  &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
+		item := &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
 		for _, parameterAttribute := range item.ParameterAttributeLi {
 			if parameterAttribute.Name == "dictionary" {
 				item.Dictionary = dictionaryManager.GetDictionaryBySession(db, parameterAttribute.Value)
@@ -246,10 +263,10 @@ func (o TemplateManager) ApplyTreeForQueryParameter(listTemplate *ListTemplate) 
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
-	
+
 	treeManager := tree.GetInstance()
 	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		item :=  &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
+		item := &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
 		for _, parameterAttribute := range item.ParameterAttributeLi {
 			if parameterAttribute.Name == "tree" {
 				item.Tree = treeManager.GetTreeBySession(db, parameterAttribute.Value)

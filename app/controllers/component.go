@@ -328,7 +328,7 @@ func (c Component) SchemaTest() revel.Result {
 
 	c.Response.Status = http.StatusOK
 	c.Response.ContentType = "text/plain; charset=utf-8"
-//	return c.RenderText(string(xmlDataArray))
+	return c.RenderText(string(xmlDataArray))
 	return c.RenderText(string(jsonArray))
 }
 

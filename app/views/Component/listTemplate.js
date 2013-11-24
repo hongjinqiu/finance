@@ -315,44 +315,43 @@ function createVirtualColumn(listTemplate, columnIndex) {
 	return null;
 }
 
-function createNumberColumn(listTemplate, columnIndex) {
-	var i = columnIndex;
+function createNumberColumn(columnConfig) {
 	var decimalPlaces = 2;
-	if (listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces) {
-		decimalPlaces = parseInt(listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces);
+	if (columnConfig.DecimalPlaces) {
+		decimalPlaces = parseInt(columnConfig.DecimalPlaces);
 	}
-	var isFormatter = listTemplate.ColumnModel.ColumnLi[i].Prefix != "";
-	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalPlaces != "";
-	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].DecimalSeparator != "";
-	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].ThousandsSeparator != "";
-	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].Suffix != "";
+	var isFormatter = columnConfig.Prefix != "";
+	isFormatter = isFormatter || columnConfig.DecimalPlaces != "";
+	isFormatter = isFormatter || columnConfig.DecimalSeparator != "";
+	isFormatter = isFormatter || columnConfig.ThousandsSeparator != "";
+	isFormatter = isFormatter || columnConfig.Suffix != "";
 	
 	// 财务相关字段的判断,以决定是否用 formatter 函数,
-	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].CurrencyField != "";
-	isFormatter = isFormatter || listTemplate.ColumnModel.ColumnLi[i].IsPercent != "";
+	isFormatter = isFormatter || columnConfig.CurrencyField != "";
+	isFormatter = isFormatter || columnConfig.IsPercent != "";
 	
 	if (isFormatter) {
 		return {
-			key: listTemplate.ColumnModel.ColumnLi[i].Name,
-			label: listTemplate.ColumnModel.ColumnLi[i].Text,
+			key: columnConfig.Name,
+			label: columnConfig.Text,
 			formatter: currencyFormatFunc,
 			
-			prefix: listTemplate.ColumnModel.ColumnLi[i].Prefix,
+			prefix: columnConfig.Prefix,
 			decimalPlaces: decimalPlaces,
-			decimalSeparator: listTemplate.ColumnModel.ColumnLi[i].DecimalSeparator,
-			thousandsSeparator: listTemplate.ColumnModel.ColumnLi[i].ThousandsSeparator,
-			suffix: listTemplate.ColumnModel.ColumnLi[i].Suffix,
+			decimalSeparator: columnConfig.DecimalSeparator,
+			thousandsSeparator: columnConfig.ThousandsSeparator,
+			suffix: columnConfig.Suffix,
 			
-			currencyField: listTemplate.ColumnModel.ColumnLi[i].CurrencyField,
-			isPercent: listTemplate.ColumnModel.ColumnLi[i].IsPercent,
-			isMoney: listTemplate.ColumnModel.ColumnLi[i].IsMoney,
-			isUnitPrice: listTemplate.ColumnModel.ColumnLi[i].IsUnitPrice,
-			isCost: listTemplate.ColumnModel.ColumnLi[i].IsCost
+			currencyField: columnConfig.CurrencyField,
+			isPercent: columnConfig.IsPercent,
+			isMoney: columnConfig.IsMoney,
+			isUnitPrice: columnConfig.IsUnitPrice,
+			isCost: columnConfig.IsCost
 		};
 	}
 	return {
-		key: listTemplate.ColumnModel.ColumnLi[i].Name,
-		label: listTemplate.ColumnModel.ColumnLi[i].Text
+		key: columnConfig.Name,
+		label: columnConfig.Text
 	};
 }
 
@@ -370,14 +369,13 @@ function convertDate2DisplayPattern(displayPattern) {
 	DisplayPattern string `xml:"displayPattern,attr"`
 	DbPattern      string `xml:"dbPattern,attr"`
  */
-function createDateColumn(listTemplate, columnIndex) {
-	var i = columnIndex;
-	var dbPattern = listTemplate.ColumnModel.ColumnLi[i].DbPattern;
-	var displayPattern = listTemplate.ColumnModel.ColumnLi[i].DisplayPattern;
+function createDateColumn(columnConfig) {
+	var dbPattern = columnConfig.DbPattern;
+	var displayPattern = columnConfig.DisplayPattern;
 	if (dbPattern && displayPattern) {
 		return {
-			key: listTemplate.ColumnModel.ColumnLi[i].Name,
-			label: listTemplate.ColumnModel.ColumnLi[i].Text,
+			key: columnConfig.Name,
+			label: columnConfig.Text,
 			dbPattern: dbPattern,
 			displayPattern: displayPattern,
 			formatter: function(o) {
@@ -430,20 +428,19 @@ function createDateColumn(listTemplate, columnIndex) {
 			}
 		};
 	} else {
-		console.log(listTemplate.ColumnModel.ColumnLi[i]);
+		console.log(columnConfig);
 		console.log("日期字段未同时配置dbPattern和displayPattern");
 	}
 	return {
-		key: listTemplate.ColumnModel.ColumnLi[i].Name,
-		label: listTemplate.ColumnModel.ColumnLi[i].Text
+		key: columnConfig.Name,
+		label: columnConfig.Text
 	};
 }
 
-function createBooleanColumn(listTemplate, columnIndex) {
-	var i = columnIndex;
+function createBooleanColumn(columnConfig) {
 	return {
-		key: listTemplate.ColumnModel.ColumnLi[i].Name,
-		label: listTemplate.ColumnModel.ColumnLi[i].Text,
+		key: columnConfig.Name,
+		label: columnConfig.Text,
 		formatter: function(o) {
 			if (o.value + "" == "true") {
 				return "是";
@@ -455,17 +452,16 @@ function createBooleanColumn(listTemplate, columnIndex) {
 	};
 }
 
-function createDictionaryColumn(listTemplate, columnIndex) {
-	var i = columnIndex;
+function createDictionaryColumn(columnConfig) {
 	return {
-		key: listTemplate.ColumnModel.ColumnLi[i].Name,
-		label: listTemplate.ColumnModel.ColumnLi[i].Text,
+		key: columnConfig.Name,
+		label: columnConfig.Text,
 		formatter: function(o) {
-			var dictionaryValue = o.data[listTemplate.ColumnModel.ColumnLi[i].Name + "_DICTIONARY_NAME"];
+			var dictionaryValue = o.data[columnConfig.Name + "_DICTIONARY_NAME"];
 			if (dictionaryValue !== undefined && dictionaryValue !== null) {
 				return dictionaryValue;
 			}
-			console.log(listTemplate.ColumnModel.ColumnLi[i]);
+			console.log(columnConfig);
 			console.log("字典字段没找到_DICTIONARY_NAME,code:" + o.value);
 			return o.value;
 		}
@@ -485,21 +481,34 @@ function createRowIndexColumn(listTemplate) {
 	return null;
 }
 
-function createColumn(listTemplate, columnIndex) {
-	var i = columnIndex;
-	if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local != "virtual-column" && listTemplate.ColumnModel.ColumnLi[i].Hideable != "true") {
-		if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "number-column") {
-			return createNumberColumn(listTemplate, columnIndex);
-		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "date-column") {
-			return createDateColumn(listTemplate, columnIndex);
-		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "boolean-column") {
-			return createBooleanColumn(listTemplate, columnIndex);
-		} else if (listTemplate.ColumnModel.ColumnLi[i].XMLName.Local == "dictionary-column") {
-			return createDictionaryColumn(listTemplate, columnIndex);
+function createColumn(columnConfig) {
+	if (columnConfig.XMLName.Local != "virtual-column" && columnConfig.Hideable != "true") {
+		if (columnConfig.ColumnModel.ColumnLi) {
+			var result = {
+				label: columnConfig.Text,
+				"children": []
+			};
+			for (var i = 0; i < columnConfig.ColumnModel.ColumnLi.length; i++) {
+				var childColumn = createColumn(columnConfig.ColumnModel.ColumnLi[i]);
+				if (childColumn) {
+					result.children.push(childColumn);
+				}
+			}
+			return result;
+		}
+		
+		if (columnConfig.XMLName.Local == "number-column") {
+			return createNumberColumn(columnConfig);
+		} else if (columnConfig.XMLName.Local == "date-column") {
+			return createDateColumn(columnConfig);
+		} else if (columnConfig.XMLName.Local == "boolean-column") {
+			return createBooleanColumn(columnConfig);
+		} else if (columnConfig.XMLName.Local == "dictionary-column") {
+			return createDictionaryColumn(columnConfig);
 		}
 		return {
-			key: listTemplate.ColumnModel.ColumnLi[i].Name,
-			label: listTemplate.ColumnModel.ColumnLi[i].Text
+			key: columnConfig.Name,
+			label: columnConfig.Text
 		};
 	}
 	return null;
@@ -520,12 +529,8 @@ function getColumns(listTemplate, Y) {
 		columns.push(rowIndexColumn);
 	}
 	
-	var nestColumn = {
-		"label": "聚合测试",
-		"children": []
-	};
 	for (var i = 0; i < listTemplate.ColumnModel.ColumnLi.length; i++) {
-		var column = createColumn(listTemplate, i);
+		var column = createColumn(listTemplate.ColumnModel.ColumnLi[i]);
 		if (column) {
 			columns.push(column);
 		} else {
@@ -534,17 +539,64 @@ function getColumns(listTemplate, Y) {
 				columns.push(virtualColumn);
 			}
 		}
-		
-		/*
-<dictionary-column name="dictTest" text="字典测试" dictionary="D_DICTTEST"></dictionary-column>
-<script-column name="scriptTest" text="脚本列测试" script="str(record.get('id') or '') + ',' + str(record.get('boolTest') or '')"/>
-		 */
-		if (listTemplate.ColumnModel.ColumnLi[i].Name == "dictTest" || listTemplate.ColumnModel.ColumnLi[i].Name == "scriptTest") {
-			nestColumn.children.push(column);
-		}
 	}
-	columns.push(nestColumn);
 	return columns;
+}
+
+function showLoadingImg() {
+	var Y = yInst;
+	var node = Y.one("tbody.yui3-datatable-data");
+	[x,y] = node.getXY();
+	var width = parseInt(node.getComputedStyle("width"));
+	var height = parseInt(node.getComputedStyle("height"));
+	
+	var loadingNode = Y.one("#loading");
+	if (!loadingNode) {
+		var loadingStyleLi = [];
+		loadingStyleLi.push('position: absolute;');
+		loadingStyleLi.push('z-index: 999;');
+		loadingStyleLi.push('background-color: white;');
+		loadingStyleLi.push('opacity: 0.5;');
+		loadingStyleLi.push('filter:alpha(opacity=50);');
+		loadingStyleLi.push('width: ' + width + 'px;');
+		loadingStyleLi.push('height: ' + height + 'px;');
+		loadingStyleLi.push('left: ' + x + 'px;');
+		loadingStyleLi.push('top: ' + y + 'px;');
+		loadingStyleLi.push('display: none;');
+		
+		var loadingImgLi = [];
+		loadingImgLi.push('width: 100%;');
+		loadingImgLi.push('height: 100%;');
+		loadingImgLi.push('text-align: center;');
+		var marginTop = parseInt((height - 16) / 2);
+		if (marginTop < 0) {
+			maringTop = 0;
+		}
+		loadingImgLi.push('margin-top: ' + marginTop + 'px;');
+		
+		var htmlLi = [];
+		htmlLi.push('<div id="loading" style="' + loadingStyleLi.join("") + '">');
+		htmlLi.push('<div id="loadingImg" style="' + loadingImgLi.join("") + '">');
+		htmlLi.push('<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>');
+		htmlLi.push('</div>');
+		htmlLi.push('</div>');
+		Y.one("body").append(htmlLi.join(""));
+		loadingNode = Y.one("#loading");
+	}
+	loadingNode.setStyle("width", width + "px");
+	loadingNode.setStyle("height", height + "px");
+	loadingNode.setStyle("left", x + "px");
+	loadingNode.setStyle("top", y + "px");
+	
+	Y.one("#loadingImg").setStyle("marginTop", parseInt((height - 16) / 2) + 'px');
+	
+	loadingNode.setStyle("display", "");
+}
+
+function hideLoadingImg() {
+	var Y = yInst;
+	var loadingNode = Y.one("#loading");
+	loadingNode.setStyle("display", "none");
 }
 
 function createDataGrid() {
@@ -558,6 +610,14 @@ function createDataGrid() {
 		source: url,
 		ioConfig: {
 	        method: "POST"
+		},
+		on: {
+			request: function(e) {
+				showLoadingImg();
+			},
+			response: function(e) {
+				hideLoadingImg();
+			}
 		}
 	});
 	//**{page}**, **{totalItems}**, **{itemsPerPage}**, **{lastPage}**, **{totalPages}**, **{itemIndexStart}**, **{itemIndexEnd}**
@@ -633,6 +693,9 @@ function createDataGrid() {
 			Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
 		}
 	}, getCheckboxCssSelector(), dt);
+	function initTest() {
+		
+	}
 }
 
 function applyQueryParameter() {
