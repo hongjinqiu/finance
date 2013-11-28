@@ -175,6 +175,5 @@
 				<tableName>DEMO_PAYOUT_ITEM</tableName>
 			</field>									
 		</bizField>
-		
 	</detailData>
 </datasource>

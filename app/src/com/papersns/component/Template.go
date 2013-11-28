@@ -9,6 +9,7 @@ type ListTemplate struct {
 	XMLName             xml.Name            `xml:"list-template"`
 	ListId              string              `xml:"list-id"`
 	SelectorId          string              `xml:"selector-id"`
+	DataSourceModelId   string              `xml:"data-source-model-id"`
 	Adapter             Adapter             `xml:"adapter"`
 	Description         string              `xml:"description"`
 	Scripts             string              `xml:"scripts"`
@@ -138,6 +139,7 @@ type ColumnAttributeGroup struct {
 	Sortable         string `xml:"sortable,attr"`
 	Comparable       string `xml:"comparable,attr"`
 	Locked           string `xml:"locked,attr"`
+	Auto             string `xml:"auto,attr"`
 	Width            string `xml:"width,attr"`
 	ExcelWidth       string `xml:"excelWidth,attr"`
 	Renderer         string `xml:"renderer,attr"`
@@ -237,6 +239,7 @@ type QueryParamAttributeGroup struct {
 	Text        string `xml:"text,attr"`
 	ColumnName  string `xml:"columnName,attr"`
 	EnterParam  string `xml:"enterParam,attr"`
+	Auto        string `xml:"auto,attr"`
 	Editor      string `xml:"editor,attr"`
 	Restriction string `xml:"restriction,attr"`
 	ColSpan     string `xml:"colSpan,attr"`

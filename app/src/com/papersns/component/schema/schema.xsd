@@ -73,6 +73,16 @@
 			</attribute>
 		</complexType>
 	</element>
+	<element name="form-template">
+		<annotation>
+			<documentation>表单配置</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+			
+			</sequence>
+		</complexType>
+	</element>
 	<element name="list-template">
 		<annotation>
 			<documentation>基于列表查询的配置</documentation>
@@ -81,6 +91,7 @@
 			<sequence>
 				<element ref="tns:list-id" minOccurs="0" />
 				<element ref="tns:selector-id" minOccurs="0" />
+				<element ref="tns:data-source-model-id" minOccurs="0" />
 				<element ref="tns:adapter" minOccurs="0" />
 				<element ref="tns:description" minOccurs="0" />
 				<element ref="tns:scripts" minOccurs="0" />
@@ -108,6 +119,12 @@
 	<element name="selector-id">
 		<annotation>
 			<documentation>开窗选择器ID</documentation>
+		</annotation>
+	</element>
+	
+	<element name="data-source-model-id">
+		<annotation>
+			<documentation>数据源模型ID</documentation>
 		</annotation>
 	</element>
 
@@ -601,6 +618,11 @@
 				<documentation>是否可锁定</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="auto" type="boolean">
+			<annotation>
+				<documentation>是否自动,用于数据源模型自动产生属性</documentation>
+			</annotation>
+		</attribute>
 		<attribute name="width" />
 		<attribute name="excelWidth" />
 		<attribute name="renderer" />
@@ -833,6 +855,7 @@
 		<attribute name="text" use="required"></attribute>
 		<attribute name="columnName"></attribute>
 		<attribute name="enterParam" type="boolean"></attribute>
+		<attribute name="auto" type="boolean"></attribute>
 		<attribute name="editor">
 			<simpleType>
 				<restriction base="string">

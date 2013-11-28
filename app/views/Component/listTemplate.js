@@ -693,9 +693,6 @@ function createDataGrid() {
 			Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
 		}
 	}, getCheckboxCssSelector(), dt);
-	function initTest() {
-		
-	}
 }
 
 function applyQueryParameter() {
@@ -821,7 +818,7 @@ function applyDateLocale(Y) {
 	}
 }
 
-YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", function(Y) {
+YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", "anim", function(Y) {
 	//,"gallery-aui-calendar-datepicker-select"
 	Y.on("domready", function(e) {
 		applyDateLocale(Y);
@@ -829,14 +826,42 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 		createDataGrid();
 		applyQueryParameter();
 		
-		Y.one("#queryBtn").on("click", function(e){
-			var pagModel = dtInst.get('paginator').get('model');
-			var page = pagModel.get("page");
-			if (page == 1) {
-				dtInst.refreshPaginator();
-			} else {
-				pagModel.set("page", 1);
-			}
-		});
+		applyQueryBtnBehavior();
 	});
 });
+
+function applyQueryBtnBehavior() {
+	var Y = yInst;
+	Y.one("#queryBtn").on("click", function(e){
+		var pagModel = dtInst.get('paginator').get('model');
+		var page = pagModel.get("page");
+		if (page == 1) {
+			dtInst.refreshPaginator();
+		} else {
+			pagModel.set("page", 1);
+		}
+	});
+	/*
+$("#btn_more").click(function(){
+	$("#btn_more").css("display","none");	  
+	$("#btn_up").css("display","block");	
+	$("#search1").slideDown();							  
+  });
+	$("#btn_up").click(function(){
+	$("#btn_more").css("display","block");	  
+	$("#btn_up").css("display","none");	
+	$("#search1").slideUp();
+	 */
+	Y.one("#btnMore").on("click", function(e){
+		var myAnim = new Y.Anim({
+		    node: '#queryContent',
+		    to: {
+		        height: 104
+		    }
+		});
+		myAnim.run();
+	});
+	Y.one("#btnUp").on("click", function(e){
+	
+	});
+}
