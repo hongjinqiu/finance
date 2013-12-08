@@ -68,6 +68,7 @@
 			</buttons>
 		</virtual-column>
 		
+		<auto-column name="id" />
 		<string-column name="id" auto="true" />
 		<string-column name="nick" auto="true" />
 		<number-column name="numTest" auto="true"></number-column>

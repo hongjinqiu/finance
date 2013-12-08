@@ -10,26 +10,36 @@ import (
 
 type QuerySupport struct{}
 
-func (qb QuerySupport) Find(collection string, query string) (result map[string]interface{}, found bool) {
+func (qb QuerySupport) FindByMap(collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
 	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
+	session := mongoDBFactory.GetSession()
 	defer session.Close()
 
+	return qb.FindByMapWithSession(session, collection, query)
+}
+
+func (qb QuerySupport) FindByMapWithSession(session *mgo.Session, collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
+	mongoDBFactory := mongo.GetInstance()
+	db := mongoDBFactory.GetDatabase(session)
 	c := db.C(collection)
 
+	result = make(map[string]interface{})
+	err := c.Find(query).One(&result)
+	if err != nil {
+		return result, false
+	}
+
+	return result, true
+}
+
+func (qb QuerySupport) Find(collection string, query string) (result map[string]interface{}, found bool) {
 	queryMap := map[string]interface{}{}
 	err := json.Unmarshal([]byte(query), &queryMap)
 	if err != nil {
 		panic(err)
 	}
 
-	result = make(map[string]interface{})
-	err = c.Find(queryMap).One(&result)
-	if err != nil {
-		return result, false
-	}
-
-	return result, true
+	return qb.FindByMap(collection, queryMap)
 }
 
 func (qb QuerySupport) Index(collection string, query map[string]interface{}, pageNo int, pageSize int, orderBy string) (result map[string]interface{}) {

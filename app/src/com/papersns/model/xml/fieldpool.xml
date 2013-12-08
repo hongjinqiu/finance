@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fields xmlns="http://www.papersns.com/fieldpool" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/fieldpool http://www.papersns.com/fieldpool ">
 	<field id="ROOT_FIELD" extends="">
-		<fieldName>ROOT_FIELD</fieldName>
+		<!-- <fieldName>ROOT_FIELD</fieldName> -->
 		<displayName>根字段模型定义</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldNumberType>UNDEFINE</fieldNumberType>
 		<fieldLength>20</fieldLength>
-		<defaultValueExpr></defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 		<checkInUsed>true</checkInUsed>
 		<fixHide>false</fixHide>
 		<fixReadOnly>false</fixReadOnly>
@@ -27,78 +27,69 @@
 		<fieldInList>false</fieldInList>
 		<listWhereField>false</listWhereField>
 		<formatExpr></formatExpr>
-		<relationDS/>
+		<relationDS></relationDS>
 	</field>
 
 	<!-- 固定字段 -->
 
 	<field id="PRIMARY_KEY" extends="ROOT_FIELD">
-		<fieldName>PRIMARY_KEY</fieldName>
+		<!-- <fieldName>_id</fieldName> -->
 		<displayName>主键</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldInList>false</fieldInList>
-		<listWhereField>false</listWhereField>		
+		<listWhereField>false</listWhereField>
 	</field>
 		
 	<field id="FOREIGN_KEY" extends="ROOT_FIELD">
-		<fieldName>FOREIGN_KEY</fieldName>
+		<!-- <fieldName>FOREIGN_KEY</fieldName> -->
 		<displayName>外键</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<field id="CREATE_BY" extends="ROOT_FIELD">
-		<fieldName>CREATE_BY</fieldName>
+		<!-- <fieldName>createBy</fieldName> -->
 		<displayName>创建人</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
-		<defaultValueExpr>return
-			com.geeboo.commons.utils.SessionUtils.getSessionUserId();
-		</defaultValueExpr>
-		
+		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
 	</field>
 
 	<field id="CREATE_TIME" extends="ROOT_FIELD">
-		<fieldName>CREATE_TIME</fieldName>
+		<!-- <fieldName>createTime</fieldName> -->
 		<displayName>创建时间</displayName>
 		<fieldDataType>LONGINT</fieldDataType>
 		<fieldNumberType>TIME</fieldNumberType>
 		<fixReadOnly>true</fixReadOnly>
-		<defaultValueExpr>return
-			com.geeboo.commons.support.DateUtils.getCurrentTime(com.geeboo.commons.support.DateUtils.SHOW_DATE_FORMAT);
-		</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
 	<field id="CREATE_UNIT" extends="ROOT_FIELD">
-		<fieldName>CREATE_UNIT</fieldName>
+		<!-- <fieldName>createUnit</fieldName> -->
 		<displayName>创建组织</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldLength>20</fieldLength>
 		<fixReadOnly>true</fixReadOnly>
-		<defaultValueExpr>return
-			com.geeboo.commons.utils.SessionUtils.getSessionUnitId();
-		</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
 	</field>
 
 	<field id="CREATE_DEPT" extends="ROOT_FIELD">
-		<fieldName>CREATE_DEPT</fieldName>
+		<!-- <fieldName>createDept</fieldName> -->
 		<displayName>创建部门</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldNumberType>UNDEFINE</fieldNumberType>
 		<fieldLength>20</fieldLength>
 		<fixReadOnly>true</fixReadOnly>
-		<defaultValueExpr>return
-			com.geeboo.commons.utils.SessionUtils.getSessionDeptId();
-		</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
 	</field>
 
 	<field id="MODIFY_BY" extends="ROOT_FIELD">
-		<fieldName>MODIFY_BY</fieldName>
+		<!-- <fieldName>modifyBy</fieldName> -->
 		<displayName>最后修改人</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>	
@@ -107,19 +98,17 @@
 	</field>
 
 	<field id="MODIFY_UNIT" extends="ROOT_FIELD">
-		<fieldName>MODIFY_UNIT</fieldName>
+		<!-- <fieldName>modifyUnit</fieldName> -->
 		<displayName>最后修改组织</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
-		<defaultValueExpr>return
-			com.geeboo.commons.utils.SessionUtils.getSessionUnitId();
-		</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
 	</field>
 
 	<field id="MODIFY_TIME" extends="ROOT_FIELD">
-		<fieldName>MODIFY_TIME</fieldName>
+		<!-- <fieldName>modifyTime</fieldName> -->
 		<displayName>最后修改时间</displayName>
 		<fieldDataType>LONGINT</fieldDataType>
 		<fieldNumberType>TIME</fieldNumberType>
@@ -127,21 +116,21 @@
 	</field>
 
 	<field id="AUDIT_STATUS" extends="ROOT_FIELD">
-		<fieldName>AUDIT_STATUS</fieldName>
+		<!-- <fieldName>auditStatus</fieldName> -->
 		<displayName>审核状态</displayName>
 		<fieldDataType>SMALLINT</fieldDataType>
-		<defaultValueExpr>2</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
 	<field id="HANDLE_AUDIT_STATUS" extends="ROOT_FIELD">
-		<fieldName>HANDLE_AUDIT_STATUS</fieldName>
+		<!-- <fieldName>handleAuditStatus</fieldName> -->
 		<displayName>手动审核状态</displayName>
 		<fieldDataType>SMALLINT</fieldDataType>
-		<defaultValueExpr>1</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
 	<field id="AUDIT_BY" extends="ROOT_FIELD">
-		<fieldName>AUDIT_BY</fieldName>
+		<!-- <fieldName>auditBy</fieldName> -->
 		<displayName>审核人</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<relationDS>
@@ -149,41 +138,41 @@
 	</field>
 
 	<field id="AUDIT_TIME" extends="ROOT_FIELD">
-		<fieldName>AUDIT_TIME</fieldName>
+		<!-- <fieldName>auditTime</fieldName> -->
 		<displayName>审核时间</displayName>
 		<fieldDataType>LONGINT</fieldDataType>
 		<fieldNumberType>TIME</fieldNumberType>
 	</field>
 
 	<field id="BILL_STATUS" extends="ROOT_FIELD">
-		<fieldName>BILL_STATUS</fieldName>
+		<!-- <fieldName>billStatus</fieldName> -->
 		<displayName>单据状态</displayName>
 		<fieldDataType>SMALLINT</fieldDataType>
-		<defaultValueExpr>1</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 	<field id="ATTACH_COUNT" extends="ROOT_FIELD">
-		<fieldName>ATTACH_COUNT</fieldName>
+		<!-- <fieldName>attachCount</fieldName> -->
 		<displayName>附件数</displayName>
 		<fieldDataType>SMALLINT</fieldDataType>
-		<defaultValueExpr>0</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
 	<field id="IS_INITBILL" extends="ROOT_FIELD">
-		<fieldName>IS_INITBILL</fieldName>
+		<!-- <fieldName>isInitBill</fieldName> -->
 		<displayName>是否初始单据</displayName>
 		<fieldDataType>BOOLEAN</fieldDataType>
-		<defaultValueExpr>0</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
 	<field id="IS_AUDIT_SIGN" extends="ROOT_FIELD">
-		<fieldName>IS_AUDIT_SIGN</fieldName>
+		<!-- <fieldName>isAuditSign</fieldName> -->
 		<displayName>审计状态</displayName>
 		<fieldDataType>BOOLEAN</fieldDataType>
-		<defaultValueExpr>0</defaultValueExpr>
+		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
 	<field id="REMARK" extends="ROOT_FIELD">
-		<fieldName>REMARK</fieldName>
+		<!-- <fieldName>remark</fieldName> -->
 		<displayName>备注</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldNumberType>UNDEFINE</fieldNumberType>
@@ -191,85 +180,85 @@
 	</field>
 
 	<field id="PARENT_ID" extends="ROOT_FIELD">
-		<fieldName>PARENT_ID</fieldName>
+		<!-- <fieldName>parentId</fieldName> -->
 		<displayName>父ID</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<field id="BILL_ID" extends="ROOT_FIELD">
-		<fieldName>BILL_ID</fieldName>
+		<!-- <fieldName>billId</fieldName> -->
 		<displayName>单据ID</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<field id="DATASET_ID" extends="ROOT_FIELD">
-		<fieldName>DATASET_ID</fieldName>
+		<!-- <fieldName>datasetId</fieldName> -->
 		<displayName>数据集ID</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>1</fieldLength>
 	</field>
 
 	<field id="ATTACH_COUNT" extends="ROOT_FIELD">
-		<fieldName>ATTACH_COUNT</fieldName>
+		<!-- <fieldName>attachCount</fieldName> -->
 		<displayName>附件数</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<field id="TRANSFER_IN_ID" extends="ROOT_FIELD">
-		<fieldName>TRANSFER_IN_ID</fieldName>
+		<!-- <fieldName>transferInId</fieldName> -->
 		<displayName>转入转单模型ID</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>100</fieldLength>
 	</field>
 
 	<field id="TRANSFER_OUT_ID" extends="ROOT_FIELD">
-		<fieldName>TRANSFER_OUT_ID</fieldName>
+		<!-- <fieldName>transferOutId</fieldName> -->
 		<displayName>转出转单模型ID</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>100</fieldLength>
 	</field>
 
 	<field id="SRC_DATASOURCE_ID" extends="ROOT_FIELD">
-		<fieldName>SRC_DATASOURCE_ID</fieldName>
+		<!-- <fieldName>srcDatasourceId</fieldName> -->
 		<displayName>来源数据源ID</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>100</fieldLength>
 	</field>
 
 	<field id="SRC_DATASET_ID" extends="ROOT_FIELD">
-		<fieldName>SRC_DATASET_ID</fieldName>
+		<!-- <fieldName>srcDatasetId</fieldName> -->
 		<displayName>来源数据集ID</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>1</fieldLength>
 	</field>
 
 	<field id="SRC_BILL_ID" extends="ROOT_FIELD">
-		<fieldName>SRC_BILL_ID</fieldName>
+		<!-- <fieldName>srcBillId</fieldName> -->
 		<displayName>来源单据ID</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<field id="SRC_DETAIL_ID" extends="ROOT_FIELD">
-		<fieldName>SRC_DETAIL_ID</fieldName>
+		<!-- <fieldName>srcDetailId</fieldName> -->
 		<displayName>来源单据分录ID</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<field id="BILL_ID" extends="ROOT_FIELD">
-		<fieldName>BILL_ID</fieldName>
+		<!-- <fieldName>billId</fieldName> -->
 		<displayName>单据ID</displayName>
 		<fieldDataType>INT</fieldDataType>
 	</field>
 
 	<!-- 基础字段 -->	
 	<field id="STRING_FIELD" extends="ROOT_FIELD">
-		<fieldName>STRING_FIELD</fieldName>
+		<!-- <fieldName>stringField</fieldName> -->
 		<displayName>字符串字段</displayName>
 		<fieldDataType>STRING</fieldDataType>
 	</field>
 	
 	<field id="INT_FIELD" extends="ROOT_FIELD">
-		<fieldName>INT_FIELD</fieldName>
+		<!-- <fieldName>intField</fieldName> -->
 		<displayName>INT字段</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldNumberType>UNDEFINE</fieldNumberType>
@@ -277,100 +266,100 @@
 	
 	<!-- 常用字段 -->
 	<field id="CODE_FIELD" extends="ROOT_FIELD">
-		<fieldName>CODE_FIELD</fieldName>
+		<!-- <fieldName>codeField</fieldName> -->
 		<displayName>代码</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>20</fieldLength>
 	</field>	
 	
 	<field id="NAME_FIELD" extends="ROOT_FIELD">
-		<fieldName>NAME_FIELD</fieldName>
+		<!-- <fieldName>nameField</fieldName> -->
 		<displayName>名称</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>20</fieldLength>
 	</field>	
 	
 	<field id="DATE_FIELD" extends="ROOT_FIELD">
-		<fieldName>DATE_FIELD</fieldName>
+		<!-- <fieldName>dateDield</fieldName> -->
 		<displayName>日期</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldNumberType>DATE</fieldNumberType>
 	</field>
 	
 	<field id="TIME_FIELD" extends="ROOT_FIELD">
-		<fieldName>TIME_FIELD</fieldName>
+		<!-- <fieldName>timeField</fieldName> -->
 		<displayName>时间</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldNumberType>TIME</fieldNumberType>
 	</field>
 
 	<field id="AMOUNT_FIELD" extends="ROOT_FIELD">
-		<fieldName>AMOUNT_FIELD</fieldName>
+		<!-- <fieldName>amountField</fieldName> -->
 		<displayName>金额</displayName>
 		<fieldDataType>MONEY</fieldDataType>
 		<fieldNumberType>MONEY</fieldNumberType>
 	</field>	
 
 	<field id="PRICE_FIELD" extends="ROOT_FIELD">
-		<fieldName>PRICE_FIELD</fieldName>
+		<!-- <fieldName>priceField</fieldName> -->
 		<displayName>单价</displayName>
 		<fieldDataType>DECIMAL</fieldDataType>
 		<fieldNumberType>PRICE</fieldNumberType>
 	</field>
 	
 	<field id="PERCENT_FIELD" extends="ROOT_FIELD">
-		<fieldName>PRICE_FIELD</fieldName>
+		<!-- <fieldName>priceField</fieldName> -->
 		<displayName>百分比</displayName>
 		<fieldDataType>DECIMAL</fieldDataType>
 		<fieldNumberType>PERCENT</fieldNumberType>
 	</field>
 	
 	<field id="EXCHANGERATE_FIELD" extends="ROOT_FIELD">
-		<fieldName>EXCHANGERATE_FIELD</fieldName>
+		<!-- <fieldName>exchangerateField</fieldName> -->
 		<displayName>换算率</displayName>
 		<fieldDataType>DECIMAL</fieldDataType>
 		<fieldNumberType>EXCHANGERATE</fieldNumberType>
 	</field>
 	
 	<field id="QUANTITY_FIELD" extends="ROOT_FIELD">
-		<fieldName>EXCHANGERATE_FIELD</fieldName>
+		<!-- <fieldName>exchangerateField</fieldName> -->
 		<displayName>数量</displayName>
 		<fieldDataType>DECIMAL</fieldDataType>
 		<fieldNumberType>QUANTITY</fieldNumberType>
 	</field>
 	
 	<field id="UNITCOST_FIELD" extends="ROOT_FIELD">
-		<fieldName>UNITCOST_FIELD</fieldName>
+		<!-- <fieldName>unitcostField</fieldName> -->
 		<displayName>单位成本</displayName>
 		<fieldDataType>DECIMAL</fieldDataType>
 		<fieldNumberType>UNITCOST</fieldNumberType>
 	</field>
 	
 	<field id="BOOLEAN_FIELD" extends="ROOT_FIELD">
-		<fieldName>BOOLEAN_FIELD</fieldName>
+		<!-- <fieldName>booleanField</fieldName> -->
 		<displayName>布尔</displayName>
 		<fieldDataType>BOOLEAN</fieldDataType>
 	</field>
 	
 	<field id="REMARK_FIELD" extends="ROOT_FIELD">
-		<fieldName>REMARK_FIELD</fieldName>
+		<!-- <fieldName>remarkField</fieldName> -->
 		<displayName>备注</displayName>
 		<fieldDataType>REMARK</fieldDataType>
 		<fieldLength>400</fieldLength>
 	</field>
 	
 	<field id="YEAR_FIELD" extends="ROOT_FIELD">
-		<fieldName>YEAR_FIELD</fieldName>
+		<!-- <fieldName>yearField</fieldName> -->
 		<displayName>年</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fieldNumberType>YEAR</fieldNumberType>		
 	</field>
 	
 	<field id="YEARMONTH_FIELD" extends="ROOT_FIELD">
-		<fieldName>YEAR_FIELD</fieldName>
+		<!-- <fieldName>yearmonthField</fieldName> -->
 		<displayName>年月</displayName>
 		<fieldDataType>INT</fieldDataType>
-		<fieldNumberType>YEARMONTH</fieldNumberType>		
+		<fieldNumberType>YEARMONTH</fieldNumberType>
 	</field>	
 			
 </fields>

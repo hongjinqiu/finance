@@ -89,6 +89,15 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	return strings.ToLower(execResult) == "true"
 }
 
+func (o ExpressionParser) Validate(text, expression string) bool {
+	if text == "" || expression == "" {
+		return true
+	}
+	methodName := "validate"
+	execResult := o.parseExpression(methodName, text, expression)
+	return strings.ToLower(execResult) == "true"
+}
+
 func (o ExpressionParser) ParseString(recordJson, expression string) string {
 	methodName := "parseString"
 	execResult := o.parseExpression(methodName, recordJson, expression)

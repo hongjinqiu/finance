@@ -6,6 +6,9 @@ import json,sys
 def trueOrFalse(jsonString, action):
     record = json.loads(jsonString)
     return str(eval(action) == True)
+    
+def validate(text, action):
+    return str(eval(action) == True)
 
 def parseString(jsonString, action):
     record = json.loads(jsonString)

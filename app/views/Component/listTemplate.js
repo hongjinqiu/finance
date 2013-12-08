@@ -546,7 +546,9 @@ function getColumns(listTemplate, Y) {
 function showLoadingImg() {
 	var Y = yInst;
 	var node = Y.one("tbody.yui3-datatable-data");
-	[x,y] = node.getXY();
+	var xy = node.getXY();
+	x = xy[0];
+	y = xy[1];
 	var width = parseInt(node.getComputedStyle("width"));
 	var height = parseInt(node.getComputedStyle("height"));
 	

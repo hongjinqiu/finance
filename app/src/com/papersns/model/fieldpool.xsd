@@ -95,7 +95,23 @@
 				</simpleType>
 			</element>
 			<!-- 预设值表达式 -->
-			<element name="defaultValueExpr" type="string" default="" minOccurs="0" maxOccurs="1" />
+			<element name="defaultValueExpr" minOccurs="0" maxOccurs="1">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute name="mode" default="text">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="text" />
+										<enumeration value="python" />
+										<enumeration value="golang" />
+									</restriction>
+								</simpleType>
+							</attribute>
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
 			<!-- 关联字段启用被用检查 -->
 			<element name="checkInUsed" type="boolean" default="true" minOccurs="0" maxOccurs="1" />
 			<!-- 是否固定隐藏 -->

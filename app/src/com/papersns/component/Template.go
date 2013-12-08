@@ -24,6 +24,22 @@ type ListTemplate struct {
 	QueryParameterGroup QueryParameterGroup `xml:"query-parameters"`
 }
 
+type FormTemplate struct {
+	XMLName           xml.Name   `xml:"form-template"`
+	DataSourceModelId string     `xml:"data-source-model-id"`
+	FormElemLi        []FormElem `xml:",any"`
+}
+
+type FormElem struct {
+	XMLName     xml.Name    `xml:""`
+	InnerHTML   string      `xml:",innerxml"`
+	Html        Html        `xml:"-"`
+	Toolbar     Toolbar     `xml:"-"`
+	ColumnModel ColumnModel `xml:"-"`
+
+	ColumnModelAttributeGroup
+}
+
 type Adapter struct {
 	XMLName xml.Name `xml:"adapter"`
 	Name    string   `xml:"name,attr"`
@@ -32,6 +48,11 @@ type Adapter struct {
 type ViewTemplate struct {
 	XMLName xml.Name `xml:"view-template"`
 	View    string   `xml:"view,attr"`
+}
+
+type Html struct {
+	XMLName xml.Name    `xml:"html"`
+	Value   template.HTML `xml:",chardata"`
 }
 
 type Toolbar struct {
@@ -102,6 +123,7 @@ type IdColumn struct {
 }
 
 type ColumnModelAttributeGroup struct {
+	Name                  string `xml:"name,attr"`
 	AutoLoad              string `xml:"autoLoad,attr"`
 	SummaryLoad           string `xml:"summaryLoad,attr"`
 	SummaryStat           string `xml:"summaryStat,attr"`
@@ -152,9 +174,10 @@ type ColumnAttributeGroup struct {
 
 type Column struct {
 	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,script-column
+	Html              string            `xml:",chardata"`
 	Name              string            `xml:"name,attr"`
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
-	Editor
+	Editor            Editor            `xml:"editor"`
 	ColumnAttributeGroup
 	ColumnModel ColumnModel `xml:"column-model"`
 
@@ -184,9 +207,9 @@ type Column struct {
 }
 
 type Editor struct {
-	XMLName         xml.Name        `xml:"editor"`
-	EditorAttribute EditorAttribute `xml:"editor_attribute"`
-	Name            string          `xml:"name,attr"`
+	XMLName         xml.Name          `xml:"editor"`
+	EditorAttribute []EditorAttribute `xml:"editor_attribute"`
+	Name            string            `xml:"name,attr"`
 }
 
 type EditorAttribute struct {

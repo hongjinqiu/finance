@@ -79,7 +79,12 @@
 		</annotation>
 		<complexType>
 			<sequence>
-			
+				<element ref="tns:data-source-model-id" minOccurs="0" />
+				<choice minOccurs="1" maxOccurs="unbounded">
+					<element ref="tns:toolbar" minOccurs="0" />
+					<element ref="tns:column-model" maxOccurs="unbounded" />
+					<element ref="tns:html" maxOccurs="unbounded" />
+				</choice>
 			</sequence>
 		</complexType>
 	</element>
@@ -161,7 +166,7 @@
 
 	<element name="toolbar">
 		<complexType>
-			<choice minOccurs="0">
+			<choice minOccurs="0" maxOccurs="unbounded">
 				<element name="button-group">
 					<complexType>
 						<choice maxOccurs="unbounded">
@@ -354,7 +359,13 @@
 			<attribute name="bsonIntercept" />
 		</complexType>
 	</element>
-
+	
+	<element name="html">
+		<annotation>
+			<documentation>html代码</documentation>
+		</annotation>
+	</element>
+	
 	<element name="column-model">
 		<annotation>
 			<documentation>列模型</documentation>
@@ -364,6 +375,20 @@
 				<element ref="tns:checkbox-column" minOccurs="0" />
 				<element ref="tns:id-column" minOccurs="0" />
 				<choice minOccurs="1" maxOccurs="unbounded">
+					<element name="auto-column">
+						<annotation>
+							<documentation>自动列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:column-attribute" minOccurs="0" maxOccurs="unbounded"></element>
+								<element ref="tns:editor" minOccurs="0">
+								</element>
+								<element ref="tns:column-model" minOccurs="0" />
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+						</complexType>
+					</element>
 					<element name="string-column">
 						<annotation>
 							<documentation>字符列</documentation>
@@ -512,6 +537,7 @@
 							<!-- <attribute name="flowId" type="long"></attribute> -->
 						</complexType>
 					</element>
+					<element ref="tns:html" />
 				</choice>
 			</sequence>
 			<attributeGroup ref="tns:column-model-attribute" />
@@ -623,6 +649,7 @@
 				<documentation>是否自动,用于数据源模型自动产生属性</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="colSpan" type="int" default="1"></attribute>
 		<attribute name="width" />
 		<attribute name="excelWidth" />
 		<attribute name="renderer" />
@@ -698,6 +725,11 @@
 		<annotation>
 			<documentation>列模型属性</documentation>
 		</annotation>
+		<attribute name="name">
+			<annotation>
+				<documentation>名称</documentation>
+			</annotation>
+		</attribute>
 		<attribute name="autoLoad" type="boolean">
 			<annotation>
 				<documentation>是否查询</documentation>
