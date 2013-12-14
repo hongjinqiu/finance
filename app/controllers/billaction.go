@@ -34,19 +34,19 @@ func (c BillAction) CancelData() revel.Result {
 	if !found {
 		panic("CancelData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
-	
-	c.beforeCancelData(dataSourceModelId, &bo)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.beforeCancelData(dataSource, &bo)
 	mainData := bo["A"].(map[string]interface{})
 	mainData["billStatus"] = 4
 	
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
-	db.C(dataSourceModelId).Update(queryMap, bo)
 	defer session.Close()
+	db.C(dataSourceModelId).Update(queryMap, bo)
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterCancelData(&dataSource, &bo)
+	c.afterCancelData(dataSource, &bo)
 	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -59,16 +59,16 @@ func (c BillAction) CancelData() revel.Result {
 	return c.Render()
 }
 
-func (c BillAction) beforeCancelData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BillAction) beforeCancelData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BillAction) afterCancelData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BillAction) afterCancelData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
 /**
- * 作废
+ * 反作废
  */
 func (c BillAction) UnCancelData() revel.Result {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
@@ -86,7 +86,10 @@ func (c BillAction) UnCancelData() revel.Result {
 		panic("UnCancelData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	
-	c.beforeUnCancelData(dataSourceModelId, &bo)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.beforeUnCancelData(dataSource, &bo)
 	mainData := bo["A"].(map[string]interface{})
 	mainData["billStatus"] = 0
 	
@@ -95,9 +98,7 @@ func (c BillAction) UnCancelData() revel.Result {
 	db.C(dataSourceModelId).Update(queryMap, bo)
 	defer session.Close()
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterUnCancelData(&dataSource, &bo)
+	c.afterUnCancelData(dataSource, &bo)
 	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -110,10 +111,10 @@ func (c BillAction) UnCancelData() revel.Result {
 	return c.Render()
 }
 
-func (c BillAction) beforeUnCancelData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BillAction) beforeUnCancelData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BillAction) afterUnCancelData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BillAction) afterUnCancelData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }

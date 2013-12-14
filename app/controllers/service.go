@@ -5,127 +5,152 @@ import (
 	"com/papersns/mongo"
 	. "com/papersns/component"
 	. "com/papersns/model"
-	"com/papersns/model/handler"
 	. "com/papersns/model/handler"
 	"fmt"
 	"strings"
 	"strconv"
+	"labix.org/v2/mgo"
 )
 
 type FinanceService struct{}
 
-func (o FinanceService) SaveData(dataSource *DataSource, bo *map[string]interface{}) {
-	id := fmt.Sprint((*bo)["_id"])
+func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface{}) *[]DiffDataRow {
+	strId := fmt.Sprint((*bo)["_id"])
+	modelTemplateFactory := ModelTemplateFactory{}
+	modelTemplateFactory.ConvertDataType(dataSource, bo)
 	// 主数据集和分录数据校验
-	message := o.validateBO((*dataSource), (*bo))
+	message := o.validateBO((dataSource), (*bo))
 	if message != "" {
 		panic(message)
 	}
-	if id == "" {
+	mongoDBFactory := mongo.GetInstance()
+	session, db := mongoDBFactory.GetConnection()
+	defer session.Close()
+	if strId == "" {
 		// 主数据集和分录id赋值,
-		mongoDBFactory := mongo.GetInstance()
-		session, db := mongoDBFactory.GetConnection()
-		defer session.Close()
-
 		modelIterator := ModelIterator{}
 		var result interface{} = ""
-		modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup *FieldGroup, data *map[string]interface{}, result *interface{}) {
-			if fieldGroup.Id == "id" {
-				if fieldGroup.IsMasterField() {
-					masterSeqName := GetMasterSequenceName((*dataSource))
-					masterSeqId := GetSequenceNo(db, masterSeqName)
-					(*data)["_id"] = masterSeqId
-					(*data)["id"] = masterSeqId
-					(*bo)["_id"] = masterSeqId
-					(*bo)["id"] = masterSeqId
-				} else {
-					detailData, found := fieldGroup.GetDetailData()
-					if found {
-						detailSeqName := GetDetailSequenceName((*dataSource), detailData)
-						detailSeqId := GetSequenceNo(db, detailSeqName)
-						(*data)["_id"] = detailSeqId
-						(*data)["id"] = detailSeqId
-					}
-				}
-			}
+		modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
+			o.setDataId(db, dataSource, &fieldGroup, bo, data)
 		})
 		// 被用过帐
 		usedCheck := UsedCheck{}
 		result = ""
-		modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup *FieldGroup, data *map[string]interface{}, result *interface{}) {
-			if fieldGroup.IsRelationField() {
-				usedCheck.Execute(db, fieldGroup, data, handler.ADD)
-			}
+		diffDataRowLi := []DiffDataRow{}
+		modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+			diffDataRowLi = append(diffDataRowLi, DiffDataRow{
+				FieldGroupLi:fieldGroupLi,
+				DestBo:bo,
+				DestData:data,
+				SrcData:nil,
+				SrcBo:nil,
+			})
 		})
-	} else {
-		// 分录差异行处理,用简单地查找出删除的数据,然后更新或删除的操作,赋值一个DiffDataType到map里面,
+		for i, _ := range diffDataRowLi {
+			fieldGroupLi := diffDataRowLi[i].FieldGroupLi
+			data := diffDataRowLi[i].DestData
+			usedCheck.Insert(db, fieldGroupLi, bo, data)
+		}
+		err := db.C(dataSource.Id).Insert(*bo)
+		if err != nil {
+			panic(err)
+		}
+		
+		return &diffDataRowLi
+	}
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		panic(err)
+	}
+	modelIterator := ModelIterator{}
+	srcBo := map[string]interface{}{}
+	var result interface{} = ""
+	err = db.C(dataSource.Id).Find(map[string]interface{}{"id": id}).One(&srcBo)
+	if err != nil {
+		panic(err)
+	}
+	
+	modelTemplateFactory.ConvertDataType(dataSource, &srcBo)
+	diffDataRowLi := []DiffDataRow{}
+	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}){
 		// 分录+id
-		// 根据diffDataType被用过帐
+		if destData != nil {
+			dataStrId := fmt.Sprint((*destData)["id"])
+			if dataStrId == "" {
+				for i, _ := range fieldGroupLi {
+					o.setDataId(db, dataSource, &fieldGroupLi[i], bo, destData)
+				}
+			}
+		}
+		diffDataRowLi = append(diffDataRowLi, DiffDataRow{
+			FieldGroupLi:fieldGroupLi,
+			DestBo:bo,
+			DestData:destData,
+			SrcData:srcData,
+			SrcBo:srcBo,
+		})
+	})
+
+	// 被用差异行处理
+	usedCheck := UsedCheck{}
+	for i, _ := range diffDataRowLi {
+		fieldGroupLi := diffDataRowLi[i].FieldGroupLi
+		destData := diffDataRowLi[i].DestData
+		srcData := diffDataRowLi[i].SrcData
+		usedCheck.Update(db, fieldGroupLi, bo, destData, srcData)
+	}
+	err = db.C(dataSource.Id).Insert(*bo)
+	if err != nil {
+		panic(err)
+	}
+	return &diffDataRowLi
+}
+
+func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, fieldGroup *FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) {
+	if fieldGroup.Id == "id" {
+		if fieldGroup.IsMasterField() {
+			masterSeqName := GetMasterSequenceName((dataSource))
+			masterSeqId := GetSequenceNo(db, masterSeqName)
+			(*data)["_id"] = masterSeqId
+			(*data)["id"] = masterSeqId
+			(*bo)["_id"] = masterSeqId
+			(*bo)["id"] = masterSeqId
+		} else {
+			detailData, found := fieldGroup.GetDetailData()
+			if found {
+				detailSeqName := GetDetailSequenceName((dataSource), detailData)
+				detailSeqId := GetSequenceNo(db, detailSeqName)
+				(*data)["_id"] = detailSeqId
+				(*data)["id"] = detailSeqId
+			}
+		}
 	}
 }
 
 func (o FinanceService) validateBO(dataSource DataSource, bo map[string]interface{}) string {
 	messageLi := []string{}
-	
-	data := bo["A"].(map[string]interface{})
-	fieldMessageLi := o.validateFixField(dataSource.MasterData.FixField, data)
-	for _, fieldMessage := range fieldMessageLi {
-		messageLi = append(messageLi, fieldMessage)
+	modelIterator := ModelIterator{}
+	detailIndex := map[string]int{}
+	for _, item := range dataSource.DetailDataLi {
+		detailIndex[item.Id] = 0
 	}
-	fieldMessageLi = o.validateBizField(dataSource.MasterData.BizField, data)
-	for _, fieldMessage := range fieldMessageLi {
-		messageLi = append(messageLi, fieldMessage)
-	}
-	
-	for i, detailData := range dataSource.DetailDataLi {
-		dataLi := bo[detailData.Id].([]interface{})
-		for _, dataItem := range dataLi {
-			data := dataItem.(map[string]interface{})
-			fieldMessageLi = o.validateFixField(detailData.FixField, data)
-			for _, fieldMessage := range fieldMessageLi {
-				messageLi = append(messageLi, "分录:" + detailData.DisplayName + "序号为" + strconv.Itoa(i) + "的数据," + fieldMessage)
+	var result interface{} = messageLi
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, messageLi *interface{}) {
+		stringLi := (*messageLi).([]string)
+		fieldMessageLi := o.validateFieldGroup(fieldGroup, *data)
+		if fieldGroup.IsMasterField() {
+			for _, item := range fieldMessageLi {
+				stringLi = append(stringLi, item)
 			}
-			fieldMessageLi = o.validateBizField(detailData.BizField, data)
-			for _, fieldMessage := range fieldMessageLi {
-				messageLi = append(messageLi, "分录:" + detailData.DisplayName + "序号为" + strconv.Itoa(i) + "的数据," + fieldMessage)
+		} else {
+			detailData, _ := fieldGroup.GetDetailData()
+			detailIndex[detailData.Id]++
+			for _, item := range fieldMessageLi {
+				stringLi = append(stringLi, "分录:" + detailData.DisplayName + "序号为" + strconv.Itoa(detailIndex[detailData.Id]) + "的数据," + item)
 			}
 		}
-	}
-	
+	})
 	return strings.Join(messageLi, "<br />")
-}
-
-func (o FinanceService) validateFixField(fixField FixField, data map[string]interface{}) []string {
-	messageLi := []string{}
-	
-	fixFieldLi := []FieldGroup{}
-	fixFieldLi = append(fixFieldLi, fixField.CreateBy.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.CreateTime.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.ModifyBy.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.ModifyTime.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.BillStatus.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.AttachCount.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.Remark.FieldGroup)
-	
-	for _, field := range fixFieldLi {
-		fieldMessageLi := o.validateFieldGroup(field, data)
-		for _, fieldMessage := range fieldMessageLi {
-			messageLi = append(messageLi, fieldMessage)
-		}
-	}
-	return messageLi
-}
-
-func (o FinanceService) validateBizField(bizField BizField, data map[string]interface{}) []string {
-	messageLi := []string{}
-	
-	for _, field := range bizField.FieldLi {
-		fieldMessageLi := o.validateFieldGroup(field.FieldGroup, data)
-		for _, fieldMessage := range fieldMessageLi {
-			messageLi = append(messageLi, fieldMessage)
-		}
-	}
-	return messageLi
 }
 
 func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[string]interface{}) []string {
@@ -195,11 +220,21 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 				messageLi = append(messageLi, fieldGroup.DisplayName + "超出范围(" + fieldGroup.LimitMin + "~" + fieldGroup.LimitMax + ")")
 			}
 		}
+	} else {
+		isDataTypeString := false
+		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "STRING"
+		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "REMARK"
+		isFieldLengthLimit := fieldGroup.FieldLength != ""
+		if isDataTypeString && isFieldLengthLimit {
+			limit, err := strconv.Atoi(fmt.Sprint(isFieldLengthLimit))
+			if err != nil {
+				panic(err)
+			}
+			if len(fieldValue) > limit {
+				messageLi = append(messageLi, fieldGroup.DisplayName + "长度超出最大值" + fieldGroup.FieldLength)
+			}
+		}
 	}
 
 	return messageLi
-}
-
-func (o FinanceService) convertDataType(fieldGroup FieldGroup, data *map[string]interface{}) string {
-	return ""
 }

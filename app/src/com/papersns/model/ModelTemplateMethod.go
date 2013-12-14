@@ -27,8 +27,14 @@ func (o FieldGroup) IsRelationField() bool {
 func (o FieldGroup) GetRelationItem() (RelationItem, bool) {
 	expressionParser := ExpressionParser{}
 	for _, item := range o.RelationDS.RelationItemLi {
-		if expressionParser.Parse("", item.RelationExpr) {
-			return item, true
+		if item.RelationExpr.Mode == "python" {
+			if expressionParser.Parse("", item.RelationExpr.Content) {
+				return item, true
+			}
+		} else if item.RelationExpr.Mode == "text" {
+			// TODO
+		} else if item.RelationExpr.Mode == "golang" {
+			// TODO
 		}
 	}
 	return RelationItem{}, false

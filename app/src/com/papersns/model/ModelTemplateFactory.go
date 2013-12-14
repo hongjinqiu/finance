@@ -6,9 +6,23 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"strings"
+	. "com/papersns/component"
+	"fmt"
+	"strconv"
 )
 
 type ModelTemplateFactory struct {
+}
+
+func (o ModelTemplateFactory) GetDataSource(dataSourceModelId string) DataSource {
+	dataSource, _ := o.getInstance(dataSourceModelId)
+	return dataSource
+}
+
+func (o ModelTemplateFactory) GetInstanceByDS(dataSource DataSource) map[string]interface{} {
+	_, bo := o.getInstance(dataSource.Id)
+	return bo
 }
 
 func (o ModelTemplateFactory) GetInstance(dataSourceModelId string) (DataSource, map[string]interface{}) {
@@ -35,19 +49,21 @@ func (o ModelTemplateFactory) getInstance(dataSourceModelId string) (DataSource,
 
 	o.applyFieldExtend(&dataSource)
 	o.applyReverseRelation(&dataSource)
-
-	o.applyDefaultValueExpr(&dataSource)
-	//	o.applyCalcValueExpr(&dataSource)
-	//	o.applyRelationFieldValue(&dataSource)
-	bo := o.getBO(&dataSource)
+	bo := o.getBo(dataSource)
+	o.applyDefaultValueExpr(&dataSource, &bo)
+	o.applyCalcValueExpr(&dataSource, &bo)
+	o.applyRelationFieldValue(&dataSource, &bo)
 
 	return dataSource, bo
 }
 
+// TODO, byTest
 func (o ModelTemplateFactory) GetCopyInstance(dataSourceModelId string, srcBo map[string]interface{}) (DataSource, map[string]interface{}) {
 	dataSource, bo := o.getInstance(dataSourceModelId)
-	o.applyCopy(dataSource, &bo, &srcBo)
-	return dataSource, srcBo
+	o.applyCopy(dataSource, &bo, srcBo)
+	o.applyCalcValueExpr(&dataSource, &bo)
+	o.applyRelationFieldValue(&dataSource, &bo)
+	return dataSource, bo
 }
 
 func (o ModelTemplateFactory) extendFieldPoolField(fieldGroup *FieldGroup, fieldGroupLi *[]FieldGroup) {
@@ -231,27 +247,8 @@ func (o ModelTemplateFactory) getBo(dataSource DataSource) map[string]interface{
 	modelIterator.IterateAllField(&dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}) {
 		if fieldGroup.IsMasterField() {
 			item := bo["A"].(map[string]interface{})
-			stringArray := []string{"STRING", "REMARK"}
-			for _, stringItem := range stringArray {
-				if stringItem == fieldGroup.FieldDataType {
-					item[fieldGroup.Id] = ""
-					break
-				}
-			}
-			intArray := []string{"SMALLINT", "INT", "LONGINT", "FLOAT", "MONEY", "DECIMAL"}
-			for _, intItem := range intArray {
-				if intItem == fieldGroup.FieldDataType {
-					item[fieldGroup.Id] = 0
-					break
-				}
-			}
-			boolArray := []string{"BOOLEAN"}
-			for _, boolItem := range boolArray {
-				if boolItem == fieldGroup.FieldDataType {
-					item[fieldGroup.Id] = false
-					break
-				}
-			}
+			content := ""
+			o.applyFieldGroupValueByString(*fieldGroup, &item, content)
 		}
 	})
 	data, err := json.MarshalIndent(bo, "", "\t")
@@ -262,13 +259,33 @@ func (o ModelTemplateFactory) getBo(dataSource DataSource) map[string]interface{
 	return bo
 }
 
-// TODO
-func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource) {
-	bo := o.getBo(*dataSource)
+// TODO,byTest
+func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup *FieldGroup, data *map[string]interface{}, result *interface{}){
-		
+	expressionParser := ExpressionParser{}
+	boJsonData, err := json.Marshal(bo)
+	if err != nil {
+		panic(err)
+	}
+	boJson := string(boJsonData)
+	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+		var content string = ""
+		if fieldGroup.DefaultValueExpr.Content != "" {
+			if fieldGroup.DefaultValueExpr.Mode == "" || fieldGroup.DefaultValueExpr.Mode == "text" {
+				content = fieldGroup.DefaultValueExpr.Content
+			} else if fieldGroup.DefaultValueExpr.Mode == "python" {
+				dataJsonData, err := json.Marshal(data)
+				if err != nil {
+					panic(err)
+				}
+				dataJson := string(dataJsonData)
+				content = expressionParser.ParseModel(boJson, dataJson, fieldGroup.DefaultValueExpr.Content)
+			} else if fieldGroup.DefaultValueExpr.Mode == "golang" {
+				content = fieldGroup.DefaultValueExpr.Content// TODO
+			}
+		}
+		o.applyFieldGroupValueByString(fieldGroup, data, content)
 	})
 	data, err := json.MarshalIndent(bo, "", "\t")
 	if err != nil {
@@ -277,9 +294,34 @@ func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource) {
 	println(string(data))
 }
 
-// TODO
-func (o ModelTemplateFactory) applyCalcValueExpr(dataSource *DataSource) {
-
+// TODO,byTest
+func (o ModelTemplateFactory) applyCalcValueExpr(dataSource *DataSource, bo *map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	expressionParser := ExpressionParser{}
+	boJsonData, err := json.Marshal(bo)
+	if err != nil {
+		panic(err)
+	}
+	boJson := string(boJsonData)
+	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+		var content string = ""
+		if fieldGroup.CalcValueExpr.Content != "" {
+			if fieldGroup.CalcValueExpr.Mode == "" || fieldGroup.CalcValueExpr.Mode == "text" {
+				content = fieldGroup.CalcValueExpr.Content
+			} else if fieldGroup.CalcValueExpr.Mode == "python" {
+				dataJsonData, err := json.Marshal(data)
+				if err != nil {
+					panic(err)
+				}
+				dataJson := string(dataJsonData)
+				content = expressionParser.ParseModel(boJson, dataJson, fieldGroup.CalcValueExpr.Content)
+			} else if fieldGroup.CalcValueExpr.Mode == "golang" {
+				content = fieldGroup.CalcValueExpr.Content// TODO
+			}
+		}
+		o.applyFieldGroupValueByString(fieldGroup, data, content)
+	})
 }
 
 /**
@@ -295,8 +337,8 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 
 	modelIterator := ModelIterator{}
 	masterFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.MasterData.FixField)
-	for i, _ := range masterFixFieldLi {
-		masterFixFieldLi[i].Parent = dataSource.MasterData.FixField
+	for i, _ := range *masterFixFieldLi {
+		(*masterFixFieldLi)[i].Parent = dataSource.MasterData.FixField
 	}
 	for i, _ := range dataSource.MasterData.BizField.FieldLi {
 		dataSource.MasterData.BizField.FieldLi[i].Parent = dataSource.MasterData.BizField
@@ -307,8 +349,8 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 		dataSource.DetailDataLi[i].BizField.Parent = dataSource.DetailDataLi[i]
 	
 		detailFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.DetailDataLi[i].FixField)
-		for j, _ := range detailFixFieldLi {
-			detailFixFieldLi[j].Parent = dataSource.DetailDataLi[i].FixField
+		for j, _ := range *detailFixFieldLi {
+			(*detailFixFieldLi)[j].Parent = dataSource.DetailDataLi[i].FixField
 		}
 		
 		for j, _ := range dataSource.DetailDataLi[i].BizField.FieldLi {
@@ -317,17 +359,159 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 	}
 }
 
-// TODO
-func (o ModelTemplateFactory) applyRelationFieldValue(dataSource *DataSource) {
-
+// TODO,byTest
+func (o ModelTemplateFactory) applyRelationFieldValue(dataSource *DataSource, bo *map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+		relationItem, found := o.ParseRelationExpr(fieldGroup, *bo, *data)
+		if !found {
+			panic("数据源:" + dataSource.Id + ",数据集:" + fieldGroup.GetDataSetId() + ",字段:" + fieldGroup.Id + ",配置的关联模型列表,不存在返回true的记录")
+		}
+		(*data)[fieldGroup.Id + "_ref"] = map[string]interface{}{
+			"RelationExpr": true,
+			"RelationModelId": relationItem.RelationModelId,
+			"RelationDataSetId": relationItem.RelationDataSetId,
+			"DisplayField": relationItem.DisplayField,
+		}
+	})
 }
 
-// TODO
-func (o ModelTemplateFactory) getBO(dataSource *DataSource) map[string]interface{} {
-	return map[string]interface{}{}
+// TODO,byTest,
+func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[string]interface{}, data map[string]interface{}) (RelationItem, bool) {
+	fieldValue := fmt.Sprint(data[fieldGroup.Id])
+	if fieldValue != "" {
+		boJsonByte, err := json.Marshal(bo)
+		if err != nil {
+			panic(err)
+		}
+		boJson := string(boJsonByte)
+		expressionParser := ExpressionParser{}
+		for _, item := range fieldGroup.RelationDS.RelationItemLi {
+			if item.RelationExpr.Content != "" {
+				var content string
+				if item.RelationExpr.Mode == "" || item.RelationExpr.Mode == "text" {
+					content = item.RelationExpr.Content
+				} else if item.RelationExpr.Mode == "python" {
+					dataJsonData, err := json.Marshal(&data)
+					if err != nil {
+						panic(err)
+					}
+					dataJson := string(dataJsonData)
+					content = expressionParser.ParseModel(boJson, dataJson, item.RelationExpr.Content)
+				} else if item.RelationExpr.Mode == "golang" {
+					content = item.RelationExpr.Content// TODO
+				}
+				if strings.ToLower(content) == "true" {
+					return item, true
+				}
+			}
+		}
+	}
+
+	return RelationItem{}, false
 }
 
-// TODO
-func (o ModelTemplateFactory) applyCopy(dataSource DataSource, bo *map[string]interface{}, srcBo *map[string]interface{}) map[string]interface{} {
-	return map[string]interface{}{}
+// TODO,byTest,
+func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[string]interface{}, srcBo map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	//o.IterateDataBo(dataSource, bo, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateDataBo(dataSource, &srcBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+		if !fieldGroupLi[0].IsMasterField() {
+			if (*destBo)[fieldGroupLi[0].GetDataSetId()] == nil {
+				(*destBo)[fieldGroupLi[0].GetDataSetId()] = []interface{}{}
+			}
+			dataSetLi := (*destBo)[fieldGroupLi[0].GetDataSetId()].([]interface{})
+			copyData := map[string]interface{}{}
+			for _, item := range fieldGroupLi {
+				content := ""
+				o.applyFieldGroupValueByString(item, &copyData, content)
+			}
+			dataSetLi = append(dataSetLi, copyData)
+			(*destBo)[fieldGroupLi[0].GetDataSetId()] = dataSetLi
+		}
+	})
+	result = ""
+	modelIterator.IterateAllFieldTwoBo(&dataSource, destBo, srcBo, &result, func(fieldGroup *FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {
+		if fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true" {
+			(*destData)[fieldGroup.Id] = srcData[fieldGroup.Id]
+		}
+	})
+}
+
+// TODO,byTest,
+func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destData map[string]interface{}, srcData map[string]interface{}) bool {
+	for _, item := range fieldGroupLi {
+		if destData[item.Id] != srcData[item.Id] {
+			return true
+		}
+	}
+	return false
+} 
+
+// TODO,byTest,
+func (o ModelTemplateFactory) ConvertDataType(dataSource DataSource, bo *map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+		content := fmt.Sprint((*data)[fieldGroup.Id])
+		o.applyFieldGroupValueByString(fieldGroup, data, content)
+	})
+}
+
+// TODO applyFieldGroupValue by default,
+func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup, data *map[string]interface{}, content string) {
+	stringArray := []string{"STRING", "REMARK"}
+	for _, stringItem := range stringArray {
+		if stringItem == fieldGroup.FieldDataType {
+			(*data)[fieldGroup.Id] = content
+			return
+		}
+	}
+	intArray := []string{"SMALLINT", "INT", "LONGINT"}
+	for _, intItem := range intArray {
+		if intItem == fieldGroup.FieldDataType {
+			if content == "" {
+				(*data)[fieldGroup.Id] = 0
+			} else {
+				value, err := strconv.Atoi(content)
+				if err != nil {
+					panic(err)
+				}
+				(*data)[fieldGroup.Id] = value
+			}
+			return
+		}
+	}
+	floatArray := []string{"FLOAT", "MONEY", "DECIMAL"}
+	for _, floatItem := range floatArray {
+		if floatItem == fieldGroup.FieldDataType {
+			if content == "" {
+				(*data)[fieldGroup.Id] = 0
+			} else {
+				value, err := strconv.ParseFloat(content, 32)
+				if err != nil {
+					panic(err)
+				}
+				(*data)[fieldGroup.Id] = float32(value)
+			}
+			return
+		}
+	}
+	boolArray := []string{"BOOLEAN"}
+	for _, boolItem := range boolArray {
+		if boolItem == fieldGroup.FieldDataType {
+			if content == "" {
+				(*data)[fieldGroup.Id] = false
+			} else {
+				value, err := strconv.ParseBool(content)
+				if err != nil {
+					panic(err)
+				}
+				(*data)[fieldGroup.Id] = value
+			}
+			return
+		}
+	}
 }

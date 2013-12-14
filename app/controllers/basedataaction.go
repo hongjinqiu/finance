@@ -7,6 +7,8 @@ import (
 	"com/papersns/mongo"
 	"strings"
 	"strconv"
+	"encoding/json"
+	. "com/papersns/model/handler"
 )
 
 func init() {
@@ -28,10 +30,11 @@ type BaseDataAction struct {
  */
 func (c BaseDataAction) NewData() revel.Result {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	c.beforeNewData(dataSourceModelId)
 	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, bo := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterNewData(&dataSource, &bo)
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	c.beforeNewData(dataSource)
+	bo := modelTemplateFactory.GetInstanceByDS(dataSource)
+	c.afterNewData(dataSource, &bo)
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		c.Response.ContentType = "application/json; charset=utf-8"
@@ -43,11 +46,11 @@ func (c BaseDataAction) NewData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeNewData(dataSourceModelId string) {
+func (c BaseDataAction) beforeNewData(dataSource DataSource) {
 	
 }
 
-func (c BaseDataAction) afterNewData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterNewData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
@@ -62,7 +65,6 @@ func (c BaseDataAction) CopyData() revel.Result {
 		panic(err)
 	}
 	
-	c.beforeCopyData(dataSourceModelId, id)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": id,
@@ -72,8 +74,11 @@ func (c BaseDataAction) CopyData() revel.Result {
 		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &srcBo)
+	c.beforeCopyData(dataSource, srcBo)
 	dataSource, bo := modelTemplateFactory.GetCopyInstance(dataSourceModelId, srcBo)
-	c.afterCopyData(&dataSource, &bo)
+	c.afterCopyData(dataSource, &bo)
 	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -86,20 +91,19 @@ func (c BaseDataAction) CopyData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeCopyData(dataSourceModelId string, id int) {
+func (c BaseDataAction) beforeCopyData(dataSource DataSource, srcBo map[string]interface{}) {
 	
 }
 
-func (c BaseDataAction) afterCopyData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterCopyData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
 /**
  * 修改验证
- * 业务为:已作废不可编辑
  */
-func (c BaseDataAction) editValidate(dataSourceModelId string, id int) bool {
-	return true
+func (c BaseDataAction) editValidate(dataSource DataSource, bo map[string]interface{}) (string, bool) {
+	return "", true
 }
 
 /**
@@ -107,34 +111,29 @@ func (c BaseDataAction) editValidate(dataSourceModelId string, id int) bool {
  */
 func (c BaseDataAction) EditData() revel.Result {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	strId := c.Params.Get("id")
-	id, err := strconv.Atoi(strId)
+	jsonBo := c.Params.Get("jsonData")
+	
+	bo := map[string]interface{}{}
+	err := json.Unmarshal([]byte(jsonBo), &bo)
 	if err != nil {
 		panic(err)
 	}
 
-	
-	querySupport := QuerySupport{}
-	queryMap := map[string]interface{}{
-		"_id": id,
-	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
-	if !found {
-		panic("EditData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
-	}
-	c.beforeEditData(dataSourceModelId, &bo)
-	
-	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
-	defer session.Close()
-	err = db.C(dataSourceModelId).Insert(bo)
-	if err != nil {
-		panic(err)
-	}
-	
 	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterEditData(&dataSource, &bo)
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	
+	editMessage, isValid := c.editValidate(dataSource, bo)
+	if !isValid {
+		panic(editMessage)
+	}
+	
+	c.beforeEditData(dataSource, &bo)
+	
+	financeService := FinanceService{}
+	diffDataRowLi := financeService.SaveData(dataSource, &bo)
+	
+	c.afterEditData(dataSource, &bo, diffDataRowLi)
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		c.Response.ContentType = "application/json; charset=utf-8"
@@ -146,11 +145,11 @@ func (c BaseDataAction) EditData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeEditData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BaseDataAction) beforeEditData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BaseDataAction) afterEditData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterEditData(dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
 	
 }
 
@@ -159,33 +158,23 @@ func (c BaseDataAction) afterEditData(dataSource *DataSource, bo *map[string]int
  */
 func (c BaseDataAction) SaveData() revel.Result {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	strId := c.Params.Get("id")
-	id, err := strconv.Atoi(strId)
+	jsonBo := c.Params.Get("jsonData")
+	
+	bo := map[string]interface{}{}
+	err := json.Unmarshal([]byte(jsonBo), &bo)
 	if err != nil {
 		panic(err)
 	}
 
-	querySupport := QuerySupport{}
-	queryMap := map[string]interface{}{
-		"_id": id,
-	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
-	if !found {
-		panic("SaveData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
-	}
-	c.beforeSaveData(dataSourceModelId, &bo)
-	
-	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
-	defer session.Close()
-	err = db.C(dataSourceModelId).Insert(bo)
-	if err != nil {
-		panic(err)
-	}
-	
 	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterSaveData(&dataSource, &bo)
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.beforeSaveData(dataSource, &bo)
+
+	financeService := FinanceService{}
+	diffDataRowLi := financeService.SaveData(dataSource, &bo)	
+	
+	c.afterSaveData(dataSource, &bo, diffDataRowLi)
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		c.Response.ContentType = "application/json; charset=utf-8"
@@ -197,11 +186,11 @@ func (c BaseDataAction) SaveData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeSaveData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BaseDataAction) beforeSaveData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BaseDataAction) afterSaveData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterSaveData(dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
 	
 }
 
@@ -224,10 +213,11 @@ func (c BaseDataAction) GiveUpData() revel.Result {
 	if !found {
 		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
-	c.beforeGiveUpData(dataSourceModelId, &bo)
 	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterGiveUpData(&dataSource, &bo)
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.beforeGiveUpData(dataSource, &bo)
+	c.afterGiveUpData(dataSource, &bo)
 	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -240,11 +230,11 @@ func (c BaseDataAction) GiveUpData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeGiveUpData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BaseDataAction) beforeGiveUpData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BaseDataAction) afterGiveUpData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterGiveUpData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
@@ -267,19 +257,30 @@ func (c BaseDataAction) DeleteData() revel.Result {
 	if !found {
 		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
-	c.beforeDeleteData(dataSourceModelId, &bo)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.beforeDeleteData(dataSource, &bo)
 	
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
+
+	usedCheck := UsedCheck{}
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+		if fieldGroupLi[0].IsMasterField() {
+			usedCheck.Delete(db, fieldGroupLi, *data)
+		}
+	})
+	
 	err = db.C(dataSourceModelId).Remove(queryMap)
 	if err != nil {
 		panic(err)
 	}
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterDeleteData(&dataSource, &bo)
+	c.afterDeleteData(dataSource, &bo)
 	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -292,11 +293,11 @@ func (c BaseDataAction) DeleteData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeDeleteData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BaseDataAction) beforeDeleteData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BaseDataAction) afterDeleteData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterDeleteData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
@@ -319,10 +320,11 @@ func (c BaseDataAction) RefreshData() revel.Result {
 	if !found {
 		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
-	c.beforeRefreshData(dataSourceModelId, &bo)
 	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource, _ := modelTemplateFactory.GetInstance(dataSourceModelId)
-	c.afterRefreshData(&dataSource, &bo)
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.beforeRefreshData(dataSource, &bo)
+	c.afterRefreshData(dataSource, &bo)
 	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -335,11 +337,11 @@ func (c BaseDataAction) RefreshData() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeRefreshData(dataSourceModelId string, bo *map[string]interface{}) {
+func (c BaseDataAction) beforeRefreshData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
-func (c BaseDataAction) afterRefreshData(dataSource *DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) afterRefreshData(dataSource DataSource, bo *map[string]interface{}) {
 	
 }
 
@@ -358,7 +360,7 @@ func (c BaseDataAction) LogList() revel.Result {
 	// reference,beReference
 	querySupport := QuerySupport{}
 	query := map[string]interface{}{
-		"beReference": []interface{}{dataSourceModelId,id},
+		"beReference": []interface{}{dataSourceModelId,"A", "id",id},
 	}
 	pageNo := 1
 	pageSize := 10
@@ -372,6 +374,3 @@ func (c BaseDataAction) LogList() revel.Result {
 	}
 	return c.Render()
 }
-
-
-

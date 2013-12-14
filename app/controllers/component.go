@@ -202,6 +202,8 @@ func (c Component) ListTemplate() revel.Result {
 	}
 }
 
+
+
 func (c Component) MapReduce() revel.Result {
 	qb := QuerySupport{}
 

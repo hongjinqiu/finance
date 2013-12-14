@@ -375,6 +375,7 @@
 						<enumeration value="YEARMONTH" />
 						<enumeration value="DATE" />
 						<enumeration value="TIME" />
+						<enumeration value="DATETIME" />
 					</restriction>
 				</simpleType>
 			</element>
@@ -411,6 +412,8 @@
 			<element name="fixHide" type="boolean" default="false" minOccurs="0" maxOccurs="1" />
 			<!-- 是否固定只读 -->
 			<element name="fixReadOnly" type="boolean" default="false" minOccurs="0" maxOccurs="1" />
+			<!-- 是否允许 复制 -->
+			<element name="allowCopy" type="boolean" default="true" minOccurs="0" maxOccurs="1" />
 			<!-- 是否允许 重复 -->
 			<element name="allowDuplicate" type="boolean" default="true" minOccurs="0" maxOccurs="1" />
 			<!-- 被用不可以修改 -->
@@ -442,7 +445,23 @@
 			<!-- 数据字典表达式 -->
 			<element name="dictionaryWhere" type="string" default="" minOccurs="0" maxOccurs="1" />
 			<!-- 联动计算表达式 -->
-			<element name="calcValueExpr" type="string" default="" minOccurs="0" maxOccurs="1" />
+			<element name="calcValueExpr" minOccurs="0" maxOccurs="1">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute name="mode" default="text">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="text" />
+										<enumeration value="python" />
+										<enumeration value="golang" />
+									</restriction>
+								</simpleType>
+							</attribute>
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
 			<!-- 是否虚拟字段 -->
 			<element name="virtual" type="boolean" default="false" minOccurs="0" maxOccurs="1" />
 			<!-- 零值显示空白 -->
@@ -463,7 +482,23 @@
 							<complexType>
 								<sequence>
 									<element name="id" type="string" default="R" />
-									<element name="relationExpr" type="string" default="1" />
+									<element name="relationExpr" type="string" default="1">
+										<complexType>
+											<simpleContent>
+												<extension base="string">
+													<attribute name="mode" default="text">
+														<simpleType>
+															<restriction base="string">
+																<enumeration value="text" />
+																<enumeration value="python" />
+																<enumeration value="golang" />
+															</restriction>
+														</simpleType>
+													</attribute>
+												</extension>
+											</simpleContent>
+										</complexType>
+									</element>
 									<element name="relationModelId" type="string" default="" />
 									<element name="relationDataSetId" type="string" default="" />
 									<element name="displayField" type="string" default="" />

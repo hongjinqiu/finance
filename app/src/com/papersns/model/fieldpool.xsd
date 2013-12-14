@@ -118,6 +118,8 @@
 			<element name="fixHide" type="boolean" default="false" minOccurs="0" maxOccurs="1" />
 			<!-- 是否固定只读 -->
 			<element name="fixReadOnly" type="boolean" default="false" minOccurs="0" maxOccurs="1" />
+			<!-- 是否允许 复制 -->
+			<element name="allowCopy" type="boolean" default="true" minOccurs="0" maxOccurs="1" />
 			<!-- 是否允许 重复 -->
 			<element name="allowDuplicate" type="boolean" default="true" minOccurs="0" maxOccurs="1" />
 			<!-- 被用不可以修改 -->

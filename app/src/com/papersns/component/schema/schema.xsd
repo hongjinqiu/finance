@@ -537,6 +537,30 @@
 							<!-- <attribute name="flowId" type="long"></attribute> -->
 						</complexType>
 					</element>
+					<element name="select-column">
+						<annotation>
+							<documentation>选择器列</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="tns:editor" minOccurs="0"></element>
+								<element ref="tns:listeners" minOccurs="0"></element>
+							</sequence>
+							<attributeGroup ref="tns:column-attributes" />
+							<attribute name="displayField"></attribute>
+							<attribute name="valueField"></attribute>
+							<attribute name="selectorName"></attribute>
+							<attribute name="selectionMode">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="single"></enumeration>
+										<enumeration value="multi"></enumeration>
+									</restriction>
+								</simpleType>
+							</attribute>
+							<attribute name="queryFunc"></attribute>
+						</complexType>
+					</element>
 					<element ref="tns:html" />
 				</choice>
 			</sequence>
@@ -697,6 +721,14 @@
 				</element>
 			</sequence>
 			<attribute name="name"></attribute>
+		</complexType>
+	</element>
+	
+	<element name="listeners">
+		<complexType>
+			<attribute name="change"></attribute>
+			<attribute name="selection"></attribute>
+			<attribute name="unSelection"></attribute>
 		</complexType>
 	</element>
 
@@ -866,6 +898,8 @@
 												<enumeration value="fieldName"></enumeration><!-- 弹窗的查询参数 -->
 												<enumeration value="fixparams"></enumeration>
 												<enumeration value="observetree"></enumeration>
+												<enumeration value="config"></enumeration><!-- 弹窗配置 -->
+												<enumeration value="listeners"></enumeration><!-- 弹窗回调函数 -->
 											</restriction>
 										</simpleType>
 									</attribute>

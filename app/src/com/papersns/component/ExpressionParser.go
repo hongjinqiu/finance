@@ -1,10 +1,10 @@
 package component
 
 import (
+	"encoding/json"
 	"github.com/sbinet/go-python"
 	"strings"
 	"sync"
-	"encoding/json"
 )
 
 var rwlock sync.RWMutex = sync.RWMutex{}
@@ -15,21 +15,21 @@ var componentMod *python.PyObject = nil
 func getExpressionMod() *python.PyObject {
 	rwlock.RLock()
 	defer rwlock.RUnlock()
-	
+
 	return expressionMod
 }
 
 func getComponentMod() *python.PyObject {
 	rwlock.RLock()
 	defer rwlock.RUnlock()
-	
+
 	return componentMod
 }
 
 func isEnvInit() bool {
 	rwlock.RLock()
 	defer rwlock.RUnlock()
-	
+
 	return flag
 }
 
@@ -39,8 +39,8 @@ func InitPythonEnv() {
 
 	if flag {
 		return
-	}	
-	
+	}
+
 	err := python.Initialize()
 	if err != nil {
 		panic(err)
@@ -60,17 +60,17 @@ func InitPythonEnv() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	expressionMod = python.PyImport_ImportModule("expression")
 	if expressionMod == nil {
 		panic("get module expression return null")
 	}
-	
+
 	componentMod = python.PyImport_ImportModule("component")
 	if componentMod == nil {
 		panic("get module component return null")
 	}
-	
+
 	flag = true
 }
 
@@ -85,7 +85,7 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 		return true
 	}
 	methodName := "trueOrFalse"
-	execResult := o.parseExpression(methodName, recordJson, expression)
+	execResult := o.parseExpression(methodName, []string{recordJson, expression})
 	return strings.ToLower(execResult) == "true"
 }
 
@@ -94,17 +94,24 @@ func (o ExpressionParser) Validate(text, expression string) bool {
 		return true
 	}
 	methodName := "validate"
-	execResult := o.parseExpression(methodName, text, expression)
+	execResult := o.parseExpression(methodName, []string{text, expression})
 	return strings.ToLower(execResult) == "true"
 }
 
 func (o ExpressionParser) ParseString(recordJson, expression string) string {
 	methodName := "parseString"
-	execResult := o.parseExpression(methodName, recordJson, expression)
+	execResult := o.parseExpression(methodName, []string{recordJson, expression})
 	return execResult
 }
 
-func (o ExpressionParser) parseExpression(methodName, recordJson, expression string) string {
+func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string {
+	methodName := "parseModel"
+	return o.parseExpression(methodName, []string{boJson, dataJson, expression})
+}
+
+//func (o ExpressionParser) parseExpression(methodName, recordJson, expression string) string {
+func (o ExpressionParser) parseExpression(methodName string, param []string) string {
+	expression := param[len(param) -1 : len(param)][0]
 	if strings.TrimSpace(expression) == "" {
 		return ""
 	}
@@ -112,15 +119,15 @@ func (o ExpressionParser) parseExpression(methodName, recordJson, expression str
 		InitPythonEnv()
 	}
 	/*
-	o.InitPythonEnv()
-	defer o.exitEnv()
+		o.InitPythonEnv()
+		defer o.exitEnv()
 
 	*/
 	/*
-	expressionMod := python.PyImport_ImportModule("expression")
-	if expressionMod == nil {
-		panic("get module return null")
-	}
+		expressionMod := python.PyImport_ImportModule("expression")
+		if expressionMod == nil {
+			panic("get module return null")
+		}
 	*/
 
 	strfunc := getExpressionMod().GetAttrString(methodName)
@@ -128,16 +135,15 @@ func (o ExpressionParser) parseExpression(methodName, recordJson, expression str
 		panic("get function return null")
 	}
 
-	args1 := python.PyString_FromString(recordJson)
-	args2 := python.PyString_FromString(strings.TrimSpace(expression))
-
-	strargs := python.PyTuple_New(2)
+	strargs := python.PyTuple_New(len(param) - 1)
 	if strargs == nil {
 		panic("build argument return null")
 	}
 
-	python.PyTuple_SET_ITEM(strargs, 0, args1)
-	python.PyTuple_SET_ITEM(strargs, 1, args2)
+	for i := 0; i < len(param)-1; i++ {
+		args := python.PyString_FromString(strings.TrimSpace(param[i]))
+		python.PyTuple_SET_ITEM(strargs, i, args)
+	}
 
 	strret := strfunc.CallObject(strargs)
 	if strret == nil {
@@ -155,9 +161,9 @@ func (o ExpressionParser) ParseBeforeBuildQuery(classMethod string, paramMap map
 	if strings.TrimSpace(classMethod) == "" {
 		return paramMap
 	}
-	
+
 	execResult := o.parseClassMethod(classMethod, paramMap)
-	
+
 	result := map[string]string{}
 	err := json.Unmarshal([]byte(execResult), &result)
 	if err != nil {
@@ -170,9 +176,9 @@ func (o ExpressionParser) ParseAfterBuildQuery(classMethod string, queryLi []map
 	if strings.TrimSpace(classMethod) == "" {
 		return queryLi
 	}
-	
+
 	execResult := o.parseClassMethod(classMethod, queryLi)
-	
+
 	result := []map[string]interface{}{}
 	err := json.Unmarshal([]byte(execResult), &result)
 	if err != nil {
@@ -187,7 +193,7 @@ func (o ExpressionParser) ParseAfterQueryData(classMethod string, items []interf
 	}
 
 	execResult := o.parseClassMethod(classMethod, items)
-	
+
 	result := []interface{}{}
 	err := json.Unmarshal([]byte(execResult), &result)
 	if err != nil {
@@ -200,18 +206,18 @@ func (o ExpressionParser) parseClassMethod(classMethod string, obj interface{}) 
 	if !isEnvInit() {
 		InitPythonEnv()
 	}
-	
+
 	className := strings.Split(classMethod, ".")[0]
 	methodName := strings.Split(classMethod, ".")[1]
-	
+
 	class := getComponentMod().GetAttrString(className)
 	if class == nil {
 		panic("get class:" + className + " return nil")
 	}
-	
+
 	classArgs := python.PyTuple_New(0)
 	object := class.CallObject(classArgs)
-	
+
 	method := object.GetAttrString(methodName)
 	if method == nil {
 		panic("get method:" + methodName + " return nil")
@@ -221,11 +227,11 @@ func (o ExpressionParser) parseClassMethod(classMethod string, obj interface{}) 
 	if err != nil {
 		panic(err)
 	}
-	
+
 	strargs := python.PyTuple_New(1)
 	args1 := python.PyString_FromString(string(jsonStringByte))
 	python.PyTuple_SET_ITEM(strargs, 0, args1)
-	
+
 	strret := method.CallObject(strargs)
 	if strret == nil {
 		panic("call object return null")
@@ -236,4 +242,3 @@ func (o ExpressionParser) parseClassMethod(classMethod string, obj interface{}) 
 
 	return python.PyString_AS_STRING(strret)
 }
-

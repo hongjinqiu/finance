@@ -97,7 +97,7 @@ type ModifyTime struct {
 	XMLName xml.Name `xml:"modifyTime"`
 	FieldGroup
 }
-type BillStatus struct {
+type BillStatus struct { // 0:正常,1:作废
 	XMLName xml.Name `xml:"billStatus"`
 	FieldGroup
 }
@@ -133,6 +133,7 @@ type FieldGroup struct {
 	FixHide           string           `xml:"fixHide"`
 	FixReadOnly       string           `xml:"fixReadOnly"`
 	AllowDuplicate    string           `xml:"allowDuplicate"`
+	AllowCopy         string           `xml:"allowCopy"`
 	DenyEditInUsed    string           `xml:"denyEditInUsed"`
 	AllowEmpty        string           `xml:"allowEmpty"`
 	LimitOption       string           `xml:"limitOption"`
@@ -142,7 +143,7 @@ type FieldGroup struct {
 	ValidateMessage   string           `xml:"validateMessage"`
 	Dictionary        string           `xml:"dictionary"`
 	DictionaryWhere   string           `xml:"dictionaryWhere"`
-	CalcValueExpr     string           `xml:"calcValueExpr"`
+	CalcValueExpr     CalcValueExpr    `xml:"calcValueExpr"`
 	Virtual           string           `xml:"virtual"`
 	ZeroShowEmpty     string           `xml:"zeroShowEmpty"`
 	LocalCurrencyency string           `xml:"localCurrencyency"`
@@ -159,6 +160,12 @@ type DefaultValueExpr struct {
 	Content string   `xml:",chardata"`
 }
 
+type CalcValueExpr struct {
+	XMLName xml.Name `xml:"calcValueExpr"`
+	Mode    string   `xml:"mode,attr"`
+	Content string   `xml:",chardata"`
+}
+
 type RelationDS struct {
 	XMLName        xml.Name       `xml:"relationDS"`
 	RelationItemLi []RelationItem `xml:"relationItem"`
@@ -166,11 +173,17 @@ type RelationDS struct {
 }
 
 type RelationItem struct {
-	XMLName           xml.Name    `xml:"relationItem"`
-	Id                string      `xml:"id"`
-	RelationExpr      string      `xml:"relationExpr"`
-	RelationModelId   string      `xml:"relationModelId"`
-	RelationDataSetId string      `xml:"relationDataSetId"`
-	DisplayField      string      `xml:"displayField"`
-	Parent            interface{} `xml:"-"`
+	XMLName           xml.Name     `xml:"relationItem"`
+	Id                string       `xml:"id"`
+	RelationExpr      RelationExpr `xml:"relationExpr"`
+	RelationModelId   string       `xml:"relationModelId"`
+	RelationDataSetId string       `xml:"relationDataSetId"`
+	DisplayField      string       `xml:"displayField"`
+	Parent            interface{}  `xml:"-"`
+}
+
+type RelationExpr struct {
+	XMLName xml.Name `xml:"relationExpr"`
+	Mode    string   `xml:"mode,attr"`
+	Content string   `xml:",chardata"`
 }

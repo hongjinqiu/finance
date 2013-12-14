@@ -13,6 +13,11 @@ def validate(text, action):
 def parseString(jsonString, action):
     record = json.loads(jsonString)
     return str(eval(action))
+    
+def parseModel(bo, data, action):
+	bo = json.loads(bo)
+	data = json.loads(data)
+    return str(eval(action))
 
 #trueOrFalse "\"{\\\"name\\\": \\\"test\\\"}\"" "\"record[\\\"name\\\"] == \\\"test\\\"\""
 if __name__ == '__main__':

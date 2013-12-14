@@ -51,7 +51,7 @@ type ViewTemplate struct {
 }
 
 type Html struct {
-	XMLName xml.Name    `xml:"html"`
+	XMLName xml.Name      `xml:"html"`
 	Value   template.HTML `xml:",chardata"`
 }
 
@@ -173,11 +173,12 @@ type ColumnAttributeGroup struct {
 }
 
 type Column struct {
-	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,script-column
+	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,script-column,select-column
 	Html              string            `xml:",chardata"`
 	Name              string            `xml:"name,attr"`
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor            Editor            `xml:"editor"`
+	Listeners         Listeners         `xml:"listeners"`
 	ColumnAttributeGroup
 	ColumnModel ColumnModel `xml:"column-model"`
 
@@ -204,12 +205,26 @@ type Column struct {
 	IsPercent     string `xml:"isPercent,attr"`     // 是否百分比
 
 	Script string `xml:"script,attr"`
+
+	// select-column的内容
+	DisplayField  string `xml:"displayField,attr"`
+	ValueField    string `xml:"valueField,attr"`
+	SelectorName  string `xml:"selectorName,attr"`
+	SelectionMode string `xml:"selectionMode,attr"`
+	QueryFunc     string `xml:"queryFunc,attr"`
 }
 
 type Editor struct {
 	XMLName         xml.Name          `xml:"editor"`
 	EditorAttribute []EditorAttribute `xml:"editor_attribute"`
 	Name            string            `xml:"name,attr"`
+}
+
+type Listeners struct {
+	XMLName     xml.Name `xml:"listeners"`
+	Change      string   `xml:"change,attr"`
+	Selection   string   `xml:"selection,attr"`
+	UnSelection string   `xml:"unSelection,attr"`
 }
 
 type EditorAttribute struct {

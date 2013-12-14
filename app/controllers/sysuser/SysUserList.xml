@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
-
 	<list-id>SysUser</list-id>
 	<selector-id>SysUserSelector</selector-id>
 	<data-source-model-id></data-source-model-id>
 
-	<adapter name="name_adapter" />
+	<adapter name="com/papersns/component/adapter/ModelTemplateAdapter" />
 	<description>员工外出申请</description>
 	<scripts>/hr/archives/empsalarycheck/empsalarychecklist.js</scripts>
 	<view-template view="component/template.ui.ftl" />
@@ -81,6 +80,9 @@
 				<dictionary-column name="nestDictTest1" dictionary="D_DICTTEST"></dictionary-column>
 			</column-model>
 		</string-column>
+		<select-column name="" displayField="" valueField="" selectorName="" selectionMode="single" queryFunc="">
+			<listeners change="" selection="" unSelection="" />
+		</select-column>
 	</column-model>
 
 	<query-parameters>
@@ -95,5 +97,9 @@
 		<query-parameter name="checkboxTest" auto="true" text=""></query-parameter>
 		<query-parameter name="radioTest" auto="true" text=""></query-parameter>
 		<query-parameter name="_id" auto="true" text=""></query-parameter>
+		<query-parameter name="nestTest" text="">
+			<parameter-attribute name="config" value="{}" />
+			<parameter-attribute name="listeners" value="{}" />
+		</query-parameter>
 	</query-parameters>
 </list-template>
