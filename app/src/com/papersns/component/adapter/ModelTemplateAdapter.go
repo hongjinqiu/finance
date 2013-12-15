@@ -39,7 +39,7 @@ func (o ModelTemplateAdapter) applyColumnModel(dataSource DataSource, listTempla
 	for i, _ := range listTemplate.ColumnModel.ColumnLi {
 		column := listTemplate.ColumnModel.ColumnLi[i]
 		if column.XMLName.Local == "auto-column" {
-			modelIterator.IterateAllField(&dataSource, result, func(fieldGroup *FieldGroup, result *interface{}){
+			modelIterator.IterateAllField(&dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}){
 				if column.Name == fieldGroup.Id {
 					if column.Text == "" {
 						column.Text = fieldGroup.DisplayName
@@ -49,7 +49,7 @@ func (o ModelTemplateAdapter) applyColumnModel(dataSource DataSource, listTempla
 					}
 					isIntField := false
 					intArray := []string{"SMALLINT", "INT", "LONGINT"}
-					for item := range intArray {
+					for _, item := range intArray {
 						if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower(item) {
 							isIntField = true
 							break
@@ -57,7 +57,7 @@ func (o ModelTemplateAdapter) applyColumnModel(dataSource DataSource, listTempla
 					}
 					isFloatField := false
 					floatArray := []string{"FLOAT", "MONEY", "DECIMAL"}
-					for item := range floatArray {
+					for _, item := range floatArray {
 						if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower(item) {
 							isFloatField = true
 							break
@@ -65,7 +65,7 @@ func (o ModelTemplateAdapter) applyColumnModel(dataSource DataSource, listTempla
 					}
 					isDateType := false
 					dateArray := []string{"YEAR","YEARMONTH","DATE","TIME","DATETIME"}
-					for item := range dateArray {
+					for _, item := range dateArray {
 						if strings.ToLower(fieldGroup.FieldDataType) == strings.ToLower(item) {
 							isDateType = true
 							break

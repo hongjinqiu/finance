@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
 	<data-source-model-id></data-source-model-id>
-	
+
 	<html>
 		<![CDATA[
 			<script type="text/javascript">console.log("hello world")</script>
@@ -23,7 +23,7 @@
 			<button-attribute name="code" value="U" />
 			<button-attribute name="functionId" value="10018" />
 		</button>
-		
+
 		<button text="修改" mode="fn" handler="test" iconCls="">
 		</button>
 		<button text="保存" mode="fn" handler="test" iconCls="">
@@ -46,7 +46,7 @@
 			<div>after toolbar</div>
 		]]>
 	</html>
-	
+
 	<html>
 		<![CDATA[
 			<div>before column-model</div>
@@ -59,19 +59,20 @@
 		<auto-column name="startDate" colSpan="3" />
 		<auto-column name="endDate" colSpan="3">
 			<editor>
-				<editor_attribute name="aaa" value="bb"/>
-				<editor_attribute name="aaa" value="cccc"/>
+				<editor_attribute name="aaa" value="bb" />
+				<editor_attribute name="aaa" value="cccc" />
 			</editor>
 		</auto-column>
-		<html>hello html
+		<html>
+			hello html
 			<editor>
-				<editor_attribute name="aaa" value="bb"/>
-				<editor_attribute name="aaa" value="cccc"/>
+				<editor_attribute name="aaa" value="bb" />
+				<editor_attribute name="aaa" value="cccc" />
 			</editor>
 		</html>
 	</column-model>
-	
-	
+
+
 	<column-model name="detailDataSet" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
 		<auto-column name="ttt" />
 		<auto-column name="eee dddd">
@@ -83,34 +84,8 @@
 		</auto-column>
 		<auto-column name="" colSpan="3" />
 	</column-model>
-	
-	<!-- 
-	<html>
-		<![CDATA[
-			<div>pos0</div>
-		]]>
-	</html>
-	<column-model name="datailDataSetName" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
-		<auto-column name="" />
-	</column-model>
-	<html>
-		<![CDATA[
-			<div>pos0</div>
-		]]>
-	</html>
-	
-	<html>
-		<![CDATA[
-			<div>pos0</div>
-		]]>
-	</html>
-	<column-model name="datailDataSetName" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
-		<auto-column name="" />
-	</column-model>
-	<html>
-		<![CDATA[
-			<div>pos0</div>
-		]]>
-	</html>
-	 -->
+
+	<!-- <html> <![CDATA[ <div>pos0</div> ]]> </html> <column-model name="datailDataSetName" selectionMode="radio" rownumber="true" bsonOrderBy="_id"> <auto-column name="" /> </column-model> 
+		<html> <![CDATA[ <div>pos0</div> ]]> </html> <html> <![CDATA[ <div>pos0</div> ]]> </html> <column-model name="datailDataSetName" selectionMode="radio" rownumber="true" bsonOrderBy="_id"> 
+		<auto-column name="" /> </column-model> <html> <![CDATA[ <div>pos0</div> ]]> </html> -->
 </form-template>

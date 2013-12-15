@@ -1,35 +1,44 @@
-http://127.0.0.1:9000/app/combo?yui.3.12.0/widget-stack/assets/skins/sam/widget-stack.css&yui.3.12.0/overlay/assets/skins/sam/overlay.css
-
-text = '''bool
-int
-int8
-int16
-int32
-int64
-uint
-uint8
-uint16
-uint32
-uint64
-uintptr
-float32
-float64
-complex64
-complex128'''
-
-template = '''else if outFieldGroupElem.Field(k).Kind() == reflect.String {
-							outValue := outFieldGroupElem.Field(k).Interface().(string)
-							innerValue := innerFieldGroupReflect.Field(k).Interface().(string)
-							if outValue == "" && innerValue != "" {
-								outFieldGroupElem.Field(k).Set(innerFieldGroupReflect.Field(k))
-							}
-						}'''
-
-for item in text.split('\n'):
-    tmpText = template
-    tmpText = tmpText.replace('reflect.String', 'reflect.' + item[:1].upper() + item[1:])
-    tmpText = tmpText.replace('(string)', '(' + item + ')')
-    print tmpText
-
-
-
+master
+createBy
+master
+createTime
+master
+modifyBy
+master
+modifyTime
+master
+billStatus
+master
+attachCount
+master
+remark
+master
+code
+master
+nick
+master
+startDate
+master
+endDate
+master
+createBy
+master
+createTime
+master
+modifyBy
+master
+modifyTime
+master
+billStatus
+master
+attachCount
+master
+remark
+master
+code
+master
+nick
+master
+startDate
+master
+endDate

@@ -17,16 +17,18 @@ func (o ModelIterator) IterateAllFieldBo(dataSource DataSource, bo *map[string]i
 	})
 }
 
-func (o ModelIterator) GetFixFieldLi(fixField *FixField) *[]FieldGroup {
-	fixFieldLi := []FieldGroup{}
-	fixFieldLi = append(fixFieldLi, fixField.PrimaryKey.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.CreateBy.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.CreateTime.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.ModifyBy.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.ModifyTime.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.BillStatus.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.AttachCount.FieldGroup)
-	fixFieldLi = append(fixFieldLi, fixField.Remark.FieldGroup)
+func (o ModelIterator) GetFixFieldLi(fixField *FixField) *[]*FieldGroup {
+	fixFieldLi := []*FieldGroup{}
+	fixFieldLi = append(fixFieldLi, &fixField.PrimaryKey.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.CreateBy.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.CreateTime.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.CreateUnit.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.ModifyBy.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.ModifyTime.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.ModifyUnit.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.BillStatus.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.AttachCount.FieldGroup)
+	fixFieldLi = append(fixFieldLi, &fixField.Remark.FieldGroup)
 	return &fixFieldLi
 }
 
@@ -37,18 +39,18 @@ func (o ModelIterator) IterateAllFieldTwoBo(dataSource *DataSource, destBo *map[
 	srcData := srcBo["A"].(map[string]interface{})
 	fieldGroupLi := o.getDataSetFieldGroupLi(&dataSource.MasterData.FixField, &dataSource.MasterData.BizField)
 	for i, _ := range *fieldGroupLi {
-		iterateFunc(&(*fieldGroupLi)[i], &destData, srcData, result)
+		iterateFunc((*fieldGroupLi)[i], &destData, srcData, result)
 	}
 	
 	for i, _ := range dataSource.DetailDataLi {
-		fieldGroupLi = o.getDataSetFieldGroupLi(&dataSource.MasterData.FixField, &dataSource.MasterData.BizField)
+		fieldGroupLi = o.getDataSetFieldGroupLi(&dataSource.DetailDataLi[i].FixField, &dataSource.DetailDataLi[i].BizField)
 		destDataLi := (*destBo)[dataSource.DetailDataLi[i].Id].([]interface{})
 		srcDataLi := srcBo[dataSource.DetailDataLi[i].Id].([]interface{})
 		for subIndex, _ := range destDataLi {
 			destDetailData := destDataLi[subIndex].(map[string]interface{})
 			srcDetailData := srcDataLi[subIndex].(map[string]interface{})
-			for i, _ := range *fieldGroupLi {
-				iterateFunc(&(*fieldGroupLi)[i], &destDetailData, srcDetailData, result)
+			for j, _ := range *fieldGroupLi {
+				iterateFunc((*fieldGroupLi)[j], &destDetailData, srcDetailData, result)
 			}
 		}
 	}
@@ -59,13 +61,13 @@ type IterateFieldFunc func(fieldGroup *FieldGroup, result *interface{})
 func (o ModelIterator) IterateAllField(dataSource *DataSource, result *interface{}, iterateFunc IterateFieldFunc) {
 	fieldGroupLi := o.getDataSetFieldGroupLi(&dataSource.MasterData.FixField, &dataSource.MasterData.BizField)
 	for i, _ := range *fieldGroupLi {
-		iterateFunc(&(*fieldGroupLi)[i], result)
+		iterateFunc((*fieldGroupLi)[i], result)
 	}
 
 	for i, _ := range dataSource.DetailDataLi {
 		fieldGroupLi = o.getDataSetFieldGroupLi(&dataSource.DetailDataLi[i].FixField, &dataSource.DetailDataLi[i].BizField)
 		for j, _ := range *fieldGroupLi {
-			iterateFunc(&(*fieldGroupLi)[j], result)
+			iterateFunc((*fieldGroupLi)[j], result)
 		}
 	}
 }
@@ -83,12 +85,20 @@ func (o ModelIterator) iterateDiffMasterDataBo(dataSource DataSource, destBo *ma
 	destData := (*destBo)["A"].(map[string]interface{})
 	srcData := srcBo["A"].(map[string]interface{})
 	
-	iterateFunc(*masterFieldGroupLi, &destData, srcData, result)
+	fieldGroupLi := []FieldGroup{}
+	for _, item := range *masterFieldGroupLi {
+		fieldGroupLi = append(fieldGroupLi, *item)
+	}
+	iterateFunc(fieldGroupLi, &destData, srcData, result)
 }
 
 func (o ModelIterator) iterateDiffDetailDataBo(dataSource DataSource, destBo *map[string]interface{}, srcBo map[string]interface{}, result *interface{}, iterateFunc IterateDiffFunc) {
 	for i, _ := range dataSource.DetailDataLi {
 		detailFieldGroupLi := o.getDataSetFieldGroupLi(&dataSource.DetailDataLi[i].FixField, &dataSource.DetailDataLi[i].BizField)
+		fieldGroupLi := []FieldGroup{}
+		for _, item := range *detailFieldGroupLi {
+			fieldGroupLi = append(fieldGroupLi, *item)
+		}
 		
 		iDestDataLi := (*destBo)[dataSource.DetailDataLi[i].Id].([]interface{})
 		iSrcDataLi := srcBo[dataSource.DetailDataLi[i].Id].([]interface{})
@@ -116,7 +126,7 @@ func (o ModelIterator) iterateDiffDetailDataBo(dataSource DataSource, destBo *ma
 			if (*destDataIdDict)[id] == nil {
 				destData := (*map[string]interface{})(nil)
 				srcData := dataItem
-				iterateFunc(*detailFieldGroupLi, destData, srcData, result)
+				iterateFunc(fieldGroupLi, destData, srcData, result)
 			}
 		}
 		
@@ -124,10 +134,10 @@ func (o ModelIterator) iterateDiffDetailDataBo(dataSource DataSource, destBo *ma
 		for j, _ := range destDataLi {
 			dataItem := destDataLi[j]
 			idStr := fmt.Sprint(dataItem["id"])
-			if idStr == "" {
+			if idStr == "" || idStr == "0" {
 				destData := dataItem
 				srcData := (map[string]interface{})(nil)
-				iterateFunc(*detailFieldGroupLi, &destData, srcData, result)
+				iterateFunc(fieldGroupLi, &destData, srcData, result)
 			}
 		}
 		
@@ -135,11 +145,11 @@ func (o ModelIterator) iterateDiffDetailDataBo(dataSource DataSource, destBo *ma
 		for j, _ := range destDataLi {
 			dataItem := destDataLi[j]
 			idStr := fmt.Sprint(dataItem["id"])
-			if idStr != "" {
-				id, _ := strconv.Atoi(fmt.Sprint(dataItem["id"]))
+			if idStr != "" && idStr != "0" {
+				id, _ := strconv.Atoi(idStr)
 				destData := (*destDataIdDict)[id].(map[string]interface{})
 				srcData := (*srcDataIdDict)[id].(map[string]interface{})
-				iterateFunc(*detailFieldGroupLi, &destData, srcData, result)
+				iterateFunc(fieldGroupLi, &destData, srcData, result)
 			}
 		}
 	}
@@ -155,20 +165,22 @@ func (o ModelIterator) getDataIdDict(dataLi *[]map[string]interface{}) *map[int]
 			if err != nil {
 				panic(err)
 			}
-			destDataIdDict[id] = dataItem
+			if id > 0 {
+				destDataIdDict[id] = dataItem
+			}
 		}
 	}
 	return &destDataIdDict
 }
 
-func (o ModelIterator) getDataSetFieldGroupLi(fixField *FixField, bizField *BizField) *[]FieldGroup {
-	fieldGroupLi := []FieldGroup{}
+func (o ModelIterator) getDataSetFieldGroupLi(fixField *FixField, bizField *BizField) *[]*FieldGroup {
+	fieldGroupLi := []*FieldGroup{}
 	fixFieldLi := o.GetFixFieldLi(fixField)
 	for i, _ := range *fixFieldLi {
 		fieldGroupLi = append(fieldGroupLi, (*fixFieldLi)[i])
 	}
 	for i, _ := range bizField.FieldLi {
-		fieldGroupLi = append(fieldGroupLi, bizField.FieldLi[i].FieldGroup)
+		fieldGroupLi = append(fieldGroupLi, &bizField.FieldLi[i].FieldGroup)
 	}
 	return &fieldGroupLi
 }
@@ -183,17 +195,25 @@ func (o ModelIterator) IterateDataBo(dataSource DataSource, bo *map[string]inter
 func (o ModelIterator) iterateMasterDataBo(dataSource DataSource, bo *map[string]interface{}, result *interface{}, iterateFunc IterateDataFunc) {
 	masterFieldGroupLi := o.getDataSetFieldGroupLi(&dataSource.MasterData.FixField, &dataSource.MasterData.BizField)
 	data := (*bo)["A"].(map[string]interface{})
-	iterateFunc(*masterFieldGroupLi, &data, result)
+	fieldGroupLi := []FieldGroup{}
+	for _, item := range *masterFieldGroupLi {
+		fieldGroupLi = append(fieldGroupLi, *item)
+	}
+	iterateFunc(fieldGroupLi, &data, result)
 }
 
 func (o ModelIterator) iterateDetailDataBo(dataSource DataSource, bo *map[string]interface{}, result *interface{}, iterateFunc IterateDataFunc) {
 	for i, _ := range dataSource.DetailDataLi {
 		item := dataSource.DetailDataLi[i]
 		detailFieldGroupLi := o.getDataSetFieldGroupLi(&item.FixField, &item.BizField)
+		fieldGroupLi := []FieldGroup{}
+		for _, item := range *detailFieldGroupLi {
+			fieldGroupLi = append(fieldGroupLi, *item)
+		}
 		dataLi := (*bo)[item.Id].([]interface{})
 		for j, _ := range dataLi {
 			data := dataLi[j].(map[string]interface{})
-			iterateFunc(*detailFieldGroupLi, &data, result)
+			iterateFunc(fieldGroupLi, &data, result)
 		}
 	}
 }

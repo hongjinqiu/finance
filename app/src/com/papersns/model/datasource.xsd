@@ -127,13 +127,13 @@
 									<attribute name="extends" default="CREATE_TIME" />
 								</complexType>
 							</element>
-							<!-- <element name="createUnit" minOccurs="1" maxOccurs="1">
+							<element name="createUnit" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
 									<attribute name="id" default="id" />
 									<attribute name="extends" default="CREATE_UNIT" />
 								</complexType>
-							</element> -->
+							</element>
 							<element name="modifyBy" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
@@ -141,13 +141,13 @@
 									<attribute name="extends" default="MODIFY_BY" />
 								</complexType>
 							</element>
-							<!-- <element name="modifyUnit" minOccurs="1" maxOccurs="1">
+							<element name="modifyUnit" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
 									<attribute name="id" default="id" />
 									<attribute name="extends" default="MODIFY_UNIT" />
 								</complexType>
-							</element> -->
+							</element>
 							<element name="modifyTime" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
@@ -232,37 +232,45 @@
 							<element name="primaryKey" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="PRIMARY_KEY" />
 								</complexType>
 							</element>
+							<!-- 
 							<element name="srcDatasourceId" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="SRC_DATASOURCE_ID" />
 								</complexType>
 							</element>
 							<element name="srcDatasetId" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="SRC_DATASET_ID" />
 								</complexType>
 							</element>
 							<element name="srcBillId" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="SRC_BILL_ID" />
 								</complexType>
 							</element>
 							<element name="srcDetailId" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="SRC_DETAIL_ID" />
 								</complexType>
 							</element>
+							 -->
 
 							<element name="createBy" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="CREATE_BY" />
 								</complexType>
 							</element>
@@ -270,42 +278,49 @@
 							<element name="createTime" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="CREATE_TIME" />
 								</complexType>
 							</element>
 							<element name="createUnit" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="CREATE_UNIT" />
 								</complexType>
 							</element>
 							<element name="modifyBy" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="MODIFY_BY" />
 								</complexType>
 							</element>
 							<element name="modifyUnit" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="MODIFY_UNIT" />
 								</complexType>
 							</element>
 							<element name="modifyTime" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="MODIFY_TIME" />
 								</complexType>
 							</element>
 							<element name="attachCount" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="ATTACH_COUNT" />
 								</complexType>
 							</element>
 							<element name="remark" minOccurs="1" maxOccurs="1">
 								<complexType>
 									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
 									<attribute name="extends" default="REMARK" />
 								</complexType>
 							</element>

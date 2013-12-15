@@ -2,7 +2,6 @@ package model
 
 import (
 	"reflect"
-	. "com/papersns/component"
 )
 
 func (o FieldGroup) IsMasterField() bool {
@@ -24,6 +23,7 @@ func (o FieldGroup) IsRelationField() bool {
 	return len(o.RelationDS.RelationItemLi) > 0
 }
 
+/*
 func (o FieldGroup) GetRelationItem() (RelationItem, bool) {
 	expressionParser := ExpressionParser{}
 	for _, item := range o.RelationDS.RelationItemLi {
@@ -39,6 +39,7 @@ func (o FieldGroup) GetRelationItem() (RelationItem, bool) {
 	}
 	return RelationItem{}, false
 }
+*/
 
 func (o FieldGroup) GetMasterData() (MasterData, bool) {
 	if o.IsMasterField() {

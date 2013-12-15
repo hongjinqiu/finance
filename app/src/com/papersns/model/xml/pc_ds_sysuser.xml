@@ -24,9 +24,9 @@
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
 			<createTime id="createTime" extends="CREATE_TIME" />
-			<!-- <createUnit id="createUnit" extends="CREATE_UNIT" /> -->
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
-			<!-- <modifyUnit id="modifyUnit" extends="MODIFY_UNIT" /> -->
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
 			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
@@ -37,11 +37,25 @@
 				<displayName>代码</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>20</fieldLength>
+				<!-- <defaultValueExpr mode="text">ccccc</defaultValueExpr> -->
+				<!-- <defaultValueExpr mode="python">str(bo['A']['attachCount']) + '_abcdefg'</defaultValueExpr> -->
+				<!-- <defaultValueExpr mode="golang">SysUserScript.GetIntTest</defaultValueExpr> -->
+				<calcValueExpr mode="golang">SysUserScript.GetIntTest</calcValueExpr>
 			</field>
 			<field id="nick" extends="NAME_FIELD">
 				<displayName>昵称</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>40</fieldLength>
+				<defaultValueExpr>3</defaultValueExpr>
+				<relationDS>
+					<relationItem>
+						<id>sysUserRel</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>SysUser</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>nick</displayField>
+					</relationItem>
+				</relationDS>
 			</field>
 			<field id="startDate" extends="DATE_FIELD">
 				<displayName>有效期从</displayName>
@@ -53,12 +67,36 @@
 	</masterData>
 	<detailData>
 		<id>B</id>
+		<displayName>分录数据集</displayName>
+		<parentId>A</parentId>
+		<allowEmptyRow>false</allowEmptyRow>
+		<allowCopy>true</allowCopy>
+		<readonly>false</readonly>
+		<primaryKey>PRIMARY_KEY</primaryKey>
 		<fixField>
-			<primaryKey id="id_ccc" extends="PRIMARY_KEY" />
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
 			<field id="endDate" extends="DATE_FIELD">
 				<displayName>有效期至</displayName>
+				<defaultValueExpr>20130311</defaultValueExpr>
+			</field>
+			<field id="int1" extends="INT_FIELD">
+				<displayName>int1</displayName>
+			</field>
+			<field id="float1" extends="FLOAT_FIELD">
+				<displayName>int1</displayName>
+			</field>
+			<field id="boo1" extends="BOOLEAN_FIELD">
+				<displayName>boo1</displayName>
 			</field>
 		</bizField>
 	</detailData>

@@ -57,7 +57,6 @@ func (o ModelTemplateFactory) getInstance(dataSourceModelId string) (DataSource,
 	return dataSource, bo
 }
 
-// TODO, byTest
 func (o ModelTemplateFactory) GetCopyInstance(dataSourceModelId string, srcBo map[string]interface{}) (DataSource, map[string]interface{}) {
 	dataSource, bo := o.getInstance(dataSourceModelId)
 	o.applyCopy(dataSource, &bo, srcBo)
@@ -66,12 +65,12 @@ func (o ModelTemplateFactory) GetCopyInstance(dataSourceModelId string, srcBo ma
 	return dataSource, bo
 }
 
-func (o ModelTemplateFactory) extendFieldPoolField(fieldGroup *FieldGroup, fieldGroupLi *[]FieldGroup) {
+func (o ModelTemplateFactory) extendFieldPoolField(fieldGroup *FieldGroup, fieldGroupLi []FieldGroup) {
 	outFieldGroup := fieldGroup
 	if outFieldGroup.Extends != "" {
 		outFieldGroupElem := reflect.ValueOf(outFieldGroup).Elem()
-		for j, _ := range *fieldGroupLi {
-			innerFieldGroup := (*fieldGroupLi)[j]
+		for j, _ := range fieldGroupLi {
+			innerFieldGroup := fieldGroupLi[j]
 			innerFieldGroupReflect := reflect.ValueOf(innerFieldGroup)
 			if outFieldGroup.Extends == innerFieldGroup.Id {
 				for k := 0; k < outFieldGroupElem.Type().NumField(); k++ {
@@ -201,7 +200,7 @@ func (o ModelTemplateFactory) getPoolFields() Fields {
 		fieldGroupLi = append(fieldGroupLi, fields.FieldLi[i].FieldGroup)
 	}
 	for i, _ := range fields.FieldLi {
-		o.extendFieldPoolField(&fields.FieldLi[i].FieldGroup, &fieldGroupLi)
+		o.extendFieldPoolField(&fields.FieldLi[i].FieldGroup, fieldGroupLi)
 	}
 
 	for i, _ := range fields.FieldLi {
@@ -229,9 +228,8 @@ func (o ModelTemplateFactory) applyFieldExtend(dataSource *DataSource) {
 	for i, _ := range fields.FieldLi {
 		fieldGroupLi = append(fieldGroupLi, fields.FieldLi[i].FieldGroup)
 	}
-
 	modelIterator.IterateAllField(dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}) {
-		o.extendFieldPoolField(fieldGroup, &fieldGroupLi)
+		o.extendFieldPoolField(fieldGroup, fieldGroupLi)
 	})
 }
 
@@ -251,15 +249,9 @@ func (o ModelTemplateFactory) getBo(dataSource DataSource) map[string]interface{
 			o.applyFieldGroupValueByString(*fieldGroup, &item, content)
 		}
 	})
-	data, err := json.MarshalIndent(bo, "", "\t")
-	if err != nil {
-		panic(err)
-	}
-	println(string(data))
 	return bo
 }
 
-// TODO,byTest
 func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
@@ -282,19 +274,14 @@ func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource, bo *
 				dataJson := string(dataJsonData)
 				content = expressionParser.ParseModel(boJson, dataJson, fieldGroup.DefaultValueExpr.Content)
 			} else if fieldGroup.DefaultValueExpr.Mode == "golang" {
-				content = fieldGroup.DefaultValueExpr.Content// TODO
+				exprContent := fieldGroup.DefaultValueExpr.Content
+				content = expressionParser.ParseGolang(*bo, *data, exprContent)
 			}
 		}
 		o.applyFieldGroupValueByString(fieldGroup, data, content)
 	})
-	data, err := json.MarshalIndent(bo, "", "\t")
-	if err != nil {
-		panic(err)
-	}
-	println(string(data))
 }
 
-// TODO,byTest
 func (o ModelTemplateFactory) applyCalcValueExpr(dataSource *DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
@@ -317,10 +304,11 @@ func (o ModelTemplateFactory) applyCalcValueExpr(dataSource *DataSource, bo *map
 				dataJson := string(dataJsonData)
 				content = expressionParser.ParseModel(boJson, dataJson, fieldGroup.CalcValueExpr.Content)
 			} else if fieldGroup.CalcValueExpr.Mode == "golang" {
-				content = fieldGroup.CalcValueExpr.Content// TODO
+				exprContent := fieldGroup.CalcValueExpr.Content
+				content = expressionParser.ParseGolang(*bo, *data, exprContent)
 			}
+			o.applyFieldGroupValueByString(fieldGroup, data, content)
 		}
-		o.applyFieldGroupValueByString(fieldGroup, data, content)
 	})
 }
 
@@ -359,25 +347,25 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 	}
 }
 
-// TODO,byTest
 func (o ModelTemplateFactory) applyRelationFieldValue(dataSource *DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
-		relationItem, found := o.ParseRelationExpr(fieldGroup, *bo, *data)
-		if !found {
-			panic("数据源:" + dataSource.Id + ",数据集:" + fieldGroup.GetDataSetId() + ",字段:" + fieldGroup.Id + ",配置的关联模型列表,不存在返回true的记录")
-		}
-		(*data)[fieldGroup.Id + "_ref"] = map[string]interface{}{
-			"RelationExpr": true,
-			"RelationModelId": relationItem.RelationModelId,
-			"RelationDataSetId": relationItem.RelationDataSetId,
-			"DisplayField": relationItem.DisplayField,
+		if fieldGroup.IsRelationField() {
+			relationItem, found := o.ParseRelationExpr(fieldGroup, *bo, *data)
+			if found {
+				(*data)[fieldGroup.Id + "_ref"] = map[string]interface{}{
+					"Id": relationItem.Id,
+					"RelationExpr": true,
+					"RelationModelId": relationItem.RelationModelId,
+					"RelationDataSetId": relationItem.RelationDataSetId,
+					"DisplayField": relationItem.DisplayField,
+				}
+			}
 		}
 	})
 }
 
-// TODO,byTest,
 func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[string]interface{}, data map[string]interface{}) (RelationItem, bool) {
 	fieldValue := fmt.Sprint(data[fieldGroup.Id])
 	if fieldValue != "" {
@@ -400,7 +388,8 @@ func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[st
 					dataJson := string(dataJsonData)
 					content = expressionParser.ParseModel(boJson, dataJson, item.RelationExpr.Content)
 				} else if item.RelationExpr.Mode == "golang" {
-					content = item.RelationExpr.Content// TODO
+					exprContent := item.RelationExpr.Content
+					content = expressionParser.ParseGolang(bo, data, exprContent)
 				}
 				if strings.ToLower(content) == "true" {
 					return item, true
@@ -412,11 +401,9 @@ func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[st
 	return RelationItem{}, false
 }
 
-// TODO,byTest,
 func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[string]interface{}, srcBo map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	//o.IterateDataBo(dataSource, bo, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
 	modelIterator.IterateDataBo(dataSource, &srcBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
 		if !fieldGroupLi[0].IsMasterField() {
 			if (*destBo)[fieldGroupLi[0].GetDataSetId()] == nil {
@@ -424,23 +411,21 @@ func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[strin
 			}
 			dataSetLi := (*destBo)[fieldGroupLi[0].GetDataSetId()].([]interface{})
 			copyData := map[string]interface{}{}
-			for _, item := range fieldGroupLi {
-				content := ""
-				o.applyFieldGroupValueByString(item, &copyData, content)
-			}
 			dataSetLi = append(dataSetLi, copyData)
 			(*destBo)[fieldGroupLi[0].GetDataSetId()] = dataSetLi
 		}
 	})
+	o.applyDefaultValueExpr(&dataSource, destBo)
 	result = ""
 	modelIterator.IterateAllFieldTwoBo(&dataSource, destBo, srcBo, &result, func(fieldGroup *FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {
 		if fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true" {
-			(*destData)[fieldGroup.Id] = srcData[fieldGroup.Id]
+			if srcData[fieldGroup.Id] != nil {
+				(*destData)[fieldGroup.Id] = srcData[fieldGroup.Id]
+			}
 		}
 	})
 }
 
-// TODO,byTest,
 func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destData map[string]interface{}, srcData map[string]interface{}) bool {
 	for _, item := range fieldGroupLi {
 		if destData[item.Id] != srcData[item.Id] {
@@ -450,12 +435,14 @@ func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destDat
 	return false
 } 
 
-// TODO,byTest,
 func (o ModelTemplateFactory) ConvertDataType(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
-		content := fmt.Sprint((*data)[fieldGroup.Id])
+		content := ""
+		if (*data)[fieldGroup.Id] != nil {
+			content = fmt.Sprint((*data)[fieldGroup.Id])
+		}
 		o.applyFieldGroupValueByString(fieldGroup, data, content)
 	})
 }

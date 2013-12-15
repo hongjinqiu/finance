@@ -5,6 +5,9 @@ import (
 	"github.com/sbinet/go-python"
 	"strings"
 	"sync"
+	"com/papersns/model/script"
+	"reflect"
+	"fmt"
 )
 
 var rwlock sync.RWMutex = sync.RWMutex{}
@@ -80,6 +83,18 @@ func exitEnv() {
 
 type ExpressionParser struct{}
 
+func (o ExpressionParser) ParseGolang(bo map[string]interface{}, data map[string]interface{}, expression string) string {
+	exprContent := expression
+	scriptStruct := strings.Split(exprContent, ".")[0]
+	scriptStructMethod := strings.Split(exprContent, ".")[1]
+	scriptType := script.GetScriptDict()[scriptStruct]
+	inst := reflect.New(scriptType).Elem().Interface()
+	instValue := reflect.ValueOf(inst)
+	in := []reflect.Value{reflect.ValueOf(bo), reflect.ValueOf(data)}
+	callValues := instValue.MethodByName(scriptStructMethod).Call(in)
+	return fmt.Sprint(callValues[0])
+}
+
 func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	if recordJson == "" || expression == "" {
 		return true
@@ -111,7 +126,7 @@ func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string
 
 //func (o ExpressionParser) parseExpression(methodName, recordJson, expression string) string {
 func (o ExpressionParser) parseExpression(methodName string, param []string) string {
-	expression := param[len(param) -1 : len(param)][0]
+	expression := param[len(param)-1 : len(param)][0]
 	if strings.TrimSpace(expression) == "" {
 		return ""
 	}
@@ -135,12 +150,12 @@ func (o ExpressionParser) parseExpression(methodName string, param []string) str
 		panic("get function return null")
 	}
 
-	strargs := python.PyTuple_New(len(param) - 1)
+	strargs := python.PyTuple_New(len(param))
 	if strargs == nil {
 		panic("build argument return null")
 	}
 
-	for i := 0; i < len(param)-1; i++ {
+	for i := 0; i < len(param); i++ {
 		args := python.PyString_FromString(strings.TrimSpace(param[i]))
 		python.PyTuple_SET_ITEM(strargs, i, args)
 	}

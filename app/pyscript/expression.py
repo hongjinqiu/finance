@@ -15,8 +15,8 @@ def parseString(jsonString, action):
     return str(eval(action))
     
 def parseModel(bo, data, action):
-	bo = json.loads(bo)
-	data = json.loads(data)
+    bo = json.loads(bo)
+    data = json.loads(data)
     return str(eval(action))
 
 #trueOrFalse "\"{\\\"name\\\": \\\"test\\\"}\"" "\"record[\\\"name\\\"] == \\\"test\\\"\""

@@ -25,17 +25,14 @@
 			<button-attribute name="code" value="U" />
 			<button-attribute name="functionId" value="10018" />
 		</button>
-		
+
 		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
 		</button>
 	</toolbar>
 
 	<security functionId="10018"></security>
 
-	<!-- 
-	<before-build-query>SysUser.beforeBuildQuery</before-build-query>
-	<after-build-query>SysUser.afterBuildQuery</after-build-query>
-	 -->
+	<!-- <before-build-query>SysUser.beforeBuildQuery</before-build-query> <after-build-query>SysUser.afterBuildQuery</after-build-query> -->
 	<after-query-data>SysUser.afterQueryData</after-query-data>
 
 	<data-provider size="10">
@@ -46,9 +43,7 @@
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
 	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<!-- 
-			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression>
-			 -->
+			<!-- <expression>"31" == str(record.get("AUDIT_STATUS"))</expression> -->
 			<expression>1 == 1</expression>
 			<!-- python language -->
 		</checkbox-column>
@@ -61,12 +56,12 @@
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={id}" >
+				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={id}">
 					<expression>1 == 1</expression>
 				</button>
 			</buttons>
 		</virtual-column>
-		
+
 		<auto-column name="id" />
 		<string-column name="id" auto="true" />
 		<string-column name="nick" auto="true" />

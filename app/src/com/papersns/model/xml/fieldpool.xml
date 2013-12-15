@@ -38,7 +38,7 @@
 		<fieldDataType>INT</fieldDataType>
 		<fieldInList>false</fieldInList>
 		<listWhereField>false</listWhereField>
-		<allowCopy>false</allowCopy>
+		<allowCopy>true</allowCopy>
 	</field>
 		
 	<field id="FOREIGN_KEY" extends="ROOT_FIELD">
@@ -262,6 +262,13 @@
 		<!-- <fieldName>intField</fieldName> -->
 		<displayName>INT字段</displayName>
 		<fieldDataType>INT</fieldDataType>
+		<fieldNumberType>UNDEFINE</fieldNumberType>
+	</field>
+	
+	<field id="FLOAT_FIELD" extends="ROOT_FIELD">
+		<!-- <fieldName>intField</fieldName> -->
+		<displayName>FLOAT字段</displayName>
+		<fieldDataType>FLOAT</fieldDataType>
 		<fieldNumberType>UNDEFINE</fieldNumberType>
 	</field>	
 	

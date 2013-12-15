@@ -49,12 +49,12 @@ type DetailData struct {
 }
 
 type FixField struct {
-	XMLName    xml.Name   `xml:"fixField"`
-	PrimaryKey PrimaryKey `xml:"primaryKey"`
-	CreateBy   CreateBy   `xml:"createBy"`
-	CreateTime CreateTime `xml:"createTime"`
-	//	CreateUnit  CreateUnit  `xml:"createUnit"`
-	//	ModifyUnit  ModifyUnit  `xml:"modifyUnit"`
+	XMLName     xml.Name    `xml:"fixField"`
+	PrimaryKey  PrimaryKey  `xml:"primaryKey"`
+	CreateBy    CreateBy    `xml:"createBy"`
+	CreateTime  CreateTime  `xml:"createTime"`
+	CreateUnit  CreateUnit  `xml:"createUnit"`
+	ModifyUnit  ModifyUnit  `xml:"modifyUnit"`
 	ModifyBy    ModifyBy    `xml:"modifyBy"`
 	ModifyTime  ModifyTime  `xml:"modifyTime"`
 	BillStatus  BillStatus  `xml:"billStatus"`
