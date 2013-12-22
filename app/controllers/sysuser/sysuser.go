@@ -20,11 +20,11 @@ type SysUser struct {
 
 func (c SysUser) Schema() revel.Result {
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/controllers/sysuser/SysUserForm.xml")
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {

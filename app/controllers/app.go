@@ -41,10 +41,10 @@ func (c App) Combo() revel.Result {
 	content := ""
 	for k := range c.Params.Query {
 		file, err := os.Open(path.Join(jsPath, k))
+		defer file.Close()
 		if err != nil {
 			panic(err)
 		}
-		defer file.Close()
 		
 		data, err := ioutil.ReadAll(file)
 		if err != nil {
@@ -82,17 +82,33 @@ func (c App) ComboView() revel.Result {
 	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
 	content := ""
 	for k := range c.Params.Query {
-		file, err := os.Open(path.Join(jsPath, k))
-		if err != nil {
-			panic(err)
+		if strings.Index(k, ".js") == -1 || strings.Index(k, ".css") == -1 {
+			panic("fileName is:" + k + ", expect ends with .js or .css")
 		}
-		defer file.Close()
-		
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			panic(err)
+		isFileExist := false
+		for _, filePath := range strings.Split(jsPath, ":") {
+			if _, err := os.Stat(path.Join(filePath, k)); err != nil {
+			    if os.IsNotExist(err) {
+	                continue
+	            }
+		    }
+		    isFileExist = true
+			file, err := os.Open(path.Join(jsPath, k))
+			defer file.Close()
+			if err != nil {
+				panic(err)
+			}
+			
+			data, err := ioutil.ReadAll(file)
+			if err != nil {
+				panic(err)
+			}
+			content += string(data) + "\n"
+			break
 		}
-		content += string(data) + "\n"
+		if !isFileExist {
+			panic(k + " is not exists")
+		}
 	}
 
 	acceptEncoding := c.Request.Header.Get("Accept-Encoding")

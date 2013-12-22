@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>Console</id>
+	<data-source-model-id></data-source-model-id>
+	<adapter name="" />
+	<description>控制台</description>
+	<scripts>console/summary.js</scripts>
+	<view-template view="console/formSchema.html"/>
+	<html>
+		<![CDATA[
+			<ul>
+				<li>组件模型控制台</li>
+				<li>选择器控制台</li>
+				<li>Form模型控制台</li>
+				<li>数据源模型控制台</li>
+			</ul>
+			<div id="componentDiv">
+		]]>
+	</html>
+	<toolbar name="ComponentToolbar">
+		<button text="重构模型" mode="fn" handler="doRefretorComponent" iconCls="test">
+		</button>
+	</toolbar>
+
+	<column-model name="Component">
+		<id-column name="id" text="编号" hideable="true" />
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/listschema.go?@name={id}">
+				</button>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=Component">
+				</button>
+			</buttons>
+		</virtual-column>
+		<script-column name="ID" text="ID" script="record.get('id')" />
+		<string-column name="name" text="名称"></string-column>
+		<string-column name="module" text="模块"></string-column>
+		<string-column name="path" text="路径"></string-column>
+	</column-model>
+	<html>
+		<![CDATA[
+			</div>
+			<div id="selectorDiv">
+		]]>
+	</html>
+	<toolbar name="SelectorToolbar">
+		<button text="重构模型" mode="fn" handler="doRefretorSelector" iconCls="test">
+		</button>
+	</toolbar>
+
+	<column-model name="Selector">
+		<id-column name="id" text="编号" hideable="true" />
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/selectorschema.go?@name={id}">
+				</button>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=Selector">
+				</button>
+			</buttons>
+		</virtual-column>
+		<script-column name="ID" text="ID" script="record.get('id')" />
+		<string-column name="name" text="名称"></string-column>
+		<string-column name="module" text="模块"></string-column>
+		<string-column name="path" text="路径"></string-column>
+	</column-model>
+	<html>
+		<![CDATA[
+			</div>
+			<div id="formDiv">
+		]]>
+	</html>
+	<toolbar name="FormToolbar">
+		<button text="重构模型" mode="fn" handler="doRefretorForm" iconCls="test">
+		</button>
+	</toolbar>
+
+	<column-model name="Form">
+		<id-column name="id" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/formschema.go?@name={id}">
+				</button>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=Form">
+				</button>
+			</buttons>
+		</virtual-column>
+		<script-column name="ID" text="ID" script="record.get('id')" />
+		<string-column name="name" text="名称"></string-column>
+		<string-column name="module" text="模块"></string-column>
+		<string-column name="path" text="路径"></string-column>
+	</column-model>
+	<html>
+		<![CDATA[
+			</div>
+			<div id="dataSourceDiv">
+		]]>
+	</html>
+	<toolbar name="DataSourceToolbar">
+		<button text="重构模型" mode="fn" handler="doRefretorDataSource" iconCls="test">
+		</button>
+	</toolbar>
+
+	<column-model name="DataSource">
+		<id-column name="id" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=DataSource">
+				</button>
+			</buttons>
+		</virtual-column>
+		<script-column name="ID" text="ID" script="record.get('id')" />
+		<string-column name="name" text="名称"></string-column>
+		<string-column name="module" text="模块"></string-column>
+		<string-column name="path" text="路径"></string-column>
+	</column-model>
+	<html>
+		<![CDATA[
+			</div>
+		]]>
+	</html>
+
+</form-template>

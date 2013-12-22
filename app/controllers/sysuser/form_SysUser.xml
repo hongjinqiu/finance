@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
-	<data-source-model-id></data-source-model-id>
-
+	<id>SysUser</id>
+	<data-source-model-id>SysUser</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>用户表单</description>
+	<scripts>console/summary.js</scripts>
+	<view-template view="console/formSchema.html"/>
 	<html>
 		<![CDATA[
 			<script type="text/javascript">console.log("hello world")</script>
@@ -14,7 +18,7 @@
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
-		<button text="新增" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+		<button text="新增" mode="fn" handler="test" iconCls="">
 			<button-attribute name="code" value="D" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -70,10 +74,13 @@
 				<editor_attribute name="aaa" value="cccc" />
 			</editor>
 		</html>
+		<select-column auto="true" name="" displayField="" valueField="" selectorName="" selectionMode="single" queryFunc="">
+			<listeners change="" selection="" unSelection="" />
+		</select-column>
 	</column-model>
 
 
-	<column-model name="detailDataSet" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
+	<column-model name="B" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
 		<auto-column name="ttt" />
 		<auto-column name="eee dddd">
 			<editor>

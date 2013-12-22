@@ -7,7 +7,7 @@ import (
 
 type ListTemplate struct {
 	XMLName             xml.Name            `xml:"list-template"`
-	ListId              string              `xml:"list-id"`
+	Id                  string              `xml:"id"`
 	SelectorId          string              `xml:"selector-id"`
 	DataSourceModelId   string              `xml:"data-source-model-id"`
 	Adapter             Adapter             `xml:"adapter"`
@@ -25,9 +25,14 @@ type ListTemplate struct {
 }
 
 type FormTemplate struct {
-	XMLName           xml.Name   `xml:"form-template"`
-	DataSourceModelId string     `xml:"data-source-model-id"`
-	FormElemLi        []FormElem `xml:",any"`
+	XMLName           xml.Name     `xml:"form-template"`
+	Id                string       `xml:"id"`
+	DataSourceModelId string       `xml:"data-source-model-id"`
+	Adapter           Adapter      `xml:"adapter"`
+	Description       string       `xml:"description"`
+	Scripts           string       `xml:"scripts"`
+	ViewTemplate      ViewTemplate `xml:"view-template"`
+	FormElemLi        []FormElem   `xml:",any"`
 }
 
 type FormElem struct {
@@ -37,7 +42,7 @@ type FormElem struct {
 	Toolbar     Toolbar     `xml:"-"`
 	ColumnModel ColumnModel `xml:"-"`
 
-	ColumnModelAttributeGroup
+	//	ColumnModelAttributeGroup
 }
 
 type Adapter struct {
@@ -46,8 +51,10 @@ type Adapter struct {
 }
 
 type ViewTemplate struct {
-	XMLName xml.Name `xml:"view-template"`
-	View    string   `xml:"view,attr"`
+	XMLName         xml.Name `xml:"view-template"`
+	View            string   `xml:"view,attr"`
+	SelectorView    string   `xml:"selectorView,attr"`
+	SelectorScripts string   `xml:"selectorScripts,attr"`
 }
 
 type Html struct {
@@ -60,6 +67,7 @@ type Toolbar struct {
 	ButtonGroup ButtonGroup `xml:"button-group"`
 	ButtonLi    []Button    `xml:",any"`
 
+	Name           string `xml:"name,attr"`
 	Export         string `xml:"export,attr"`
 	Exporter       string `xml:"exporter,attr"`
 	ExportParam    string `xml:"exportParam,attr"`
@@ -146,6 +154,8 @@ type ColumnModelAttributeGroup struct {
 	RecordIntercept       string `xml:"recordIntercept,attr"`
 	SelectionTemplate     string `xml:"selectionTemplate,attr"`
 	SelectionTitle        string `xml:"selectionTitle,attr"`
+	DisplayMode           string `xml:"displayMode,attr"`
+	DataSetId             string `xml:"dataSetId,attr"`
 }
 
 type ColumnAttributeGroup struct {
@@ -248,6 +258,7 @@ type QueryParameterGroup struct {
 
 	FormColumns      string `xml:"formColumns,attr"`
 	EnableEnterParam string `xml:"enableEnterParam,attr"`
+	DataSetId        string `xml:"dataSetId,attr"`
 }
 
 type FixedParameter struct {

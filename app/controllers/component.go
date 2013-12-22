@@ -15,6 +15,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	. "com/papersns/script"
 )
 
 func init() {
@@ -65,11 +66,11 @@ type Component struct {
 
 func (c Component) Schema() revel.Result {
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/查询示例.xml")
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -100,11 +101,11 @@ func (c Component) Schema() revel.Result {
 
 func (c Component) ListTemplate() revel.Result {
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml")
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -123,7 +124,7 @@ func (c Component) ListTemplate() revel.Result {
 	templateManager := TemplateManager{}
 	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
 	templateManager.ApplyTreeForQueryParameter(&listTemplate)
-	toolbarBo := templateManager.GetToolbarForListTemplate(&listTemplate)
+	toolbarBo := templateManager.GetToolbarForListTemplate(listTemplate)
 	paramMap := map[string]string{}
 	for k, v := range c.Params.Form {
 		value := strings.Join(v, ",")
@@ -135,7 +136,7 @@ func (c Component) ListTemplate() revel.Result {
 	pageSize := 10
 	if listTemplate.DataProvider.Size != "" {
 		pageSizeInt, err := strconv.Atoi(listTemplate.DataProvider.Size)
-		if err !=  nil {
+		if err != nil {
 			panic(err)
 		}
 		pageSize = pageSizeInt
@@ -187,11 +188,11 @@ func (c Component) ListTemplate() revel.Result {
 		showParameterLi := templateManager.GetShowParameterLiForListTemplate(&listTemplate)
 		hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(&listTemplate)
 		result := map[string]interface{}{
-			"pageSize": pageSize,
-			"listTemplate": listTemplate,
-			"toolbarBo":    toolbarBo,
-			"showParameterLi":    showParameterLi,
-			"hiddenParameterLi":    hiddenParameterLi,
+			"pageSize":          pageSize,
+			"listTemplate":      listTemplate,
+			"toolbarBo":         toolbarBo,
+			"showParameterLi":   showParameterLi,
+			"hiddenParameterLi": hiddenParameterLi,
 			//		"dataBo":       dataBo,
 			//		"columns":       columns,
 			"dataBoJson":       template.JS(string(dataBoByte)),
@@ -201,8 +202,6 @@ func (c Component) ListTemplate() revel.Result {
 		return c.Render(result)
 	}
 }
-
-
 
 func (c Component) MapReduce() revel.Result {
 	qb := QuerySupport{}
@@ -295,11 +294,11 @@ func (c Component) IndexTest() revel.Result {
 
 func (c Component) SchemaTest() revel.Result {
 	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -336,11 +335,11 @@ func (c Component) SchemaTest() revel.Result {
 
 func (c Component) SchemaQueryParameterTest() revel.Result {
 	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -387,11 +386,11 @@ func (c Component) SchemaQueryParameterTest() revel.Result {
 
 func (c Component) GetColumnModelDataForListTemplate() revel.Result {
 	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -416,7 +415,7 @@ func (c Component) GetColumnModelDataForListTemplate() revel.Result {
 		queryResult["items"] = items[:1]
 	}
 
-	columnResult := templateManager.GetColumnModelDataForListTemplate(&listTemplate, items[:1])
+	columnResult := templateManager.GetColumnModelDataForListTemplate(listTemplate, items[:1])
 	jsonByte, err := json.MarshalIndent(columnResult, "", "\t")
 	if err != nil {
 		panic(err)
@@ -429,11 +428,11 @@ func (c Component) GetColumnModelDataForListTemplate() revel.Result {
 
 func (c Component) GetToolbarForListTemplate() revel.Result {
 	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return c.Render(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -449,7 +448,7 @@ func (c Component) GetToolbarForListTemplate() revel.Result {
 	}
 
 	templateManager := TemplateManager{}
-	queryResult := templateManager.GetToolbarForListTemplate(&listTemplate)
+	queryResult := templateManager.GetToolbarForListTemplate(listTemplate)
 
 	jsonByte, err := json.MarshalIndent(queryResult, "", "\t")
 	if err != nil {

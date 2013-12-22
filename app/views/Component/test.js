@@ -3,7 +3,7 @@ var listTemplate = {
 		"Space" : "http://www.papersns.com/template",
 		"Local" : "list-template"
 	},
-	"ListId" : "SysUser",
+	"Id" : "SysUser",
 	"SelectorId" : "SysUserSelector",
 	"Adapter" : {
 		"XMLName" : {

@@ -18,10 +18,10 @@ type Model struct {
 
 func (m Model) FieldTest() revel.Result {
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/model/xml/fieldpool.xml")
+	defer file.Close()
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -40,10 +40,10 @@ func (m Model) FieldTest() revel.Result {
 
 func (m Model) DataSourceTest() revel.Result {
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/model/demo/datasource/pc_ds_billtype.xml")
+	defer file.Close()
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {

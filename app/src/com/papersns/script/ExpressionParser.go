@@ -1,44 +1,42 @@
-package component
+package script
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/sbinet/go-python"
 	"strings"
 	"sync"
-	"com/papersns/model/script"
-	"reflect"
-	"fmt"
 )
 
-var rwlock sync.RWMutex = sync.RWMutex{}
+var pyrwlock sync.RWMutex = sync.RWMutex{}
 var flag bool = false
 var expressionMod *python.PyObject = nil
 var componentMod *python.PyObject = nil
 
 func getExpressionMod() *python.PyObject {
-	rwlock.RLock()
-	defer rwlock.RUnlock()
+	pyrwlock.RLock()
+	defer pyrwlock.RUnlock()
 
 	return expressionMod
 }
 
 func getComponentMod() *python.PyObject {
-	rwlock.RLock()
-	defer rwlock.RUnlock()
+	pyrwlock.RLock()
+	defer pyrwlock.RUnlock()
 
 	return componentMod
 }
 
 func isEnvInit() bool {
-	rwlock.RLock()
-	defer rwlock.RUnlock()
+	pyrwlock.RLock()
+	defer pyrwlock.RUnlock()
 
 	return flag
 }
 
 func InitPythonEnv() {
-	rwlock.Lock()
-	defer rwlock.Unlock()
+	pyrwlock.Lock()
+	defer pyrwlock.Unlock()
 
 	if flag {
 		return
@@ -84,15 +82,11 @@ func exitEnv() {
 type ExpressionParser struct{}
 
 func (o ExpressionParser) ParseGolang(bo map[string]interface{}, data map[string]interface{}, expression string) string {
-	exprContent := expression
-	scriptStruct := strings.Split(exprContent, ".")[0]
-	scriptStructMethod := strings.Split(exprContent, ".")[1]
-	scriptType := script.GetScriptDict()[scriptStruct]
-	inst := reflect.New(scriptType).Elem().Interface()
-	instValue := reflect.ValueOf(inst)
-	in := []reflect.Value{reflect.ValueOf(bo), reflect.ValueOf(data)}
-	callValues := instValue.MethodByName(scriptStructMethod).Call(in)
-	return fmt.Sprint(callValues[0])
+	scriptManager := ScriptManager{}
+	//Parse(classMethod string, param []interface{}) []interface{} {
+	paramLi := []interface{}{bo, data}
+	values := scriptManager.Parse(expression, paramLi)
+	return fmt.Sprint(values[0])
 }
 
 func (o ExpressionParser) Parse(recordJson, expression string) bool {

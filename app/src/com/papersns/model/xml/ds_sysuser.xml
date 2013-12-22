@@ -39,8 +39,8 @@
 				<fieldLength>20</fieldLength>
 				<!-- <defaultValueExpr mode="text">ccccc</defaultValueExpr> -->
 				<!-- <defaultValueExpr mode="python">str(bo['A']['attachCount']) + '_abcdefg'</defaultValueExpr> -->
-				<!-- <defaultValueExpr mode="golang">SysUserScript.GetIntTest</defaultValueExpr> -->
-				<calcValueExpr mode="golang">SysUserScript.GetIntTest</calcValueExpr>
+				<!-- <defaultValueExpr mode="golang">SysUserInterceptor.GetIntTest</defaultValueExpr> -->
+				<calcValueExpr mode="golang">SysUserInterceptor.GetIntTest</calcValueExpr>
 			</field>
 			<field id="nick" extends="NAME_FIELD">
 				<displayName>昵称</displayName>

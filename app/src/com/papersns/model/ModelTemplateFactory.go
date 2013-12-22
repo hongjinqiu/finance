@@ -1,67 +1,192 @@
 package model
 
+import "github.com/robfig/revel"
+
 import (
-	"encoding/xml"
 	"encoding/json"
+	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"reflect"
-	"strings"
-	. "com/papersns/component"
-	"fmt"
 	"strconv"
+	"strings"
+	"sync"
+	. "com/papersns/script"
 )
+
+var rwlock sync.RWMutex = sync.RWMutex{}
+var gDataSourceDict map[string]DataSourceInfo = map[string]DataSourceInfo{}
+
+type DataSourceInfo struct {
+	Path       string
+	DataSource DataSource
+}
 
 type ModelTemplateFactory struct {
 }
 
-func (o ModelTemplateFactory) GetDataSource(dataSourceModelId string) DataSource {
-	dataSource, _ := o.getInstance(dataSourceModelId)
-	return dataSource
-}
-
-func (o ModelTemplateFactory) GetInstanceByDS(dataSource DataSource) map[string]interface{} {
-	_, bo := o.getInstance(dataSource.Id)
-	return bo
-}
-
-func (o ModelTemplateFactory) GetInstance(dataSourceModelId string) (DataSource, map[string]interface{}) {
-	return o.getInstance(dataSourceModelId)
-}
-
-func (o ModelTemplateFactory) getInstance(dataSourceModelId string) (DataSource, map[string]interface{}) {
-	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/model/xml/pc_ds_sysuser.xml")
-	if err != nil {
-		panic(err)
+// TODO, byTest
+func (o ModelTemplateFactory) GetDataSourceInfo() []DataSourceInfo {
+	dataSourceInfo := []DataSourceInfo{}
+	for _, item := range gDataSourceDict {
+		dataSourceInfo = append(dataSourceInfo, item)
 	}
+	return dataSourceInfo
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) RefretorDataSourceInfo() []DataSourceInfo {
+	o.clearDataSource()
+	o.loadDataSource()
+	dataSourceInfo := []DataSourceInfo{}
+	for _, item := range gDataSourceDict {
+		dataSourceInfo = append(dataSourceInfo, item)
+	}
+	return dataSourceInfo
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) GetDataSource(id string) DataSource {
+	if revel.Config.StringDefault("mode.dev", "true") == "true" {
+		dataSourceInfo, found := o.findDataSource(id)
+		if found {
+			dataSourceInfo, err := o.loadSingleDataSourceWithLock(dataSourceInfo.Path)
+			if err != nil {
+				panic(err)
+			}
+			if dataSourceInfo.DataSource.Id == id {
+				return dataSourceInfo.DataSource
+			}
+		}
+		o.clearDataSource()
+		o.loadDataSource()
+		dataSourceInfo, found = o.findDataSource(id)
+		if found {
+			return dataSourceInfo.DataSource
+		}
+		panic(id + " not exists in DataSource list")
+	}
+
+	if len(gDataSourceDict) == 0 {
+		o.loadDataSource()
+	}
+	dataSourceInfo, found := o.findDataSource(id)
+	if found {
+		return dataSourceInfo.DataSource
+	}
+	panic(id + " not exists in DataSource list")
+}
+
+// TODO bytest,
+func (o ModelTemplateFactory) findDataSource(id string) (DataSourceInfo, bool) {
+	rwlock.RLock()
+	defer rwlock.RUnlock()
+
+	for _, item := range gDataSourceDict {
+		if item.DataSource.Id == id {
+			return item, true
+		}
+	}
+	return DataSourceInfo{}, false
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) clearDataSource() {
+	rwlock.Lock()
+	defer rwlock.Unlock()
+
+	gDataSourceDict = map[string]DataSourceInfo{}
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) loadDataSource() {
+	rwlock.Lock()
+	defer rwlock.Unlock()
+
+	path := revel.Config.StringDefault("DATA_SOURCE_PATH", "")
+	if path != "" {
+		filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if strings.Index(path, "ds_") > -1 && strings.Index(path, ".xml") > -1 && !info.IsDir() {
+				_, err = o.loadSingleDataSource(path)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		})
+	}
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) loadSingleDataSourceWithLock(path string) (DataSourceInfo, error) {
+	rwlock.Lock()
+	defer rwlock.Unlock()
+
+	return o.loadSingleDataSource(path)
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) loadSingleDataSource(path string) (DataSourceInfo, error) {
+	file, err := os.Open(path)
 	defer file.Close()
+	if err != nil {
+		return DataSourceInfo{}, err
+	}
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		panic(err)
+		return DataSourceInfo{}, err
 	}
 
 	dataSource := DataSource{}
 	err = xml.Unmarshal(data, &dataSource)
 	if err != nil {
-		panic(err)
+		return DataSourceInfo{}, err
 	}
 
 	o.applyFieldExtend(&dataSource)
 	o.applyReverseRelation(&dataSource)
+
+	dataSourceInfo := DataSourceInfo{
+		Path:       path,
+		DataSource: dataSource,
+	}
+	gDataSourceDict[dataSource.Id] = dataSourceInfo
+	return dataSourceInfo, nil
+}
+
+func (o ModelTemplateFactory) GetInstanceByDS(dataSource DataSource) map[string]interface{} {
 	bo := o.getBo(dataSource)
-	o.applyDefaultValueExpr(&dataSource, &bo)
-	o.applyCalcValueExpr(&dataSource, &bo)
-	o.applyRelationFieldValue(&dataSource, &bo)
+	o.applyDefaultValueExpr(dataSource, &bo)
+	o.applyCalcValueExpr(dataSource, &bo)
+	o.applyRelationFieldValue(dataSource, &bo)
+
+	return bo
+}
+
+func (o ModelTemplateFactory) GetInstance(dataSourceModelId string) (DataSource, map[string]interface{}) {
+	dataSource := o.GetDataSource(dataSourceModelId)
+
+	bo := o.getBo(dataSource)
+	o.applyDefaultValueExpr(dataSource, &bo)
+	o.applyCalcValueExpr(dataSource, &bo)
+	o.applyRelationFieldValue(dataSource, &bo)
 
 	return dataSource, bo
 }
 
 func (o ModelTemplateFactory) GetCopyInstance(dataSourceModelId string, srcBo map[string]interface{}) (DataSource, map[string]interface{}) {
-	dataSource, bo := o.getInstance(dataSourceModelId)
+	dataSource, bo := o.GetInstance(dataSourceModelId)
 	o.applyCopy(dataSource, &bo, srcBo)
-	o.applyCalcValueExpr(&dataSource, &bo)
-	o.applyRelationFieldValue(&dataSource, &bo)
+	o.applyCalcValueExpr(dataSource, &bo)
+	o.applyRelationFieldValue(dataSource, &bo)
 	return dataSource, bo
 }
 
@@ -182,10 +307,10 @@ func (o ModelTemplateFactory) extendFieldPoolField(fieldGroup *FieldGroup, field
 
 func (o ModelTemplateFactory) getPoolFields() Fields {
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/model/xml/fieldpool.xml")
+	defer file.Close()
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -252,7 +377,7 @@ func (o ModelTemplateFactory) getBo(dataSource DataSource) map[string]interface{
 	return bo
 }
 
-func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource, bo *map[string]interface{}) {
+func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	expressionParser := ExpressionParser{}
@@ -261,7 +386,7 @@ func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource, bo *
 		panic(err)
 	}
 	boJson := string(boJsonData)
-	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
 		var content string = ""
 		if fieldGroup.DefaultValueExpr.Content != "" {
 			if fieldGroup.DefaultValueExpr.Mode == "" || fieldGroup.DefaultValueExpr.Mode == "text" {
@@ -282,7 +407,7 @@ func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource *DataSource, bo *
 	})
 }
 
-func (o ModelTemplateFactory) applyCalcValueExpr(dataSource *DataSource, bo *map[string]interface{}) {
+func (o ModelTemplateFactory) applyCalcValueExpr(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	expressionParser := ExpressionParser{}
@@ -291,7 +416,7 @@ func (o ModelTemplateFactory) applyCalcValueExpr(dataSource *DataSource, bo *map
 		panic(err)
 	}
 	boJson := string(boJsonData)
-	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
 		var content string = ""
 		if fieldGroup.CalcValueExpr.Content != "" {
 			if fieldGroup.CalcValueExpr.Mode == "" || fieldGroup.CalcValueExpr.Mode == "text" {
@@ -331,35 +456,35 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 	for i, _ := range dataSource.MasterData.BizField.FieldLi {
 		dataSource.MasterData.BizField.FieldLi[i].Parent = dataSource.MasterData.BizField
 	}
-	
+
 	for i, _ := range dataSource.DetailDataLi {
 		dataSource.DetailDataLi[i].FixField.Parent = dataSource.DetailDataLi[i]
 		dataSource.DetailDataLi[i].BizField.Parent = dataSource.DetailDataLi[i]
-	
+
 		detailFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.DetailDataLi[i].FixField)
 		for j, _ := range *detailFixFieldLi {
 			(*detailFixFieldLi)[j].Parent = dataSource.DetailDataLi[i].FixField
 		}
-		
+
 		for j, _ := range dataSource.DetailDataLi[i].BizField.FieldLi {
 			dataSource.DetailDataLi[i].BizField.FieldLi[j].Parent = dataSource.DetailDataLi[i].BizField
 		}
 	}
 }
 
-func (o ModelTemplateFactory) applyRelationFieldValue(dataSource *DataSource, bo *map[string]interface{}) {
+func (o ModelTemplateFactory) applyRelationFieldValue(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateAllFieldBo(*dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
 		if fieldGroup.IsRelationField() {
 			relationItem, found := o.ParseRelationExpr(fieldGroup, *bo, *data)
 			if found {
-				(*data)[fieldGroup.Id + "_ref"] = map[string]interface{}{
-					"Id": relationItem.Id,
-					"RelationExpr": true,
-					"RelationModelId": relationItem.RelationModelId,
+				(*data)[fieldGroup.Id+"_ref"] = map[string]interface{}{
+					"Id":                relationItem.Id,
+					"RelationExpr":      true,
+					"RelationModelId":   relationItem.RelationModelId,
 					"RelationDataSetId": relationItem.RelationDataSetId,
-					"DisplayField": relationItem.DisplayField,
+					"DisplayField":      relationItem.DisplayField,
 				}
 			}
 		}
@@ -404,7 +529,7 @@ func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[st
 func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[string]interface{}, srcBo map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateDataBo(dataSource, &srcBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateDataBo(dataSource, &srcBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}) {
 		if !fieldGroupLi[0].IsMasterField() {
 			if (*destBo)[fieldGroupLi[0].GetDataSetId()] == nil {
 				(*destBo)[fieldGroupLi[0].GetDataSetId()] = []interface{}{}
@@ -415,7 +540,7 @@ func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[strin
 			(*destBo)[fieldGroupLi[0].GetDataSetId()] = dataSetLi
 		}
 	})
-	o.applyDefaultValueExpr(&dataSource, destBo)
+	o.applyDefaultValueExpr(dataSource, destBo)
 	result = ""
 	modelIterator.IterateAllFieldTwoBo(&dataSource, destBo, srcBo, &result, func(fieldGroup *FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {
 		if fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true" {
@@ -433,12 +558,12 @@ func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destDat
 		}
 	}
 	return false
-} 
+}
 
 func (o ModelTemplateFactory) ConvertDataType(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
 		content := ""
 		if (*data)[fieldGroup.Id] != nil {
 			content = fmt.Sprint((*data)[fieldGroup.Id])

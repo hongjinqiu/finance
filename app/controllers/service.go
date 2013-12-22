@@ -2,14 +2,14 @@ package controllers
 
 //import "github.com/robfig/revel"
 import (
-	"com/papersns/mongo"
-	. "com/papersns/component"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
+	"com/papersns/mongo"
+	. "com/papersns/script"
 	"fmt"
-	"strings"
-	"strconv"
 	"labix.org/v2/mgo"
+	"strconv"
+	"strings"
 )
 
 type FinanceService struct{}
@@ -37,13 +37,13 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 		usedCheck := UsedCheck{}
 		result = ""
 		diffDataRowLi := []DiffDataRow{}
-		modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+		modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}) {
 			diffDataRowLi = append(diffDataRowLi, DiffDataRow{
-				FieldGroupLi:fieldGroupLi,
-				DestBo:bo,
-				DestData:data,
-				SrcData:nil,
-				SrcBo:nil,
+				FieldGroupLi: fieldGroupLi,
+				DestBo:       bo,
+				DestData:     data,
+				SrcData:      nil,
+				SrcBo:        nil,
 			})
 		})
 		for i, _ := range diffDataRowLi {
@@ -55,7 +55,7 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 		if err != nil {
 			panic(err)
 		}
-		
+
 		return &diffDataRowLi
 	}
 	id, err := strconv.Atoi(strId)
@@ -69,10 +69,10 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 	if err != nil {
 		panic(err)
 	}
-	
+
 	modelTemplateFactory.ConvertDataType(dataSource, &srcBo)
 	diffDataRowLi := []DiffDataRow{}
-	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}){
+	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {
 		// 分录+id
 		if destData != nil {
 			dataStrId := fmt.Sprint((*destData)["id"])
@@ -83,11 +83,11 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 			}
 		}
 		diffDataRowLi = append(diffDataRowLi, DiffDataRow{
-			FieldGroupLi:fieldGroupLi,
-			DestBo:bo,
-			DestData:destData,
-			SrcData:srcData,
-			SrcBo:srcBo,
+			FieldGroupLi: fieldGroupLi,
+			DestBo:       bo,
+			DestData:     destData,
+			SrcData:      srcData,
+			SrcBo:        srcBo,
 		})
 	})
 
@@ -146,7 +146,7 @@ func (o FinanceService) validateBO(dataSource DataSource, bo map[string]interfac
 			detailData, _ := fieldGroup.GetDetailData()
 			detailIndex[detailData.Id]++
 			for _, item := range fieldMessageLi {
-				stringLi = append(stringLi, "分录:" + detailData.DisplayName + "序号为" + strconv.Itoa(detailIndex[detailData.Id]) + "的数据," + item)
+				stringLi = append(stringLi, "分录:"+detailData.DisplayName+"序号为"+strconv.Itoa(detailIndex[detailData.Id])+"的数据,"+item)
 			}
 		}
 	})
@@ -161,11 +161,11 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 		if value != nil {
 			strValue := fmt.Sprint(value)
 			if strValue == "" {
-				messageLi = append(messageLi, fieldGroup.DisplayName + "不允许空值")
+				messageLi = append(messageLi, fieldGroup.DisplayName+"不允许空值")
 				return messageLi
 			}
 		} else {
-			messageLi = append(messageLi, fieldGroup.DisplayName + "不允许空值")
+			messageLi = append(messageLi, fieldGroup.DisplayName+"不允许空值")
 			return messageLi
 		}
 	}
@@ -174,7 +174,7 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 		// python and golang validate, TODO miss golang validate
 		expressionParser := ExpressionParser{}
 		if !expressionParser.Validate(fieldValue, fieldGroup.ValidateExpr) {
-			messageLi = append(messageLi, fieldGroup.DisplayName + fieldGroup.ValidateMessage)
+			messageLi = append(messageLi, fieldGroup.DisplayName+fieldGroup.ValidateMessage)
 			return messageLi
 		}
 	}
@@ -197,7 +197,7 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 				panic(err)
 			}
 			if maxValue < fieldValueFloat {
-				messageLi = append(messageLi, fieldGroup.DisplayName + "超出最大值" + fieldGroup.LimitMax)
+				messageLi = append(messageLi, fieldGroup.DisplayName+"超出最大值"+fieldGroup.LimitMax)
 			}
 		} else if fieldGroup.LimitOption == "limitMin" {
 			minValue, err := strconv.ParseFloat(fieldGroup.LimitMin, 64)
@@ -205,7 +205,7 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 				panic(err)
 			}
 			if fieldValueFloat < minValue {
-				messageLi = append(messageLi, fieldGroup.DisplayName + "小于最小值" + fieldGroup.LimitMin)
+				messageLi = append(messageLi, fieldGroup.DisplayName+"小于最小值"+fieldGroup.LimitMin)
 			}
 		} else if fieldGroup.LimitOption == "limitRange" {
 			minValue, err := strconv.ParseFloat(fieldGroup.LimitMin, 64)
@@ -217,7 +217,7 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 				panic(err)
 			}
 			if fieldValueFloat < minValue || maxValue < fieldValueFloat {
-				messageLi = append(messageLi, fieldGroup.DisplayName + "超出范围(" + fieldGroup.LimitMin + "~" + fieldGroup.LimitMax + ")")
+				messageLi = append(messageLi, fieldGroup.DisplayName+"超出范围("+fieldGroup.LimitMin+"~"+fieldGroup.LimitMax+")")
 			}
 		}
 	} else {
@@ -231,7 +231,7 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 				panic(err)
 			}
 			if len(fieldValue) > limit {
-				messageLi = append(messageLi, fieldGroup.DisplayName + "长度超出最大值" + fieldGroup.FieldLength)
+				messageLi = append(messageLi, fieldGroup.DisplayName+"长度超出最大值"+fieldGroup.FieldLength)
 			}
 		}
 	}

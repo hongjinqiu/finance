@@ -179,6 +179,7 @@ type RelationItem struct {
 	RelationModelId   string       `xml:"relationModelId"`
 	RelationDataSetId string       `xml:"relationDataSetId"`
 	DisplayField      string       `xml:"displayField"`
+	ValueField        string       `xml:"valueField"`
 	Parent            interface{}  `xml:"-"`
 }
 

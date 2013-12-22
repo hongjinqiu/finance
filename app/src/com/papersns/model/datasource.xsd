@@ -517,6 +517,7 @@
 									<element name="relationModelId" type="string" default="" />
 									<element name="relationDataSetId" type="string" default="" />
 									<element name="displayField" type="string" default="" />
+									<element name="valueField" type="string" default="" />
 								</sequence>
 							</complexType>
 						</element>

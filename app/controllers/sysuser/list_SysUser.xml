@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
-	<list-id>SysUser</list-id>
+	<id>SysUser</id>
 	<selector-id>SysUserSelector</selector-id>
-	<data-source-model-id></data-source-model-id>
+	<data-source-model-id>SysUser</data-source-model-id>
 
-	<adapter name="com/papersns/component/adapter/ModelTemplateAdapter" />
-	<description>员工外出申请</description>
-	<scripts>/hr/archives/empsalarycheck/empsalarychecklist.js</scripts>
-	<view-template view="component/template.ui.ftl" />
+	<adapter name="ModelListTemplateAdapter" />
+	<description>用户列表</description>
+	<scripts></scripts>
+	<view-template view="console/listSchema.html" selectorView="console/selectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
 		<button text="新增" mode="fn" handler="doSave" iconCls="test">
@@ -41,7 +41,7 @@
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
-	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id">
+	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<!-- <expression>"31" == str(record.get("AUDIT_STATUS"))</expression> -->
 			<expression>1 == 1</expression>
@@ -80,7 +80,7 @@
 		</select-column>
 	</column-model>
 
-	<query-parameters>
+	<query-parameters dataSetId="A">
 		<query-parameter name="nick" auto="true" text=""></query-parameter>
 		<query-parameter name="dept_id" auto="true" text=""></query-parameter>
 		<query-parameter name="type" auto="true" text=""></query-parameter>

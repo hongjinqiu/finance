@@ -79,7 +79,12 @@
 		</annotation>
 		<complexType>
 			<sequence>
+				<element ref="tns:id" minOccurs="0" />
 				<element ref="tns:data-source-model-id" minOccurs="0" />
+				<element ref="tns:adapter" minOccurs="0" />
+				<element ref="tns:description" minOccurs="0" />
+				<element ref="tns:scripts" minOccurs="0" />
+				<element ref="tns:view-template" minOccurs="0" />
 				<choice minOccurs="1" maxOccurs="unbounded">
 					<element ref="tns:toolbar" minOccurs="0" />
 					<element ref="tns:column-model" maxOccurs="unbounded" />
@@ -94,7 +99,7 @@
 		</annotation>
 		<complexType>
 			<sequence>
-				<element ref="tns:list-id" minOccurs="0" />
+				<element ref="tns:id" minOccurs="0" />
 				<element ref="tns:selector-id" minOccurs="0" />
 				<element ref="tns:data-source-model-id" minOccurs="0" />
 				<element ref="tns:adapter" minOccurs="0" />
@@ -115,9 +120,9 @@
 		</complexType>
 	</element>
 
-	<element name="list-id">
+	<element name="id">
 		<annotation>
-			<documentation>清单ID</documentation>
+			<documentation>ID</documentation>
 		</annotation>
 	</element>
 
@@ -161,6 +166,16 @@
 					<documentation>模版视图</documentation>
 				</annotation>
 			</attribute>
+			<attribute name="selectorView" use="optional">
+				<annotation>
+					<documentation>选择器视图</documentation>
+				</annotation>
+			</attribute>
+			<attribute name="selectorScripts" use="optional">
+				<annotation>
+					<documentation>选择器脚本</documentation>
+				</annotation>
+			</attribute>
 		</complexType>
 	</element>
 
@@ -199,6 +214,7 @@
 				<element ref="tns:button" maxOccurs="unbounded" />
 				<element ref="tns:split-button" />
 			</choice>
+			<attribute name="name"></attribute>
 			<attribute name="export" default="true" type="boolean"></attribute>
 			<attribute name="exporter"></attribute>
 			<attribute name="exportParam" default="false" type="boolean"></attribute>
@@ -864,6 +880,15 @@
 		<attribute name="recordIntercept"></attribute>
 		<attribute name="selectionTemplate"></attribute>
 		<attribute name="selectionTitle"></attribute>
+		<attribute name="displayMode" default="list">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="form" />
+					<enumeration value="list" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="dataSetId"></attribute>
 	</attributeGroup>
 
 	<element name="query-parameters">
@@ -913,6 +938,7 @@
 			</choice>
 			<attribute name="formColumns" type="int" default="4"></attribute>
 			<attribute name="enableEnterParam" type="boolean"></attribute>
+			<attribute name="dataSetId"></attribute>
 		</complexType>
 	</element>
 
