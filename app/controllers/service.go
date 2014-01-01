@@ -110,7 +110,7 @@ func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, field
 	if fieldGroup.Id == "id" {
 		if fieldGroup.IsMasterField() {
 			masterSeqName := GetMasterSequenceName((dataSource))
-			masterSeqId := GetSequenceNo(db, masterSeqName)
+			masterSeqId := mongo.GetSequenceNo(db, masterSeqName)
 			(*data)["_id"] = masterSeqId
 			(*data)["id"] = masterSeqId
 			(*bo)["_id"] = masterSeqId
@@ -119,7 +119,7 @@ func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, field
 			detailData, found := fieldGroup.GetDetailData()
 			if found {
 				detailSeqName := GetDetailSequenceName((dataSource), detailData)
-				detailSeqId := GetSequenceNo(db, detailSeqName)
+				detailSeqId := mongo.GetSequenceNo(db, detailSeqName)
 				(*data)["_id"] = detailSeqId
 				(*data)["id"] = detailSeqId
 			}

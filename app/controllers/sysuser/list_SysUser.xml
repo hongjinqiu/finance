@@ -42,6 +42,9 @@
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
 	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id" dataSetId="A">
+		<toolbar>
+			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
+		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<!-- <expression>"31" == str(record.get("AUDIT_STATUS"))</expression> -->
 			<expression>1 == 1</expression>

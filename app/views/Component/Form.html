@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>layout test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="/public/js/yui.3.12.0/cssreset/cssreset-min.css" />
+<link rel="stylesheet" type="text/css" href="/public/js/yui.3.12.0/cssfonts/cssfonts-min.css" />
+<link rel="stylesheet" type="text/css" href="/public/js/yui.3.12.0/cssbase/cssbase-min.css" />
+<link rel="stylesheet" type="text/css" href="/public/js/gallery-2013.09.18-18-49/build/gallery-layout/assets/gallery-layout-core.css">
+<style type="text/css">
+.x-form-text {
+	border: 1px solid black;
+	height: 22px;
+	line-height: 17px;
+}
+.x-form-invalid-field {
+	background-color: white;
+	background-image: url(/public/img/invalid_line.gif);
+	background-repeat: repeat-x;
+	background-repeat-x: repeat;
+	background-repeat-y: no-repeat;
+	background-position: bottom;
+	background-position-x: 50%;
+	background-position-y: 100%;
+	border-color: #C30;
+	border-top-color: #C30;
+	border-right-color: #C30;
+	border-bottom-color: #C30;
+	border-left-color: #C30;
+}
+</style>
+<script type="text/javascript">
+	YUI_config = {
+		debug : true,
+		combine : true,
+		comboBase : '/app/combo?',
+		root : 'yui.3.12.0/',
+		gallery: 'gallery-2013.09.18-18-49'
+	};
+</script>
+<script src="/public/js/yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var field;
+	YUI().use("node", "event", "gallery-form", function(Y) {
+		Y.on("domready", function(e) {
+			/* 
+			var myForm = new Y.Form({
+			    method : "post",
+			    action : "/test.php?action=submit",
+			    inlineValidation : true,
+			    children : [
+			        {name : 'input1', type : 'text', label : 'Email Input: ', validator : 'email'},
+			        {name : 'input2', type : 'text', label : 'Phone Number Input: ', validator : 'phone'},
+			        {name : 'choiceinput', type : 'ChoiceField', label : 'Radio Choices: ', choices : [
+			            {label : 'Choice A', value : 'A'},
+			            {label : 'Choice B', value : 'B'},
+			            {label : 'Choice C', value : 'C'}
+			        ]},
+			        {type : 'SubmitButton', value : 'Submit'},
+			        {type : 'ResetButton', value : 'Reset'}
+			    ]
+			});
+			myForm.render('#formContainer');
+			myForm.add({name : 'choiceinput', type : 'ChoiceField', label : 'Radio Choices: ', choices : [
+		           {label : 'Choice A', value : 'A'},
+		          {label : 'Choice B', value : 'B'},
+		          {label : 'Choice C', value : 'C'}
+		      ]});
+			 */
+			field = new Y.TextField({name : 'input1', type : 'text', required: true, validator : 'email'});
+			field.render("#test2");
+			field.get("error");// string
+			field.validateField();// true or false
+			var textElem = Y.one("#testText");
+			textElem.on("mouseover", function(Y){
+				textElem.addClass("x-form-invalid-field");
+			});
+			textElem.on("mouseout", function(Y){
+				textElem.removeClass("x-form-invalid-field");
+			});
+		});
+	});
+</script>
+
+</head>
+<body class="yui3-skin-sam">
+	<div id="test2">test2</div>
+	<input type="text" id="testText" value="text" class="x-form-text" />
+</body>
+</html>

@@ -1,0 +1,9 @@
+Transactions,
+
+id,自增长ID,transactionsId,
+id:递增主键
+state:(begin_commit|prepare|commit|abort|done|cancelled)
+collections:[],这次操作所涉及到的collection
+applications:这个application
+createTime:创建时间,
+updateTime:更新时间,

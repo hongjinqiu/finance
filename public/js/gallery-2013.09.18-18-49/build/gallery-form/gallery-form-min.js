@@ -1,4 +1,1979 @@
-YUI.add("gallery-form",function(a){a.Form=a.Base.create("form",a.Widget,[a.WidgetParent],{toString:function(){return this.name;},CONTENT_TEMPLATE:"<form></form>",_ioIds:null,_validateMethod:function(b){if(!a.Lang.isString(b)){return false;}if(b.toLowerCase()!="get"&&b.toLowerCase()!="post"){return false;}return true;},_parseAction:function(b){var c=b.one("form");if(!c){c=b;}if(c){return c.get("action");}},_parseMethod:function(b){var c=b.one("form");if(!c){c=b;}if(c){return c.get("method");}},_parseFields:function(c){var e=c.all("*"),f=c.all("label"),b=[],d={text:a.TextField,hidden:a.HiddenField,file:a.FileField,checkbox:a.CheckboxField,radio:a.RadioField,reset:a.ResetButton,submit:a.SubmitButton,button:(a.Button||a.FormButton)};e.each(function(j,h,g){var n=j.get("nodeName"),l=j.get("id"),i,k,m=[];if(n=="INPUT"){i=j.get("type");k={type:(d[i]?d[i]:a.TextField),name:j.get("name"),value:j.get("value"),checked:j.get("checked")};if(k.type==d.button){k.label=j.get("value");}}else{if(n=="BUTTON"){k={type:d.button,name:j.get("name"),label:j.get("innerHTML")};}else{if(n=="SELECT"){j.all("option").each(function(p,q,o){m.push({label:p.get("innerHTML"),value:p.get("value")});});k={type:a.SelectField,name:j.get("name"),choices:m};}else{if(n=="TEXTAREA"){k={type:a.TextareaField,name:j.get("name"),value:j.get("innerHTML")};}}}}if(k){if(l){k.id=l;f.some(function(p,q,o){if(p.get("htmlFor")==l){k.label=p.get("innerHTML");}});}b.push(k);}j.remove();});return b;},_syncFormAttributes:function(){var b=this.get("contentBox");b.setAttrs({action:this.get("action"),method:this.get("method")});if(this.get("encodingType")===a.Form.MULTIPART_ENCODED){b.setAttribute("enctype","multipart/form-data");}},_runValidation:function(){var b=true;this.each(function(c){if(c.validateField()===false){b=false;}});return b;},_enableInlineValidation:function(){this.each(function(b){b.set("validateInline",true);});},_disableInlineValidation:function(){this.each(function(b){b.set("validateInline",false);});},_handleIOEvent:function(d,b,c){if(this._ioIds[b]!==undefined){this.fire(d,{response:c});}},reset:function(){var b=a.Node.getDOMNode(this.get("contentBox"));if(a.Lang.isFunction(b.reset)){b.reset();}this.each(function(c){c.resetFieldNode();c.set("error",null);});},submit:function(){if(this.get("skipValidationBeforeSubmit")===true||this._runValidation()){var d=this.get("action"),f=this.get("method"),e=this.get("submitViaIO"),h=this.get("io"),c=this.get("ioConfig")||{},g,b;if(e===true){b=a.merge({method:f,form:{id:this.get("contentBox"),upload:(this.get("encodingType")===a.Form.MULTIPART_ENCODED)}},c);g=h(d,b);this._ioIds[g.id]=g;}else{this.get("contentBox").submit();}}},getField:function(b){var c;if(a.Lang.isNumber(b)){c=this.item(b);}else{if(a.Lang.isString(b)){this.each(function(d){if(d.get("name")==b){c=d;}});}}return c;},toJSON:function(){var b={};this.each(function(c){b[c.get("name")]=(c instanceof a.CheckboxField)?c.get("checked"):c.get("value");});return b;},initializer:function(b){this._ioIds={};this.publish("submit");this.publish("reset");this.publish("start");this.publish("success");this.publish("failure");this.publish("complete");this.publish("xdr");},destructor:function(){},renderUI:function(){},bindUI:function(){this.get("contentBox").on("submit",a.bind(function(b){b.halt();},this));this.after("inlineValidationChange",a.bind(function(b){if(b.newVal===true){this._enableInlineValidation();}else{this._disableInlineValidation();}},this));this.after("success",a.bind(function(b){if(this.get("resetAfterSubmit")===true){this.reset();}},this));a.on("io:start",a.bind(this._handleIOEvent,this,"start"));a.on("io:complete",a.bind(this._handleIOEvent,this,"complete"));a.on("io:xdr",a.bind(this._handleIOEvent,this,"xdr"));a.on("io:success",a.bind(this._handleIOEvent,this,"success"));a.on("io:failure",a.bind(this._handleIOEvent,this,"failure"));this.each(a.bind(function(b){if(b.name=="submit-button"){b.on("click",a.bind(this.submit,this));}else{if(b.name=="reset-button"){b.on("click",a.bind(this.reset,this));}}},this));},syncUI:function(){this._syncFormAttributes();if(this.get("inlineValidation")===true){this._enableInlineValidation();}}},{ATTRS:{defaultChildType:{valueFn:function(){return a.TextField;}},method:{value:"post",validator:function(b){return this._validateMethod(b);},setter:function(b){return b.toLowerCase();}},action:{value:".",validator:a.Lang.isString},fields:{setter:function(b){return this.set("children",b);}},inlineValidation:{value:false,validator:a.Lang.isBoolean},resetAfterSubmit:{value:true,validator:a.Lang.isBoolean},encodingType:{value:1,validator:a.Lang.isNumber},skipValidationBeforeSubmit:{value:false,validator:a.Lang.isBoolean},submitViaIO:{value:true,validator:a.Lang.isBoolean},io:{value:a.io},ioConfig:{}},HTML_PARSER:{action:function(b){return this._parseAction(b);},method:function(b){return this._parseMethod(b);},children:function(b){return this._parseFields(b);}},FORM_TEMPLATE:"<form></form>",URL_ENCODED:1,MULTIPART_ENCODED:2});a.FormField=a.Base.create("form-field",a.Widget,[a.WidgetParent,a.WidgetChild],{toString:function(){return this.name;},FIELD_TEMPLATE:"<input>",FIELD_CLASS:"field",LABEL_TEMPLATE:"<label></label>",LABEL_CLASS:"label",HINT_TEMPLATE:"",HINT_CLASS:"hint",ERROR_TEMPLATE:"<span></span>",ERROR_CLASS:"error",_labelNode:null,_hintNode:null,_fieldNode:null,_errorNode:null,_initialValue:null,_validateError:function(b){if(a.Lang.isString(b)){return true;}if(b===null||typeof b=="undefined"){return true;}return false;},_validateValidator:function(c){if(a.Lang.isString(c)){var b=/^(email|phone|ip|date|time|postal|special)$/;if(b.test(c)===true){return true;}}if(a.Lang.isFunction(c)){return true;}return false;},_setValidator:function(c){var b={email:a.FormField.VALIDATE_EMAIL_ADDRESS,phone:a.FormField.VALIDATE_PHONE_NUMBER,ip:a.FormField.VALIDATE_IP_ADDRESS,date:a.FormField.VALIDATE_DATE,time:a.FormField.VALIDATE_TIME,postal:a.FormField.VALIDATE_POSTAL_CODE,special:a.FormField.VALIDATE_NO_SPECIAL_CHARS};
-return(b[c]?b[c]:c);},_renderNode:function(e,d,c){if(!e){return null;}var b=this.get("contentBox"),g=a.Node.create(e),f=b.one("."+d);g.addClass(d);if(f){f.replace(g);}else{if(c){b.insertBefore(g,c);}else{b.appendChild(g);}}return g;},_renderLabelNode:function(){var b=this.get("contentBox"),c=b.one("label");if(!c||c.get("for")!=this.get("id")){c=this._renderNode(this.LABEL_TEMPLATE,this.LABEL_CLASS);}this._labelNode=c;},_renderHintNode:function(){this._hintNode=this._renderNode(this.HINT_TEMPLATE,this.HINT_CLASS);},_renderFieldNode:function(){var b=this.get("contentBox"),c=b.one("#"+this.get("id"));if(!c){c=this._renderNode(this.FIELD_TEMPLATE,this.FIELD_CLASS);}this._fieldNode=c;},_syncLabelNode:function(){var b=this.get("label"),d=this.get("required"),c=this.get("requiredLabel");if(this._labelNode){this._labelNode.set("text","");if(b){this._labelNode.append("<span class='caption'>"+b+"</span>");}if(d&&c){this._labelNode.append("<span class='separator'> </span>");this._labelNode.append("<span class='required'>"+c+"</span>");}this._labelNode.setAttribute("for",this.get("id")+a.FormField.FIELD_ID_SUFFIX);}},_syncHintNode:function(){if(this._hintNode){this._hintNode.set("text",this.get("hint"));}},_syncFieldNode:function(){var b=this.INPUT_TYPE||this.name.split("-")[0];if(!b){return;}this._fieldNode.setAttrs({name:this.get("name"),type:b,id:this.get("id")+a.FormField.FIELD_ID_SUFFIX,value:this.get("value")});this._fieldNode.setAttribute("tabindex",a.FormField.tabIndex);a.FormField.tabIndex++;},_syncError:function(){var b=this.get("error");if(b){this._showError(b);}},_syncDisabled:function(c){var b=this.get("disabled");if(b===true){this._fieldNode.setAttribute("disabled","disabled");}else{this._fieldNode.removeAttribute("disabled");}},_checkRequired:function(){if(this.get("required")===true&&this.get("value").length===0){return false;}return true;},_showError:function(b){var c=this._renderNode(this.ERROR_TEMPLATE,this.ERROR_CLASS,this._labelNode);c.set("text",b);this._errorNode=c;},_clearError:function(){if(this._errorNode){this._errorNode.remove();this._errorNode=null;}},_enableInlineValidation:function(){this.after("valueChange",this.validateField,this);},_disableInlineValidation:function(){this.detach("valueChange",this.validateField,this);},validateField:function(d){var c=this.get("value"),b=this.get("validator");this.set("error",null);if(d&&d.src!="ui"){return false;}if(!this._checkRequired()){this.set("error",a.FormField.REQUIRED_ERROR_TEXT);return false;}else{if(!c){return true;}}return b.call(this,c,this);},resetFieldNode:function(){this.set("value",this._initialValue);this._fieldNode.set("value",this._initialValue);this.fire("nodeReset");},clear:function(){this.set("value","");this._fieldNode.set("value","");this._initialValue=null;this.fire("clear");},initializer:function(){this.publish("blur");this.publish("change");this.publish("focus");this.publish("clear");this.publish("nodeReset");this._initialValue=this.get("value");},destructor:function(b){},renderUI:function(){this._renderLabelNode();this._renderFieldNode();this._renderHintNode();},bindUI:function(){this._fieldNode.on("change",a.bind(function(b){this.set("value",this._fieldNode.get("value"),{src:"ui"});},this));this.on("valueChange",a.bind(function(b){if(b.src!="ui"){this._fieldNode.set("value",b.newVal);}},this));this._fieldNode.on("blur",a.bind(function(b){this.set("value",this._fieldNode.get("value"),{src:"ui"});},this));this._fieldNode.on("focus",a.bind(function(b){this.fire("focus",b);},this));this.on("errorChange",a.bind(function(b){if(b.newVal){this._showError(b.newVal);}else{this._clearError();}},this));this.on("validateInlineChange",a.bind(function(b){if(b.newVal===true){this._enableInlineValidation();}else{this._disableInlineValidation();}},this));this.after("disabledChange",a.bind(function(b){this._syncDisabled();},this));},syncUI:function(){this.get("boundingBox").removeAttribute("tabindex");this._syncLabelNode();this._syncHintNode();this._syncFieldNode();this._syncError();this._syncDisabled();if(this.get("validateInline")===true){this._enableInlineValidation();}}},{ATTRS:{id:{value:a.guid(),validator:a.Lang.isString,writeOnce:true},name:{validator:a.Lang.isString,writeOnce:true},value:{value:"",validator:a.Lang.isString},label:{value:"",validator:a.Lang.isString},hint:{value:"",validator:a.Lang.isString},validator:{value:function(b){return true;},validator:function(b){return this._validateValidator(b);},setter:function(b){return this._setValidator(b);}},error:{value:false,validator:function(b){return this._validateError(b);}},required:{value:false,validator:a.Lang.isBoolean},validateInline:{value:false,validator:a.Lang.isBoolean},requiredLabel:{value:"",validator:a.Lang.isString}},tabIndex:1,VALIDATE_EMAIL_ADDRESS:function(d,c){var b=/^([\w]+(?:\.[\w]+)*)@((?:[\w]+\.)*\w[\w]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;if(b.test(d)===false){c.set("error",a.FormField.INVALID_EMAIL_MESSAGE);return false;}return true;},INVALID_EMAIL_MESSAGE:"Please enter a valid email address",VALIDATE_PHONE_NUMBER:function(d,c){var b=/^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;if(b.test(d)===false){c.set("error",a.FormField.INVALID_PHONE_NUMBER);return false;}return true;},INVALID_PHONE_NUMBER:"Please enter a valid phone number",VALIDATE_IP_ADDRESS:function(f,e){var c=/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/,b,d=true;if(c.test(f)===false){d=false;}b=f.split(".");a.Array.each(b,function(h,j,g){var k=parseInt(h,10);if(k<0||k>255){d=false;}});if(d===false){e.set("error",a.FormField.INVALID_IP_MESSAGE);}return d;},INVALID_IP_MESSAGE:"Please enter a valid IP address",VALIDATE_DATE:function(d,c){var b=/^([1-9]|1[0-2])(\-|\/)([0-2][0-9]|3[0-1])(\-|\/)(\d{4}|\d{2})$/;if(b.test(d)===false){c.set("error",a.FormField.INVALID_DATE_MESSAGE);return false;}return true;},INVALID_DATE_MESSAGE:"Please enter a a valid date",VALIDATE_TIME:function(d,c){var b=/^([1-9]|1[0-2]):[0-5]\d(:[0-5]\d(\.\d{1,3})?)?$/;
-if(b.test(d)===false){c.set("error",a.FormField.INVALID_TIME_MESSAGE);return false;}return true;},INVALID_TIME_MESSAGE:"Please enter a valid time",VALIDATE_POSTAL_CODE:function(e,d){var b,c=true;if(e.length==6||e.length==7){b=/^[a-zA-Z]\d[a-zA-Z](-|\s)?\d[a-zA-Z]\d$/;}else{if(e.length==5||e.length==10){b=/^\d{5}((-|\s)\d{4})?$/;}else{if(e.length>0){c=false;}}}if(c===false||(b&&b.test(e)===false)){d.set("error",a.FormField.INVALID_POSTAL_CODE_MESSAGE);return false;}return true;},INVALID_POSTAL_CODE_MESSAGE:"Please enter a valid postal code",VALIDATE_NO_SPECIAL_CHARS:function(d,c){var b=/^[a-zA-Z0-9]*$/;if(b.test(d)===false){c.set("error",a.FormField.INVALID_SPECIAL_CHARS);return false;}return true;},INVALID_SPECIAL_CHARS:"Please use only letters and numbers",REQUIRED_ERROR_TEXT:"This field is required",FIELD_ID_SUFFIX:"-field"});a.TextField=a.Base.create("text-field",a.FormField,[a.WidgetChild]);a.PasswordField=a.Base.create("password-field",a.FormField,[a.WidgetChild]);a.CheckboxField=a.Base.create("checkbox-field",a.FormField,[a.WidgetChild],{_syncChecked:function(){this._fieldNode.set("checked",this.get("checked"));},initializer:function(){a.CheckboxField.superclass.initializer.apply(this,arguments);},renderUI:function(){this._renderFieldNode();this._renderLabelNode();},syncUI:function(){a.CheckboxField.superclass.syncUI.apply(this,arguments);this._syncChecked();},bindUI:function(){a.CheckboxField.superclass.bindUI.apply(this,arguments);this.after("checkedChange",a.bind(function(b){if(b.src!="ui"){this._fieldNode.set("checked",b.newVal);}},this));this._fieldNode.after("change",a.bind(function(b){this.set("checked",b.currentTarget.get("checked"),{src:"ui"});},this));}},{ATTRS:{"checked":{value:false,validator:a.Lang.isBoolean}}});a.RadioField=a.Base.create("radio-field",a.CheckboxField,[a.WidgetChild]);a.HiddenField=a.Base.create("hidden-field",a.FormField,[a.WidgetChild],{_valueDisplayNode:null,_renderValueDisplayNode:function(){if(this.get("displayValue")===true){var c=a.Node.create("<div></div>"),b=this.get("contentBox");b.appendChild(c);this._valueDisplayNode=c;}},renderUI:function(){a.HiddenField.superclass.renderUI.apply(this,arguments);this._renderValueDisplayNode();},bindUI:function(){a.HiddenField.superclass.bindUI.apply(this,arguments);if(this.get("displayValue")===true){this.after("valueChange",a.bind(function(b,c){this._valueDisplayNode.set("innerHTML",c.newVal);},this,true));}},clear:function(){}},{ATTRS:{displayValue:{value:false,writeOnce:true,validator:a.Lang.isBoolean}}});a.TextareaField=a.Base.create("textarea-field",a.FormField,[a.WidgetChild],{FIELD_TEMPLATE:"<textarea></textarea>"});a.ChoiceField=a.Base.create("choice-field",a.FormField,[a.WidgetParent,a.WidgetChild],{LABEL_TEMPLATE:"<span></span>",SINGLE_CHOICE:a.RadioField,MULTI_CHOICE:a.CheckboxField,_validateChoices:function(d){if(!a.Lang.isArray(d)){return false;}var c=0,b=d.length;for(;c<b;c++){if(!a.Lang.isObject(d[c])){delete d[c];continue;}if(!d[c].label||(!a.Lang.isString(d[c].label)&&!a.Lang.isNumber(d[c].value))||!d[c].value||(!a.Lang.isString(d[c].value)&&!a.Lang.isNumber(d[c].value))){delete d[c];continue;}}return true;},_renderFieldNode:function(){var d=this.get("contentBox"),e=d.one("."+this.FIELD_CLASS),f=this.get("choices"),b=this.get("multi"),c=(b===true?this.MULTI_CHOICE:this.SINGLE_CHOICE);if(!e){e=d;}a.Array.each(f,function(l,j,h){var g={checked:l.checked,value:l.value,id:(this.get("id")+"_choice"+j),name:this.get("name"),label:l.label},k=new c(g);k.render(e);},this);this._fieldNode=e.all("input");},_syncFieldNode:function(){var b=this.get("value").split(",");if(b&&b.length>0){b=a.Array.map(b,function(c){return a.Lang.trim(c);});this._fieldNode.each(function(e,d,f){var c=a.Lang.trim(e.get("value"));if(!!~a.Array.indexOf(b,c)){e.set("checked",true);}else{e.set("checked",false);}});}},_afterChoicesChange:function(c){var b=this.get("contentBox");b.all(".yui3-form-field").remove();this._renderFieldNode();},clear:function(){this._fieldNode.each(function(c,b,d){c.set("checked",false);},this);this.set("value","");},bindUI:function(){this._fieldNode.on("change",a.bind(function(d){var c="",b=this.get("multi")?"checkbox":"radio";this._fieldNode.each(function(f,e,g){if(f.get("type")==b&&f.get("checked")===true){if(c.length>0){c+=",";}c+=f.get("value");}},this);this.set("value",c,{fromUI:true});},this));this.after("choicesChange",this._afterChoicesChange);this.after("valueChange",function(b){if(!b.fromUI){this._syncFieldNode();}});}},{ATTRS:{choices:{valueFn:function(){return[];},validator:function(b){return this._validateChoices(b);}},multi:{validator:a.Lang.isBoolean,value:false}}});a.SelectField=a.Base.create("select-field",a.ChoiceField,[a.WidgetParent,a.WidgetChild],{FIELD_TEMPLATE:"<select></select>",DEFAULT_OPTION_TEXT:"Choose one",_renderFieldNode:function(){a.SelectField.superclass.constructor.superclass._renderFieldNode.apply(this,arguments);this._renderOptionNodes();},_renderOptionNodes:function(){var c=this.get("choices"),b;if(this.get("useDefaultOption")===true){b=a.Node.create(a.SelectField.OPTION_TEMPLATE);this._fieldNode.appendChild(b);}a.Array.each(c,function(f,e,d){b=a.Node.create(a.SelectField.OPTION_TEMPLATE);this._fieldNode.appendChild(b);},this);},_syncFieldNode:function(){a.SelectField.superclass.constructor.superclass._syncFieldNode.apply(this,arguments);this._fieldNode.setAttrs({size:this.get("size"),multiple:(this.get("multi")===true?"multiple":"")});},_syncOptionNodes:function(){var f=this.get("choices")||[],b=this.get("contentBox"),d=b.all("option"),e=this.get("useDefaultOption"),c=this.get("value");if(e===true){f.unshift({label:this.DEFAULT_OPTION_TEXT,value:""});}d.each(function(j,i,h){var g=f[i].label,k=f[i].value;j.setAttrs({innerHTML:g,value:k});if(c==k){j.setAttrs({selected:true,defaultSelected:true});}},this);if(!c&&!e&&f[0]){this.set("value",f[0].value);}},_afterChoicesChange:function(b){var c=this._fieldNode.all("option");c.remove();this._renderOptionNodes();this._syncOptionNodes();
-},clear:function(){this._fieldNode.value="";},bindUI:function(){a.SelectField.superclass.constructor.superclass.bindUI.apply(this,arguments);this.after("choicesChange",this._afterChoicesChange);},syncUI:function(){a.SelectField.superclass.syncUI.apply(this,arguments);this._syncOptionNodes();}},{OPTION_TEMPLATE:"<option></option>",ATTRS:{useDefaultOption:{validator:a.Lang.isBoolean,value:true},choices:{validator:function(b){if(this.get("useDefaultOption")&&a.Lang.isArray(b)&&b.length===0){return true;}else{return this._validateChoices(b);}}},size:{validator:a.Lang.isString,value:"0"}}});a.FormButton=a.Base.create("button-field",a.FormField,[a.WidgetChild],{FIELD_TEMPLATE:"<button></button>",LABEL_TEMPLATE:"",_syncFieldNode:function(){this._fieldNode.setAttrs({innerHTML:this.get("label"),id:this.get("id")+a.FormField.FIELD_ID_SUFFIX});this.get("contentBox").addClass("first-child");},_setClickHandler:function(){if(!this._fieldNode){return;}a.Event.purgeElement(this._fieldNode,true,"click");a.on("click",a.bind(this._promptConfirm,this),this._fieldNode);},_promptConfirm:function(d){d.preventDefault();var c=this.get("message"),b=this.get("onclick");if(c){if(!this.get("confirm")(c)){return;}}b.fn.apply(b.scope);},bindUI:function(){this.after("onclickChange",a.bind(this._setClickHandler,this,true));this.after("disabledChange",this._syncDisabled,this);this._setClickHandler();}},{ATTRS:{onclick:{validator:function(b){if(a.Lang.isObject(b)===false){return false;}if(typeof b.fn=="undefined"||a.Lang.isFunction(b.fn)===false){return false;}return true;},value:{fn:function(b){}},setter:function(b){b.scope=b.scope||this;b.argument=b.argument||{};return b;}},message:{validator:a.Lang.isString,value:null},confirm:{validator:a.Lang.isFunction,value:null}}});a.FileField=a.Base.create("file-field",a.FormField,[a.WidgetChild]);a.SubmitButton=a.Base.create("submit-button",a.FormField,[a.WidgetChild],{_renderLabelNode:function(){}});a.ResetButton=a.Base.create("reset-button",a.FormField,[a.WidgetChild],{LABEL_TEMPLATE:""});},"gallery-2011.11.10-16-24",{requires:["node","widget-base","widget-htmlparser","io-form","widget-parent","widget-child","base-build","substitute","io-upload-iframe","collection"]});
+YUI.add('gallery-form', function(Y) {
+
+/**
+ * Create a form object that can handle both client and server side validation
+ *
+ * @module form
+ */
+
+
+/**
+ * Creates an form which contains fields, and does clientside validation, as well
+ * as handling input from the server.
+ *
+ * @class Form
+ * @extends Widget
+ * @param config {Object} Configuration object
+ * @constructor
+ */
+
+Y.Form = Y.Base.create('form', Y.Widget, [Y.WidgetParent], {
+    toString: function() {
+        return this.name;
+    },
+
+    CONTENT_TEMPLATE: '<form></form>',
+
+    /**
+     * @property _ioIds
+     * @type Object
+     * @protected
+     * @description An object who's keys represent the IO request ids sent by this Y.Form instance
+     */
+    _ioIds: null,
+
+    /**
+     * @method _validateAction
+     * @private
+     * @param {String} val
+     * @description Validates the values of the 'action' attribute
+     */
+    _validateMethod: function(val) {
+        if (!Y.Lang.isString(val)) {
+            return false;
+        }
+        if (val.toLowerCase() != 'get' && val.toLowerCase() != 'post') {
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @method _parseAction
+     * @private
+     * @param {Y.Node} contentBox
+     * @description Sets the 'action' attribute based on parsed HTML
+     */
+    _parseAction: function(contentBox) {
+        var form = contentBox.one('form');
+        if (!form) {
+            form = contentBox;
+        }
+        if (form) {
+            return form.get('action');
+        }
+    },
+
+    /**
+     * @method _parseMethod
+     * @private
+     * @param {Y.Node} contentBox
+     * @description Sets the 'method' attribute based on parsed HTML
+     */
+    _parseMethod: function(contentBox) {
+        var form = contentBox.one('form');
+        if (!form) {
+            form = contentBox;
+        }
+        if (form) {
+            return form.get('method');
+        }
+    },
+
+    /**
+     * @method _parseFields
+     * @private
+     * @param {Y.Node} contentBox
+     * @description Sets the 'fields' attribute based on parsed HTML
+     */
+    _parseFields: function(contentBox) {
+        var children = contentBox.all('*'),
+        labels = contentBox.all('label'),
+        fields = [],
+        inputMap = {
+            text: Y.TextField,
+            hidden: Y.HiddenField,
+            file: Y.FileField,
+            checkbox: Y.CheckboxField,
+            radio: Y.RadioField,
+            reset: Y.ResetButton,
+            submit: Y.SubmitButton,
+            button: (Y.Button || Y.FormButton)
+        };
+
+        children.each(function(node, index, nodeList) {
+            var nodeName = node.get('nodeName'),
+            nodeId = node.get('id'),
+            type,
+            o,
+            c = [];
+            if (nodeName == 'INPUT') {
+                type = node.get('type');
+                o = {
+                    type: (inputMap[type] ? inputMap[type] : Y.TextField),
+                    name: node.get('name'),
+                    value: node.get('value'),
+                    checked: node.get('checked')
+                };
+
+                if (o.type == inputMap.button) {
+                    o.label = node.get('value');
+                }
+            } else if (nodeName == 'BUTTON') {
+                o = {
+                    type: inputMap.button,
+                    name: node.get('name'),
+                    label: node.get('innerHTML')
+                };
+            } else if (nodeName == 'SELECT') {
+                node.all('option').each(function(optNode, optNodeIndex, optNodeList) {
+                    c.push({
+                        label: optNode.get('innerHTML'),
+                        value: optNode.get('value')
+                    });
+                });
+                o = {
+                    type: Y.SelectField,
+                    name: node.get('name'),
+                    choices: c
+                };
+            } else if (nodeName == 'TEXTAREA') {
+                o = {
+                    type: Y.TextareaField,
+                    name: node.get('name'),
+                    value: node.get('innerHTML')
+                };
+            }
+
+            if (o) {
+                if (nodeId) {
+                    o.id = nodeId;
+                    labels.some(function(labelNode, labelNodeIndex, labelNodeList) {
+                        if (labelNode.get('htmlFor') == nodeId) {
+                            o.label = labelNode.get('innerHTML');
+                        }
+                    });
+                }
+                fields.push(o);
+            }
+            node.remove();
+        });
+
+        return fields;
+    },
+
+    /**
+     * @method _syncFormAttributes
+     * @protected
+     * @description Syncs the form node action and method attributes
+     */
+    _syncFormAttributes: function() {
+        var contentBox = this.get('contentBox');
+        contentBox.setAttrs({
+            action: this.get('action'),
+            method: this.get('method')
+        });
+
+        if (this.get('encodingType') === Y.Form.MULTIPART_ENCODED) {
+            contentBox.setAttribute('enctype', 'multipart/form-data');
+        }
+    },
+
+    /**
+     * @method _runValidation
+     * @protected
+     * @description Validates the form based on each field's validator
+     */
+    _runValidation: function() {
+        var isValid = true;
+
+        this.each(function(f) {
+            if (f.validateField() === false) {
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    },
+
+    _enableInlineValidation: function() {
+        this.each(function(f) {
+            f.set('validateInline', true);
+        });
+    },
+
+    _disableInlineValidation: function() {
+        this.each(function(f) {
+            f.set('validateInline', false);
+        });
+    },
+
+    /**
+     * @method _handleIOEvent
+     * @protected
+     * @param {String} eventName
+     * @param {Number} ioId
+     * @param {Object} ioResponse
+     * @description Handles the IO events of transactions instantiated by this instance
+     */
+    _handleIOEvent: function(eventName, ioId, ioResponse) {
+        if (this._ioIds[ioId] !== undefined) {
+            this.fire(eventName, {
+                response: ioResponse
+            });
+        }
+    },
+
+    /**
+     * @method reset
+     * @description Resets all form fields to their initial value 
+     */
+    reset: function() {
+        var cb = Y.Node.getDOMNode(this.get('contentBox'));
+        if (Y.Lang.isFunction(cb.reset)) {
+            cb.reset();
+        }
+        this.each(function(field) {
+            field.resetFieldNode();
+            field.set('error', null);
+        });
+    },
+
+    /**
+     * @method submit
+     * @description Submits the form using the defined method to the URL defined in the action
+     */
+    submit: function() {
+        if (this.get('skipValidationBeforeSubmit') === true || this._runValidation()) {
+            var formAction = this.get('action'),
+            formMethod = this.get('method'),
+            submitViaIO = this.get('submitViaIO'),
+            io = this.get("io"),
+            ioConfig = this.get('ioConfig') || {},
+            transaction,
+            cfg;
+
+            if (submitViaIO === true) {
+                cfg = Y.merge({
+                    method: formMethod,
+                    form: {
+                        id: this.get('contentBox'),
+                        upload: (this.get('encodingType') === Y.Form.MULTIPART_ENCODED)
+                    }
+                }, ioConfig);
+
+                transaction = io(formAction, cfg);
+                this._ioIds[transaction.id] = transaction;
+            } else {
+                this.get('contentBox').submit();
+            }
+        }
+    },
+
+    /**
+     * @method getField
+     * @param {String|Number} selector
+     * @description Get a form field by its name attribute or numerical index
+     */
+    getField: function(selector) {
+        var sel;
+
+        if (Y.Lang.isNumber(selector)) {
+            sel = this.item(selector);
+        } else if (Y.Lang.isString(selector)) {
+            this.each(function(f) {
+                if (f.get('name') == selector) {
+                    sel = f;
+                }
+            });
+        }
+        return sel;
+    },
+
+    /**
+     * @method toJSON
+     * @description Returns a JSON object representing the values of
+     *              the form fields
+     */
+    toJSON : function () {
+        var data = {}; 
+        this.each(function (f) {
+            data[f.get('name')] = (f instanceof Y.CheckboxField) ? f.get('checked') : f.get('value');
+        }); 
+
+        return data;
+    },   
+
+    initializer: function(config) {
+        this._ioIds = {};
+
+        this.publish('submit');
+        this.publish('reset');
+        this.publish('start');
+        this.publish('success');
+        this.publish('failure');
+        this.publish('complete');
+        this.publish('xdr');
+    },
+
+    destructor: function() {
+        },
+
+    renderUI: function() {
+        },
+
+    bindUI: function() {
+        this.get('contentBox').on('submit', Y.bind(function(e) {
+            e.halt();
+        },
+        this));
+
+        this.after('inlineValidationChange', Y.bind(function(e) {
+            if (e.newVal === true) {
+                this._enableInlineValidation();
+            } else {
+                this._disableInlineValidation();
+            }
+        },
+        this));
+
+        this.after('success', Y.bind(function(e) {
+            if (this.get('resetAfterSubmit') === true) {
+                this.reset();
+            }
+        },
+        this));
+
+        Y.on('io:start', Y.bind(this._handleIOEvent, this, 'start'));
+        Y.on('io:complete', Y.bind(this._handleIOEvent, this, 'complete'));
+        Y.on('io:xdr', Y.bind(this._handleIOEvent, this, 'xdr'));
+        Y.on('io:success', Y.bind(this._handleIOEvent, this, 'success'));
+        Y.on('io:failure', Y.bind(this._handleIOEvent, this, 'failure'));
+
+        this.each(Y.bind(function(f) {
+            // This should probably be performed also when children
+            // are with Form.add() after the form is rendered.
+            if (f.name == 'submit-button') {
+                f.on('click', Y.bind(this.submit, this));
+            } else if (f.name == 'reset-button') {
+                f.on('click', Y.bind(this.reset, this));
+            }
+        },
+        this));
+    },
+
+    syncUI: function() {
+        this._syncFormAttributes();
+        if (this.get('inlineValidation') === true) {
+            this._enableInlineValidation();
+        }
+    }
+},
+{
+
+    /**
+     * @property Form.ATTRS
+     * @type Object
+     * @static
+     */
+    ATTRS: {
+        defaultChildType: {
+            valueFn: function() {console.log("valueFn");
+            	console.log(Y.TextField);
+                return Y.TextField;
+            }
+        },
+
+        /**
+         * @attribute method
+         * @type String
+         * @default 'post'
+         * @description The method by which the form should be transmitted. Valid values are 'get' and 'post'
+         */
+        method: {
+            value: 'post',
+            validator: function(val) {
+                return this._validateMethod(val);
+            },
+            setter: function(val) {
+                return val.toLowerCase();
+            }
+        },
+
+        /**
+         * @attribute action
+         * @type String
+         * @default '.'
+         * @description A url to which the validated form is to be sent
+         */
+        action: {
+            value: '.',
+            validator: Y.Lang.isString
+        },
+
+        /**
+         * @attribute fields
+         * @type Array
+         * @deprecated Use "children" attribet instead
+         * @description An array of the fields to be rendered into the Y.Form. Each item in the 
+         *              array can either be a FormField instance or an object literal defining
+         *              the properties of the field to be generated. Alternatively, this value
+         *              will be parsed in from HTML
+         */
+        fields: {
+            setter: function(val) {
+                return this.set('children', val);
+            }
+        },
+
+        /**
+         * @attribute inlineValidation
+         * @type Boolean
+         * @description Set to true to validate fields "on the fly", where they will
+         *                              validate themselves any time the value attribute is changed
+         * @default false
+         */
+        inlineValidation: {
+            value: false,
+            validator: Y.Lang.isBoolean
+        },
+
+        /**
+         * @attribute resetAfterSubmit
+         * @type Boolean
+         * @description If true, the form is reset following a successful submit event 
+         * @default true
+         */
+        resetAfterSubmit: {
+            value: true,
+            validator: Y.Lang.isBoolean
+        },
+
+        /**
+         * @attribute encodingType
+         * @type Number
+         * @description Set to Form.MULTIPART_ENCODED in order to use the FileField for uploads
+         * @default Form.URL_ENCODED
+         */
+        encodingType: {
+            value: 1,
+            validator: Y.Lang.isNumber
+        },
+
+        /**
+         * @attribute skipValidationBeforeSubmit
+         * @type Boolean
+         * @description Set to true to skip the validation step when submitting
+         * @default false
+         */
+        skipValidationBeforeSubmit: {
+            value: false,
+            validator: Y.Lang.isBoolean
+        },
+
+        submitViaIO: {
+            value: true,
+            validator: Y.Lang.isBoolean
+        },
+
+        /**
+         * @attribute io
+         * @type Function
+         * @description The factory for creating IO transactions, used by tests.
+         * @default Y.io
+         */
+        io: {
+            value: Y.io
+        },
+
+        ioConfig : {
+        }
+
+    },
+
+    /**
+     * @property Form.HTML_PARSER
+     * @type Object
+     * @static
+     */
+    HTML_PARSER: {
+        action: function(contentBox) {
+            return this._parseAction(contentBox);
+        },
+        method: function(contentBox) {
+            return this._parseMethod(contentBox);
+        },
+        children: function(contentBox) {
+            return this._parseFields(contentBox);
+        }
+    },
+
+    /**
+     * @property Form.FORM_TEMPLATE
+     * @type String
+     * @static
+     * @description The HTML used to create the form Node
+     */
+    //FORM_TEMPLATE: '<form></form>',
+
+    /**
+     * @property Form.URL_ENCODED
+     * @type Number
+     * @description Set the form the default text encoding
+     */
+    URL_ENCODED: 1,
+
+    /**
+     * @property Form.MULTIPART_ENCODED
+     * @type Number
+     * @description Set form to multipart/form-data encoding for file uploads
+     */
+    MULTIPART_ENCODED: 2
+});
+/**
+ * @class FormField
+ * @extends Widget
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A representation of an individual form field.
+ */
+
+Y.FormField = Y.Base.create('form-field', Y.Widget, [Y.WidgetParent, Y.WidgetChild], {
+    toString: function() {
+        return this.name;
+    },
+
+    /**
+     * @property FormField.FIELD_TEMPLATE
+     * @type String
+     * @description Template used to render the field node
+     */
+    FIELD_TEMPLATE : '<input>',
+
+    /**
+     * @property FormField.FIELD_CLASS
+     * @type String
+     * @description CSS class used to locate a placeholder for
+     *     the field node and style it.
+     */
+    FIELD_CLASS : 'field',
+
+    /**
+     * @property FormField.LABEL_TEMPLATE
+     * @type String
+     * @description Template used to draw a label node
+     */
+    LABEL_TEMPLATE : '<label></label>',
+
+    /**
+     * @property FormField.LABEL_CLASS
+     * @type String
+     * @description CSS class used to locate a placeholder for
+     *     the label node and style it.
+     */
+    LABEL_CLASS : 'label',
+
+    /**
+     * @property FormField.HINT_TEMPLATE
+     * @type String
+     * @description Optionally a template used to draw a hint node. Derived
+     *     classes can use it to provide additional information about the field
+     */
+    HINT_TEMPLATE : '',
+
+    /**
+     * @property FormField.HINT_CLASS
+     * @type String
+     * @description CSS class used to locate a placeholder for
+     *     the hint node and style it.
+     */
+    HINT_CLASS : 'hint',
+
+    /**
+     * @property FormField.ERROR_TEMPLATE
+     * @type String
+     * @description Template used to draw an error node
+     */
+    ERROR_TEMPLATE : '<span></span>',
+
+    /**
+     * @property FormField.ERROR_CLASS
+     * @type String
+     * @description CSS class used to locate a placeholder for
+     *     the error node and style it.
+     */
+    ERROR_CLASS : 'error',
+
+    /**
+     * @property _labelNode
+     * @protected
+     * @type Object
+     * @description The label node for this form field
+     */
+    _labelNode: null,
+
+     /**
+     * @property _hintNode
+     * @protected
+     * @type Object
+     * @description The hint node with extra text describing the field
+     */    
+    _hintNode : null,
+
+    /**
+     * @property _fieldNode
+     * @protected
+     * @type Object
+     * @description The form field itself
+     */
+    _fieldNode: null,
+
+    /**
+     * @property _errorNode
+     * @protected
+     * @type Object
+     * @description If a validation error occurs, it will be displayed in this node
+     */
+    _errorNode: null,
+
+    /**
+     * @property _initialValue
+     * @private
+     * @type String
+     * @description The initial value set on this field, reset will set the value to this
+     */
+    _initialValue: null,
+
+    /**
+     * @method _validateError
+     * @protected
+     * @param val {Mixed}
+     * @description Validates the value passed to the error attribute
+     * @return {Boolean}
+     */
+    _validateError: function(val) {
+        if (Y.Lang.isString(val)) {
+            return true;
+        }
+        if (val === null || typeof val == 'undefined') {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * @method _validateValidator
+     * @protected
+     * @param val {Mixed}
+     * @description Validates the input of the validator attribute
+     * @return {Boolean}
+     */
+    _validateValidator: function(val) {
+        if (Y.Lang.isString(val)) {
+            var validate = /^(email|phone|ip|date|time|postal|special)$/;
+            if (validate.test(val) === true) {
+                return true;
+            }
+        }
+        if (Y.Lang.isFunction(val)) {
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * @method _setValidator
+     * @protected
+     * @param {val} {String|Function}
+     * @description Sets the validator to the supplied method or if one of the 
+     *              convenience strings is passed, the corresponding utility
+     *              validator
+     * @return {Function}
+     */
+    _setValidator: function(val) {
+        var valMap = {
+            email: Y.FormField.VALIDATE_EMAIL_ADDRESS,
+            phone: Y.FormField.VALIDATE_PHONE_NUMBER,
+            ip: Y.FormField.VALIDATE_IP_ADDRESS,
+            date: Y.FormField.VALIDATE_DATE,
+            time: Y.FormField.VALIDATE_TIME,
+            postal: Y.FormField.VALIDATE_POSTAL_CODE,
+            special: Y.FormField.VALIDATE_NO_SPECIAL_CHARS
+        };
+
+        return (valMap[val] ? valMap[val] : val);
+    },
+
+    /**
+     * @method _renderNode
+     * @protected
+     * @description Helper method to render new nodes, possibly replacing
+     *     markup placeholders.
+     */
+    _renderNode : function (nodeTemplate, nodeClass, nodeBefore) {
+        if (!nodeTemplate) {
+            return null;
+        }
+        var contentBox = this.get('contentBox'),
+            node = Y.Node.create(nodeTemplate),
+            placeHolder = contentBox.one('.' + nodeClass);
+
+        node.addClass(nodeClass);
+
+        if (placeHolder) {
+            placeHolder.replace(node);
+        } else {
+            if (nodeBefore) {
+                contentBox.insertBefore(node, nodeBefore);
+            } else {
+                contentBox.appendChild(node);
+            }
+        }
+
+        return node;
+    },
+
+    /**
+     * @method _renderLabelNode
+     * @protected
+     * @description Draws the form field's label node into the contentBox
+     */
+    _renderLabelNode: function() {
+        var contentBox = this.get('contentBox'),
+        labelNode = contentBox.one('label');
+
+        if (!labelNode || labelNode.get('for') != this.get('id')) {
+            labelNode = this._renderNode(this.LABEL_TEMPLATE, this.LABEL_CLASS);
+        }
+
+        this._labelNode = labelNode;
+    },
+
+    /**
+     * @method _renderHintNode
+     * @protected
+     * @description Draws the hint node into the contentBox. If a node is
+     *     found in the contentBox with class HINT_CLASS, it will be
+     *     considered a markup placeholder and replaced with the hint node.
+     */
+    _renderHintNode : function () {
+        this._hintNode = this._renderNode(this.HINT_TEMPLATE,
+                                          this.HINT_CLASS);
+    },
+
+    /**
+     * @method _renderFieldNode
+     * @protected
+     * @description Draws the field node into the contentBox
+     */
+    _renderFieldNode: function() {
+        var contentBox = this.get('contentBox'),
+        field = contentBox.one('#' + this.get('id'));
+
+        if (!field) {
+            field = this._renderNode(this.FIELD_TEMPLATE, this.FIELD_CLASS);
+        }
+
+        this._fieldNode = field;
+    },
+
+    /**
+     * @method _syncLabelNode
+     * @protected
+     * @description Syncs the the label node and this instances attributes
+     */
+    _syncLabelNode: function() {
+        var label = this.get('label'),
+            required = this.get('required'),
+            requiredLabel = this.get('requiredLabel');
+        if (this._labelNode) {
+            this._labelNode.set("text", "");
+            if (label) {
+                this._labelNode.append("<span class='caption'>" + label + "</span>"); 
+            }
+            if (required && requiredLabel) {
+                this._labelNode.append("<span class='separator'> </span>");
+                this._labelNode.append("<span class='required'>" + requiredLabel + "</span>");
+            }
+            this._labelNode.setAttribute('for', this.get('id') + Y.FormField.FIELD_ID_SUFFIX);
+        }
+    },
+
+    /**
+     * @method _syncHintNode
+     * @protected
+     * @description Syncs the hintNode
+     */
+    _syncHintNode : function () {
+        if (this._hintNode) {
+            this._hintNode.set("text", this.get("hint"));
+        }
+    },
+
+    /**
+     * @method _syncFieldNode
+     * @protected
+     * @description Syncs the fieldNode and this instances attributes
+     */
+    _syncFieldNode: function() {
+        var nodeType = this.INPUT_TYPE || this.name.split('-')[0];
+        if (!nodeType) {
+            return;
+        }
+
+        this._fieldNode.setAttrs({
+            name: this.get('name'),
+            type: nodeType,
+            id: this.get('id') + Y.FormField.FIELD_ID_SUFFIX,
+            value: this.get('value')
+        });
+
+        this._fieldNode.setAttribute('tabindex', Y.FormField.tabIndex);
+        Y.FormField.tabIndex++;
+    },
+
+    /**
+     * @method _syncError
+     * @private
+     * @description Displays any pre-defined error message
+     */
+    _syncError: function() {
+        var err = this.get('error');
+        if (err) {
+            this._showError(err);
+        }
+    },
+
+    _syncDisabled: function(e) {
+        var dis = this.get('disabled');
+        if (dis === true) {
+            this._fieldNode.setAttribute('disabled', 'disabled');
+        } else {
+            this._fieldNode.removeAttribute('disabled');
+        }
+    },
+
+    /**
+     * @method _checkRequired
+     * @private
+     * @description if the required attribute is set to true, returns whether or not a value has been set
+     * @return {Boolean}
+     */
+    _checkRequired: function() {
+        if (this.get('required') === true && this.get('value').length === 0) {
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @method _showError
+     * @param {String} errMsg
+     * @private
+     * @description Adds an error node with the supplied message
+     */
+    _showError: function(errMsg) {
+        var errorNode = this._renderNode(this.ERROR_TEMPLATE, this.ERROR_CLASS, this._labelNode);
+
+        errorNode.set("text", errMsg);
+        this._errorNode = errorNode;
+    },
+
+    /**
+     * @method _clearError
+     * @private
+     * @description Removes the error node from this field
+     */
+    _clearError: function() {
+        if (this._errorNode) {
+            this._errorNode.remove();
+            this._errorNode = null;
+        }
+    },
+
+    _enableInlineValidation: function() {
+        this.after('valueChange', this.validateField, this);
+    },
+
+    _disableInlineValidation: function() {
+        this.detach('valueChange', this.validateField, this);
+    },
+
+    /**
+     * @method validateField
+     * @description Runs the validation functions of this form field
+     * @return {Boolean}
+     */
+    validateField: function(e) {
+        var value = this.get('value'),
+        validator = this.get('validator');
+
+        this.set('error', null);
+
+        if (e && e.src != 'ui') {
+            return false;
+        }
+
+        if (!this._checkRequired()) {
+            this.set('error', Y.FormField.REQUIRED_ERROR_TEXT);
+            return false;
+        } else if (!value) {
+            return true;
+        }
+
+        return validator.call(this, value, this);
+    },
+
+    resetFieldNode: function() {
+        this.set('value', this._initialValue);
+        this._fieldNode.set('value', this._initialValue);
+        this.fire('nodeReset');
+    },
+
+    /**
+     * @method clear
+     * @description Clears the value AND the initial value of this field
+     */
+    clear: function() {
+        this.set('value', '');
+        this._fieldNode.set('value', '');
+        this._initialValue = null;
+        this.fire('clear');
+    },
+
+    initializer: function() {
+        this.publish('blur');
+        this.publish('change');
+        this.publish('focus');
+        this.publish('clear');
+        this.publish('nodeReset');
+
+        this._initialValue = this.get('value');
+    },
+
+    destructor: function(config) {
+
+    },
+
+    renderUI: function() {
+        this._renderLabelNode();
+        this._renderFieldNode();
+        this._renderHintNode();
+    },
+
+    bindUI: function() {
+        this._fieldNode.on('change', Y.bind(function(e) {
+            this.set('value', this._fieldNode.get('value'), {
+                src: 'ui'
+            });
+        },
+        this));
+
+        this.on('valueChange', Y.bind(function(e) {
+            if (e.src != 'ui') {
+                this._fieldNode.set('value', e.newVal);
+            }
+        },
+        this));
+
+        this._fieldNode.on('blur', Y.bind(function(e) {
+            this.set('value', this._fieldNode.get('value'), {
+                src: 'ui'
+            });
+        },
+        this));
+
+        this._fieldNode.on('focus', Y.bind(function(e) {
+            this.fire('focus', e);
+        },
+        this));
+
+        this.on('errorChange', Y.bind(function(e) {
+            if (e.newVal) {
+                this._showError(e.newVal);
+            } else {
+                this._clearError();
+            }
+        },
+        this));
+
+        this.on('validateInlineChange', Y.bind(function(e) {
+            if (e.newVal === true) {
+                this._enableInlineValidation();
+            } else {
+                this._disableInlineValidation();
+            }
+        },
+        this));
+
+        this.after('disabledChange', Y.bind(function(e) {
+            this._syncDisabled();
+        },
+        this));
+    },
+
+    syncUI: function() {
+        this.get('boundingBox').removeAttribute('tabindex');
+        this._syncLabelNode();
+        this._syncHintNode();
+        this._syncFieldNode();
+        this._syncError();
+        this._syncDisabled();
+
+        if (this.get('validateInline') === true) {
+            this._enableInlineValidation();
+        }
+    }
+},
+{
+    /**
+     * @property FormField.ATTRS
+     * @type Object
+     * @protected
+     * @static
+     */
+    ATTRS: {
+        /**
+         * @attribute id
+         * @type String
+         * @default Either a user defined ID or a randomly generated by Y.guid()
+         * @description A randomly generated ID that will be assigned to the field and used 
+         * in the label's for attribute
+         */
+        id: {
+            value: Y.guid(),
+            validator: Y.Lang.isString,
+            writeOnce: true
+        },
+
+        /**
+         * @attribute name
+         * @type String
+         * @default ""
+         * @writeOnce
+         * @description The name attribute to use on the field
+         */
+        name: {
+            validator: Y.Lang.isString,
+            writeOnce: true
+        },
+
+        /**
+         * @attribute value
+         * @type String
+         * @default ""
+         * @description The current value of the form field
+         */
+        value: {
+            value: '',
+            validator: Y.Lang.isString
+        },
+
+        /**
+         * @attribute label
+         * @type String
+         * @default ""
+         * @description Label of the form field
+         */
+        label: {
+            value: '',
+            validator: Y.Lang.isString
+        },
+
+        /**
+         * @attribute hint
+         * @type String
+         * @default ""
+         * @description Extra text explaining what the field is about.
+         */
+        hint : {
+            value : '',
+            validator : Y.Lang.isString
+        },
+        
+        /**
+         * @attribute validator
+         * @type Function
+         * @default "function () { return true; }"
+         * @description Used to validate this field by the Form class
+         */
+        validator: {
+            value: function(val) {
+                return true;
+            },
+            validator: function(val) {
+                return this._validateValidator(val);
+            },
+            setter: function(val) {
+                return this._setValidator(val);
+            }
+        },
+
+        /**
+         * @attribute error
+         * @type String
+         * @description An error message associated with this field. Setting this will
+         *              cause validation to fail until a new value is entered
+         */
+        error: {
+            value: false,
+            validator: function(val) {
+                return this._validateError(val);
+            }
+        },
+
+        /**
+         * @attribute required
+         * @type Boolean
+         * @default false
+         * @description Set true if this field must be filled out when submitted
+         */
+        required: {
+            value: false,
+            validator: Y.Lang.isBoolean
+        },
+
+        /**
+         * @attribute validateInline
+         * @type Boolean
+         * @default false
+         * @description Set to true to validate this field whenever it's value is changed
+         */
+        validateInline: {
+            value: false,
+            validator: Y.Lang.isBoolean
+        },
+
+        /**
+         * @attribute requiredLabel
+         * @type String
+         * @description Text to append to the labal caption for a required
+         *     field, by default nothing will be appended.
+         */
+        requiredLabel : {
+            value : '',
+            validator : Y.Lang.isString
+        }
+    },
+
+    /**
+     * @property FormField.tabIndex
+     * @type Number
+     * @description The current tab index of all Y.FormField instances
+     */
+    tabIndex: 1,
+
+    /**
+     * @method FormField.VALIDATE_EMAIL_ADDRESS
+     * @static
+     * @description Utility function to validate an email address
+     */
+    VALIDATE_EMAIL_ADDRESS: function(val, field) {
+        var filter = /^([\w]+(?:\.[\w]+)*)@((?:[\w]+\.)*\w[\w]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        if (filter.test(val) === false) {
+            field.set('error', Y.FormField.INVALID_EMAIL_MESSAGE);
+            return false;
+        }
+
+        return true;
+    },
+
+    /**
+     * @property FormField.INVALID_EMAIL_MESSAGE
+     * @type String
+     * @description Message to display when an invalid email address is entered
+     */
+    INVALID_EMAIL_MESSAGE: "Please enter a valid email address",
+
+    /**
+     * @method FormField.VALIDATE_PHONE_NUMBER
+     * @static
+     * @description Utility function to validate US and international phone numbers
+     */
+    VALIDATE_PHONE_NUMBER: function(val, field) {
+        var filter = /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
+        if (filter.test(val) === false) {
+            field.set('error', Y.FormField.INVALID_PHONE_NUMBER);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @property FormField.INVALID_PHONE_NUMBER
+     * @type String
+     * @description Message to display when an invalid phone number is entered
+     */
+    INVALID_PHONE_NUMBER: "Please enter a valid phone number",
+
+    /**
+     * @method FormField.VALIDATE_IP_ADDRESS
+     * @static
+     * @description Utility function to validate IPv4 addresses
+     */
+    VALIDATE_IP_ADDRESS: function(val, field) {
+        var filter = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/,
+        arr,
+        valid = true;
+
+        if (filter.test(val) === false) {
+            valid = false;
+        }
+
+        arr = val.split(".");
+        Y.Array.each(arr,
+        function(v, i, a) {
+            var n = parseInt(v, 10);
+            if (n < 0 || n > 255) {
+                valid = false;
+            }
+        });
+
+        if (valid === false) {
+            field.set('error', Y.FormField.INVALID_IP_MESSAGE);
+        }
+
+        return valid;
+    },
+
+    /**
+     * @property FormField.INVALID_IP_MESSAGE
+     * @type String
+     * @description Message to display when an invalid IP address is entered
+     */
+    INVALID_IP_MESSAGE: "Please enter a valid IP address",
+
+    /**
+     * @method FormField.VALIDATE_DATE
+     * @static
+     * @description Utility function to validate dates
+     */
+    VALIDATE_DATE: function(val, field) {
+        var filter = /^([1-9]|1[0-2])(\-|\/)([0-2][0-9]|3[0-1])(\-|\/)(\d{4}|\d{2})$/;
+        if (filter.test(val) === false) {
+            field.set('error', Y.FormField.INVALID_DATE_MESSAGE);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @property FormField.INVALID_DATE_MESSAGE
+     * @type String
+     * @description Message to display when an invalid date is entered
+     */
+    INVALID_DATE_MESSAGE: "Please enter a a valid date",
+
+    /**
+     * @method FormField.VALIDATE_TIME
+     * @static
+     * @description Utility function to validate times
+     */
+    VALIDATE_TIME: function(val, field) {
+        var filter = /^([1-9]|1[0-2]):[0-5]\d(:[0-5]\d(\.\d{1,3})?)?$/;
+        if (filter.test(val) === false) {
+            field.set('error', Y.FormField.INVALID_TIME_MESSAGE);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @property FormField.INVALID_TIME_MESSAGE
+     * @type String
+     * @description Message to display when an invalid time is entered
+     */
+    INVALID_TIME_MESSAGE: "Please enter a valid time",
+
+    /**
+     * @method FormField.VALIDATE_POSTAL_CODE
+     * @static
+     * @description Utility function to validate US and international postal codes
+     */
+    VALIDATE_POSTAL_CODE: function(val, field) {
+        var filter,
+        valid = true;
+
+        if (val.length == 6 || val.length == 7) {
+            filter = /^[a-zA-Z]\d[a-zA-Z](-|\s)?\d[a-zA-Z]\d$/;
+        } else if (val.length == 5 || val.length == 10) {
+            filter = /^\d{5}((-|\s)\d{4})?$/;
+        } else if (val.length > 0) {
+            valid = false;
+        }
+
+        if (valid === false || (filter && filter.test(val) === false)) {
+            field.set('error', Y.FormField.INVALID_POSTAL_CODE_MESSAGE);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @property FormField.INVALID_POSTAL_CODE_MESSAGE
+     * @type String
+     * @description Message to display when an invalid postal code is entered
+     */
+    INVALID_POSTAL_CODE_MESSAGE: "Please enter a valid postal code",
+
+    /**
+     * @method FormField.VALIDATE_NO_SPECIAL_CHARS
+     * @static
+     * @description Utility function to validate only alphanumeric characters
+     */
+    VALIDATE_NO_SPECIAL_CHARS: function(val, field) {
+        var filter = /^[a-zA-Z0-9]*$/;
+        if (filter.test(val) === false) {
+            field.set('error', Y.FormField.INVALID_SPECIAL_CHARS);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * @property FormField.INVALID_SPECIAL_CHARS
+     * @type String
+     * @description Message to display when invalid characters are entered
+     */
+    INVALID_SPECIAL_CHARS: "Please use only letters and numbers",
+
+    /**
+     * @property FormField.REQUIRED_ERROR_TEXT
+     * @type String
+     * @description Error text to display for a required field
+     */
+    REQUIRED_ERROR_TEXT: 'This field is required',
+
+    /**
+     * @property FormField.FIELD_ID_SUFFIX
+     * @type String
+     */
+    FIELD_ID_SUFFIX: '-field'
+});
+/**
+ * @class TextField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A text field node
+ */
+Y.TextField = Y.Base.create('text-field', Y.FormField, [Y.WidgetChild]);
+/**
+ * @class PasswordField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A password field node
+ */
+Y.PasswordField = Y.Base.create('password-field', Y.FormField, [Y.WidgetChild]);
+/**
+ * @class CheckboxField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A checkbox field node
+ */
+
+Y.CheckboxField = Y.Base.create('checkbox-field', Y.FormField, [Y.WidgetChild], {
+    _syncChecked : function () {
+        this._fieldNode.set('checked', this.get('checked'));
+    },
+
+    initializer : function () {
+        Y.CheckboxField.superclass.initializer.apply(this, arguments);
+    },
+
+    renderUI : function () {
+        this._renderFieldNode();
+        this._renderLabelNode();
+    },
+
+    syncUI : function () {
+        Y.CheckboxField.superclass.syncUI.apply(this, arguments);
+        this._syncChecked();
+    },
+
+    bindUI :function () {
+        Y.CheckboxField.superclass.bindUI.apply(this, arguments);
+        this.after('checkedChange', Y.bind(function(e) {
+            if (e.src != 'ui') {
+                this._fieldNode.set('checked', e.newVal);
+            }
+        }, this));
+
+        this._fieldNode.after('change', Y.bind(function (e) {
+            this.set('checked', e.currentTarget.get('checked'), {src : 'ui'});
+        }, this));
+    }
+}, {
+    ATTRS : {
+        'checked' : {
+            value : false,
+            validator : Y.Lang.isBoolean
+        }
+    }
+});
+/**
+ * @class RadioField
+ * @extends CheckboxField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A Radio field node
+ */
+Y.RadioField = Y.Base.create('radio-field', Y.CheckboxField, [Y.WidgetChild]);
+/**
+ * @class HiddenField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A hidden field node
+ */
+Y.HiddenField = Y.Base.create('hidden-field', Y.FormField, [Y.WidgetChild], {
+    /**
+     * @property _valueDisplayNode
+     * @protected
+     * @type Y.Node
+     * @description Node used to display the value of this field
+     */
+    _valueDisplayNode: null,
+
+    _renderValueDisplayNode: function() {
+        if (this.get('displayValue') === true) {
+            var div = Y.Node.create('<div></div>'),
+            contentBox = this.get('contentBox');
+
+            contentBox.appendChild(div);
+            this._valueDisplayNode = div;
+        }
+    },
+
+    renderUI: function() {
+        Y.HiddenField.superclass.renderUI.apply(this, arguments);
+        this._renderValueDisplayNode();
+    },
+
+    bindUI: function() {
+        Y.HiddenField.superclass.bindUI.apply(this, arguments);
+
+        if (this.get('displayValue') === true) {
+            this.after('valueChange', Y.bind(function(m, e) {
+                this._valueDisplayNode.set('innerHTML', e.newVal);
+            },
+            this, true));
+        }
+    },
+
+    clear: function() {}
+},
+{
+    /**
+	 * @property HiddenField.ATTRS
+	 * @type Object
+	 * @static
+	 */
+    ATTRS: {
+        /**
+		 * @attribute displayValue
+		 * @type Boolean
+		 * @default false
+		 * @writeOnce
+		 * @description Set to true to render this field with node displaying the current value
+		 */
+        displayValue: {
+            value: false,
+            writeOnce: true,
+            validator: Y.Lang.isBoolean
+        }
+    }
+
+});
+/**
+ * @class TextareaField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A hidden field node
+ */
+Y.TextareaField = Y.Base.create('textarea-field', Y.FormField, [Y.WidgetChild], {
+
+    FIELD_TEMPLATE : '<textarea></textarea>'
+
+});
+/**
+ * @class ChoiceField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A form field which allows one or multiple values from a 
+ * selection of choices
+ */
+Y.ChoiceField = Y.Base.create('choice-field', Y.FormField, [Y.WidgetParent, Y.WidgetChild], {
+
+    LABEL_TEMPLATE: '<span></span>',
+    SINGLE_CHOICE: Y.RadioField,
+    MULTI_CHOICE: Y.CheckboxField,
+
+    /**
+     * @method _validateChoices
+     * @protected
+     * @param {Object} val
+     * @description Validates the value passe to the choices attribute
+     */
+    _validateChoices: function(val) {
+        if (!Y.Lang.isArray(val)) {
+            return false;
+        }
+
+        var i = 0,
+        len = val.length;
+
+        for (; i < len; i++) {
+            if (!Y.Lang.isObject(val[i])) {
+                delete val[i];
+                continue;
+            }
+            if (!val[i].label ||
+            (!Y.Lang.isString(val[i].label) && !Y.Lang.isNumber(val[i].value)) ||
+            !val[i].value ||
+            (!Y.Lang.isString(val[i].value) && !Y.Lang.isNumber(val[i].value))) {
+                delete val[i];
+                continue;
+            }
+        }
+
+        return true;
+    },
+
+    _renderFieldNode: function() {
+        var contentBox = this.get('contentBox'),
+            parent = contentBox.one("." + this.FIELD_CLASS),
+            choices = this.get('choices'),
+            multiple = this.get('multi'),
+            fieldType = (multiple === true ? this.MULTI_CHOICE: this.SINGLE_CHOICE);
+
+        if (!parent) {
+            parent = contentBox;
+        }
+        Y.Array.each(choices,
+        function(c, i, a) {
+            var cfg = {
+                checked : c.checked,
+                value: c.value,
+                id: (this.get('id') + '_choice' + i),
+                name: this.get('name'),
+                label: c.label
+            },
+            field = new fieldType(cfg);
+
+            field.render(parent);
+        }, this);
+        this._fieldNode = parent.all('input');
+    },
+
+    _syncFieldNode: function() {
+        var choices = this.get('value').split(',');
+
+        if (choices && choices.length > 0) {
+            choices = Y.Array.map(choices, function(choice) {
+                return Y.Lang.trim(choice);
+            });
+
+            this._fieldNode.each(function(node, index, list) {
+                var nodeValue = Y.Lang.trim(node.get('value'));
+                if (!!~Y.Array.indexOf(choices, nodeValue)) {
+                    node.set('checked', true);
+                } else {
+                    node.set('checked', false);
+                }
+            });
+        }
+    },
+
+    /**
+     * @method _afterChoicesChange
+     * @description When the available choices for the choice field change,
+     *     the old ones are removed and the new ones are rendered.
+     */
+    _afterChoicesChange: function(event) {
+        var contentBox = this.get("contentBox");
+        contentBox.all(".yui3-form-field").remove();
+        this._renderFieldNode();
+    },
+
+    clear: function() {
+        this._fieldNode.each(function(node, index, list) {
+            node.set('checked', false);
+        },
+        this);
+
+        this.set('value', '');
+    },
+
+    bindUI: function() {
+        this._fieldNode.on('change', Y.bind(function(e) {
+            var value = '',
+                type = this.get('multi') ? 'checkbox' : 'radio';
+
+            this._fieldNode.each(function(node, index, list) {
+                if (node.get('type') == type && node.get('checked') === true) {
+                    if (value.length > 0) {
+                        value += ',';
+                    }
+                    value += node.get('value');
+                }
+            }, this);
+            this.set('value', value, {fromUI : true});
+        },
+        this));
+        this.after('choicesChange', this._afterChoicesChange);
+
+        this.after('valueChange', function (e) {
+            if (!e.fromUI) {
+                this._syncFieldNode();
+            }
+        });
+    }
+
+},
+{
+    ATTRS: {
+        /** 
+         * @attribute choices
+         * @type Array
+         * @description The choices to render into this field
+         */
+        choices: {
+            valueFn : function () {
+                return [];
+            },
+            validator: function(val) {
+                return this._validateChoices(val);
+            }
+        },
+
+        /** 
+         * @attribute multi
+         * @type Boolean
+         * @default false
+         * @description Set to true to allow multiple values to be selected
+         */
+        multi: {
+            validator: Y.Lang.isBoolean,
+            value: false
+        }
+    }
+});
+/**
+ * @class SelectField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A select field node
+ */
+Y.SelectField = Y.Base.create('select-field', Y.ChoiceField, [Y.WidgetParent, Y.WidgetChild], {
+
+    FIELD_TEMPLATE : '<select></select>',
+
+    /**
+     * @property SelectField.DEFAULT_OPTION_TEXT
+     * @type String
+     * @description The display title of the default choice in the select box
+     */
+    DEFAULT_OPTION_TEXT : 'Choose one',	
+
+    /**
+	 * @method _renderFieldNode
+	 * @protected
+	 * @description Draws the select node into the contentBox
+	 */
+    _renderFieldNode: function() {
+        Y.SelectField.superclass.constructor.superclass._renderFieldNode.apply(this, arguments);
+        this._renderOptionNodes();
+    },
+
+    /**
+	 * @method _renderOptionNodes
+	 * @protected
+	 * @description Renders the option nodes into the select node
+	 */
+    _renderOptionNodes: function() {
+        var choices = this.get('choices'),
+        elOption;
+
+        // Create the "Choose one" option
+        if (this.get('useDefaultOption') === true) {
+            elOption = Y.Node.create(Y.SelectField.OPTION_TEMPLATE);
+            this._fieldNode.appendChild(elOption);
+        }
+
+        Y.Array.each(choices,
+        function(c, i, a) {
+            elOption = Y.Node.create(Y.SelectField.OPTION_TEMPLATE);
+            this._fieldNode.appendChild(elOption);
+        },
+        this);
+    },
+
+    /**
+	 * @method _syncFieldNode
+	 * @protected
+	 * @description Syncs the select node with the instance attributes
+	 */
+    _syncFieldNode: function() {
+        Y.SelectField.superclass.constructor.superclass._syncFieldNode.apply(this, arguments);
+
+        this._fieldNode.setAttrs({
+            size : this.get('size'),
+            multiple: (this.get('multi') === true ? 'multiple': '')
+        });
+    },
+
+    /**
+	 * @method _syncOptionNodes
+	 * @protected
+	 * @description Syncs the option nodes with the choices attribute
+	 */
+    _syncOptionNodes: function() {
+        var choices = this.get('choices') || [],
+        contentBox = this.get('contentBox'),
+        options = contentBox.all('option'),
+        useDefaultOption = this.get('useDefaultOption'),
+        currentVal = this.get('value');
+
+        if (useDefaultOption === true) {
+            choices.unshift({
+                label : this.DEFAULT_OPTION_TEXT,
+                value: ''
+            });
+        }
+
+        options.each(function(node, index, nodeList) {
+            var label = choices[index].label,
+            val = choices[index].value;
+
+            node.setAttrs({
+                innerHTML: label,
+                value: val
+            });
+
+            if (currentVal == val) {
+                node.setAttrs({
+                    selected: true,
+                    defaultSelected: true
+                });
+            }
+        },
+        this);
+
+        if (!currentVal && !useDefaultOption && choices[0]) {
+            this.set('value', choices[0].value);
+        }
+    },
+
+    /**
+     * @method _afterChoiceChange
+     * @description When the available options for the select field change,
+     *     the old ones are removed and the new ones are rendered.
+     */
+    _afterChoicesChange: function(evt) {
+        var options = this._fieldNode.all("option");
+        options.remove();
+        this._renderOptionNodes();
+        this._syncOptionNodes();
+    },
+
+    /**
+	 * @method clear
+	 * @description Restores the selected option to the default
+	 */
+    clear: function() {
+        this._fieldNode.value = '';
+    },
+
+    bindUI: function() {
+        Y.SelectField.superclass.constructor.superclass.bindUI.apply(this, arguments);
+        this.after('choicesChange', this._afterChoicesChange);
+    },
+
+    syncUI: function() {
+        Y.SelectField.superclass.syncUI.apply(this, arguments);
+        this._syncOptionNodes();
+    }
+},
+{
+    /**
+	 * @property SelectField.OPTION_TEMPLATE
+	 * @type String
+	 * @description Template used to draw an option node
+	 */
+    OPTION_TEMPLATE: '<option></option>',
+
+    ATTRS: {
+        /**
+	     * @attribute useDefaultOption
+	     * @type Boolean
+	     * @default true
+	     * @description If true, the first option will use the DEFAULT_OPTION_TEXT
+	     *              to create a blank option
+	     */
+        useDefaultOption: {
+            validator: Y.Lang.isBoolean,
+            value: true
+        },
+
+        /** 
+         * @attribute choices
+         * @type Array
+         * @description The choices to render into this field
+         */
+        choices: {
+            validator: function(val) {
+                if (this.get("useDefaultOption") &&
+                    Y.Lang.isArray(val) &&
+                    val.length === 0) {
+                    // Empty arrays are okay if useDefaultOption is 'true'
+                    return true;
+                } else {
+                    return this._validateChoices(val);
+                }
+            }
+        },
+
+        /**
+         * @attribute size
+         * @type String
+         * @default 0
+         * @description Value of 'size' attribute of the select element.
+         */
+        size : {
+            validator : Y.Lang.isString,
+            value : '0'
+        }
+    }
+});
+Y.FormButton = Y.Base.create('button-field', Y.FormField, [Y.WidgetChild], {
+
+    FIELD_TEMPLATE : '<button></button>',
+    LABEL_TEMPLATE: '',
+
+    _syncFieldNode : function () {
+        this._fieldNode.setAttrs({
+            innerHTML : this.get('label'),
+            id : this.get('id') + Y.FormField.FIELD_ID_SUFFIX
+        });
+        
+        this.get('contentBox').addClass('first-child');
+    },
+
+    _setClickHandler : function () {
+        if (!this._fieldNode) {
+            return;
+        }
+
+        Y.Event.purgeElement(this._fieldNode, true, 'click');
+        Y.on('click', Y.bind(this._promptConfirm, this), this._fieldNode);
+    },
+
+    _promptConfirm: function(event) {
+        event.preventDefault();
+        var message = this.get("message"),
+            onclick = this.get("onclick");
+
+        if (message) {
+            if (!this.get("confirm")(message)) {
+                return;
+            }
+        }
+        onclick.fn.apply(onclick.scope);
+    },
+
+    bindUI : function () {
+        this.after('onclickChange', Y.bind(this._setClickHandler, this, true));
+        this.after('disabledChange', this._syncDisabled, this);
+        this._setClickHandler();
+    }
+}, {
+    ATTRS : {
+        onclick : {
+            validator : function (val) {
+                if (Y.Lang.isObject(val) === false) {
+                    return false;
+                }
+                if (typeof val.fn == 'undefined' ||
+                    Y.Lang.isFunction(val.fn) === false) {
+                    return false;
+                }
+                return true;
+            },
+            value : {
+                fn : function (e) {
+
+                }
+            },
+            setter : function (val) {
+                val.scope = val.scope || this;
+                val.argument = val.argument || {};
+                return val;
+            }
+        },
+
+        /** 
+         * @attribute message
+         * @type String
+         * @default null
+         * @description Optional confirmation message to be passed to the
+         *     confirm function.
+         */
+        message: {
+            validator : Y.Lang.isString,
+            value: null
+        },
+
+        /** 
+         * @attribute confirm
+         * @type Function
+         * @default null
+         * @description Optional confirmation function called when the button
+         *     is clicked. It will be be passed the string set in the 'message'
+         *     attribute. If it returns 'true' the the onclick handler will be
+         *     called, otherwise it will be skipped.
+         */
+        confirm:  {
+            validator : Y.Lang.isFunction,
+            value: null
+        }
+    }
+});
+/**
+ * @class FileField
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A file field node
+ */
+
+Y.FileField = Y.Base.create('file-field', Y.FormField, [Y.WidgetChild]);
+/**
+ * @class SubmitButton
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A submit button
+ */
+Y.SubmitButton = Y.Base.create('submit-button', Y.FormField, [Y.WidgetChild], {
+    _renderLabelNode : function () {}
+});
+/**
+ * @class ResetButton
+ * @extends FormField
+ * @param config {Object} Configuration object
+ * @constructor
+ * @description A reset button
+ */
+Y.ResetButton = Y.Base.create('reset-button', Y.FormField, [Y.WidgetChild], {
+    LABEL_TEMPLATE: ''
+});
+
+
+}, 'gallery-2011.11.10-16-24' ,{requires:['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection']});

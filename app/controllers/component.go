@@ -468,6 +468,14 @@ func (c Component) Layout() revel.Result {
 	return c.Render()
 }
 
+func (c Component) Form() revel.Result {
+	return c.Render()
+}
+
+func (c Component) DialogTest() revel.Result {
+	return c.Render()
+}
+
 func (c Component) Dicttest() revel.Result {
 	dictionaryManager := dictionary.GetInstance()
 	result := dictionaryManager.GetDictionary("D_DICTTEST")

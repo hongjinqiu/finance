@@ -103,6 +103,7 @@ type ColumnModel struct {
 
 	CheckboxColumn CheckboxColumn `xml:"checkbox-column"`
 	IdColumn       IdColumn       `xml:"id-column"`
+	Toolbar        Toolbar        `xml:"toolbar"`
 	ColumnLi       []Column       `xml:",any"`
 
 	ColumnModelAttributeGroup

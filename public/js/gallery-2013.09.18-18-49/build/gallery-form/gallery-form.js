@@ -378,7 +378,7 @@ Y.Form = Y.Base.create('form', Y.Widget, [Y.WidgetParent], {
      */
     ATTRS: {
         defaultChildType: {
-            valueFn: function() {
+            valueFn: function() {console.log("valueFn");
                 return Y.TextField;
             }
         },

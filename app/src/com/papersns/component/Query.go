@@ -4,7 +4,6 @@ import (
 	"com/papersns/mongo"
 	"encoding/json"
 	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
 	"strings"
 )
 
@@ -49,7 +48,7 @@ func (qb QuerySupport) Index(collection string, query map[string]interface{}, pa
 
 	c := db.C(collection)
 
-	items := []interface{}{}
+	items := []map[string]interface{}{}
 	var err error
 	if orderBy != "" {
 		fieldLi := strings.Split(orderBy, ",")
@@ -68,12 +67,7 @@ func (qb QuerySupport) Index(collection string, query map[string]interface{}, pa
 
 	mapItems := []interface{}{}
 	for _, item := range items {
-		record := item.(bson.M)
-		mapItem := map[string]interface{}{}
-		for k,v := range record {
-			mapItem[k] = v
-		}
-		mapItems = append(mapItems, mapItem)
+		mapItems = append(mapItems, item)
 	}
 	return map[string]interface{}{
 		"totalResults": totalResults,

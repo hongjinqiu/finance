@@ -54,6 +54,7 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>nick</displayField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
 			</field>

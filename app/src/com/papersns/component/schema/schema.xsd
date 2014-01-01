@@ -388,6 +388,7 @@
 		</annotation>
 		<complexType>
 			<sequence>
+				<element ref="tns:toolbar" minOccurs="0" />
 				<element ref="tns:checkbox-column" minOccurs="0" />
 				<element ref="tns:id-column" minOccurs="0" />
 				<choice minOccurs="1" maxOccurs="unbounded">

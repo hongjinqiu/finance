@@ -54,7 +54,29 @@ def initDictionary():
                 'order': 1,
             }],
         })
+        
+def initTransactionsId():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    id = mongoDB.counters.find_one({'_id': 'transactionsId'})
+    if not id:
+        mongoDB.counters.save({'_id': 'transactionsId', 'c': 1})
+
+def initTest1Id():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    id = mongoDB.counters.find_one({'_id': 'test1Id'})
+    if not id:
+        mongoDB.counters.save({'_id': 'test1Id', 'c': 1})
+
+def initTest2Id():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    id = mongoDB.counters.find_one({'_id': 'test2Id'})
+    if not id:
+        mongoDB.counters.save({'_id': 'test2Id', 'c': 1})
 
 if __name__ == '__main__':
     initDictionary()
+    initTransactionsId()
+    initTest1Id()
+    initTest2Id()
+
 

@@ -82,6 +82,9 @@
 
 	<column-model name="B" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
 		<auto-column name="ttt" />
+		<virtual-column name="">
+			
+		</virtual-column>
 		<auto-column name="eee dddd">
 			<editor>
 				<editor_attribute name="" value=""></editor_attribute>
