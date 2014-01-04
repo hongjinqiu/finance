@@ -30,14 +30,14 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 		// 主数据集和分录id赋值,
 		modelIterator := ModelIterator{}
 		var result interface{} = ""
-		modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
+		modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 			o.setDataId(db, dataSource, &fieldGroup, bo, data)
 		})
 		// 被用过帐
 		usedCheck := UsedCheck{}
 		result = ""
 		diffDataRowLi := []DiffDataRow{}
-		modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}) {
+		modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 			diffDataRowLi = append(diffDataRowLi, DiffDataRow{
 				FieldGroupLi: fieldGroupLi,
 				DestBo:       bo,
@@ -135,7 +135,7 @@ func (o FinanceService) validateBO(dataSource DataSource, bo map[string]interfac
 		detailIndex[item.Id] = 0
 	}
 	var result interface{} = messageLi
-	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, messageLi *interface{}) {
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, messageLi *interface{}) {
 		stringLi := (*messageLi).([]string)
 		fieldMessageLi := o.validateFieldGroup(fieldGroup, *data)
 		if fieldGroup.IsMasterField() {

@@ -10,16 +10,17 @@ import (
 )
 
 const (
-	RETRY_COUNT  = 2
-	BEGIN_COMMIT = "begin_commit"
-	PREPARE      = "prepare"
-	COMMIT       = "commit"
-	ABORT        = "abort"
-	DONE         = "done"
-	CANCELLED    = "cancelled"
-	DELETEFLAG   = "deleteFlag"
-	SLEEP_TIME   = 500 * time.Millisecond
-	TXN_PERIOD   = 1 * time.Minute
+	RETRY_COUNT   = 2
+	BEGIN_COMMIT  = "begin_commit"
+	PREPARE       = "prepare"
+	COMMIT        = "commit"
+	ABORT         = "abort"
+	DONE          = "done"
+	CANCELLED     = "cancelled"
+	DELETEFLAG    = "deleteFlag"
+	SLEEP_TIME    = 500 * time.Millisecond
+	TXN_PERIOD    = 1 * time.Minute
+	RESUME_PERIOD = 10 * time.Minute
 )
 
 type TxnPeriodTask struct{}
@@ -39,10 +40,7 @@ type TxnManager struct {
 }
 
 // TODO, byTest
-func (o TxnManager) BeginTransaction(collections []string) int {
-	if collections == nil || len(collections) == 0 {
-		panic("collections can't be null, and length must > 0")
-	}
+func (o TxnManager) BeginTransaction() int {
 	c := o.DB.C("Transactions")
 	seqName := GetCollectionSequenceName("Transactions")
 	_id := GetSequenceNo(o.DB, seqName)
@@ -60,7 +58,7 @@ func (o TxnManager) BeginTransaction(collections []string) int {
 	change := map[string]interface{}{
 		"$set": map[string]interface{}{
 			"state":       PREPARE,
-			"collections": collections,
+			"collections": []string{},
 			"updateTime":  o.GetCurrentDateTime(),
 		},
 	}
@@ -239,6 +237,8 @@ func throwsPanic(f func()) (b bool) {
 
 // TODO, byTest,
 func (o TxnManager) Insert(txnId int, collection string, doc map[string]interface{}) map[string]interface{} {
+	o.pubTxnCollectionIfNotExist(txnId, collection)
+
 	seqName := GetCollectionSequenceName(collection)
 	sequenceNo := GetSequenceNo(o.DB, seqName)
 	doc["_id"] = sequenceNo
@@ -258,6 +258,8 @@ func (o TxnManager) Insert(txnId int, collection string, doc map[string]interfac
 
 // TODO, byTest
 func (o TxnManager) Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
+	o.pubTxnCollectionIfNotExist(txnId, collection)
+
 	for i := 0; i < RETRY_COUNT; i++ {
 		if result, found := o.update(txnId, collection, doc); found {
 			return result, true
@@ -274,7 +276,12 @@ func (o TxnManager) update(txnId int, collection string, doc map[string]interfac
 			"_id": doc["_id"],
 		}
 		doc["txnId"] = txnId
-		pendingTransactions := oldDoc["pendingTransactions"].([]interface{})
+		var pendingTransactions []interface{}
+		if oldDoc["pendingTransactions"] != nil {
+			pendingTransactions = oldDoc["pendingTransactions"].([]interface{})
+		} else {
+			pendingTransactions = []interface{}{}
+		}
 		pendingTransactions = append(pendingTransactions, map[string]interface{}{
 			"update": oldDoc,
 		})
@@ -285,12 +292,21 @@ func (o TxnManager) update(txnId int, collection string, doc map[string]interfac
 			}
 			panic(err)
 		}
-		return doc, true
+		result := map[string]interface{}{}
+		if err := o.DB.C(collection).Find(query).One(&result); err != nil {
+			if err == mgo.ErrNotFound {
+				return nil, false
+			}
+			panic(err)
+		}
+		return result, true
 	}
 	return nil, false
 }
 
 func (o TxnManager) SelectForUpdate(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
+	o.pubTxnCollectionIfNotExist(txnId, collection)
+
 	return o.selectForUpdate(txnId, collection, doc)
 }
 
@@ -348,9 +364,15 @@ func (o TxnManager) selectMultiForUpdate(txnId int, collection string, query map
 }
 
 // TODO, byTest
-func (o TxnManager) FindAndModify(txnId int, collection string, query map[string]interface{}, update map[string]interface{}, unModify map[string]interface{}) (map[string]interface{}, bool) {
+/**
+atomic for every found document,
+but not atomic for all found document
+*/
+func (o TxnManager) UpdateAll(txnId int, collection string, query map[string]interface{}, update map[string]interface{}, unModify map[string]interface{}) (map[string]interface{}, bool) {
+	o.pubTxnCollectionIfNotExist(txnId, collection)
+
 	for i := 0; i < RETRY_COUNT; i++ {
-		if result, found := o.findAndModify(txnId, collection, query, update, unModify); found {
+		if result, found := o.updateAll(txnId, collection, query, update, unModify); found {
 			return result, true
 		}
 		time.Sleep(SLEEP_TIME)
@@ -359,7 +381,7 @@ func (o TxnManager) FindAndModify(txnId int, collection string, query map[string
 }
 
 // TODO, byTest
-func (o TxnManager) findAndModify(txnId int, collection string, query map[string]interface{}, update map[string]interface{}, unModify map[string]interface{}) (map[string]interface{}, bool) {
+func (o TxnManager) updateAll(txnId int, collection string, query map[string]interface{}, update map[string]interface{}, unModify map[string]interface{}) (map[string]interface{}, bool) {
 	if _, found := o.selectMultiForUpdate(txnId, collection, query); found {
 		changeQuery := map[string]interface{}{
 			"txnId": txnId,
@@ -401,6 +423,8 @@ func (o TxnManager) findAndModify(txnId int, collection string, query map[string
 
 //  Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
 func (o TxnManager) Remove(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
+	o.pubTxnCollectionIfNotExist(txnId, collection)
+
 	for i := 0; i < RETRY_COUNT; i++ {
 		if result, found := o.remove(txnId, collection, doc); found {
 			return result, true
@@ -416,28 +440,50 @@ func (o TxnManager) remove(txnId int, collection string, doc map[string]interfac
 		query := map[string]interface{}{
 			"_id": doc["_id"],
 		}
-		doc["txnId"] = txnId
-		doc[DELETEFLAG] = 9
-		pendingTransactions := oldDoc["pendingTransactions"].([]interface{})
+		var pendingTransactions []interface{}
+		if oldDoc["pendingTransactions"] != nil {
+			pendingTransactions = oldDoc["pendingTransactions"].([]interface{})
+		} else {
+			pendingTransactions = []interface{}{}
+		}
 		pendingTransactions = append(pendingTransactions, map[string]interface{}{
 			"remove": true,
 		})
-		doc["pendingTransactions"] = pendingTransactions
-		if err := o.DB.C(collection).Update(query, doc); err != nil {
+		update := map[string]interface{}{
+			"$set": map[string]interface{}{
+				"txnId":               txnId,
+				DELETEFLAG:            9,
+				"pendingTransactions": pendingTransactions,
+			},
+		}
+		if err := o.DB.C(collection).Update(query, update); err != nil {
 			if err == mgo.ErrNotFound {
 				return nil, false
 			}
 			panic(err)
 		}
-		return doc, true
+		result := map[string]interface{}{}
+		if err := o.DB.C(collection).Find(query).One(&result); err != nil {
+			if err == mgo.ErrNotFound {
+				return nil, false
+			}
+			panic(err)
+		}
+		return result, true
 	}
 	return nil, false
 }
 
 // TODO, byTest
-func (o TxnManager) FindAndRemove(txnId int, collection string, query map[string]interface{}) (map[string]interface{}, bool) {
+/**
+atomic for every found document,
+but not atomic for all found document
+*/
+func (o TxnManager) RemoveAll(txnId int, collection string, query map[string]interface{}) (map[string]interface{}, bool) {
+	o.pubTxnCollectionIfNotExist(txnId, collection)
+
 	for i := 0; i < RETRY_COUNT; i++ {
-		if result, found := o.findAndRemove(txnId, collection, query); found {
+		if result, found := o.removeAll(txnId, collection, query); found {
 			return result, true
 		}
 		time.Sleep(SLEEP_TIME)
@@ -446,7 +492,7 @@ func (o TxnManager) FindAndRemove(txnId int, collection string, query map[string
 }
 
 // TODO, byTest
-func (o TxnManager) findAndRemove(txnId int, collection string, query map[string]interface{}) (map[string]interface{}, bool) {
+func (o TxnManager) removeAll(txnId int, collection string, query map[string]interface{}) (map[string]interface{}, bool) {
 	if _, found := o.selectMultiForUpdate(txnId, collection, query); found {
 		changeQuery := map[string]interface{}{
 			"txnId": txnId,
@@ -510,7 +556,7 @@ func (o TxnManager) Resume() {
 // 协调者的时间更新,
 func (o TxnManager) ResumePeriod() {
 	t := time.Now()
-	t = t.Add(-10 * time.Minute)
+	t = t.Add(-RESUME_PERIOD)
 	txnLi := []map[string]interface{}{}
 	query := bson.M{
 		"state": bson.M{
@@ -550,6 +596,25 @@ func (o TxnManager) finishTxn(txnLi []interface{}) {
 			o.Commit(txnId)
 		} else if state == ABORT {
 			o.Rollback(txnId)
+		}
+	}
+}
+
+func (o TxnManager) pubTxnCollectionIfNotExist(txnId int, collection string) {
+	query := map[string]interface{}{
+		"_id": txnId,
+		"collections": map[string]interface{}{
+			"$nin": []string{collection},
+		},
+	}
+	update := map[string]interface{}{
+		"$push": map[string]interface{}{
+			"collections": collection,
+		},
+	}
+	if err := o.DB.C("Transactions").Update(query, update); err != nil {
+		if err != mgo.ErrNotFound {
+			panic(err)
 		}
 	}
 }

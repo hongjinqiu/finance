@@ -38,11 +38,19 @@
 		root : 'yui.3.12.0/',
 		gallery: 'gallery-2013.09.18-18-49'
 	};
+	var formJsConfig = {
+		modules: {
+	        "papersns-form": {
+	            fullpath: '/app/FormJS',
+	            requires: ['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection']
+	        }
+	    }	
+	};
 </script>
 <script src="/public/js/yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
 <script type="text/javascript">
 	var field;
-	YUI().use("node", "event", "gallery-form", function(Y) {
+	YUI(formJsConfig).use("node", "event", "papersns-form", function(Y) {
 		Y.on("domready", function(e) {
 			/* 
 			var myForm = new Y.Form({
@@ -68,9 +76,12 @@
 		          {label : 'Choice C', value : 'C'}
 		      ]});
 			 */
+			 /*
+			//gallery-form
 			field = new Y.TextField({name : 'input1', type : 'text', required: true, validator : 'email'});
 			field.render("#test2");
 			field.get("error");// string
+			//field.set('error', Y.PFormField.INVALID_IP_MESSAGE);
 			field.validateField();// true or false
 			var textElem = Y.one("#testText");
 			textElem.on("mouseover", function(Y){
@@ -79,6 +90,10 @@
 			textElem.on("mouseout", function(Y){
 				textElem.removeClass("x-form-invalid-field");
 			});
+			*/
+			// papersns-form
+			var field = new Y.PTextField({name : 'input1', type : 'text', required: true, validator : 'email'});
+			field.render("#test3");
 		});
 	});
 </script>
@@ -87,5 +102,6 @@
 <body class="yui3-skin-sam">
 	<div id="test2">test2</div>
 	<input type="text" id="testText" value="text" class="x-form-text" />
+	<div id="test3">test3</div>
 </body>
 </html>

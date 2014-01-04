@@ -113,8 +113,8 @@ func (c ModelTest) BeginTransaction() revel.Result {
 	defer session.Close()
 
 	txnManager := TxnManager{db}
-	collections := []string{"Test1", "Test2"}
-	txnManager.BeginTransaction(collections)
+
+	txnManager.BeginTransaction()
 
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText("BeginTransaction")
@@ -126,14 +126,14 @@ func (c ModelTest) Commit1() revel.Result {
 	defer session.Close()
 
 	txnManager := TxnManager{db}
-	collections := []string{"Test1", "Test2"}
-	txnId := txnManager.BeginTransaction(collections)
-	
+
+	txnId := txnManager.BeginTransaction()
+
 	test1 := map[string]interface{}{"name": "insertTest1"}
 	txnManager.Insert(txnId, "Test1", test1)
 	test2 := map[string]interface{}{"name": "insertTest2"}
 	txnManager.Insert(txnId, "Test2", test2)
-	
+
 	txnManager.Commit(txnId)
 
 	c.Response.ContentType = "text/plain; charset=utf-8"
@@ -146,14 +146,14 @@ func (c ModelTest) Commit2() revel.Result {
 	defer session.Close()
 
 	txnManager := TxnManager{db}
-	collections := []string{"Test1", "Test2"}
-	txnId := txnManager.BeginTransaction(collections)
-	
+
+	txnId := txnManager.BeginTransaction()
+
 	test1 := map[string]interface{}{"name": "insertTest2"}
 	txnManager.Insert(txnId, "Test1", test1)
 	test2 := map[string]interface{}{"name": "insertTest2"}
 	txnManager.Insert(txnId, "Test2", test2)
-	
+
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText("Commit2")
 }
@@ -164,16 +164,16 @@ func (c ModelTest) Commit3() revel.Result {
 	defer session.Close()
 
 	txnManager := TxnManager{db}
-	collections := []string{"Test1", "Test2"}
-	txnId := txnManager.BeginTransaction(collections)
-	
+
+	txnId := txnManager.BeginTransaction()
+
 	test1 := map[string]interface{}{"name": "insertTest3"}
 	txnManager.Insert(txnId, "Test1", test1)
 	test2 := map[string]interface{}{"_id": 3, "name": "insertTest3"}
 	txnManager.Update(txnId, "Test2", test2)
-	
+
 	txnManager.Commit(txnId)
-	
+
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText("Commit3")
 }
@@ -184,14 +184,14 @@ func (c ModelTest) Commit4() revel.Result {
 	defer session.Close()
 
 	txnManager := TxnManager{db}
-	collections := []string{"Test1", "Test2"}
-	txnId := txnManager.BeginTransaction(collections)
-	
+
+	txnId := txnManager.BeginTransaction()
+
 	test1 := map[string]interface{}{"name": "insertTest4"}
 	txnManager.Insert(txnId, "Test1", test1)
 	test2 := map[string]interface{}{"_id": 3, "name": "insertTest4"}
 	txnManager.Update(txnId, "Test2", test2)
-	
+
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText("Commit4")
 }
@@ -202,21 +202,669 @@ func (c ModelTest) Commit5() revel.Result {
 	defer session.Close()
 
 	txnManager := TxnManager{db}
-	collections := []string{"Test1", "Test2"}
-	txnId := txnManager.BeginTransaction(collections)
-	
+
+	txnId := txnManager.BeginTransaction()
+
 	test1 := map[string]interface{}{"name": "insertTest5"}
 	txnManager.Insert(txnId, "Test1", test1)
 	test2 := map[string]interface{}{"_id": 3, "name": "insertTest5"}
 	txnManager.Update(txnId, "Test2", test2)
-	
+
 	test3 := map[string]interface{}{"_id": 2, "name": "insertTest5"}
 	txnManager.Remove(txnId, "Test2", test3)
-	
+
 	txnManager.Commit(txnId)
-	
+
 	c.Response.ContentType = "text/plain; charset=utf-8"
 	return c.RenderText("Commit5")
 }
 
+func (c ModelTest) Commit6() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
 
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{"name": "insertTest6"}
+	txnManager.Insert(txnId, "Test1", test1)
+	test2 := map[string]interface{}{"_id": 4, "name": "insertTest6"}
+	txnManager.Update(txnId, "Test2", test2)
+
+	test3 := map[string]interface{}{"_id": 2, "name": "insertTest6"}
+	txnManager.Remove(txnId, "Test2", test3)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit6")
+}
+
+func (c ModelTest) Commit7() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{"name": "insertTest7"}
+	txnManager.Insert(txnId, "Test1", test1)
+
+	test3 := map[string]interface{}{"_id": 2, "name": "insertTest7"}
+	txnManager.Remove(txnId, "Test2", test3)
+
+	test2 := map[string]interface{}{"_id": 4, "name": "insertTest7"}
+	txnManager.Update(txnId, "Test2", test2)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit7")
+}
+
+func (c ModelTest) Commit8() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{"name": "insertTest8"}
+	txnManager.Insert(txnId, "Test1", test1)
+
+	test3 := map[string]interface{}{"_id": 3, "name": "insertTest8"}
+	txnManager.Remove(txnId, "Test2", test3)
+
+	test2 := map[string]interface{}{"_id": 4, "name": "insertTest8"}
+	txnManager.Update(txnId, "Test2", test2)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit8")
+}
+
+func (c ModelTest) Commit9() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{"name": "insertTest9"}
+	txnManager.Insert(txnId, "Test1", test1)
+
+	test3 := map[string]interface{}{"_id": 3, "name": "insertTest9"}
+	txnManager.Remove(txnId, "Test2", test3)
+
+	test2 := map[string]interface{}{"_id": 4, "name": "insertTest9"}
+	txnManager.Update(txnId, "Test2", test2)
+
+	test4 := map[string]interface{}{"_id": 5, "name": "insertTest9"}
+	txnManager.Remove(txnId, "Test2", test4)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-9"
+	return c.RenderText("Commit9")
+}
+
+func (c ModelTest) Commit10() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{"name": "insertTest10"}
+	txnManager.Insert(txnId, "Test1", test1)
+
+	test3 := map[string]interface{}{"_id": 4, "name": "insertTest10"}
+	txnManager.Remove(txnId, "Test2", test3)
+
+	test2 := map[string]interface{}{"_id": 6, "name": "insertTest10"}
+	txnManager.Update(txnId, "Test2", test2)
+
+	test4 := map[string]interface{}{"_id": 7, "name": "insertTest10"}
+	txnManager.Remove(txnId, "Test2", test4)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit10")
+}
+
+func (c ModelTest) Commit11() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	{
+		query := map[string]interface{}{
+			"_id": map[string]interface{}{
+				"$lt": 7,
+			},
+		}
+		update := map[string]interface{}{
+			"$set": map[string]interface{}{
+				"age": 11,
+			},
+		}
+		unModify := map[string]interface{}{
+			"$unset": map[string]interface{}{
+				"age": 1,
+			},
+		}
+		txnManager.UpdateAll(txnId, "Test1", query, update, unModify)
+	}
+	{
+		query := map[string]interface{}{
+			"_id": map[string]interface{}{
+				"$gte": 8,
+			},
+		}
+		update := map[string]interface{}{
+			"$set": map[string]interface{}{
+				"age": 12,
+			},
+		}
+		unModify := map[string]interface{}{
+			"$unset": map[string]interface{}{
+				"age": 1,
+			},
+		}
+		txnManager.UpdateAll(txnId, "Test2", query, update, unModify)
+	}
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit11")
+}
+
+func (c ModelTest) Commit12() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	{
+		query := map[string]interface{}{
+			"_id": map[string]interface{}{
+				"$lt": 7,
+			},
+		}
+		update := map[string]interface{}{
+			"$set": map[string]interface{}{
+				"age": 9,
+			},
+		}
+		unModify := map[string]interface{}{
+			"$unset": map[string]interface{}{
+				"age": 1,
+			},
+		}
+		txnManager.UpdateAll(txnId, "Test1", query, update, unModify)
+	}
+	{
+		query := map[string]interface{}{
+			"_id": map[string]interface{}{
+				"$gte": 8,
+			},
+		}
+		update := map[string]interface{}{
+			"$set": map[string]interface{}{
+				"age": 9,
+			},
+		}
+		unModify := map[string]interface{}{
+			"$unset": map[string]interface{}{
+				"age": 1,
+			},
+		}
+		txnManager.UpdateAll(txnId, "Test2", query, update, unModify)
+	}
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit12")
+}
+
+func (c ModelTest) Commit13() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest13",
+	}
+	txnManager.Insert(txnId, "Test1", test1)
+
+	test1["age"] = 20
+	txnManager.Update(txnId, "Test1", test1)
+
+	txnManager.Remove(txnId, "Test1", test1)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit13")
+}
+
+func (c ModelTest) Commit14() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest14",
+	}
+	txnManager.Insert(txnId, "Test1", test1)
+
+	test1["age"] = 20
+	txnManager.Update(txnId, "Test1", test1)
+
+	txnManager.Remove(txnId, "Test1", test1)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit14")
+}
+
+func (c ModelTest) Commit15() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest15",
+	}
+	test1 = txnManager.Insert(txnId, "Test1", test1)
+	test1, _ = txnManager.Remove(txnId, "Test1", test1)
+	test1["age"] = 20
+	test1, _ = txnManager.Update(txnId, "Test1", test1)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit15")
+}
+
+func (c ModelTest) Commit16() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest16",
+	}
+	test1 = txnManager.Insert(txnId, "Test1", test1)
+	test1, _ = txnManager.Remove(txnId, "Test1", test1)
+	test1["age"] = 20
+	test1, _ = txnManager.Update(txnId, "Test1", test1)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit16")
+}
+
+func (c ModelTest) Commit17() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest17",
+	}
+	test1 = txnManager.Insert(txnId, "Test1", test1)
+	test1, _ = txnManager.Remove(txnId, "Test1", test1)
+	test1["age"] = 20
+	test1, _ = txnManager.Remove(txnId, "Test1", test1)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit17")
+}
+
+func (c ModelTest) Commit18() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest18",
+	}
+	test1 = txnManager.Insert(txnId, "Test1", test1)
+	test1, _ = txnManager.Remove(txnId, "Test1", test1)
+	test1["age"] = 20
+	test1, _ = txnManager.Remove(txnId, "Test1", test1)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit18")
+}
+
+func (c ModelTest) Commit19() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest19",
+	}
+	test1 = txnManager.Insert(txnId, "Test1", test1)
+	test1["address"] = "xiamen"
+	test1, _ = txnManager.Update(txnId, "Test1", test1)
+	test1["age"] = 20
+	test1, _ = txnManager.Update(txnId, "Test1", test1)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit19")
+}
+
+func (c ModelTest) Commit20() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"name": "insertTest20",
+	}
+	test1 = txnManager.Insert(txnId, "Test1", test1)
+	test1["address"] = "xiamen"
+	test1, _ = txnManager.Update(txnId, "Test1", test1)
+	test1["age"] = 20
+	test1, _ = txnManager.Update(txnId, "Test1", test1)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit20")
+}
+
+func (c ModelTest) SelectForUpdate1() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"_id":  36,
+		"name": "SelectForUpdate1",
+	}
+	txnManager.SelectForUpdate(txnId, "Test1", test1)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("SelectForUpdate1")
+}
+
+func (c ModelTest) SelectForUpdate2() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"_id":  36,
+		"name": "SelectForUpdate2",
+	}
+	txnManager.SelectForUpdate(txnId, "Test1", test1)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("SelectForUpdate2")
+}
+
+func (c ModelTest) SelectForUpdate3() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{
+		"_id":  36,
+		"name": "SelectForUpdate3",
+	}
+	txnManager.SelectForUpdate(txnId, "Test1", test1)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("SelectForUpdate3")
+}
+
+func (c ModelTest) UpdateAll1() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	query := map[string]interface{}{
+		"_id": 36,
+	}
+	update := map[string]interface{}{
+		"$set": map[string]interface{}{
+			"age": 20,
+		},
+	}
+	unModify := map[string]interface{}{
+		"$unset": map[string]interface{}{
+			"age": 1,
+		},
+	}
+	txnManager.UpdateAll(txnId, "Test1", query, update, unModify)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("UpdateAll1")
+}
+
+func (c ModelTest) UpdateAll2() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	query := map[string]interface{}{
+		"_id": 36,
+	}
+	update := map[string]interface{}{
+		"$inc": map[string]interface{}{
+			"age": 5,
+		},
+	}
+	unModify := map[string]interface{}{
+		"$inc": map[string]interface{}{
+			"age": -5,
+		},
+	}
+	txnManager.UpdateAll(txnId, "Test1", query, update, unModify)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("UpdateAll1")
+}
+
+func (c ModelTest) UpdateAll3() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	query := map[string]interface{}{
+		"_id": map[string]interface{}{
+			"$lte": 100,
+		},
+	}
+	update := map[string]interface{}{
+		"$inc": map[string]interface{}{
+			"age": 5,
+		},
+	}
+	unModify := map[string]interface{}{
+		"$inc": map[string]interface{}{
+			"age": -5,
+		},
+	}
+	obj, _ := txnManager.UpdateAll(txnId, "Test1", query, update, unModify)
+	fmt.Println("obj3", obj)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("UpdateAll3")
+}
+
+func (c ModelTest) RemoveAll1() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	query := map[string]interface{}{
+		"_id": 5,
+	}
+	obj, _ := txnManager.RemoveAll(txnId, "Test1", query)
+	fmt.Println("removeAll1", obj)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("RemoveAll1")
+}
+
+func (c ModelTest) RemoveAll2() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnId := txnManager.BeginTransaction()
+
+	query := map[string]interface{}{
+		"_id": map[string]interface{}{
+			"$lte": 100,
+		},
+	}
+	obj, _ := txnManager.RemoveAll(txnId, "Test1", query)
+	fmt.Println("RemoveAll2", obj)
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("RemoveAll2")
+}
+
+func (c ModelTest) Rollback1() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+
+	test1 := map[string]interface{}{"name": "rollbackTest1"}
+	txnManager.Insert(txnId, "Test1", test1)
+	test2 := map[string]interface{}{"name": "rollbackTest2"}
+	txnManager.Insert(txnId, "Test2", test2)
+
+	txnManager.Rollback(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Rollback1")
+}
+
+func (c ModelTest) ResumeBeginCommit1() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnManager.Resume()
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("ResumeBeginCommit1")
+}
+
+func (c ModelTest) ResumeBeginCommit2() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+	txnManager.ResumePeriod()
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("ResumeBeginCommit2")
+}
+
+func (c ModelTest) RecoverTest() revel.Result {
+	connectionFactory := mongo.ConnectionFactory{}
+	session, db := connectionFactory.GetConnection()
+	defer session.Close()
+
+	txnManager := TxnManager{db}
+
+	txnId := txnManager.BeginTransaction()
+	defer func() {
+		if x := recover(); x != nil {
+			txnManager.Rollback(txnId)
+			panic(x)
+		}
+	}()
+
+	test1 := map[string]interface{}{"name": "insertTest1"}
+	txnManager.Insert(txnId, "Test1", test1)
+	test2 := map[string]interface{}{"name": "insertTest2"}
+	txnManager.Insert(txnId, "Test2", test2)
+
+	txnManager.Commit(txnId)
+
+	c.Response.ContentType = "text/plain; charset=utf-8"
+	return c.RenderText("Commit1")
+}

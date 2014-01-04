@@ -1,14 +1,14 @@
 function ModelIterator() {
 }
 
-function IterateFunc(fieldGroup, data, result) {
+function IterateFunc(fieldGroup, data, rowIndex, result) {
 }
 
 ModelIterator.prototype.iterateAllFieldBo = function(dataSource, bo, result, iterateFunc) {
 	var self = this;
-	self.iterateDataBo(dataSource, bo, result, function(fieldGroupLi, data, result){
+	self.iterateDataBo(dataSource, bo, result, function(fieldGroupLi, data, rowIndex, result){
 		for (var i = 0; i < fieldGroupLi.length; i++) {
-			iterateFunc(fieldGroupLi[i], data, result);
+			iterateFunc(fieldGroupLi[i], data, rowIndex, result);
 		}
 	})
 }
@@ -54,7 +54,7 @@ ModelIterator.prototype._getDataSetFieldGroupLi = function(fixField, bizField) {
 	return fieldGroupLi;
 }
 
-function IterateDataFunc(fieldGroupLi, data, result) {}
+function IterateDataFunc(fieldGroupLi, data, rowIndex, result) {}
 
 ModelIterator.prototype.iterateDataBo = function(dataSource, bo, result, iterateFunc) {
 	var self = this;
@@ -66,7 +66,8 @@ ModelIterator.prototype._iterateMasterDataBo = function(dataSource, bo, result, 
 	var self = this;
 	var data = bo["A"];
 	var fieldGroupLi = self._getDataSetFieldGroupLi(dataSource.MasterData.FixField, dataSource.MasterData.BizField)
-	iterateFunc(fieldGroupLi, data, result)
+	var rowIndex = 0;
+	iterateFunc(fieldGroupLi, data, rowIndex, result)
 }
 
 ModelIterator.prototype._iterateDetailDataBo = function(dataSource, bo, result, iterateFunc) {
@@ -77,7 +78,7 @@ ModelIterator.prototype._iterateDetailDataBo = function(dataSource, bo, result, 
 		var dataLi = bo[item.Id];
 		for (var j = 0; j < dataLi.length; j++) {
 			var data = dataLi[j];
-			iterateFunc(fieldGroupLi, data, result);
+			iterateFunc(fieldGroupLi, data, j, result);
 		}
 	}
 }

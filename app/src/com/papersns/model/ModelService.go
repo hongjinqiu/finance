@@ -7,12 +7,12 @@ import (
 
 type ModelIterator struct {}
 
-type IterateFunc func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{})
+type IterateFunc func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{})
 
 func (o ModelIterator) IterateAllFieldBo(dataSource DataSource, bo *map[string]interface{}, result *interface{}, iterateFunc IterateFunc) {
-	o.IterateDataBo(dataSource, bo, result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+	o.IterateDataBo(dataSource, bo, result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
 		for _, item := range fieldGroupLi {
-			iterateFunc(item, data, result)
+			iterateFunc(item, data, rowIndex, result)
 		}
 	})
 }
@@ -185,7 +185,7 @@ func (o ModelIterator) getDataSetFieldGroupLi(fixField *FixField, bizField *BizF
 	return &fieldGroupLi
 }
 
-type IterateDataFunc func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{})
+type IterateDataFunc func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{})
 
 func (o ModelIterator) IterateDataBo(dataSource DataSource, bo *map[string]interface{}, result *interface{}, iterateFunc IterateDataFunc) {
 	o.iterateMasterDataBo(dataSource, bo, result, iterateFunc)
@@ -199,7 +199,8 @@ func (o ModelIterator) iterateMasterDataBo(dataSource DataSource, bo *map[string
 	for _, item := range *masterFieldGroupLi {
 		fieldGroupLi = append(fieldGroupLi, *item)
 	}
-	iterateFunc(fieldGroupLi, &data, result)
+	rowIndex := 0
+	iterateFunc(fieldGroupLi, &data, rowIndex, result)
 }
 
 func (o ModelIterator) iterateDetailDataBo(dataSource DataSource, bo *map[string]interface{}, result *interface{}, iterateFunc IterateDataFunc) {
@@ -213,7 +214,7 @@ func (o ModelIterator) iterateDetailDataBo(dataSource DataSource, bo *map[string
 		dataLi := (*bo)[item.Id].([]interface{})
 		for j, _ := range dataLi {
 			data := dataLi[j].(map[string]interface{})
-			iterateFunc(fieldGroupLi, &data, result)
+			iterateFunc(fieldGroupLi, &data, j, result)
 		}
 	}
 }

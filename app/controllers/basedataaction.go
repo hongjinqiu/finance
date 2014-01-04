@@ -269,7 +269,7 @@ func (c BaseDataAction) DeleteData() revel.Result {
 	usedCheck := UsedCheck{}
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}){
+	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
 		if fieldGroupLi[0].IsMasterField() {
 			usedCheck.Delete(db, fieldGroupLi, *data)
 		}

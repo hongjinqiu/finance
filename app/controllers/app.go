@@ -45,7 +45,7 @@ func (c App) Combo() revel.Result {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		data, err := ioutil.ReadAll(file)
 		if err != nil {
 			panic(err)
@@ -78,27 +78,28 @@ func (c App) Combo() revel.Result {
 	}
 	return c.RenderText(content)
 }
+
 func (c App) ComboView() revel.Result {
 	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
 	content := ""
 	for k := range c.Params.Query {
-		if strings.Index(k, ".js") == -1 || strings.Index(k, ".css") == -1 {
+		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
 			panic("fileName is:" + k + ", expect ends with .js or .css")
 		}
 		isFileExist := false
 		for _, filePath := range strings.Split(jsPath, ":") {
 			if _, err := os.Stat(path.Join(filePath, k)); err != nil {
-			    if os.IsNotExist(err) {
-	                continue
-	            }
-		    }
-		    isFileExist = true
-			file, err := os.Open(path.Join(jsPath, k))
+				if os.IsNotExist(err) {
+					continue
+				}
+			}
+			isFileExist = true
+			file, err := os.Open(path.Join(filePath, k))
 			defer file.Close()
 			if err != nil {
 				panic(err)
 			}
-			
+
 			data, err := ioutil.ReadAll(file)
 			if err != nil {
 				panic(err)
@@ -134,5 +135,60 @@ func (c App) ComboView() revel.Result {
 	} else {
 		c.Response.ContentType = "text/css;charset=UTF-8"
 	}
+	return c.RenderText(content)
+}
+
+func (c App) FormJS() revel.Result {
+	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
+	content := ""
+	formJsLi := []string{"js/form/p-form-field.js", "js/form/p-text-field.js"}
+	for _, k := range formJsLi {
+		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
+			panic("fileName is:" + k + ", expect ends with .js or .css")
+		}
+		isFileExist := false
+		for _, filePath := range strings.Split(jsPath, ":") {
+			if _, err := os.Stat(path.Join(filePath, k)); err != nil {
+				if os.IsNotExist(err) {
+					continue
+				}
+			}
+			isFileExist = true
+			file, err := os.Open(path.Join(filePath, k))
+			defer file.Close()
+			if err != nil {
+				panic(err)
+			}
+
+			data, err := ioutil.ReadAll(file)
+			if err != nil {
+				panic(err)
+			}
+			content += string(data) + "\n"
+			break
+		}
+		if !isFileExist {
+			panic(k + " is not exists")
+		}
+	}
+	prefix := "YUI.add('papersns-form', function(Y) {\n"
+	suffix := "}, '1.1.0' ,{requires:['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection']});\n"
+	content = prefix + content + suffix
+
+	acceptEncoding := c.Request.Header.Get("Accept-Encoding")
+	if strings.Index(acceptEncoding, "gzip") > -1 {
+		data := bytes.Buffer{}
+		w := gzip.NewWriter(&data)
+		w.Write([]byte(content))
+		w.Close()
+
+		c.Response.Status = http.StatusOK
+		c.Response.ContentType = "text/javascript;charset=UTF-8"
+		c.Response.Out.Header().Set("Content-Encoding", "gzip")
+		return c.RenderText(data.String())
+	}
+
+	c.Response.Status = http.StatusOK
+	c.Response.ContentType = "text/javascript;charset=UTF-8"
 	return c.RenderText(content)
 }

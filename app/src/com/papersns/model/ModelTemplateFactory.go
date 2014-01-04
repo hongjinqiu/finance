@@ -386,7 +386,7 @@ func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource DataSource, bo *m
 		panic(err)
 	}
 	boJson := string(boJsonData)
-	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		var content string = ""
 		if fieldGroup.DefaultValueExpr.Content != "" {
 			if fieldGroup.DefaultValueExpr.Mode == "" || fieldGroup.DefaultValueExpr.Mode == "text" {
@@ -416,7 +416,7 @@ func (o ModelTemplateFactory) applyCalcValueExpr(dataSource DataSource, bo *map[
 		panic(err)
 	}
 	boJson := string(boJsonData)
-	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		var content string = ""
 		if fieldGroup.CalcValueExpr.Content != "" {
 			if fieldGroup.CalcValueExpr.Mode == "" || fieldGroup.CalcValueExpr.Mode == "text" {
@@ -475,7 +475,7 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 func (o ModelTemplateFactory) applyRelationFieldValue(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		if fieldGroup.IsRelationField() {
 			relationItem, found := o.ParseRelationExpr(fieldGroup, *bo, *data)
 			if found {
@@ -529,7 +529,7 @@ func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[st
 func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[string]interface{}, srcBo map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateDataBo(dataSource, &srcBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, result *interface{}) {
+	modelIterator.IterateDataBo(dataSource, &srcBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		if !fieldGroupLi[0].IsMasterField() {
 			if (*destBo)[fieldGroupLi[0].GetDataSetId()] == nil {
 				(*destBo)[fieldGroupLi[0].GetDataSetId()] = []interface{}{}
@@ -563,7 +563,7 @@ func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destDat
 func (o ModelTemplateFactory) ConvertDataType(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, result *interface{}) {
+	modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		content := ""
 		if (*data)[fieldGroup.Id] != nil {
 			content = fmt.Sprint((*data)[fieldGroup.Id])
