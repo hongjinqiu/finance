@@ -4,7 +4,7 @@
 	<id>SysUser</id>
 	<selector-id>SysUserSelector</selector-id>
 
-	<adapter name="name_adapter" />
+	<adapter name="" />
 	<description>员工外出申请</description>
 	<scripts>/hr/archives/empsalarycheck/empsalarychecklist.js</scripts>
 	<view-template view="component/template.ui.ftl" />
@@ -36,7 +36,8 @@
 	<before-build-query>SysUser.beforeBuildQuery</before-build-query>
 	<after-build-query>SysUser.afterBuildQuery</after-build-query>
 	 -->
-	<after-query-data>SysUser.afterQueryData</after-query-data>
+	<before-build-query></before-build-query>
+	<after-query-data></after-query-data>
 
 	<data-provider size="10">
 		<collection>SysUser</collection><!-- mongoDB collection name -->

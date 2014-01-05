@@ -93,4 +93,23 @@
 	margin-right: 3px;
 }
 
-
+.x-form-text {
+	border: 1px solid black;
+	height: 22px;
+	line-height: 17px;
+}
+.x-form-invalid-field {
+	background-color: white;
+	background-image: url(../img/invalid_line.gif);
+	background-repeat: repeat-x;
+	background-repeat-x: repeat;
+	background-repeat-y: no-repeat;
+	background-position: bottom;
+	background-position-x: 50%;
+	background-position-y: 100%;
+	border-color: #C30;
+	border-top-color: #C30;
+	border-right-color: #C30;
+	border-bottom-color: #C30;
+	border-left-color: #C30;
+}

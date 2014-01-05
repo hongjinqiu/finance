@@ -98,65 +98,66 @@ function DataTableManager() {
 }
 
 DataTableManager.prototype.showLoadingImg = function() {
+	var gridRender = this.param.render;
 	var gridRenderId = this.param.render.replace("#", "");
-	YUI().use("node", function(Y) {
-		var node = Y.one(gridRender + " tbody.yui3-datatable-data");
-		var xy = node.getXY();
-		x = xy[0];
-		y = xy[1];
-		var width = parseInt(node.getComputedStyle("width"));
-		var height = parseInt(node.getComputedStyle("height"));
+	var Y = this.yInst;
+	var node = Y.one(gridRender + " tbody.yui3-datatable-data");
+	var xy = node.getXY();
+	x = xy[0];
+	y = xy[1];
+	var width = parseInt(node.getComputedStyle("width"));
+	var height = parseInt(node.getComputedStyle("height"));
 
-		var loadingNode = Y.one("#" + gridRenderId + "_loading");
-		if (!loadingNode) {
-			var loadingStyleLi = [];
-			loadingStyleLi.push('position: absolute;');
-			loadingStyleLi.push('z-index: 999;');
-			loadingStyleLi.push('background-color: white;');
-			loadingStyleLi.push('opacity: 0.5;');
-			loadingStyleLi.push('filter:alpha(opacity=50);');
-			loadingStyleLi.push('width: ' + width + 'px;');
-			loadingStyleLi.push('height: ' + height + 'px;');
-			loadingStyleLi.push('left: ' + x + 'px;');
-			loadingStyleLi.push('top: ' + y + 'px;');
-			loadingStyleLi.push('display: none;');
+	var loadingNode = Y.one("#" + gridRenderId + "_loading");
+	if (!loadingNode) {
+		var loadingStyleLi = [];
+		loadingStyleLi.push('position: absolute;');
+		loadingStyleLi.push('z-index: 999;');
+		loadingStyleLi.push('background-color: white;');
+		loadingStyleLi.push('opacity: 0.5;');
+		loadingStyleLi.push('filter:alpha(opacity=50);');
+		loadingStyleLi.push('width: ' + width + 'px;');
+		loadingStyleLi.push('height: ' + height + 'px;');
+		loadingStyleLi.push('left: ' + x + 'px;');
+		loadingStyleLi.push('top: ' + y + 'px;');
+		loadingStyleLi.push('display: none;');
 
-			var loadingImgLi = [];
-			loadingImgLi.push('width: 100%;');
-			loadingImgLi.push('height: 100%;');
-			loadingImgLi.push('text-align: center;');
-			var marginTop = parseInt((height - 16) / 2);
-			if (marginTop < 0) {
-				maringTop = 0;
-			}
-			loadingImgLi.push('margin-top: ' + marginTop + 'px;');
-
-			var htmlLi = [];
-			htmlLi.push('<div id="' + gridRenderId + '_loading" style="' + loadingStyleLi.join("") + '">');
-			htmlLi.push('<div id="' + gridRenderId + '_loadingImg" style="' + loadingImgLi.join("") + '">');
-			htmlLi.push('<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>');
-			htmlLi.push('</div>');
-			htmlLi.push('</div>');
-			Y.one("body").append(htmlLi.join(""));
-			loadingNode = Y.one("#loading");
+		var loadingImgLi = [];
+		loadingImgLi.push('width: 100%;');
+		loadingImgLi.push('height: 100%;');
+		loadingImgLi.push('text-align: center;');
+		var marginTop = parseInt((height - 16) / 2);
+		if (marginTop < 0) {
+			maringTop = 0;
 		}
-		loadingNode.setStyle("width", width + "px");
-		loadingNode.setStyle("height", height + "px");
-		loadingNode.setStyle("left", x + "px");
-		loadingNode.setStyle("top", y + "px");
+		loadingImgLi.push('margin-top: ' + marginTop + 'px;');
 
-		Y.one("#loadingImg").setStyle("marginTop", parseInt((height - 16) / 2) + 'px');
+		var htmlLi = [];
+		htmlLi.push('<div id="' + gridRenderId + '_loading" style="' + loadingStyleLi.join("") + '">');
+		htmlLi.push('<div id="' + gridRenderId + '_loadingImg" style="' + loadingImgLi.join("") + '">');
+		htmlLi.push('<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>');
+		htmlLi.push('</div>');
+		htmlLi.push('</div>');
+		Y.one("body").append(htmlLi.join(""));
+		//loadingNode = Y.one("#loading");
+		loadingNode = Y.one("#" + gridRenderId + "_loading");
+	}
+	loadingNode.setStyle("width", width + "px");
+	loadingNode.setStyle("height", height + "px");
+	loadingNode.setStyle("left", x + "px");
+	loadingNode.setStyle("top", y + "px");
 
-		loadingNode.setStyle("display", "");
-	});
+	//Y.one("#loadingImg").setStyle("marginTop", parseInt((height - 16) / 2) + 'px');
+	Y.one("#" + gridRenderId + "_loadingImg").setStyle("marginTop", parseInt((height - 16) / 2) + 'px');
+
+	loadingNode.setStyle("display", "");
 }
 
 DataTableManager.prototype.hideLoadingImg = function() {
 	var gridRenderId = this.param.render.replace("#", "");
-	YUI().use("node", function(Y) {
-		var loadingNode = Y.one("#" + gridRenderId + "_loading");
-		loadingNode.setStyle("display", "none");
-	});
+	var Y = this.yInst;
+	var loadingNode = Y.one("#" + gridRenderId + "_loading");
+	loadingNode.setStyle("display", "none");
 }
 
 DataTableManager.prototype.createDataGrid = function(Y, param, config) {
@@ -261,6 +262,7 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	//	dt.processPageRequest(1);
 	dt.detach('*:change');
 
+	this.yInst = Y;
 	var checkboxCssSelector = self.getCheckboxCssSelector();
 	dt.delegate("click", function(e) {
 		var checked = e.target.get('checked') || undefined;
@@ -291,10 +293,9 @@ DataTableManager.prototype.getCheckboxCssSelector = function() {
 	var renderName = this.param.render;
 	var columnModel = this.param.columnModel;
 	var result;
-	YUI().use("lang", "node", function(Y){
-		result = Y.Lang.sub(renderName + " .yui3-datatable-data .yui3-datatable-col-{select} input",{
-			"select": columnModel.CheckboxColumn.Name
-		});
+	var Y = this.yInst;
+	result = Y.Lang.sub(renderName + " .yui3-datatable-data .yui3-datatable-col-{select} input",{
+		"select": columnModel.CheckboxColumn.Name
 	});
 	return result;
 }
@@ -304,17 +305,15 @@ DataTableManager.prototype.getSelectRecordLi = function() {
 	var renderName = this.param.render;
 	var columnModel = this.param.columnModel;
 	var dt = this.dt;
+	var yInst = self.yInst;
 	
 	var checkboxCssSelector = self.getCheckboxCssSelector();
-	
 	var result = [];
-	YUI().use("lang", "node", function(Y){
-		var li = Y.all(checkboxCssSelector);
-		li.each(function(item){
-			if (item.get("checked")) {
-				result.push(dt.getRecord(item));
-			}
-		});
+	var li = yInst.all(checkboxCssSelector);
+	li.each(function(item){
+		if (item.get("checked")) {
+			result.push(dt.getRecord(item));
+		}
 	});
 	return result;
 }
@@ -322,10 +321,9 @@ DataTableManager.prototype.getSelectRecordLi = function() {
 DataTableManager.prototype.doVirtualColumnBtnAction = function(elem, fn){
 	var self = this;
 	var dt = self.dt;
-	YUI().use("lang", "node", function(Y){
-		var o = dt.getRecord(Y.one(elem));
-		fn(o);
-	});
+	var yInst = self.yInst;
+	var o = dt.getRecord(yInst.one(elem));
+	fn(o);
 }
 
 /**

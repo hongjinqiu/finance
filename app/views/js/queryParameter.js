@@ -2,6 +2,7 @@ function QueryParameterManager() {}
 
 QueryParameterManager.prototype.applyQueryParameter = function() {
 	YUI().use("node", "event", function(Y){
+		var columnManager = new ColumnManager();
 		for (var i = 0; i < listTemplate.QueryParameterGroup.QueryParameterLi.length; i++) {
 			var queryParameterManager = new QueryParameterManager();
 			var queryParameter = listTemplate.QueryParameterGroup.QueryParameterLi[i];
@@ -20,7 +21,7 @@ QueryParameterManager.prototype.applyQueryParameter = function() {
 					}
 				}
 				if (dateFormat) {
-					dateFormat = convertDate2DisplayPattern(dateFormat);
+					dateFormat = columnManager.convertDate2DisplayPattern(dateFormat);
 					/*
 				var calendar = new Y.Calendar({
 					trigger: "#" + queryParameter.Name,
@@ -39,7 +40,7 @@ QueryParameterManager.prototype.applyQueryParameter = function() {
 }
 
 QueryParameterManager.prototype.applyQueryParameterObserve = function(queryParameter) {
-	YUI().use("lang", "node", "event", function(Y){
+	YUI().use("node", "event", "json", "io-base", function(Y){
 		if (queryParameter.ParameterAttributeLi) {
 			for (var j = 0; j < queryParameter.ParameterAttributeLi.length; j++) {
 				if (queryParameter.ParameterAttributeLi[j].Name == "observe") {

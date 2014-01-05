@@ -46,15 +46,17 @@ func (o InterceptorManager) ParseAfterQueryData(classMethod string, items *[]int
 }
 
 func (o InterceptorManager) parse(classMethod string, param *[]*interface{}) {
-	exprContent := classMethod
-	scriptStruct := strings.Split(exprContent, ".")[0]
-	scriptStructMethod := strings.Split(exprContent, ".")[1]
-	scriptType := GetInterceptorDict()[scriptStruct]
-	inst := reflect.New(scriptType).Elem().Interface()
-	instValue := reflect.ValueOf(inst)
-	in := []reflect.Value{}
-	for i, _ := range *param {
-		in = append(in, reflect.ValueOf((*param)[i]))
+	if classMethod != "" {
+		exprContent := classMethod
+		scriptStruct := strings.Split(exprContent, ".")[0]
+		scriptStructMethod := strings.Split(exprContent, ".")[1]
+		scriptType := GetInterceptorDict()[scriptStruct]
+		inst := reflect.New(scriptType).Elem().Interface()
+		instValue := reflect.ValueOf(inst)
+		in := []reflect.Value{}
+		for i, _ := range *param {
+			in = append(in, reflect.ValueOf((*param)[i]))
+		}
+		instValue.MethodByName(scriptStructMethod).Call(in)
 	}
-	instValue.MethodByName(scriptStructMethod).Call(in)
 }

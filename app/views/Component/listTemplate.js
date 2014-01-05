@@ -103,7 +103,7 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 });
 
 function applyQueryBtnBehavior() {
-	YUI().use("node", "event", function(Y){
+	YUI().use("node", "event", "anim", function(Y){
 		Y.one("#queryBtn").on("click", function(e){
 			var pagModel = dtInst.dt.get('paginator').get('model');
 			var page = pagModel.get("page");

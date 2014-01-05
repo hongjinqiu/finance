@@ -149,7 +149,7 @@ ColumnManager.prototype.createVirtualColumn = function(render, columnModel, colu
 							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
 						}
 						if (buttonBoLi[j]["isShow"]) {
-							YUI().use("lang", function(Y){
+							YUI().use("node", function(Y){
 								// handler进行值的预替换,
 								var handler = virtualColumn.Buttons.ButtonLi[j].Handler;
 								handler = Y.Lang.sub(handler, o.data);

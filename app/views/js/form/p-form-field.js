@@ -70,7 +70,7 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
      * @description CSS class used to locate a placeholder for
      *     the error node and style it.
      */
-    ERROR_CLASS : 'error',
+    ERROR_CLASS : 'x-form-invalid-field',
 
     /**
      * @property _labelNode
@@ -312,11 +312,16 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
      * @private
      * @description Adds an error node with the supplied message
      */
+    /*
     _showError: function(errMsg) {
         var errorNode = this._renderNode(this.ERROR_TEMPLATE, this.ERROR_CLASS, this._labelNode);
 
         errorNode.set("text", errMsg);
         this._errorNode = errorNode;
+    },
+    */
+    _showError: function(errMsg) {
+    	this._fieldNode.addClass(this.ERROR_CLASS);
     },
 
     /**
@@ -324,10 +329,69 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
      * @private
      * @description Removes the error node from this field
      */
+    /*
     _clearError: function() {
         if (this._errorNode) {
             this._errorNode.remove();
             this._errorNode = null;
+        }
+    },
+    */
+    _clearError: function() {
+    	this._fieldNode.removeClass(this.ERROR_CLASS);
+    	this._clearErrorOnMouseOver();
+    },
+    
+    _showErrorOnMouseOver: function() {
+    	var err = this.get('error');
+        if (err) {
+        	var xy = this._fieldNode.getXY();
+    		x = xy[0];
+    		y = xy[1];
+    		var fieldWidth = parseInt(this._fieldNode.getComputedStyle("width"));
+    		var width = 200;
+    		var height = 50;
+//    		var height = parseInt(this._fieldNode.getComputedStyle("height"));
+    		
+    		var errorRenderId = this.get('id') + "_error";
+        	var errorNode = Y.one("#" + errorRenderId);
+    		if (!errorNode) {
+    			var errorStyleLi = [];
+    			errorStyleLi.push('position: absolute;');
+    			errorStyleLi.push('z-index: 999;');
+    			errorStyleLi.push('background-color: white;');
+//    			errorStyleLi.push('opacity: 0.5;');
+//    			errorStyleLi.push('filter:alpha(opacity=50);');
+    			errorStyleLi.push('width: ' + width + 'px;');
+    			errorStyleLi.push('height: ' + height + 'px;');
+    			errorStyleLi.push('left: ' + (x + fieldWidth) + 'px;');
+    			errorStyleLi.push('top: ' + y + 'px;');
+    			errorStyleLi.push('display: none;');
+    			errorStyleLi.push('border: 1px solid red;');
+
+
+    			var htmlLi = [];
+    			htmlLi.push('<div id="' + errorRenderId + '" style="' + errorStyleLi.join("") + '">');
+    			htmlLi.push(err);
+    			htmlLi.push('</div>');
+    			Y.one("body").append(htmlLi.join(""));
+    			errorNode = Y.one("#" + errorRenderId);
+    		}
+    		errorNode.setStyle("width", width + "px");
+    		errorNode.setStyle("height", height + "px");
+    		errorNode.setStyle("left", (x + fieldWidth) + "px");
+    		errorNode.setStyle("top", y + "px");
+
+    		errorNode.setStyle("display", "");
+        }
+    },
+    
+    _clearErrorOnMouseOver: function() {
+    	var errorRenderId = this.get('id') + "_error";
+    	var errorNode = Y.one("#" + errorRenderId);
+    	if (errorNode) {
+    		errorNode.remove();
+    		errorNode = null;
         }
     },
 
@@ -436,6 +500,17 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             }
         },
         this));
+        
+        this._fieldNode.on('mouseover', Y.bind(function(e) {
+            this._showErrorOnMouseOver();
+        },
+        this));
+        
+        this._fieldNode.on('mouseout', Y.bind(function(e) {
+            this._clearErrorOnMouseOver();
+        },
+        this));
+        
 
         this.on('validateInlineChange', Y.bind(function(e) {
             if (e.newVal === true) {
