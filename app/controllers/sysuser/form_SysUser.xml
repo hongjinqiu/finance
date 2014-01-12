@@ -5,7 +5,7 @@
 	<adapter name="ModelFormTemplateAdapter" />
 	<description>用户表单</description>
 	<scripts>console/summary.js</scripts>
-	<view-template view="console/formSchema.html"/>
+	<view-template view="Console/FormSchema.html"/>
 	<html>
 		<![CDATA[
 			<script type="text/javascript">console.log("hello world")</script>

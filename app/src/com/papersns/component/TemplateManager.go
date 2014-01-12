@@ -44,8 +44,14 @@ type SelectorTemplateInfo struct {
 type TemplateManager struct{}
 
 // TODO, byTest
-func (o TemplateManager) GetListTemplateInfo() []ListTemplateInfo {
+func (o TemplateManager) GetListTemplateInfoLi() []ListTemplateInfo {
 	listTemplateInfo := []ListTemplateInfo{}
+	if len(gListTemplateDict) == 0 {
+		o.loadListTemplate()
+	}
+	templaterwlock.RLock()
+	defer templaterwlock.RUnlock()
+	
 	for _, item := range gListTemplateDict {
 		listTemplateInfo = append(listTemplateInfo, item)
 	}
@@ -65,22 +71,26 @@ func (o TemplateManager) RefretorListTemplateInfo() []ListTemplateInfo {
 
 // TODO, byTest
 func (o TemplateManager) GetListTemplate(id string) ListTemplate {
+	return o.GetListTemplateInfo(id).ListTemplate
+}
+
+func (o TemplateManager) GetListTemplateInfo(id string) ListTemplateInfo {
 	if revel.Config.StringDefault("mode.dev", "true") == "true" {
-		listTemplateInfo, found := o.findListTemplate(id)
+		listTemplateInfo, found := o.findListTemplateInfo(id)
 		if found {
 			listTemplateInfo, err := o.loadSingleListTemplateWithLock(listTemplateInfo.Path)
 			if err != nil {
 				panic(err)
 			}
 			if listTemplateInfo.ListTemplate.Id == id {
-				return listTemplateInfo.ListTemplate
+				return listTemplateInfo
 			}
 		}
 		o.clearListTemplate()
 		o.loadListTemplate()
-		listTemplateInfo, found = o.findListTemplate(id)
+		listTemplateInfo, found = o.findListTemplateInfo(id)
 		if found {
-			return listTemplateInfo.ListTemplate
+			return listTemplateInfo
 		}
 		panic(id + " not exists in ListTemplate list")
 	}
@@ -88,15 +98,15 @@ func (o TemplateManager) GetListTemplate(id string) ListTemplate {
 	if len(gListTemplateDict) == 0 {
 		o.loadListTemplate()
 	}
-	listTemplateInfo, found := o.findListTemplate(id)
+	listTemplateInfo, found := o.findListTemplateInfo(id)
 	if found {
-		return listTemplateInfo.ListTemplate
+		return listTemplateInfo
 	}
 	panic(id + " not exists in ListTemplate list")
 }
 
 // TODO bytest,
-func (o TemplateManager) findListTemplate(id string) (ListTemplateInfo, bool) {
+func (o TemplateManager) findListTemplateInfo(id string) (ListTemplateInfo, bool) {
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
 
@@ -171,10 +181,11 @@ func (o TemplateManager) loadSingleListTemplate(path string) (ListTemplateInfo, 
 	if listTemplate.Adapter.Name != "" {
 		classMethod := listTemplate.Adapter.Name + ".ApplyAdapter"
 		commonMethod := CommonMethod{}
-		paramLi := []*interface{}{}
+		paramLi := []interface{}{}
 		var param interface{} = listTemplate
-		paramLi = append(paramLi, &param)
-		commonMethod.Parse(classMethod, &paramLi)
+		paramLi = append(paramLi, param)
+		values := commonMethod.Parse(classMethod, paramLi)
+		listTemplate = values[0].Interface().(ListTemplate)
 	}
 
 	listTemplateInfo := ListTemplateInfo{
@@ -186,8 +197,14 @@ func (o TemplateManager) loadSingleListTemplate(path string) (ListTemplateInfo, 
 }
 
 // TODO, byTest
-func (o TemplateManager) GetSelectorTemplateInfo() []SelectorTemplateInfo {
+func (o TemplateManager) GetSelectorTemplateInfoLi() []SelectorTemplateInfo {
 	selectorTemplateInfo := []SelectorTemplateInfo{}
+	if len(gSelectorTemplateDict) == 0 {
+		o.loadSelectorTemplate()
+	}
+	templaterwlock.RLock()
+	defer templaterwlock.RUnlock()
+	
 	for _, item := range gSelectorTemplateDict {
 		selectorTemplateInfo = append(selectorTemplateInfo, item)
 	}
@@ -205,10 +222,14 @@ func (o TemplateManager) RefretorSelectorTemplateInfo() []SelectorTemplateInfo {
 	return selectorTemplateInfo
 }
 
-// TODO, byTest
 func (o TemplateManager) GetSelectorTemplate(id string) ListTemplate {
+	return o.GetSelectorTemplateInfo(id).ListTemplate
+}
+
+// TODO, byTest
+func (o TemplateManager) GetSelectorTemplateInfo(id string) SelectorTemplateInfo {
 	if revel.Config.StringDefault("mode.dev", "true") == "true" {
-		selectorTemplateInfo, found := o.findSelectorTemplate(id)
+		selectorTemplateInfo, found := o.findSelectorTemplateInfo(id)
 		if found {
 			selectorTemplateInfo, err := o.loadSingleSelectorTemplateWithLock(selectorTemplateInfo.Path)
 			if err != nil {
@@ -216,15 +237,15 @@ func (o TemplateManager) GetSelectorTemplate(id string) ListTemplate {
 			}
 			if strings.Index(selectorTemplateInfo.Path, "list_") == -1 {
 				if selectorTemplateInfo.ListTemplate.Id == id {
-					return selectorTemplateInfo.ListTemplate
+					return selectorTemplateInfo
 				}
 			}
 		}
 		o.clearSelectorTemplate()
 		o.loadSelectorTemplate()
-		selectorTemplateInfo, found = o.findSelectorTemplate(id)
+		selectorTemplateInfo, found = o.findSelectorTemplateInfo(id)
 		if found {
-			return selectorTemplateInfo.ListTemplate
+			return selectorTemplateInfo
 		}
 		panic(id + " not exists in ListTemplate list")
 	}
@@ -232,15 +253,15 @@ func (o TemplateManager) GetSelectorTemplate(id string) ListTemplate {
 	if len(gSelectorTemplateDict) == 0 {
 		o.loadSelectorTemplate()
 	}
-	selectorTemplateInfo, found := o.findSelectorTemplate(id)
+	selectorTemplateInfo, found := o.findSelectorTemplateInfo(id)
 	if found {
-		return selectorTemplateInfo.ListTemplate
+		return selectorTemplateInfo
 	}
 	panic(id + " not exists in ListTemplate list")
 }
 
 // TODO bytest,
-func (o TemplateManager) findSelectorTemplate(id string) (SelectorTemplateInfo, bool) {
+func (o TemplateManager) findSelectorTemplateInfo(id string) (SelectorTemplateInfo, bool) {
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
 
@@ -335,10 +356,10 @@ func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTempla
 		if listTemplate.Adapter.Name != "" {
 			classMethod := listTemplate.Adapter.Name + ".ApplyAdapter"
 			commonMethod := CommonMethod{}
-			paramLi := []*interface{}{}
+			paramLi := []interface{}{}
 			var param interface{} = listTemplate
-			paramLi = append(paramLi, &param)
-			commonMethod.Parse(classMethod, &paramLi)
+			paramLi = append(paramLi, param)
+			commonMethod.Parse(classMethod, paramLi)
 		}
 
 		selectorTemplateInfo := SelectorTemplateInfo{
@@ -356,8 +377,15 @@ func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTempla
 
 
 // TODO, byTest
-func (o TemplateManager) GetFormTemplateInfo() []FormTemplateInfo {
+func (o TemplateManager) GetFormTemplateInfoLi() []FormTemplateInfo {
 	formTemplateInfo := []FormTemplateInfo{}
+	if len(gFormTemplateDict) == 0 {
+		o.loadFormTemplate()
+	}
+	
+	templaterwlock.RLock()
+	defer templaterwlock.RUnlock()
+	
 	for _, item := range gFormTemplateDict {
 		formTemplateInfo = append(formTemplateInfo, item)
 	}
@@ -375,24 +403,28 @@ func (o TemplateManager) RefretorFormTemplateInfo() []FormTemplateInfo {
 	return formTemplateInfo
 }
 
-// TODO, byTest
 func (o TemplateManager) GetFormTemplate(id string) FormTemplate {
+	return o.GetFormTemplateInfo(id).FormTemplate
+}
+
+// TODO, byTest
+func (o TemplateManager) GetFormTemplateInfo(id string) FormTemplateInfo {
 	if revel.Config.StringDefault("mode.dev", "true") == "true" {
-		formTemplateInfo, found := o.findFormTemplate(id)
+		formTemplateInfo, found := o.findFormTemplateInfo(id)
 		if found {
 			formTemplateInfo, err := o.loadSingleFormTemplateWithLock(formTemplateInfo.Path)
 			if err != nil {
 				panic(err)
 			}
 			if formTemplateInfo.FormTemplate.Id == id {
-				return formTemplateInfo.FormTemplate
+				return formTemplateInfo
 			}
 		}
 		o.clearFormTemplate()
 		o.loadFormTemplate()
-		formTemplateInfo, found = o.findFormTemplate(id)
+		formTemplateInfo, found = o.findFormTemplateInfo(id)
 		if found {
-			return formTemplateInfo.FormTemplate
+			return formTemplateInfo
 		}
 		panic(id + " not exists in FormTemplate list")
 	}
@@ -400,15 +432,15 @@ func (o TemplateManager) GetFormTemplate(id string) FormTemplate {
 	if len(gFormTemplateDict) == 0 {
 		o.loadFormTemplate()
 	}
-	formTemplateInfo, found := o.findFormTemplate(id)
+	formTemplateInfo, found := o.findFormTemplateInfo(id)
 	if found {
-		return formTemplateInfo.FormTemplate
+		return formTemplateInfo
 	}
 	panic(id + " not exists in FormTemplate list")
 }
 
 // TODO bytest,
-func (o TemplateManager) findFormTemplate(id string) (FormTemplateInfo, bool) {
+func (o TemplateManager) findFormTemplateInfo(id string) (FormTemplateInfo, bool) {
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
 
@@ -483,10 +515,10 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 	if formTemplate.Adapter.Name != "" {
 		classMethod := formTemplate.Adapter.Name + ".ApplyAdapter"
 		commonMethod := CommonMethod{}
-		paramLi := []*interface{}{}
+		paramLi := []interface{}{}
 		var param interface{} = formTemplate
-		paramLi = append(paramLi, &param)
-		commonMethod.Parse(classMethod, &paramLi)
+		paramLi = append(paramLi, param)
+		commonMethod.Parse(classMethod, paramLi)
 	}
 
 	for i, _ := range formTemplate.FormElemLi {
@@ -558,12 +590,12 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 				if listTemplate.Adapter.Name != "" {
 					classMethod := listTemplate.Adapter.Name + ".ApplyQueryParameter"
 					commonMethod := CommonMethod{}
-					paramLi := []*interface{}{}
-					var param interface{} = listTemplate
-					paramLi = append(paramLi, &param)
-					param = queryParameter
-					paramLi = append(paramLi, &param)
-					commonMethod.Parse(classMethod, &paramLi)
+					paramLi := []interface{}{}
+					var listTemplateParam interface{} = listTemplate
+					paramLi = append(paramLi, listTemplateParam)
+					var queryParameterParam interface{} = queryParameter
+					paramLi = append(paramLi, queryParameterParam)
+					commonMethod.Parse(classMethod, paramLi)
 				}
 				queryParameterMap := queryParameterBuilder.buildQuery(queryParameter, paramMap[name])
 				queryLi = append(queryLi, queryParameterMap)
@@ -616,43 +648,43 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 }
 
 func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemplate, items []interface{}) []interface{} {
-	o.applyAdapterColumnName(&listTemplate)
+	o.applyAdapterColumnName(listTemplate)
 	return o.GetColumnModelDataForColumnModel(listTemplate.ColumnModel, items)
 }
 
-func (o TemplateManager) applyAdapterColumnName(listTemplate *ListTemplate) {
+func (o TemplateManager) applyAdapterColumnName(listTemplate ListTemplate) {
 	if listTemplate.Adapter.Name != "" {
 		//ApplyColumnName(listTemplate *ListTemplate, column *Column) {
 		classMethod := listTemplate.Adapter.Name + ".ApplyColumnName"
 		commonMethod := CommonMethod{}
-		paramLi := []*interface{}{}
-		var param interface{} = listTemplate
-		paramLi = append(paramLi, &param)
-		param = listTemplate.ColumnModel.IdColumn
-		paramLi = append(paramLi, &param)
-		commonMethod.Parse(classMethod, &paramLi)
+		paramLi := []interface{}{}
+		var listTemplateParam interface{} = listTemplate
+		paramLi = append(paramLi, listTemplateParam)
+		var idColumn interface{} = listTemplate.ColumnModel.IdColumn
+		paramLi = append(paramLi, idColumn)
+		commonMethod.Parse(classMethod, paramLi)
 		for i, _ := range listTemplate.ColumnModel.ColumnLi {
-			o.recursionApplyAdapterColumnName(*listTemplate, &listTemplate.ColumnModel.ColumnLi[i])
+			o.recursionApplyAdapterColumnName(listTemplate, listTemplate.ColumnModel.ColumnLi[i])
 		}
 	}
 }
 
 // TODO, bytest
-func (o TemplateManager) recursionApplyAdapterColumnName(listTemplate ListTemplate, columnItem *Column) {
+func (o TemplateManager) recursionApplyAdapterColumnName(listTemplate ListTemplate, columnItem Column) {
 	if columnItem.XMLName.Local != "virtual-column" {
 		if columnItem.ColumnModel.ColumnLi != nil {
 			for i, _ := range columnItem.ColumnModel.ColumnLi {
-				o.recursionApplyAdapterColumnName(listTemplate, &columnItem.ColumnModel.ColumnLi[i])
+				o.recursionApplyAdapterColumnName(listTemplate, columnItem.ColumnModel.ColumnLi[i])
 			}
 		} else {
 			commonMethod := CommonMethod{}
 			classMethod := listTemplate.Adapter.Name + ".ApplyColumnName"
-			paramLi := []*interface{}{}
-			var param interface{} = listTemplate
-			paramLi = append(paramLi, &param)
-			param = *columnItem
-			paramLi = append(paramLi, &param)
-			commonMethod.Parse(classMethod, &paramLi)
+			paramLi := []interface{}{}
+			var listTemplateParam interface{} = listTemplate
+			paramLi = append(paramLi, listTemplateParam)
+			var columnItemParam interface{} = columnItem
+			paramLi = append(paramLi, columnItemParam)
+			commonMethod.Parse(classMethod, paramLi)
 		}
 	}
 }

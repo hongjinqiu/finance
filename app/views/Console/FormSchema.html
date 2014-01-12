@@ -2,7 +2,7 @@
 
 <html>
 <head>
-<title>layout test</title>
+<title>{{.result.formTemplate.Description}}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">
 	YUI_config = {
@@ -59,13 +59,14 @@ body {
 </head>
 
 <body class="yui3-skin-sam">
+	{{$tResult := .result}}
 	{{range $index, $item := .result.formTemplate.FormElemLi}}
 		{{if eq $item.XMLName.Local "html"}}
 			{{$item.Html.Value}}
 		{{end}}
 		{{if eq $item.XMLName.Local "toolbar"}}
 		<div>
-			{{range $toolbarBoKey, $toolbarBoValue := .result.toolbarBo}}
+			{{range $toolbarBoKey, $toolbarBoValue := $tResult.toolbarBo}}
 				{{if eq $toolbarBoKey $item.Toolbar.Name}}
 					{{$toolbarBo := $toolbarBoValue}}
 					{{range $btnIndex,$btnValue := $item.Toolbar.ButtonLi}}
@@ -90,7 +91,7 @@ body {
 		</div>
 		{{end}}
 		{{if eq $item.XMLName.Local "column-model"}}
-			{{if eq .result.formTemplate.DataSourceModelId ""}}
+			{{if eq $tResult.formTemplate.DataSourceModelId ""}}
 				{{if eq $item.Name ""}}
 					<div id="columnModel_{{$index}}"></div>
 				{{else}}

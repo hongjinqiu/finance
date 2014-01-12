@@ -269,6 +269,7 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 		Y.all(checkboxCssSelector).set("checked", checked ? "checked" : "");
 	}, ".protocol-select-all", dt);
 
+	var checkboxItemCssSelector = self.getCheckboxItemCssSelector();
 	dt.delegate("click", function(e) {
 		var checkLi = Y.all(checkboxCssSelector).get("checked");
 		var isAllSelect = true;
@@ -280,10 +281,10 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 			}
 		}
 		// 单选没有全部选中的按钮
-		if (Y.one(".protocol-select-all")) {
-			Y.one(".protocol-select-all").set("checked", isAllSelect ? "checked" : "");
+		if (Y.one(render + " .protocol-select-all")) {
+			Y.one(render + " .protocol-select-all").set("checked", isAllSelect ? "checked" : "");
 		}
-	}, checkboxCssSelector, dt);
+	}, checkboxItemCssSelector, dt);
 	this.dt = dt;
 	return this;
 //	return dt;
@@ -295,6 +296,17 @@ DataTableManager.prototype.getCheckboxCssSelector = function() {
 	var result;
 	var Y = this.yInst;
 	result = Y.Lang.sub(renderName + " .yui3-datatable-data .yui3-datatable-col-{select} input",{
+		"select": columnModel.CheckboxColumn.Name
+	});
+	return result;
+}
+
+DataTableManager.prototype.getCheckboxItemCssSelector = function() {
+	var renderName = this.param.render;
+	var columnModel = this.param.columnModel;
+	var result;
+	var Y = this.yInst;
+	result = Y.Lang.sub(".yui3-datatable-data .yui3-datatable-col-{select} input",{
 		"select": columnModel.CheckboxColumn.Name
 	});
 	return result;
@@ -329,6 +341,7 @@ DataTableManager.prototype.doVirtualColumnBtnAction = function(elem, fn){
 /**
  * 外部一般不会调用这个方法,这个方法主要用于做模型控制台的重构用,其它的一般都是ajax table,自动会有loadingImg动画,
  */
+/*
 DataTableManager.prototype.syncData = function(data){
 	var self = this;
 	var dt = self.dt;
@@ -336,3 +349,4 @@ DataTableManager.prototype.syncData = function(data){
 	dt.set("data", data)
 	self.hideLoadingImg()
 }
+*/

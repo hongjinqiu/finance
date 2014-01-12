@@ -7,11 +7,12 @@ import (
 type ModelFormTemplateAdapter struct{}
 
 // TODO, bytest
-func (o ModelFormTemplateAdapter) ApplyAdapter(formTemplate *FormTemplate) {
+func (o ModelFormTemplateAdapter) ApplyAdapter(iFormTemplate interface{}) {
+	formTemplate := (iFormTemplate).(FormTemplate)
 	if formTemplate.DataSourceModelId != "" {
 		modelTemplateFactory := ModelTemplateFactory{}
 		dataSource := modelTemplateFactory.GetDataSource(formTemplate.DataSourceModelId)
-		o.applyDetailDataSet(dataSource, formTemplate)
+		o.applyDetailDataSet(dataSource, &formTemplate)
 	}
 }
 

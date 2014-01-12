@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
-	<id>SysUser</id>
-	<displayName>系统用户</displayName>
+	<id>Demo</id>
+	<displayName>演示用</displayName>
 	<systemId>FINANCE</systemId>
 	<codeFieldName></codeFieldName>
 	<businessDateField></businessDateField>
 	<accountBookIdField></accountBookIdField>
 	<modelType>BASE</modelType>
 	<inUsedDenyEdit>false</inUsedDenyEdit>
-	<actionNameSpace>/finance/sysuser</actionNameSpace>
-	<listUrl>/component/schema.go?@name=PL_DATASOURCE_SYSUSER</listUrl>
-	<collectionName>SysUser</collectionName>
+	<actionNameSpace>/demo</actionNameSpace>
+	<listUrl>/console/listschema.go?@name=Demo</listUrl>
+	<collectionName>Demo</collectionName>
 	<billTypeField></billTypeField>
 	<billTypeParamDataSource></billTypeParamDataSource>
 	<hasCheckField></hasCheckField>
@@ -19,7 +19,6 @@
 		<id>A</id>
 		<displayName>主数据集</displayName>
 		<allowCopy>true</allowCopy>
-		<!-- <primaryKey>PRIMARY_KEY</primaryKey> -->
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
@@ -33,20 +32,19 @@
 			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
+			<field id="_id" extends="INT_FIELD">
+				<displayName>mongoDB主键</displayName>
+				<allowEmpty>false</allowEmpty>
+			</field>
 			<field id="code" extends="CODE_FIELD">
 				<displayName>代码</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>20</fieldLength>
-				<!-- <defaultValueExpr mode="text">ccccc</defaultValueExpr> -->
-				<!-- <defaultValueExpr mode="python">str(bo['A']['attachCount']) + '_abcdefg'</defaultValueExpr> -->
-				<!-- <defaultValueExpr mode="golang">SysUserInterceptor.GetIntTest</defaultValueExpr> -->
-				<calcValueExpr mode="golang">SysUserInterceptor.GetIntTest</calcValueExpr>
 			</field>
-			<field id="nick" extends="NAME_FIELD">
-				<displayName>昵称</displayName>
+			<field id="name" extends="NAME_FIELD">
+				<displayName>名称</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>40</fieldLength>
-				<defaultValueExpr>3</defaultValueExpr>
 			</field>
 			<field id="stringColumn" extends="STRING_FIELD">
 				<displayName>stringColumn测试</displayName>

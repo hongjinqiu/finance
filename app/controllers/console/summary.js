@@ -17,10 +17,14 @@ function doRefretorDataSource() {
 function doRefretor(name) {
 	var dtManager = gridPanelDict[name];
 	var uri = "/console/refretor?type=" + name;
-	Y.on('io:complete', function(id, o, args) {
-		var id = id; // Transaction ID.
-		var data = Y.JSON.parse(o.responseText);
-		dtManager.syncData(data.items);
-	}, Y, []);
-	var request = Y.io(uri);
+	YUI().use("node", "event", "json", "io-base", function(Y){
+		Y.on('io:complete', function(id, o, args) {
+			var id = id; // Transaction ID.
+			var data = Y.JSON.parse(o.responseText);
+			dtManager.dt.set("data", data.items);
+			dtManager.hideLoadingImg();
+		}, Y, []);
+		dtManager.showLoadingImg();
+		var request = Y.io(uri);
+	});
 }

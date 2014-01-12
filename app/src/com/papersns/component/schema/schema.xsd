@@ -435,6 +435,7 @@
 							<attribute name="isUnitPrice" type="boolean"></attribute>
 							<attribute name="isCost" type="boolean"></attribute>
 							<attribute name="isPercent" type="boolean"></attribute>
+							<attribute name="isQuantity" type="boolean"></attribute>
 							<!-- 财务专用字段end -->
 							
 							<attribute name="prefix"></attribute>

@@ -5,6 +5,7 @@ import (
 	. "com/papersns/component"
 	. "com/papersns/model"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	//	"net/http"
@@ -15,6 +16,7 @@ import (
 )
 
 func init() {
+	
 }
 
 type Console struct {
@@ -25,6 +27,14 @@ func (c Console) Summary() revel.Result {
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate("Console")
 
+	//	if true {
+	//		xmlDataArray, err := xml.Marshal(&formTemplate)
+	//		if err != nil {
+	//			panic(err)
+	//		}
+	//		return c.RenderXml(&formTemplate)
+	//	}
+
 	formTemplateJsonDataArray, err := json.Marshal(&formTemplate)
 	if err != nil {
 		panic(err)
@@ -33,60 +43,28 @@ func (c Console) Summary() revel.Result {
 	toolbarBo := map[string]interface{}{}
 
 	dataBo := map[string]interface{}{}
-	//	GetFormTemplateInfo
 	{
-		listTemplateInfoLi := templateManager.GetListTemplateInfo()
-
-		componentItems := []interface{}{}
-		for _, item := range listTemplateInfoLi {
-			module := "组件模型"
-			if item.ListTemplate.DataSourceModelId != "" && item.ListTemplate.Adapter.Name != "" {
-				module = "数据源模型适配"
-			}
-			componentItems = append(componentItems, map[string]interface{}{
-				"id":     item.ListTemplate.Id,
-				"name":   item.ListTemplate.Description,
-				"module": module,
-				"path":   item.Path,
-			})
-		}
-		dataBo["Component"] = componentItems
+		listTemplateInfoLi := templateManager.GetListTemplateInfoLi()
+		dataBo["Component"] = getSummaryListTemplateInfoLi(listTemplateInfoLi)
 	}
 	{
-		formTemplateInfoLi := templateManager.GetFormTemplateInfo()
-
-		formItems := []interface{}{}
-		for _, item := range formTemplateInfoLi {
-			module := "form模型"
-			if item.FormTemplate.DataSourceModelId != "" && item.FormTemplate.Adapter.Name != "" {
-				module = "数据源模型适配"
-			}
-			formItems = append(formItems, map[string]interface{}{
-				"id":     item.FormTemplate.Id,
-				"name":   item.FormTemplate.Description,
-				"module": module,
-				"path":   item.Path,
-			})
-		}
-		dataBo["Form"] = formItems
+		selectorTemplateInfoLi := templateManager.GetSelectorTemplateInfoLi()
+		dataBo["Selector"] = getSummarySelectorTemplateInfoLi(selectorTemplateInfoLi)
+	}
+	{
+		formTemplateInfoLi := templateManager.GetFormTemplateInfoLi()
+		dataBo["Form"] = getSummaryFormTemplateInfoLi(formTemplateInfoLi)
 	}
 	{
 		modelTemplateFactory := ModelTemplateFactory{}
-		dataSourceInfoLi := modelTemplateFactory.GetDataSourceInfo()
-
-		dataSourceItems := []interface{}{}
-		for _, item := range dataSourceInfoLi {
-			dataSourceItems = append(dataSourceItems, map[string]interface{}{
-				"id":     item.DataSource.Id,
-				"name":   item.DataSource.DisplayName,
-				"module": "数据源模型",
-				"path":   item.Path,
-			})
-		}
-		dataBo["DataSource"] = dataSourceItems
+		dataSourceInfoLi := modelTemplateFactory.GetDataSourceInfoLi()
+		dataBo["DataSource"] = getSummaryDataSourceInfoLi(dataSourceInfoLi)
 	}
 	for _, item := range formTemplate.FormElemLi {
 		if item.XMLName.Local == "column-model" {
+			if dataBo[item.ColumnModel.Name] == nil {
+				dataBo[item.ColumnModel.Name] = []interface{}{}
+			}
 			items := dataBo[item.ColumnModel.Name].([]interface{})
 			items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
 			dataBo[item.ColumnModel.Name] = items
@@ -123,10 +101,89 @@ func (c Console) Summary() revel.Result {
 	if err != nil {
 		panic(err)
 	}
+	//	c.Response.Out
+	//	return c.RenderTemplate(string(fileContent))
+	funcMap := map[string]interface{}{
+		"eq": func(a, b interface{}) bool {
+			return a == b
+		},
+	}
+	c.Response.ContentType = "text/html; charset=utf-8"
+	tmpl, err := template.New("summary").Funcs(funcMap).Parse(string(fileContent))
+	if err != nil {
+		panic(err)
+	}
+	tmplResult := map[string]interface{}{
+		"result": result,
+	}
+	//tmpl.Execute(c.Response.Out, result)
+	tmpl.Execute(c.Response.Out, tmplResult)
+	return nil
+	//	return c.Render(string(fileContent), result)
+}
 
-	return c.Render(string(fileContent), result)
-	//	return c.RenderText(string(jsonDataArray))
-	//	return c.RenderText(string(xmlDataArray))
+func getSummaryListTemplateInfoLi(listTemplateInfoLi []ListTemplateInfo) []interface{} {
+	componentItems := []interface{}{}
+	for _, item := range listTemplateInfoLi {
+		module := "组件模型"
+		if item.ListTemplate.DataSourceModelId != "" && item.ListTemplate.Adapter.Name != "" {
+			module = "数据源模型适配"
+		}
+		componentItems = append(componentItems, map[string]interface{}{
+			"id":     item.ListTemplate.Id,
+			"name":   item.ListTemplate.Description,
+			"module": module,
+			"path":   item.Path,
+		})
+	}
+	return componentItems
+}
+
+func getSummarySelectorTemplateInfoLi(selectorTemplateInfoLi []SelectorTemplateInfo) []interface{} {
+	componentItems := []interface{}{}
+	for _, item := range selectorTemplateInfoLi {
+		module := "组件模型选择器"
+		if item.ListTemplate.DataSourceModelId != "" && item.ListTemplate.Adapter.Name != "" {
+			module = "数据源模型选择器适配"
+		}
+		componentItems = append(componentItems, map[string]interface{}{
+			"id":     item.ListTemplate.Id,
+			"name":   item.ListTemplate.Description,
+			"module": module,
+			"path":   item.Path,
+		})
+	}
+	return componentItems
+}
+
+func getSummaryFormTemplateInfoLi(formTemplateInfoLi []FormTemplateInfo) []interface{} {
+	formItems := []interface{}{}
+	for _, item := range formTemplateInfoLi {
+		module := "form模型"
+		if item.FormTemplate.DataSourceModelId != "" && item.FormTemplate.Adapter.Name != "" {
+			module = "数据源模型适配"
+		}
+		formItems = append(formItems, map[string]interface{}{
+			"id":     item.FormTemplate.Id,
+			"name":   item.FormTemplate.Description,
+			"module": module,
+			"path":   item.Path,
+		})
+	}
+	return formItems
+}
+
+func getSummaryDataSourceInfoLi(dataSourceInfoLi []DataSourceInfo) []interface{} {
+	dataSourceItems := []interface{}{}
+	for _, item := range dataSourceInfoLi {
+		dataSourceItems = append(dataSourceItems, map[string]interface{}{
+			"id":     item.DataSource.Id,
+			"name":   item.DataSource.DisplayName,
+			"module": "数据源模型",
+			"path":   item.Path,
+		})
+	}
+	return dataSourceItems
 }
 
 func (c Console) ListSchema() revel.Result {
@@ -368,27 +425,53 @@ func (c Console) FormSchema() revel.Result {
 func (c Console) Refretor() revel.Result {
 	refretorType := c.Params.Get("type")
 	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate("Console")
 
 	if refretorType == "Component" {
 		listTemplateInfoLi := templateManager.RefretorListTemplateInfo()
-		dataBo := map[string]interface{}{
-			"items": listTemplateInfoLi,
+		items := getSummaryListTemplateInfoLi(listTemplateInfoLi)
+		for _, item := range formTemplate.FormElemLi {
+			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Component" {
+				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				break
+			}
 		}
+		
+		dataBo := map[string]interface{}{
+			"items": items,
+		}
+		
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(&dataBo)
 	}
 	if refretorType == "Selector" {
-		listTemplateInfoLi := templateManager.RefretorSelectorTemplateInfo()
+		selectorTemplateInfoLi := templateManager.RefretorSelectorTemplateInfo()
+		items := getSummarySelectorTemplateInfoLi(selectorTemplateInfoLi)
+		for _, item := range formTemplate.FormElemLi {
+			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Selector" {
+				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				break
+			}
+		}
+		
 		dataBo := map[string]interface{}{
-			"items": listTemplateInfoLi,
+			"items": items,
 		}
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(&dataBo)
 	}
 	if refretorType == "Form" {
 		formTemplateInfoLi := templateManager.RefretorFormTemplateInfo()
+		items := getSummaryFormTemplateInfoLi(formTemplateInfoLi)
+		for _, item := range formTemplate.FormElemLi {
+			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Form" {
+				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				break
+			}
+		}
+		
 		dataBo := map[string]interface{}{
-			"items": formTemplateInfoLi,
+			"items": items,
 		}
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(&dataBo)
@@ -396,8 +479,16 @@ func (c Console) Refretor() revel.Result {
 	if refretorType == "DataSource" {
 		modelTemplateFactory := ModelTemplateFactory{}
 		dataSourceTemplateInfoLi := modelTemplateFactory.RefretorDataSourceInfo()
+		items := getSummaryDataSourceInfoLi(dataSourceTemplateInfoLi)
+		for _, item := range formTemplate.FormElemLi {
+			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "DataSource" {
+				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				break
+			}
+		}
+		
 		dataBo := map[string]interface{}{
-			"items": dataSourceTemplateInfoLi,
+			"items": items,
 		}
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(&dataBo)
@@ -415,24 +506,94 @@ func (c Console) Xml() revel.Result {
 
 	if refretorType == "Component" {
 		listTemplate := templateManager.GetListTemplate(id)
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(&listTemplate)
+		return c.RenderXml(&listTemplate)
 	}
 	if refretorType == "Selector" {
-		listTemplate := templateManager.GetSelectorTemplate(id)
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(&listTemplate)
+		selectorTemplate := templateManager.GetSelectorTemplate(id)
+		return c.RenderXml(&selectorTemplate)
 	}
 	if refretorType == "Form" {
 		formTemplate := templateManager.GetFormTemplate(id)
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(&formTemplate)
+		return c.RenderXml(&formTemplate)
 	}
 	if refretorType == "DataSource" {
 		modelTemplateFactory := ModelTemplateFactory{}
 		dataSourceTemplate := modelTemplateFactory.GetDataSource(id)
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(&dataSourceTemplate)
+		return c.RenderXml(&dataSourceTemplate)
+	}
+	c.Response.ContentType = "application/json; charset=utf-8"
+	return c.RenderJson(map[string]interface{}{
+		"message": "可能传入了错误的refretorType:" + refretorType,
+	})
+}
+
+func (c Console) RawXml() revel.Result {
+	refretorType := c.Params.Get("type")
+	id := c.Params.Get("@name")
+	templateManager := TemplateManager{}
+
+	if refretorType == "Component" {
+		listTemplateInfo := templateManager.GetListTemplateInfo(id)
+		listTemplate := ListTemplate{}
+		file, err := os.Open(listTemplateInfo.Path)
+		defer file.Close()
+		if err != nil {
+			panic(err)
+		}
+	
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			panic(err)
+		}
+		
+		err = xml.Unmarshal(data, &listTemplate)
+		if err != nil {
+			panic(err)
+		}
+		
+		return c.RenderXml(&listTemplate)
+	}
+	if refretorType == "Selector" {
+		selectorTemplateInfo := templateManager.GetSelectorTemplateInfo(id)
+		selectorTemplate := ListTemplate{}
+		file, err := os.Open(selectorTemplateInfo.Path)
+		defer file.Close()
+		if err != nil {
+			panic(err)
+		}
+	
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			panic(err)
+		}
+		
+		err = xml.Unmarshal(data, &selectorTemplate)
+		if err != nil {
+			panic(err)
+		}
+		
+		return c.RenderXml(&selectorTemplate)
+	}
+	if refretorType == "Form" {
+		formTemplateInfo := templateManager.GetFormTemplateInfo(id)
+		formTemplate := FormTemplate{}
+		file, err := os.Open(formTemplateInfo.Path)
+		defer file.Close()
+		if err != nil {
+			panic(err)
+		}
+	
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			panic(err)
+		}
+		
+		err = xml.Unmarshal(data, &formTemplate)
+		if err != nil {
+			panic(err)
+		}
+		
+		return c.RenderXml(&formTemplate)
 	}
 	c.Response.ContentType = "application/json; charset=utf-8"
 	return c.RenderJson(map[string]interface{}{

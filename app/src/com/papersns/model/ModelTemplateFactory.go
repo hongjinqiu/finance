@@ -28,8 +28,15 @@ type ModelTemplateFactory struct {
 }
 
 // TODO, byTest
-func (o ModelTemplateFactory) GetDataSourceInfo() []DataSourceInfo {
+func (o ModelTemplateFactory) GetDataSourceInfoLi() []DataSourceInfo {
 	dataSourceInfo := []DataSourceInfo{}
+	if len(gDataSourceDict) == 0 {
+		o.loadDataSource()
+	}
+	
+	rwlock.RLock()
+	defer rwlock.RUnlock()
+	
 	for _, item := range gDataSourceDict {
 		dataSourceInfo = append(dataSourceInfo, item)
 	}
@@ -47,24 +54,28 @@ func (o ModelTemplateFactory) RefretorDataSourceInfo() []DataSourceInfo {
 	return dataSourceInfo
 }
 
-// TODO, byTest
 func (o ModelTemplateFactory) GetDataSource(id string) DataSource {
+	return o.GetDataSourceInfo(id).DataSource
+}
+
+// TODO, byTest
+func (o ModelTemplateFactory) GetDataSourceInfo(id string) DataSourceInfo {
 	if revel.Config.StringDefault("mode.dev", "true") == "true" {
-		dataSourceInfo, found := o.findDataSource(id)
+		dataSourceInfo, found := o.findDataSourceInfo(id)
 		if found {
 			dataSourceInfo, err := o.loadSingleDataSourceWithLock(dataSourceInfo.Path)
 			if err != nil {
 				panic(err)
 			}
 			if dataSourceInfo.DataSource.Id == id {
-				return dataSourceInfo.DataSource
+				return dataSourceInfo
 			}
 		}
 		o.clearDataSource()
 		o.loadDataSource()
-		dataSourceInfo, found = o.findDataSource(id)
+		dataSourceInfo, found = o.findDataSourceInfo(id)
 		if found {
-			return dataSourceInfo.DataSource
+			return dataSourceInfo
 		}
 		panic(id + " not exists in DataSource list")
 	}
@@ -72,15 +83,15 @@ func (o ModelTemplateFactory) GetDataSource(id string) DataSource {
 	if len(gDataSourceDict) == 0 {
 		o.loadDataSource()
 	}
-	dataSourceInfo, found := o.findDataSource(id)
+	dataSourceInfo, found := o.findDataSourceInfo(id)
 	if found {
-		return dataSourceInfo.DataSource
+		return dataSourceInfo
 	}
 	panic(id + " not exists in DataSource list")
 }
 
 // TODO bytest,
-func (o ModelTemplateFactory) findDataSource(id string) (DataSourceInfo, bool) {
+func (o ModelTemplateFactory) findDataSourceInfo(id string) (DataSourceInfo, bool) {
 	rwlock.RLock()
 	defer rwlock.RUnlock()
 
@@ -306,7 +317,8 @@ func (o ModelTemplateFactory) extendFieldPoolField(fieldGroup *FieldGroup, field
 }
 
 func (o ModelTemplateFactory) getPoolFields() Fields {
-	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/model/xml/fieldpool.xml")
+	fieldPoolPath := revel.Config.StringDefault("FIELD_POOL_PATH", "")
+	file, err := os.Open(fieldPoolPath)
 	defer file.Close()
 	if err != nil {
 		panic(err)

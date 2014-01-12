@@ -5,16 +5,18 @@
 	<adapter name="" />
 	<description>控制台</description>
 	<scripts>console/summary.js</scripts>
-	<view-template view="console/formSchema.html"/>
+	<view-template view="Console/FormSchema.html"/>
 	<html>
 		<![CDATA[
-			<ul>
-				<li>组件模型控制台</li>
-				<li>选择器控制台</li>
-				<li>Form模型控制台</li>
-				<li>数据源模型控制台</li>
-			</ul>
-			<div id="componentDiv">
+			<div id="tabContent" style="visibility: hidden;">
+				<ul>
+					<li><a href="#componentDiv">组件模型控制台</a></li>
+					<li><a href="#selectorDiv">选择器控制台</a></li>
+					<li><a href="#formDiv">Form模型控制台</a></li>
+					<li><a href="#dataSourceDiv">数据源模型控制台</a></li>
+				</ul>
+				<div>
+					<div id="componentDiv">
 		]]>
 	</html>
 	<toolbar name="ComponentToolbar">
@@ -23,12 +25,16 @@
 	</toolbar>
 
 	<column-model name="Component">
+		<checkbox-column name="checkboxSelect" hideable="false">
+		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/listschema.go?@name={id}">
+				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/listschema?@name={id}">
 				</button>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=Component">
+				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Component">
+				</button>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=Component">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -39,8 +45,8 @@
 	</column-model>
 	<html>
 		<![CDATA[
-			</div>
-			<div id="selectorDiv">
+					</div>
+					<div id="selectorDiv">
 		]]>
 	</html>
 	<toolbar name="SelectorToolbar">
@@ -49,12 +55,16 @@
 	</toolbar>
 
 	<column-model name="Selector">
+		<checkbox-column name="checkboxSelect" hideable="false">
+		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/selectorschema.go?@name={id}">
+				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/selectorschema?@name={id}">
 				</button>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=Selector">
+				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Selector">
+				</button>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=Selector">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -65,8 +75,8 @@
 	</column-model>
 	<html>
 		<![CDATA[
-			</div>
-			<div id="formDiv">
+					</div>
+					<div id="formDiv">
 		]]>
 	</html>
 	<toolbar name="FormToolbar">
@@ -75,13 +85,17 @@
 	</toolbar>
 
 	<column-model name="Form">
+		<checkbox-column name="checkboxSelect" hideable="false">
+		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/formschema.go?@name={id}">
+				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/formschema?@name={id}">
 				</button>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=Form">
+				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Form">
+				</button>
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=Form">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -92,8 +106,8 @@
 	</column-model>
 	<html>
 		<![CDATA[
-			</div>
-			<div id="dataSourceDiv">
+					</div>
+					<div id="dataSourceDiv">
 		]]>
 	</html>
 	<toolbar name="DataSourceToolbar">
@@ -102,11 +116,13 @@
 	</toolbar>
 
 	<column-model name="DataSource">
+		<checkbox-column name="checkboxSelect" hideable="false">
+		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml.go?@name={id}&amp;type=DataSource">
+				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=DataSource">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -117,7 +133,16 @@
 	</column-model>
 	<html>
 		<![CDATA[
+					</div>
+				</div>
 			</div>
+			<script type="text/javascript">
+			YUI().use('tabview', function(Y) {
+				var tabview = new Y.TabView({srcNode:'#tabContent'});
+				tabview.render();
+				Y.one("#tabContent").setStyle("visibility", "visible");
+			});
+			</script>
 		]]>
 	</html>
 

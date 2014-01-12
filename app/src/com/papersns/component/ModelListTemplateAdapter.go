@@ -3,23 +3,28 @@ package component
 import (
 	. "com/papersns/model"
 	"strings"
+	"encoding/json"
 )
 
 type ModelListTemplateAdapter struct{}
 
 // TODO, bytest
-func (o ModelListTemplateAdapter) ApplyAdapter(listTemplate *ListTemplate) {
+func (o ModelListTemplateAdapter) ApplyAdapter(iListTemplate interface{}) ListTemplate {
+	listTemplate := iListTemplate.(ListTemplate)
 	if listTemplate.DataSourceModelId != "" {
 		modelTemplateFactory := ModelTemplateFactory{}
 		dataSource := modelTemplateFactory.GetDataSource(listTemplate.DataSourceModelId)
-		o.applyDataProvider(dataSource, listTemplate)
-		o.applyColumnModel(dataSource, listTemplate)
-		o.applyQueryParameter(dataSource, listTemplate)
+		o.applyDataProvider(dataSource, &listTemplate)
+		o.applyColumnModel(dataSource, &listTemplate)
+		o.applyQueryParameter(dataSource, &listTemplate)
 	}
+	return listTemplate
 }
 
 // TODO, bytest
-func (o ModelListTemplateAdapter) ApplyQueryParameter(listTemplate *ListTemplate, queryParameter *QueryParameter) {
+func (o ModelListTemplateAdapter) ApplyQueryParameter(iListTemplate *interface{}, iQueryParameter *interface{}) {
+	listTemplate := (*iListTemplate).(ListTemplate)
+	queryParameter := (*iQueryParameter).(QueryParameter)
 	if listTemplate.DataSourceModelId != "" {
 		if listTemplate.QueryParameterGroup.DataSetId != "" {
 			queryParameter.Name = listTemplate.QueryParameterGroup.DataSetId + "." + queryParameter.Name
@@ -28,7 +33,9 @@ func (o ModelListTemplateAdapter) ApplyQueryParameter(listTemplate *ListTemplate
 }
 
 // TODO, bytest
-func (o ModelListTemplateAdapter) ApplyColumnName(listTemplate *ListTemplate, column *Column) {
+func (o ModelListTemplateAdapter) ApplyColumnName(iListTemplate *interface{}, iColumn *interface{}) {
+	listTemplate := (*iListTemplate).(ListTemplate)
+	column := (*iColumn).(Column)
 	if listTemplate.DataSourceModelId != "" {
 		if listTemplate.QueryParameterGroup.DataSetId != "" {
 			column.Name = listTemplate.QueryParameterGroup.DataSetId + "." + column.Name
@@ -56,31 +63,30 @@ func (o ModelListTemplateAdapter) applyQueryParameter(dataSource DataSource, lis
 	var result interface{} = ""
 	modelIterator := ModelIterator{}
 	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		queryParameter := listTemplate.QueryParameterGroup.QueryParameterLi[i]
+		queryParameter := &listTemplate.QueryParameterGroup.QueryParameterLi[i]
+		queryParameterDataSetId := listTemplate.QueryParameterGroup.DataSetId
+		if queryParameterDataSetId == "" {
+			queryParameterDataSetId = "A"
+		}
 		if queryParameter.Auto == "true" {
 			modelIterator.IterateAllField(&dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}){
-				if fieldGroup.IsMasterField() {
-					name := queryParameter.Name
-					if queryParameter.ColumnName != "" {
-						name = queryParameter.ColumnName
+				name := queryParameter.Name
+				if queryParameter.ColumnName != "" {
+					name = queryParameter.ColumnName
+				}
+				if fieldGroup.GetDataSetId() == queryParameterDataSetId && name == fieldGroup.Id {
+					if queryParameter.Text == "" {
+						queryParameter.Text = fieldGroup.DisplayName
 					}
-					if name == fieldGroup.Id {
-						if queryParameter.Text == "" {
-							queryParameter.Text = fieldGroup.DisplayName
+					if fieldGroup.FixHide == "true" {
+						if queryParameter.Editor == "" {
+							queryParameter.Editor = "hidden"
 						}
-						if fieldGroup.FixHide == "true" {
-							if queryParameter.Editor == "" {
-								queryParameter.Editor = "hidden"
-							}
-						}
-//						if queryParameter.Hidden == "" {
-//							queryParameter.Hidden = fieldGroup.FixHide
-//						}
-						xmlName := commonMethod.getColumnXMLName(*fieldGroup)
-						if xmlName != "" {
-							o.applyQueryParameterAttr(xmlName, &queryParameter)
-							o.applyQueryParameterSubAttr(xmlName, *fieldGroup, &queryParameter)
-						}
+					}
+					xmlName := commonMethod.getColumnXMLName(*fieldGroup)
+					if xmlName != "" {
+						o.applyQueryParameterAttr(xmlName, queryParameter)
+						o.applyQueryParameterSubAttr(xmlName, *fieldGroup, queryParameter)
 					}
 				}
 			})
@@ -129,7 +135,35 @@ func (o ModelListTemplateAdapter) applyQueryParameterAttr(xmlName string, queryP
 
 func (o ModelListTemplateAdapter) applyQueryParameterSubAttr(xmlName string, fieldGroup FieldGroup, queryParameter *QueryParameter) {
 	if xmlName == "select-column" {
-		// do nothing
+		relationItem := fieldGroup.RelationDS.RelationItemLi[0]
+		hasConfig := false
+		if queryParameter.ParameterAttributeLi != nil {
+			for _, attrItem := range queryParameter.ParameterAttributeLi {
+				if attrItem.Name == "config" {
+					hasConfig = true
+					break
+				}
+			}
+		}
+		if !hasConfig {
+			if queryParameter.ParameterAttributeLi == nil {
+				queryParameter.ParameterAttributeLi = []ParameterAttribute{}
+			}
+			parameterAttribute := ParameterAttribute{}
+			parameterAttribute.Name = "config"
+			selectValue := map[string]interface{}{
+				"displayField": relationItem.DisplayField,
+				"valueField": relationItem.ValueField,
+				"selectorName": relationItem.Id,
+				"selectionMode": "multi",
+			}
+			data, err := json.Marshal(selectValue)
+			if err != nil {
+				panic(err)
+			}
+			parameterAttribute.Value = string(data)
+			queryParameter.ParameterAttributeLi = append(queryParameter.ParameterAttributeLi, parameterAttribute)
+		}
 	} else if xmlName == "string-column" {
 		// do nothing
 	} else if xmlName == "number-column" {

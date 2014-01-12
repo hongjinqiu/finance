@@ -80,6 +80,7 @@
 						<enumeration value="UNITCOST" />
 						<enumeration value="YEAR" />
 						<enumeration value="YEARMONTH" />
+						<enumeration value="DATETIME" />
 						<enumeration value="DATE" />
 						<enumeration value="TIME" />
 					</restriction>

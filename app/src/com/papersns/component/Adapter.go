@@ -26,32 +26,37 @@ func GetAdapterDict() map[string]reflect.Type {
 type CommonMethod struct{}
 
 // TODO, byTest
-func (o CommonMethod) Parse(classMethod string, param *[]*interface{}) {
+func (o CommonMethod) Parse(classMethod string, param []interface{}) []reflect.Value {
 	exprContent := classMethod
 	scriptStruct := strings.Split(exprContent, ".")[0]
 	scriptStructMethod := strings.Split(exprContent, ".")[1]
 	scriptType := GetAdapterDict()[scriptStruct]
+	if scriptType == nil {
+		panic("adatpter " + scriptStruct + " not found")
+	}
 	inst := reflect.New(scriptType).Elem().Interface()
 	instValue := reflect.ValueOf(inst)
-	//in := []reflect.Value{reflect.ValueOf(paramMap)}
 	in := []reflect.Value{}
-	for i, _ := range *param {
-		in = append(in, reflect.ValueOf((*param)[i]))
+	for _, item := range param {
+		in = append(in, reflect.ValueOf(item))
 	}
-	instValue.MethodByName(scriptStructMethod).Call(in)
+	return instValue.MethodByName(scriptStructMethod).Call(in)
 }
 
 // TODO, bytest
 func (o CommonMethod) recursionApplyColumnModel(dataSource DataSource, columnModel *ColumnModel, result *interface{}) {
 	modelIterator := ModelIterator{}
 	for i, _ := range columnModel.ColumnLi {
-		column := columnModel.ColumnLi[i]
+		column := &columnModel.ColumnLi[i]
 		if column.ColumnModel.ColumnLi == nil {
 			if column.XMLName.Local == "auto-column" || column.Auto == "true" {
 				modelIterator.IterateAllField(&dataSource, result, func(fieldGroup *FieldGroup, result *interface{}) {
 					isApplyColumn := false
-					isApplyColumn = isApplyColumn || (fieldGroup.IsMasterField() && column.Name == fieldGroup.Id)
-					isApplyColumn = isApplyColumn || (!fieldGroup.IsMasterField() && fieldGroup.GetDataSetId() == columnModel.DataSetId && column.Name == fieldGroup.Id)
+					columnModelDataSetId := columnModel.DataSetId
+					if columnModelDataSetId == "" {
+						columnModelDataSetId = "A"
+					}
+					isApplyColumn = isApplyColumn || (fieldGroup.GetDataSetId() == columnModelDataSetId && column.Name == fieldGroup.Id)
 					if isApplyColumn {
 						if column.Text == "" {
 							column.Text = fieldGroup.DisplayName
@@ -60,10 +65,10 @@ func (o CommonMethod) recursionApplyColumnModel(dataSource DataSource, columnMod
 							column.Hideable = fieldGroup.FixHide
 						}
 						if column.XMLName.Local == "auto-column" {
-							o.applyAutoColumnXMLName(*fieldGroup, &column)
+							o.applyAutoColumnXMLName(*fieldGroup, column)
 						}
 
-						o.applyColumnExtend(*fieldGroup, &column)
+						o.applyColumnExtend(*fieldGroup, column)
 					}
 				})
 			}
@@ -73,7 +78,6 @@ func (o CommonMethod) recursionApplyColumnModel(dataSource DataSource, columnMod
 	}
 }
 
-// TODO, bytest
 func (o CommonMethod) applyAutoColumnXMLName(fieldGroup FieldGroup, column *Column) {
 	xmlName := o.getColumnXMLName(fieldGroup)
 	if xmlName != "" {
@@ -81,12 +85,11 @@ func (o CommonMethod) applyAutoColumnXMLName(fieldGroup FieldGroup, column *Colu
 	}
 }
 
-// TODO, byTest
 func (o CommonMethod) getColumnXMLName(fieldGroup FieldGroup) string {
 	isIntField := false
 	intArray := []string{"SMALLINT", "INT", "LONGINT"}
 	for _, item := range intArray {
-		if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower(item) {
+		if strings.ToLower(fieldGroup.FieldDataType) == strings.ToLower(item) {
 			isIntField = true
 			break
 		}
@@ -94,7 +97,7 @@ func (o CommonMethod) getColumnXMLName(fieldGroup FieldGroup) string {
 	isFloatField := false
 	floatArray := []string{"FLOAT", "MONEY", "DECIMAL"}
 	for _, item := range floatArray {
-		if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower(item) {
+		if strings.ToLower(fieldGroup.FieldDataType) == strings.ToLower(item) {
 			isFloatField = true
 			break
 		}
@@ -102,7 +105,7 @@ func (o CommonMethod) getColumnXMLName(fieldGroup FieldGroup) string {
 	isDateType := false
 	dateArray := []string{"YEAR", "YEARMONTH", "DATE", "TIME", "DATETIME"}
 	for _, item := range dateArray {
-		if strings.ToLower(fieldGroup.FieldDataType) == strings.ToLower(item) {
+		if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower(item) {
 			isDateType = true
 			break
 		}
@@ -155,6 +158,10 @@ func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 		} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("PERCENT") {
 			if column.IsPercent == "" {
 				column.IsPercent = "true"
+			}
+		} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("QUANTITY") {
+			if column.IsQuantity == "" {
+				column.IsQuantity = "true"
 			}
 		}
 	} else if column.XMLName.Local == "date-column" {

@@ -42,19 +42,19 @@ type FormElem struct {
 	Toolbar     Toolbar     `xml:"-"`
 	ColumnModel ColumnModel `xml:"-"`
 
-	//	ColumnModelAttributeGroup
+	ColumnModelAttributeGroup
 }
 
 type Adapter struct {
 	XMLName xml.Name `xml:"adapter"`
-	Name    string   `xml:"name,attr"`
+	Name    string   `xml:"name,attr,omitempty"`
 }
 
 type ViewTemplate struct {
 	XMLName         xml.Name `xml:"view-template"`
-	View            string   `xml:"view,attr"`
-	SelectorView    string   `xml:"selectorView,attr"`
-	SelectorScripts string   `xml:"selectorScripts,attr"`
+	View            string   `xml:"view,attr,omitempty"`
+	SelectorView    string   `xml:"selectorView,attr,omitempty"`
+	SelectorScripts string   `xml:"selectorScripts,attr,omitempty"`
 }
 
 type Html struct {
@@ -67,24 +67,24 @@ type Toolbar struct {
 	ButtonGroup ButtonGroup `xml:"button-group"`
 	ButtonLi    []Button    `xml:",any"`
 
-	Name           string `xml:"name,attr"`
-	Export         string `xml:"export,attr"`
-	Exporter       string `xml:"exporter,attr"`
-	ExportParam    string `xml:"exportParam,attr"`
-	FreezedHeader  string `xml:"freezedHeader,attr"`
-	ExportChart    string `xml:"exportChart,attr"`
-	ExcelChart     string `xml:"excelChart,attr"`
-	ExcelChartType string `xml:"excelChartType,attr"`
-	ExportTitle    string `xml:"exportTitle,attr"`
-	ExportSuffix   string `xml:"exportSuffix,attr"`
+	Name           string `xml:"name,attr,omitempty"`
+	Export         string `xml:"export,attr,omitempty"`
+	Exporter       string `xml:"exporter,attr,omitempty"`
+	ExportParam    string `xml:"exportParam,attr,omitempty"`
+	FreezedHeader  string `xml:"freezedHeader,attr,omitempty"`
+	ExportChart    string `xml:"exportChart,attr,omitempty"`
+	ExcelChart     string `xml:"excelChart,attr,omitempty"`
+	ExcelChartType string `xml:"excelChartType,attr,omitempty"`
+	ExportTitle    string `xml:"exportTitle,attr,omitempty"`
+	ExportSuffix   string `xml:"exportSuffix,attr,omitempty"`
 }
 
 type Security struct {
 	XMLName xml.Name `xml:"security"`
 
-	FunctionId            string `xml:"functionId,attr"`
-	Override              string `xml:"override,attr"`
-	DEFAULT_RESOURCE_CODE string `xml:"DEFAULT_RESOURCE_CODE,attr"`
+	FunctionId            string `xml:"functionId,attr,omitempty"`
+	Override              string `xml:"override,attr,omitempty"`
+	DEFAULT_RESOURCE_CODE string `xml:"DEFAULT_RESOURCE_CODE,attr,omitempty"`
 }
 
 type DataProvider struct {
@@ -94,8 +94,8 @@ type DataProvider struct {
 	FixBsonQuery  string `xml:"fix-bson-query"`
 	Map           string `xml:"map"`
 	Reduce        string `xml:"reduce"`
-	Size          string `xml:"size,attr"`
-	BsonIntercept string `xml:"bsonIntercept,attr"`
+	Size          string `xml:"size,attr,omitempty"`
+	BsonIntercept string `xml:"bsonIntercept,attr,omitempty"`
 }
 
 type ColumnModel struct {
@@ -114,15 +114,15 @@ type CheckboxColumn struct {
 
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Expression        string            `xml:"expression"`
-	Hideable          string            `xml:"hideable,attr"`
-	Name              string            `xml:"name,attr"`
+	Hideable          string            `xml:"hideable,attr,omitempty"`
+	Name              string            `xml:"name,attr,omitempty"`
 }
 
 type ColumnAttribute struct {
 	XMLName xml.Name `xml:"column-attribute"`
 
-	Name  string `xml:"name,attr"`
-	Value string `xml:"value,attr"`
+	Name  string `xml:"name,attr,omitempty"`
+	Value string `xml:"value,attr,omitempty"`
 }
 
 type IdColumn struct {
@@ -132,123 +132,124 @@ type IdColumn struct {
 }
 
 type ColumnModelAttributeGroup struct {
-	Name                  string `xml:"name,attr"`
-	AutoLoad              string `xml:"autoLoad,attr"`
-	SummaryLoad           string `xml:"summaryLoad,attr"`
-	SummaryStat           string `xml:"summaryStat,attr"`
-	Summation             string `xml:"summation,attr"`
-	GroupSummation        string `xml:"groupSummation,attr"`
-	GroupMerge            string `xml:"groupMerge,attr"`
-	ShowGroupFilter       string `xml:"showGroupFilter,attr"`
-	ShowAggregationFilter string `xml:"showAggregationFilter,attr"`
-	AutoRowHeight         string `xml:"autoRowHeight,attr"`
-	Nowrap                string `xml:"nowrap,attr"`
-	Rownumber             string `xml:"rownumber,attr"`
-	SelectionMode         string `xml:"selectionMode,attr"`
-	ShowClearBtn          string `xml:"showClearBtn,attr"`
-	SelectionSupport      string `xml:"selectionSupport,attr"`
-	GroupField            string `xml:"groupField,attr"`
-	BsonOrderBy           string `xml:"bsonOrderBy,attr"`
-	SaveUrl               string `xml:"saveUrl,attr"`
-	DeleteUrl             string `xml:"deleteUrl,attr"`
-	StoreIntercept        string `xml:"storeIntercept,attr"`
-	RecordIntercept       string `xml:"recordIntercept,attr"`
-	SelectionTemplate     string `xml:"selectionTemplate,attr"`
-	SelectionTitle        string `xml:"selectionTitle,attr"`
-	DisplayMode           string `xml:"displayMode,attr"`
-	DataSetId             string `xml:"dataSetId,attr"`
+	Name                  string `xml:"name,attr,omitempty"`
+	AutoLoad              string `xml:"autoLoad,attr,omitempty"`
+	SummaryLoad           string `xml:"summaryLoad,attr,omitempty"`
+	SummaryStat           string `xml:"summaryStat,attr,omitempty"`
+	Summation             string `xml:"summation,attr,omitempty"`
+	GroupSummation        string `xml:"groupSummation,attr,omitempty"`
+	GroupMerge            string `xml:"groupMerge,attr,omitempty"`
+	ShowGroupFilter       string `xml:"showGroupFilter,attr,omitempty"`
+	ShowAggregationFilter string `xml:"showAggregationFilter,attr,omitempty"`
+	AutoRowHeight         string `xml:"autoRowHeight,attr,omitempty"`
+	Nowrap                string `xml:"nowrap,attr,omitempty"`
+	Rownumber             string `xml:"rownumber,attr,omitempty"`
+	SelectionMode         string `xml:"selectionMode,attr,omitempty"`
+	ShowClearBtn          string `xml:"showClearBtn,attr,omitempty"`
+	SelectionSupport      string `xml:"selectionSupport,attr,omitempty"`
+	GroupField            string `xml:"groupField,attr,omitempty"`
+	BsonOrderBy           string `xml:"bsonOrderBy,attr,omitempty"`
+	SaveUrl               string `xml:"saveUrl,attr,omitempty"`
+	DeleteUrl             string `xml:"deleteUrl,attr,omitempty"`
+	StoreIntercept        string `xml:"storeIntercept,attr,omitempty"`
+	RecordIntercept       string `xml:"recordIntercept,attr,omitempty"`
+	SelectionTemplate     string `xml:"selectionTemplate,attr,omitempty"`
+	SelectionTitle        string `xml:"selectionTitle,attr,omitempty"`
+	DisplayMode           string `xml:"displayMode,attr,omitempty"`
+	DataSetId             string `xml:"dataSetId,attr,omitempty"`
 }
 
 type ColumnAttributeGroup struct {
-	Name             string `xml:"name,attr"`
-	Bson             string `xml:"bson,attr"`
-	Text             string `xml:"text,attr"`
-	Align            string `xml:"align,attr"`
-	Graggable        string `xml:"graggable,attr"`
-	Groupable        string `xml:"groupable,attr"`
-	Hideable         string `xml:"hideable,attr"`
-	Editable         string `xml:"editable,attr"`
-	MenuDisabled     string `xml:"menuDisabled,attr"`
-	Sortable         string `xml:"sortable,attr"`
-	Comparable       string `xml:"comparable,attr"`
-	Locked           string `xml:"locked,attr"`
-	Auto             string `xml:"auto,attr"`
-	Width            string `xml:"width,attr"`
-	ExcelWidth       string `xml:"excelWidth,attr"`
-	Renderer         string `xml:"renderer,attr"`
-	RendererTemplate string `xml:"rendererTemplate,attr"`
-	SummaryText      string `xml:"summaryText,attr"`
-	SummaryType      string `xml:"summaryType,attr"`
-	Cycle            string `xml:"cycle,attr"`
-	Exported         string `xml:"exported,attr"`
+	Name             string `xml:"name,attr,omitempty"`
+	Bson             string `xml:"bson,attr,omitempty"`
+	Text             string `xml:"text,attr,omitempty"`
+	Align            string `xml:"align,attr,omitempty"`
+	Graggable        string `xml:"graggable,attr,omitempty"`
+	Groupable        string `xml:"groupable,attr,omitempty"`
+	Hideable         string `xml:"hideable,attr,omitempty"`
+	Editable         string `xml:"editable,attr,omitempty"`
+	MenuDisabled     string `xml:"menuDisabled,attr,omitempty"`
+	Sortable         string `xml:"sortable,attr,omitempty"`
+	Comparable       string `xml:"comparable,attr,omitempty"`
+	Locked           string `xml:"locked,attr,omitempty"`
+	Auto             string `xml:"auto,attr,omitempty"`
+	Width            string `xml:"width,attr,omitempty"`
+	ExcelWidth       string `xml:"excelWidth,attr,omitempty"`
+	Renderer         string `xml:"renderer,attr,omitempty"`
+	RendererTemplate string `xml:"rendererTemplate,attr,omitempty"`
+	SummaryText      string `xml:"summaryText,attr,omitempty"`
+	SummaryType      string `xml:"summaryType,attr,omitempty"`
+	Cycle            string `xml:"cycle,attr,omitempty"`
+	Exported         string `xml:"exported,attr,omitempty"`
 }
 
 type Column struct {
 	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,script-column,select-column
 	Html              string            `xml:",chardata"`
-	Name              string            `xml:"name,attr"`
+	Name              string            `xml:"name,attr,omitempty"`
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor            Editor            `xml:"editor"`
 	Listeners         Listeners         `xml:"listeners"`
 	ColumnAttributeGroup
 	ColumnModel ColumnModel `xml:"column-model"`
 
-	//	Format         string `xml:"format,attr"`
-	DisplayPattern string `xml:"displayPattern,attr"`
-	DbPattern      string `xml:"dbPattern,attr"`
+	//	Format         string `xml:"format,attr,omitempty"`
+	DisplayPattern string `xml:"displayPattern,attr,omitempty"`
+	DbPattern      string `xml:"dbPattern,attr,omitempty"`
 	BooleanColumnAttributeGroup
 
-	Dictionary string `xml:"dictionary,attr"`
-	Complex    string `xml:"complex,attr"`
+	Dictionary string `xml:"dictionary,attr,omitempty"`
+	Complex    string `xml:"complex,attr,omitempty"`
 
 	Buttons            Buttons `xml:"buttons"`
-	Prefix             string  `xml:"prefix,attr"`
-	DecimalPlaces      string  `xml:"decimalPlaces,attr"`
-	DecimalSeparator   string  `xml:"decimalSeparator,attr"`
-	ThousandsSeparator string  `xml:"thousandsSeparator,attr"`
-	Suffix             string  `xml:"suffix,attr"`
+	Prefix             string  `xml:"prefix,attr,omitempty"`
+	DecimalPlaces      string  `xml:"decimalPlaces,attr,omitempty"`
+	DecimalSeparator   string  `xml:"decimalSeparator,attr,omitempty"`
+	ThousandsSeparator string  `xml:"thousandsSeparator,attr,omitempty"`
+	Suffix             string  `xml:"suffix,attr,omitempty"`
 
 	// 财务格式化字段
-	CurrencyField string `xml:"currencyField,attr"` // 币别字段
-	IsMoney       string `xml:"isMoney,attr"`       // 是否金额
-	IsUnitPrice   string `xml:"isUnitPrice,attr"`   // 是否单价
-	IsCost        string `xml:"isCost,attr"`        // 是否成本
-	IsPercent     string `xml:"isPercent,attr"`     // 是否百分比
+	CurrencyField string `xml:"currencyField,attr,omitempty"` // 币别字段
+	IsMoney       string `xml:"isMoney,attr,omitempty"`       // 是否金额
+	IsUnitPrice   string `xml:"isUnitPrice,attr,omitempty"`   // 是否单价
+	IsCost        string `xml:"isCost,attr,omitempty"`        // 是否成本
+	IsPercent     string `xml:"isPercent,attr,omitempty"`     // 是否百分比
+	IsQuantity     string `xml:"isQuantity,attr,omitempty"`     // 是否数量
 
-	Script string `xml:"script,attr"`
+	Script string `xml:"script,attr,omitempty"`
 
 	// select-column的内容
-	DisplayField  string `xml:"displayField,attr"`
-	ValueField    string `xml:"valueField,attr"`
-	SelectorName  string `xml:"selectorName,attr"`
-	SelectionMode string `xml:"selectionMode,attr"`
-	QueryFunc     string `xml:"queryFunc,attr"`
+	DisplayField  string `xml:"displayField,attr,omitempty"`
+	ValueField    string `xml:"valueField,attr,omitempty"`
+	SelectorName  string `xml:"selectorName,attr,omitempty"`
+	SelectionMode string `xml:"selectionMode,attr,omitempty"`
+	QueryFunc     string `xml:"queryFunc,attr,omitempty"`
 }
 
 type Editor struct {
 	XMLName         xml.Name          `xml:"editor"`
 	EditorAttribute []EditorAttribute `xml:"editor_attribute"`
-	Name            string            `xml:"name,attr"`
+	Name            string            `xml:"name,attr,omitempty"`
 }
 
 type Listeners struct {
 	XMLName     xml.Name `xml:"listeners"`
-	Change      string   `xml:"change,attr"`
-	Selection   string   `xml:"selection,attr"`
-	UnSelection string   `xml:"unSelection,attr"`
+	Change      string   `xml:"change,attr,omitempty"`
+	Selection   string   `xml:"selection,attr,omitempty"`
+	UnSelection string   `xml:"unSelection,attr,omitempty"`
 }
 
 type EditorAttribute struct {
 	XMLName xml.Name `xml:"editor_attribute"`
 
-	Name  string `xml:"name,attr"`
-	Value string `xml:"value,attr"`
+	Name  string `xml:"name,attr,omitempty"`
+	Value string `xml:"value,attr,omitempty"`
 }
 
 type BooleanColumnAttributeGroup struct {
-	TrueText      string `xml:"trueText,attr"`
-	FalseText     string `xml:"falseText,attr"`
-	UndefinedText string `xml:"undefinedText,attr"`
+	TrueText      string `xml:"trueText,attr,omitempty"`
+	FalseText     string `xml:"falseText,attr,omitempty"`
+	UndefinedText string `xml:"undefinedText,attr,omitempty"`
 }
 
 type QueryParameterGroup struct {
@@ -257,9 +258,9 @@ type QueryParameterGroup struct {
 	FixedParameterLi []FixedParameter `xml:"fixed-parameter"`
 	QueryParameterLi []QueryParameter `xml:"query-parameter"`
 
-	FormColumns      string `xml:"formColumns,attr"`
-	EnableEnterParam string `xml:"enableEnterParam,attr"`
-	DataSetId        string `xml:"dataSetId,attr"`
+	FormColumns      string `xml:"formColumns,attr,omitempty"`
+	EnableEnterParam string `xml:"enableEnterParam,attr,omitempty"`
+	DataSetId        string `xml:"dataSetId,attr,omitempty"`
 }
 
 type FixedParameter struct {
@@ -280,25 +281,25 @@ type QueryParameter struct {
 type ParameterAttribute struct {
 	XMLName xml.Name `xml:"parameter-attribute"`
 
-	Name  string `xml:"name,attr"`
-	Value string `xml:"value,attr"`
+	Name  string `xml:"name,attr,omitempty"`
+	Value string `xml:"value,attr,omitempty"`
 }
 
 type QueryParamAttributeGroup struct {
-	Name        string `xml:"name,attr"`
-	Text        string `xml:"text,attr"`
-	ColumnName  string `xml:"columnName,attr"`
-	EnterParam  string `xml:"enterParam,attr"`
-	Auto        string `xml:"auto,attr"`
-	Editor      string `xml:"editor,attr"`
-	Restriction string `xml:"restriction,attr"`
-	ColSpan     string `xml:"colSpan,attr"`
-	RowSpan     string `xml:"rowSpan,attr"`
-	Value       string `xml:"value,attr"`
-	OtherName   string `xml:"otherName,attr"`
-	Having      string `xml:"having,attr"`
-	Required    string `xml:"required,attr"`
-	UseIn       string `xml:"use-in,attr"`
+	Name        string `xml:"name,attr,omitempty"`
+	Text        string `xml:"text,attr,omitempty"`
+	ColumnName  string `xml:"columnName,attr,omitempty"`
+	EnterParam  string `xml:"enterParam,attr,omitempty"`
+	Auto        string `xml:"auto,attr,omitempty"`
+	Editor      string `xml:"editor,attr,omitempty"`
+	Restriction string `xml:"restriction,attr,omitempty"`
+	ColSpan     string `xml:"colSpan,attr,omitempty"`
+	RowSpan     string `xml:"rowSpan,attr,omitempty"`
+	Value       string `xml:"value,attr,omitempty"`
+	OtherName   string `xml:"otherName,attr,omitempty"`
+	Having      string `xml:"having,attr,omitempty"`
+	Required    string `xml:"required,attr,omitempty"`
+	UseIn       string `xml:"use-in,attr,omitempty"`
 }
 
 type ButtonGroup struct {
@@ -321,21 +322,21 @@ type Button struct {
 
 type ButtonAttribute struct {
 	XMLName xml.Name `xml:"button-attribute"`
-	Name    string   `xml:"name,attr"`
-	Value   string   `xml:"value,attr"`
+	Name    string   `xml:"name,attr,omitempty"`
+	Value   string   `xml:"value,attr,omitempty"`
 }
 
 type ButtonAttributeGroup struct {
-	Xtype      string      `xml:"xtype,attr"`
-	Name       string      `xml:"name,attr"`
-	Text       string      `xml:"text,attr"`
-	IconCls    string      `xml:"iconCls,attr"`
-	IconAlign  string      `xml:"iconAlign,attr"`
-	Disabled   string      `xml:"disabled,attr"`
-	Hidden     string      `xml:"hidden,attr"`
-	ArrowAlign string      `xml:"arrowAlign,attr"`
-	Scale      string      `xml:"scale,attr"`
-	Rowspan    string      `xml:"rowspan,attr"`
-	Handler    template.JS `xml:"handler,attr"`
-	Mode       string      `xml:"mode,attr"`
+	Xtype      string      `xml:"xtype,attr,omitempty"`
+	Name       string      `xml:"name,attr,omitempty"`
+	Text       string      `xml:"text,attr,omitempty"`
+	IconCls    string      `xml:"iconCls,attr,omitempty"`
+	IconAlign  string      `xml:"iconAlign,attr,omitempty"`
+	Disabled   string      `xml:"disabled,attr,omitempty"`
+	Hidden     string      `xml:"hidden,attr,omitempty"`
+	ArrowAlign string      `xml:"arrowAlign,attr,omitempty"`
+	Scale      string      `xml:"scale,attr,omitempty"`
+	Rowspan    string      `xml:"rowspan,attr,omitempty"`
+	Handler    template.JS `xml:"handler,attr,omitempty"`
+	Mode       string      `xml:"mode,attr,omitempty"`
 }
