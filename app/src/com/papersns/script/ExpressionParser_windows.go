@@ -42,7 +42,8 @@ func (o ExpressionParser) ParseAfterBuildQuery(classMethod string, queryLi []map
 	return queryLi
 }
 
+/*
 func (o ExpressionParser) ParseAfterQueryData(classMethod string, items []interface{}) []interface{} {
 	return items
 }
-
+*/

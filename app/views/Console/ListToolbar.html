@@ -1,0 +1,20 @@
+		<div id="toolbar">
+			{{$toolbarBo := .result.toolbarBo}}
+			{{range $index,$value := .result.listTemplate.Toolbar.ButtonLi}}
+				{{range $subIndex,$subValue := $toolbarBo}}
+					{{if eq $index $subIndex}}
+						{{if $subValue.isShow}}
+							{{if eq $value.Mode "fn"}}
+								<input type="button" value="{{$value.Text}}" class="{{$value.IconCls}}" onclick="{{$value.Handler}}()"/>
+							{{end}}
+							{{if eq $value.Mode "url"}}
+								<input type="button" value="{{$value.Text}}" class="{{$value.IconCls}}" onclick="location.href='{{$value.Handler}}'"/>
+							{{end}}
+							{{if eq $value.Mode "url^"}}
+								<input type="button" value="{{$value.Text}}" class="{{$value.IconCls}}" onclick="alert('需要用弹出{{$value.Handler}}')"/>
+							{{end}}
+						{{end}}
+					{{end}}
+				{{end}}
+			{{end}}
+		</div>

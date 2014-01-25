@@ -13,6 +13,7 @@ func init() {
 	rwlock.Lock()
 	defer rwlock.Unlock()
 	interceptorDict[reflect.TypeOf(SysUserInterceptor{}).Name()] = reflect.TypeOf(SysUserInterceptor{})
+	interceptorDict[reflect.TypeOf(ModelListTemplateInterceptor{}).Name()] = reflect.TypeOf(ModelListTemplateInterceptor{})
 }
 
 func GetInterceptorDict() map[string]reflect.Type {
@@ -23,40 +24,70 @@ func GetInterceptorDict() map[string]reflect.Type {
 
 type InterceptorManager struct{}
 
-func (o InterceptorManager) ParseBeforeBuildQuery(classMethod string, paramMap *map[string]string) {
-	//paramLi := []*interface{}{paramMap}
-	paramLi := []*interface{}{}
-	var paramPointer interface{} = *paramMap
-	paramLi = append(paramLi, &paramPointer)
-	o.parse(classMethod, &paramLi)
+func (o InterceptorManager) ParseBeforeBuildQuery(classMethod string, paramMap map[string]string) map[string]string {
+	if classMethod == "" {
+		return paramMap
+	}
+
+	paramLi := []interface{}{}
+	paramLi = append(paramLi, paramMap)
+	values := o.parse(classMethod, paramLi)
+	if values != nil {
+		return values[0].(map[string]string)
+	}
+	return paramMap
 }
 
-func (o InterceptorManager) ParseAfterBuildQuery(classMethod string, queryLi *[]map[string]interface{}) {
-	paramLi := []*interface{}{}
-	var paramPointer interface{} = *queryLi
-	paramLi = append(paramLi, &paramPointer)
-	o.parse(classMethod, &paramLi)
+func (o InterceptorManager) ParseAfterBuildQuery(classMethod string, queryLi []map[string]interface{}) []map[string]interface{} {
+	if classMethod == "" {
+		return queryLi
+	}
+	
+	paramLi := []interface{}{}
+	paramLi = append(paramLi, queryLi)
+	values := o.parse(classMethod, paramLi)
+	if values != nil {
+		return values[0].([]map[string]interface{})
+	}
+	return queryLi
 }
 
-func (o InterceptorManager) ParseAfterQueryData(classMethod string, items *[]interface{}) {
-	paramLi := []*interface{}{}
-	var paramPointer interface{} = *items
-	paramLi = append(paramLi, &paramPointer)
-	o.parse(classMethod, &paramLi)
+func (o InterceptorManager) ParseAfterQueryData(classMethod string, dataSetId string, items []interface{}) []interface{} {
+	if classMethod == "" {
+		return items
+	}
+
+	paramLi := []interface{}{}
+	paramLi = append(paramLi, dataSetId)
+	paramLi = append(paramLi, items)
+	values := o.parse(classMethod, paramLi)
+	if values != nil {
+		return values[0].([]interface{})
+	}
+	return items
 }
 
-func (o InterceptorManager) parse(classMethod string, param *[]*interface{}) {
+func (o InterceptorManager) parse(classMethod string, param []interface{}) []interface{} {
 	if classMethod != "" {
 		exprContent := classMethod
 		scriptStruct := strings.Split(exprContent, ".")[0]
 		scriptStructMethod := strings.Split(exprContent, ".")[1]
 		scriptType := GetInterceptorDict()[scriptStruct]
+		if scriptType == nil {
+			panic(scriptStruct + " is not exist")
+		}
 		inst := reflect.New(scriptType).Elem().Interface()
 		instValue := reflect.ValueOf(inst)
 		in := []reflect.Value{}
-		for i, _ := range *param {
-			in = append(in, reflect.ValueOf((*param)[i]))
+		for i, _ := range param {
+			in = append(in, reflect.ValueOf(param[i]))
 		}
-		instValue.MethodByName(scriptStructMethod).Call(in)
+		values := instValue.MethodByName(scriptStructMethod).Call(in)
+		result := []interface{}{}
+		for i, _ := range values {
+			result = append(result, values[i].Interface())
+		}
+		return result
 	}
+	return nil
 }

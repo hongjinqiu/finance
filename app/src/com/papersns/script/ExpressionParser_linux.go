@@ -196,6 +196,7 @@ func (o ExpressionParser) ParseAfterBuildQuery(classMethod string, queryLi []map
 	return result
 }
 
+/*
 func (o ExpressionParser) ParseAfterQueryData(classMethod string, items []interface{}) []interface{} {
 	if strings.TrimSpace(classMethod) == "" {
 		return items
@@ -210,6 +211,7 @@ func (o ExpressionParser) ParseAfterQueryData(classMethod string, items []interf
 	}
 	return result
 }
+*/
 
 func (o ExpressionParser) parseClassMethod(classMethod string, obj interface{}) string {
 	if !isEnvInit() {

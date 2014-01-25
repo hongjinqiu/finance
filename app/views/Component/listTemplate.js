@@ -88,8 +88,8 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 			data:dataBo.items,
 			columnModel:listTemplate.ColumnModel,
 			render:"#columnModel_1",
-			url:"/component/listtemplate?format=json",
-			totalResults: dataBo.totalResults || 50,
+			url:"/console/listschema?@name=" + listTemplate.Id + "&format=json",
+			totalResults: dataBo.totalResults || 1,
 			pageSize: DATA_PROVIDER_SIZE,
 			paginatorContainer : '#pagContC',
 			paginatorTemplate : '#tmpl-bar'

@@ -462,8 +462,14 @@ func (o QueryParameterBuilder) regexpOperator(queryParameter QueryParameter, val
 }
 
 func (o QueryParameterBuilder) GetQueryName(queryParameter QueryParameter) string {
-	if queryParameter.ColumnName != "" {
-		return queryParameter.ColumnName
+	if queryParameter.DataSetId == "" {
+		if queryParameter.ColumnName != "" {
+			return queryParameter.ColumnName
+		}
+		return queryParameter.Name
 	}
-	return queryParameter.Name
+	if queryParameter.ColumnName != "" {
+		return queryParameter.DataSetId + "." + queryParameter.ColumnName
+	}
+	return queryParameter.DataSetId + "." + queryParameter.Name
 }

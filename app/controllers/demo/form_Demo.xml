@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>Demo</id>
+	<data-source-model-id>Demo</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>Demo表单</description>
+	<scripts>demo/demoModel.js</scripts>
+	<view-template view="Console/FormSchema.html"/>
+	<toolbar>
+		<button text="列表页" mode="fn" handler="doSave" iconCls="test"></button>
+		<button text="新增" mode="fn" handler="test" iconCls=""></button>
+		<button text="复制" mode="url" handler="doExport"></button>
+		<button text="修改" mode="fn" handler="test" iconCls=""></button>
+		<button text="保存" mode="fn" handler="test" iconCls=""></button>
+		<button text="放弃" mode="fn" handler="test" iconCls=""></button>
+		<button text="删除" mode="fn" handler="test" iconCls=""></button>
+		<button text="作废" mode="fn" handler="test" iconCls=""></button>
+		<button text="反作废" mode="fn" handler="test" iconCls=""></button>
+		<button text="刷新" mode="fn" handler="test" iconCls=""></button>
+		<button text="修改日志" mode="fn" handler="test" iconCls=""></button>
+	</toolbar>
+
+	<column-model dataSetId="A" colSpan="4">
+		<id-column name="_id" text="编号" hideable="true" />
+		<auto-column name="id" hideable="true" />
+		
+		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="name" colSpan="4" labelWidth="15%" />
+	</column-model>
+	
+	<column-model dataSetId="A" colSpan="6">
+		<auto-column name="stringColumn" colSpan="2" labelWidth="15%" columnWidth="18%" />
+		<html colSpan="2">
+			<![CDATA[
+				<td width="15%">
+					不存在列
+				</td>
+				<td width="">
+					<div id="notExist_render"></div>
+					<script type="text/javascript">
+					YUI(formJsConfig).use("node", "event", "papersns-form", function(Y) {
+						var field = new Y.PTextField({name : 'input1', type : 'text', required: true, validateInline: true, validator : function(value, formFieldObj){
+							if (value != "abc") {
+								formFieldObj.set("error", "值必须为abc");
+								return false;
+							}
+							return true;
+						}});
+						field.render("#notExist_render");
+						masterFormFieldLi.push(field);
+					});
+					</script>
+				</td>
+			]]>
+		</html>
+		<auto-column name="moneyNumberColumn" colSpan="2" labelWidth="15%" />
+		<auto-column name="priceNumberColumn" colSpan="2" />
+		<auto-column name="unitCostNumberColumn" colSpan="2" />
+		<auto-column name="percentNumberColumn" colSpan="2" />
+		<auto-column name="quantityNumberColumn" colSpan="2" />
+		
+		<auto-column name="dateTest" colSpan="2" />
+		<auto-column name="timeTest" colSpan="2" />
+		<auto-column name="dateTimeTest" colSpan="2" />
+		<auto-column name="yearTest" colSpan="2" />
+		<auto-column name="yearMonthTest" colSpan="2" />
+		<auto-column name="dictionaryTest" colSpan="2" />
+		
+		<auto-column name="selectTest" colSpan="2" />
+	</column-model>
+
+	<column-model dataSetId="B">
+		<toolbar>
+			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="addRow" iconCls="yui3-button btn-show"></button>
+			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+		</toolbar>
+		<id-column name="_id" text="编号" hideable="true" />
+		<auto-column name="id" hideable="true" />
+		
+		<auto-column name="code" />
+		<auto-column name="name" />
+		
+		<auto-column name="stringColumn" />
+		<auto-column name="moneyNumberColumn" />
+		<auto-column name="priceNumberColumn" />
+		<auto-column name="unitCostNumberColumn" />
+		<auto-column name="percentNumberColumn" />
+		<auto-column name="quantityNumberColumn" />
+		
+		<auto-column name="dateTest" />
+		<auto-column name="timeTest" />
+		<auto-column name="dateTimeTest" />
+		<auto-column name="yearTest" />
+		<auto-column name="yearMonthTest" />
+		<auto-column name="dictionaryTest" />
+		
+		<auto-column name="selectTest" />
+	</column-model>
+	
+	<column-model dataSetId="C">
+		<toolbar>
+			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="addRow" iconCls="test"></button>
+			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+		</toolbar>
+		<id-column name="_id" text="编号" hideable="true" />
+		<auto-column name="id" hideable="true" />
+		
+		<auto-column name="code" />
+		<auto-column name="name" />
+		
+		<auto-column name="stringColumn" />
+		<auto-column name="moneyNumberColumn" />
+		<auto-column name="priceNumberColumn" />
+		<auto-column name="unitCostNumberColumn" />
+		<auto-column name="percentNumberColumn" />
+		<auto-column name="quantityNumberColumn" />
+		
+		<auto-column name="dateTest" />
+		<auto-column name="timeTest" />
+		<auto-column name="dateTimeTest" />
+		<auto-column name="yearTest" />
+		<auto-column name="yearMonthTest" />
+		<auto-column name="dictionaryTest" />
+		
+		<auto-column name="selectTest" />
+	</column-model>
+</form-template>

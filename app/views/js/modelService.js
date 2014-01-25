@@ -21,7 +21,7 @@ ModelIterator.prototype.iterateAllField = function(dataSource, result, iterateFu
 	for (var i = 0; i < fieldGroupLi.length; i++) {
 		iterateFunc(fieldGroupLi[i], result);
 	}
-	for (var i = 0; i < dataSource.DetailDataLi; i++) {
+	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
 		var fieldGroupLi = self._getDataSetFieldGroupLi(dataSource.DetailDataLi[i].FixField, dataSource.DetailDataLi[i].BizField);
 		for (var j = 0; j < fieldGroupLi.length; j++) {
 			iterateFunc(fieldGroupLi[j], result);
@@ -32,24 +32,24 @@ ModelIterator.prototype.iterateAllField = function(dataSource, result, iterateFu
 
 ModelIterator.prototype.getFixFieldLi = function(fixField) {
 	var fixFieldLi = [];
-	fixFieldLi.push(fixField.PrimaryKey.FieldGroup);
-	fixFieldLi.push(fixField.CreateBy.FieldGroup);
-	fixFieldLi.push(fixField.CreateTime.FieldGroup);
-	fixFieldLi.push(fixField.CreateUnit.FieldGroup);
-	fixFieldLi.push(fixField.ModifyBy.FieldGroup);
-	fixFieldLi.push(fixField.ModifyTime.FieldGroup);
-	fixFieldLi.push(fixField.ModifyUnit.FieldGroup);
-	fixFieldLi.push(fixField.BillStatus.FieldGroup);
-	fixFieldLi.push(fixField.AttachCount.FieldGroup);
-	fixFieldLi.push(fixField.Remark.FieldGroup);
+	fixFieldLi.push(fixField.PrimaryKey);
+	fixFieldLi.push(fixField.CreateBy);
+	fixFieldLi.push(fixField.CreateTime);
+	fixFieldLi.push(fixField.CreateUnit);
+	fixFieldLi.push(fixField.ModifyBy);
+	fixFieldLi.push(fixField.ModifyTime);
+	fixFieldLi.push(fixField.ModifyUnit);
+	fixFieldLi.push(fixField.BillStatus);
+	fixFieldLi.push(fixField.AttachCount);
+	fixFieldLi.push(fixField.Remark);
 	return fixFieldLi;
 }
 
 ModelIterator.prototype._getDataSetFieldGroupLi = function(fixField, bizField) {
 	var self = this;
 	var fieldGroupLi = self.getFixFieldLi(fixField);
-	for (var i = 0; i < bizField.FieldLi) {
-		fieldGroupLi.push(bizField.FieldLi[i].FieldGroup);
+	for (var i = 0; i < bizField.FieldLi.length; i++) {
+		fieldGroupLi.push(bizField.FieldLi[i]);
 	}
 	return fieldGroupLi;
 }

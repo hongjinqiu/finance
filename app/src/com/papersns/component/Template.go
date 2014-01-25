@@ -12,7 +12,7 @@ type ListTemplate struct {
 	DataSourceModelId   string              `xml:"data-source-model-id"`
 	Adapter             Adapter             `xml:"adapter"`
 	Description         string              `xml:"description"`
-	Scripts             string              `xml:"scripts"`
+	Scripts             template.HTML       `xml:"scripts"`
 	ViewTemplate        ViewTemplate        `xml:"view-template"`
 	Toolbar             Toolbar             `xml:"toolbar"`
 	Security            Security            `xml:"security"`
@@ -25,14 +25,14 @@ type ListTemplate struct {
 }
 
 type FormTemplate struct {
-	XMLName           xml.Name     `xml:"form-template"`
-	Id                string       `xml:"id"`
-	DataSourceModelId string       `xml:"data-source-model-id"`
-	Adapter           Adapter      `xml:"adapter"`
-	Description       string       `xml:"description"`
-	Scripts           string       `xml:"scripts"`
-	ViewTemplate      ViewTemplate `xml:"view-template"`
-	FormElemLi        []FormElem   `xml:",any"`
+	XMLName           xml.Name      `xml:"form-template"`
+	Id                string        `xml:"id"`
+	DataSourceModelId string        `xml:"data-source-model-id"`
+	Adapter           Adapter       `xml:"adapter"`
+	Description       string        `xml:"description"`
+	Scripts           template.HTML `xml:"scripts"`
+	ViewTemplate      ViewTemplate  `xml:"view-template"`
+	FormElemLi        []FormElem    `xml:",any"`
 }
 
 type FormElem struct {
@@ -41,6 +41,7 @@ type FormElem struct {
 	Html        Html        `xml:"-"`
 	Toolbar     Toolbar     `xml:"-"`
 	ColumnModel ColumnModel `xml:"-"`
+	RenderTag   string      `xml:"-"` // 页面上渲染时用,主要是golang html的渲染能力较弱,
 
 	ColumnModelAttributeGroup
 }
@@ -51,15 +52,16 @@ type Adapter struct {
 }
 
 type ViewTemplate struct {
-	XMLName         xml.Name `xml:"view-template"`
-	View            string   `xml:"view,attr,omitempty"`
-	SelectorView    string   `xml:"selectorView,attr,omitempty"`
-	SelectorScripts string   `xml:"selectorScripts,attr,omitempty"`
+	XMLName         xml.Name      `xml:"view-template"`
+	View            string        `xml:"view,attr,omitempty"`
+	SelectorView    string        `xml:"selectorView,attr,omitempty"`
+	SelectorScripts template.HTML `xml:"selectorScripts,attr,omitempty"`
 }
 
 type Html struct {
 	XMLName xml.Name      `xml:"html"`
 	Value   template.HTML `xml:",chardata"`
+	ColSpan string        `xml:"colSpan,attr,omitempty"`
 }
 
 type Toolbar struct {
@@ -157,6 +159,8 @@ type ColumnModelAttributeGroup struct {
 	SelectionTitle        string `xml:"selectionTitle,attr,omitempty"`
 	DisplayMode           string `xml:"displayMode,attr,omitempty"`
 	DataSetId             string `xml:"dataSetId,attr,omitempty"`
+	ColSpan               string `xml:"colSpan,attr,omitempty"`
+	Text                  string `xml:"text,attr,omitempty"`
 }
 
 type ColumnAttributeGroup struct {
@@ -181,11 +185,15 @@ type ColumnAttributeGroup struct {
 	SummaryType      string `xml:"summaryType,attr,omitempty"`
 	Cycle            string `xml:"cycle,attr,omitempty"`
 	Exported         string `xml:"exported,attr,omitempty"`
+	ColSpan          string `xml:"colSpan,attr,omitempty"`
+	ColumnWidth      string `xml:"columnWidth,attr,omitempty"`
+	LabelWidth       string `xml:"labelWidth,attr,omitempty"`
+	DataSetId        string `xml:"-"`
 }
 
 type Column struct {
 	XMLName           xml.Name          `xml:""` // 有可能是string-column,number-column,date-column,boolean-column,dictionary-column,virtual-column,script-column,select-column
-	Html              string            `xml:",chardata"`
+	Html              template.HTML     `xml:",chardata"`
 	Name              string            `xml:"name,attr,omitempty"`
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor            Editor            `xml:"editor"`
@@ -214,7 +222,7 @@ type Column struct {
 	IsUnitPrice   string `xml:"isUnitPrice,attr,omitempty"`   // 是否单价
 	IsCost        string `xml:"isCost,attr,omitempty"`        // 是否成本
 	IsPercent     string `xml:"isPercent,attr,omitempty"`     // 是否百分比
-	IsQuantity     string `xml:"isQuantity,attr,omitempty"`     // 是否数量
+	IsQuantity    string `xml:"isQuantity,attr,omitempty"`    // 是否数量
 
 	Script string `xml:"script,attr,omitempty"`
 
@@ -276,6 +284,7 @@ type QueryParameter struct {
 	QueryParamAttributeGroup
 	Dictionary map[string]interface{} `xml:"-"`
 	Tree       map[string]interface{} `xml:"-"`
+	DataSetId  string                 `xml:"-"`
 }
 
 type ParameterAttribute struct {

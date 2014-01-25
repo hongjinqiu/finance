@@ -22,26 +22,26 @@ func (o ModelListTemplateAdapter) ApplyAdapter(iListTemplate interface{}) ListTe
 }
 
 // TODO, bytest
-func (o ModelListTemplateAdapter) ApplyQueryParameter(iListTemplate *interface{}, iQueryParameter *interface{}) {
-	listTemplate := (*iListTemplate).(ListTemplate)
-	queryParameter := (*iQueryParameter).(QueryParameter)
-	if listTemplate.DataSourceModelId != "" {
-		if listTemplate.QueryParameterGroup.DataSetId != "" {
-			queryParameter.Name = listTemplate.QueryParameterGroup.DataSetId + "." + queryParameter.Name
-		}
-	}
-}
+//func (o ModelListTemplateAdapter) ApplyQueryParameter(iListTemplate *interface{}, iQueryParameter *interface{}) {
+//	listTemplate := (*iListTemplate).(ListTemplate)
+//	queryParameter := (*iQueryParameter).(QueryParameter)
+//	if listTemplate.DataSourceModelId != "" {
+//		if listTemplate.QueryParameterGroup.DataSetId != "" {
+//			queryParameter.Name = listTemplate.QueryParameterGroup.DataSetId + "." + queryParameter.Name
+//		}
+//	}
+//}
 
 // TODO, bytest
-func (o ModelListTemplateAdapter) ApplyColumnName(iListTemplate *interface{}, iColumn *interface{}) {
-	listTemplate := (*iListTemplate).(ListTemplate)
-	column := (*iColumn).(Column)
-	if listTemplate.DataSourceModelId != "" {
-		if listTemplate.QueryParameterGroup.DataSetId != "" {
-			column.Name = listTemplate.QueryParameterGroup.DataSetId + "." + column.Name
-		}
-	}
-}
+//func (o ModelListTemplateAdapter) ApplyColumnName(iListTemplate *interface{}, iColumn *interface{}) {
+//	listTemplate := (*iListTemplate).(ListTemplate)
+//	column := (*iColumn).(Column)
+//	if listTemplate.DataSourceModelId != "" {
+//		if listTemplate.QueryParameterGroup.DataSetId != "" {
+//			column.Name = listTemplate.QueryParameterGroup.DataSetId + "." + column.Name
+//		}
+//	}
+//}
 
 // TODO, bytest
 func (o ModelListTemplateAdapter) applyDataProvider(dataSource DataSource, listTemplate *ListTemplate) {

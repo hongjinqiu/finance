@@ -43,7 +43,6 @@ func (o CommonMethod) Parse(classMethod string, param []interface{}) []reflect.V
 	return instValue.MethodByName(scriptStructMethod).Call(in)
 }
 
-// TODO, bytest
 func (o CommonMethod) recursionApplyColumnModel(dataSource DataSource, columnModel *ColumnModel, result *interface{}) {
 	modelIterator := ModelIterator{}
 	for i, _ := range columnModel.ColumnLi {

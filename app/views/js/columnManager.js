@@ -2,6 +2,8 @@ function ColumnManager() {
 }
 
 ColumnManager.prototype.currencyFormatFunc = function(o) {
+	var self = this;
+	var yInst = self.yInst;
 	var formatConfig = null;
 	var currencyField = o.column.currencyField;
 	if (currencyField != "") {
@@ -126,7 +128,7 @@ ColumnManager.prototype.createCheckboxColumn = function(columnModel) {
 	return null;
 }
 
-ColumnManager.prototype.createVirtualColumn = function(render, columnModel, columnIndex) {
+ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnModel, columnIndex) {
 	var i = columnIndex;
 	if (columnModel.ColumnLi[i].XMLName.Local == "virtual-column" && columnModel.ColumnLi[i].Hideable != "true") {
 		var virtualColumn = columnModel.ColumnLi[i];
@@ -141,8 +143,7 @@ ColumnManager.prototype.createVirtualColumn = function(render, columnModel, colu
 					for (var j = 0; j < virtualColumn.Buttons.ButtonLi.length; j++) {
 						var btnTemplate = null;
 						if (virtualColumn.Buttons.ButtonLi[j].Mode == "fn") {
-							var gridRenderId = render.replace("#", "");
-							btnTemplate = "<input type='button' value='{value}' onclick='doVirtualColumnBtnAction(\"{gridRenderId}\", this, {handler})' class='{class}' />";
+							btnTemplate = "<input type='button' value='{value}' onclick='doVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
 						} else if (virtualColumn.Buttons.ButtonLi[j].Mode == "url") {
 							btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
 						} else {
@@ -158,7 +159,7 @@ ColumnManager.prototype.createVirtualColumn = function(render, columnModel, colu
 									handler: handler,
 									"class": virtualColumn.Buttons.ButtonLi[j].IconCls,
 									href: handler,
-									gridRenderId: gridRenderId
+									gridRenderId: columnModelName
 								}));
 							});
 						}
@@ -172,6 +173,8 @@ ColumnManager.prototype.createVirtualColumn = function(render, columnModel, colu
 }
 
 ColumnManager.prototype.createNumberColumn = function(columnConfig) {
+	var self = this;
+	var yInst = self.yInst;
 	var decimalPlaces = 2;
 	if (columnConfig.DecimalPlaces) {
 		decimalPlaces = parseInt(columnConfig.DecimalPlaces);
@@ -187,11 +190,10 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 	isFormatter = isFormatter || columnConfig.IsPercent != "";
 	
 	if (isFormatter) {
-		var columnManager = new ColumnManager();
 		return {
 			key: columnConfig.Name,
 			label: columnConfig.Text,
-			formatter: columnManager.currencyFormatFunc,
+			formatter: yInst.bind(self.currencyFormatFunc, self),
 			
 			prefix: columnConfig.Prefix,
 			decimalPlaces: decimalPlaces,
@@ -227,6 +229,8 @@ DisplayPattern string `xml:"displayPattern,attr"`
 DbPattern      string `xml:"dbPattern,attr"`
 */
 ColumnManager.prototype.createDateColumn = function(columnConfig) {
+	var self = this;
+	var yInst = self.yInst;
 	var dbPattern = columnConfig.DbPattern;
 	var displayPattern = columnConfig.DisplayPattern;
 	if (dbPattern && displayPattern) {
@@ -373,8 +377,9 @@ ColumnManager.prototype.createColumn = function(columnConfig) {
 	return null;
 }
 
-ColumnManager.prototype.getColumns = function(render, columnModel, Y) {
+ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
 	var self = this;
+	self.yInst = Y;
 	var columns = [];
 	var checkboxColumn = self.createCheckboxColumn(columnModel);
 	if (checkboxColumn) {
@@ -394,7 +399,7 @@ ColumnManager.prototype.getColumns = function(render, columnModel, Y) {
 		if (column) {
 			columns.push(column);
 		} else {
-			var virtualColumn = self.createVirtualColumn(render, columnModel, i);
+			var virtualColumn = self.createVirtualColumn(columnModelName, columnModel, i);
 			if (virtualColumn) {
 				columns.push(virtualColumn);
 			}

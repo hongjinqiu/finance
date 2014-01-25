@@ -23,7 +23,7 @@ ModelTemplateFactory.prototype._applyReverseRelation = function(dataSource) {
 		dataSource.DetailDataLi[i].FixField.Parent = dataSource.DetailDataLi[i];
 		dataSource.DetailDataLi[i].BizField.Parent = dataSource.DetailDataLi[i];
 		
-		var detailFixFieldLi = modelIterator.GetFixFieldLi(dataSource.DetailDataLi[i].FixField);
+		var detailFixFieldLi = modelIterator.getFixFieldLi(dataSource.DetailDataLi[i].FixField);
 		for (var j = 0; j < detailFixFieldLi.length; j++) {
 			detailFixFieldLi[j].Parent = dataSource.DetailDataLi[i].FixField;
 		}
@@ -51,7 +51,7 @@ ModelTemplateFactory.prototype._applyIsMasterField = function(dataSource) {
 		}
 	}
 	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		var detailFixFieldLi = modelIterator.GetFixFieldLi(dataSource.DetailDataLi[i].FixField);
+		var detailFixFieldLi = modelIterator.getFixFieldLi(dataSource.DetailDataLi[i].FixField);
 		for (var j = 0; j < detailFixFieldLi.length; j++) {
 			detailFixFieldLi[j].isMasterField = function() {
 				return false;
@@ -74,7 +74,10 @@ ModelTemplateFactory.prototype._applyIsRelationField = function(dataSource) {
 	var result = {};
 	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
 		fieldGroup.isRelationField = function(){
-			return fieldGroup.RelationDS && fieldGroup.RelationDS.RelationItemLi && fieldGroup.RelationDS.RelationItemLi.length > 0;
+			if (fieldGroup.RelationDS && fieldGroup.RelationDS.RelationItemLi && fieldGroup.RelationDS.RelationItemLi.length > 0) {
+				return true;
+			}
+			return false;
 		}
 	});
 }
@@ -82,7 +85,7 @@ ModelTemplateFactory.prototype._applyIsRelationField = function(dataSource) {
 /**
  * 默认用第一个关联字段生成关联配置
  */
-ModelTemplateFactory.prototype.applyRelationFieldValue = function(dataSource) {
+ModelTemplateFactory.prototype._applyRelationFieldValue = function(dataSource) {
 	var modelIterator = new ModelIterator();
 	var result = {};
 	var commonUtil = new CommonUtil();
@@ -94,7 +97,7 @@ ModelTemplateFactory.prototype.applyRelationFieldValue = function(dataSource) {
 			var relationItem = fieldGroup.RelationDS.RelationItemLi[0];
 			var triggerConfig = {
 				displayField: commonUtil.getFuncOrString(relationItem.DisplayField),
-				valueField: commonUtil.getFuncOrString(relationItem.ValueField),,
+				valueField: commonUtil.getFuncOrString(relationItem.ValueField),
 				selectorName: commonUtil.getFuncOrString(relationItem.Id),
 				selectionMode: "single"
 			};
@@ -184,17 +187,30 @@ ModelTemplateFactory.prototype.extendDataSource = function(dataSource, modelExtr
 	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
 		var dataSetConfig = modelExtraInfo[fieldGroup.getDataSetId()];
 		if (dataSetConfig && dataSetConfig[fieldGroup.Id]) {
-			var jsConfig = dataSetConfig[fieldGroup.Id].jsConfig;
-			if (jsConfig) {
-				for (var key in jsConfig) {
-					fieldGroup[key] = jsConfig[key];
+			if (dataSetConfig[fieldGroup.Id]) {
+				for (var key in dataSetConfig[fieldGroup.Id]) {
+					if (!fieldGroup.jsConfig) {
+						fieldGroup.jsConfig = {};
+					}
+					fieldGroup.jsConfig[key] = dataSetConfig[fieldGroup.Id][key];
 				}
 			}
 		}
 	});
-	// 扩展DataSet, TODO
 }
 
-
+/**
+ * 扩展dataSource,扩展字段的关联关系等等,
+ */
+ModelTemplateFactory.prototype.enhanceDataSource = function(dataSource) {
+	this._applyReverseRelation(dataSource);
+	this._applyIsMasterField(dataSource);
+	this._applyIsRelationField(dataSource);
+	this._applyRelationFieldValue(dataSource);
+	this._applyGetMasterData(dataSource);
+	this._applyGetDetailData(dataSource);
+	this._applyGetDataSource(dataSource);
+	this._applyGetDataSetId(dataSource);
+}
 
 

@@ -213,18 +213,18 @@
 					</simpleType>
 				</element>
 				<element name="displayName" type="string" default="分录数据集" />
-				<element name="parentId" type="string" default="A" />
+				<!-- <element name="parentId" type="string" default="A" /> -->
 				<element name="allowEmptyRow" type="boolean" default="false" />
 				<element name="allowCopy" type="boolean" default="true" />
 				<element name="readonly" type="boolean" default="false" />
 				<!-- 主键字段 -->
-				<element name="primaryKey">
+				<!-- <element name="primaryKey">
 					<simpleType>
 						<restriction base="string">
 							<enumeration value="PRIMARY_KEY" />
 						</restriction>
 					</simpleType>
-				</element>
+				</element> -->
 				<!-- 固定字段 -->
 				<element name="fixField">
 					<complexType>
@@ -497,7 +497,7 @@
 							<complexType>
 								<sequence>
 									<element name="id" type="string" default="R" />
-									<element name="relationExpr" type="string" default="1">
+									<element name="relationExpr" default="1">
 										<complexType>
 											<simpleContent>
 												<extension base="string">

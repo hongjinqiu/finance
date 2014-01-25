@@ -4,6 +4,8 @@
 <head>
 <title>{{.result.formTemplate.Description}}</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css" />
+<link rel="stylesheet" type="text/css" href="/public/css/global.css" />
 <script type="text/javascript">
 	YUI_config = {
 		debug : true,
@@ -12,39 +14,36 @@
 		root : 'yui.3.12.0/',
 		gallery: 'gallery-2013.09.18-18-49'
 	};
+	var formJsConfig = {
+		modules: {
+	        "papersns-form": {
+	            fullpath: '/app/FormJS',
+	            requires: ['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection']
+	        }
+	    }
+	};
+	var formQuickEditJsConfig = {
+		modules: {
+	        "papersns-form-quickedit": {
+	            fullpath: '/app/comboview?js/form/p-form-quickedit.js',
+	            requires: ["datatable-base", "papersns-form"]
+	        }
+	    }	
+	};
+	// 系统参数
+	var sysParam = {
+		localCurrency: {
+			prefix: "￥",
+			decimalPlaces: 3,// 金额小数位数
+			unitPriceDecimalPlaces: 4// 单价小数位数
+		},
+		unitCostDecimalPlaces: 5,// 单位成本小数位数
+		percentDecimalPlaces: 1,// 百分比小数位数
+		thousandsSeparator: ","
+	};
 </script>
-<!-- 
-<link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css&gallery-2013.09.18-18-49/build/gallery-aui-skin-classic/css/gallery-aui-skin-classic-min.css&gallery-2013.09.18-18-49/build/gallery-aui-skin-base/css/gallery-aui-skin-base-min.css" />
- -->
-<link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css" />
-<link rel="stylesheet" type="text/css" href="/public/css/global.css" />
-<style type="text/css">
-body {
-	font-size: 12px;
-}
-#pagContC {
-    font-size:  12px;
-    vertical-align: middle;
-    padding:    4px 0;
-}
-
-#pagContC img.pgControls {
-    width:  auto;
-    height: 12px;
-    padding: 0 4px 0 4px;
-    border: none;
-    vertical-align: middle;
-    cursor: pointer;
-}
-
-#pagContC img.yui3-pagview-disabled {
-    cursor: default;
-}
-#pagContC .yui3-pagview-input-page {
-	width: 30px;
-}
-</style>
-<script src="/public/js/yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
+<script src="/app/combo?yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/app/comboview?js/common.js&js/dataTableExtend.js&js/dataTableDataSourceExtend.js&js/columnManager.js&js/columnDataSourceManager.js&js/formtoolbar.js&js/modelService.js&js/modelTemplateFactory.js&{{.result.formTemplate.Scripts}}"></script>
 <script type="text/javascript">
 	var dataBo = {{.result.dataBoJson}};
 	var formTemplateJsonData = {{.result.formTemplateJsonData}};
@@ -53,9 +52,14 @@ body {
 	{{else}}
 	var dataSourceJson = null;
 	{{end}}
+	if (dataSourceJson) {
+		var modelTemplateFactory = new ModelTemplateFactory();
+		modelTemplateFactory.enhanceDataSource(dataSourceJson);
+	}
+	var masterFormFieldLi = [];
 	var gridPanelDict = {};
+	//var masterRenderLiJson = {{.result.masterRenderLiJson}};
 </script>
-<script type="text/javascript" src="/app/comboview?js/dataTableExtend.js&js/columnManager.js&{{.result.formTemplate.Scripts}}"></script>
 </head>
 
 <body class="yui3-skin-sam">
@@ -91,79 +95,149 @@ body {
 		</div>
 		{{end}}
 		{{if eq $item.XMLName.Local "column-model"}}
-			{{if eq $tResult.formTemplate.DataSourceModelId ""}}
-				{{if eq $item.Name ""}}
-					<div id="columnModel_{{$index}}"></div>
-				{{else}}
-					<div id="{{$item.Name}}"></div>
+			{{if eq $item.DataSetId "A"}}
+			<div id="{{$item.DataSetId}}_{{$index}}">
+				{{if eq $item.ColumnModel.IdColumn.Hideable "true"}}
+				<input type="hidden" name="{{$item.ColumnModel.IdColumn.Name}}" value="" />
 				{{end}}
+				{{range $hiddenIndex, $hiddenItem := $item.ColumnModel.ColumnLi}}
+					{{if eq $hiddenItem.Hideable "true"}}
+						<input type="hidden" name="{{$hiddenItem.Name}}" value="" />
+					{{end}}
+				{{end}}
+				{{range $masterRenderKey, $masterRenderValue := $tResult.masterRenderLi}}
+					{{if eq $masterRenderKey $item.RenderTag}}
+						<table cellspacing="0" cellpadding="0" border="0" width="100%">
+							{{range $lineIndex, $lineItem := $masterRenderValue}}
+								<tr>
+									{{range $tdIndex, $tdItem := $lineItem}}
+									{{if eq $tdItem.isHtml "true"}}
+										{{$tdItem.html}}
+									{{else}}
+										<td width="{{$tdItem.labelWidth}}">
+											{{if eq $tdItem.required "true"}}<font style="color: red">*</font>{{end}}
+											{{$tdItem.label}}
+										</td>
+										<td width="{{$tdItem.columnWidth}}" colspan="{{$tdItem.columnSpan}}">
+											<div id="{{$item.DataSetId}}_{{$tdItem.name}}_render"></div>
+											<script type="text/javascript">
+											YUI(formJsConfig).use("node", "event", "papersns-form", function(Y) {
+												var field = new Y.PTextField({name : '{{$tdItem.name}}', dataSetId: '{{$item.DataSetId}}', type : 'text', required: true, validateInline: true, validator : function(value, formFieldObj){
+													if (value != "abc") {
+														formFieldObj.set("error", "值必须为abc");
+														return false;
+													}
+													return true;
+												}});
+												field.render("#{{$item.DataSetId}}_{{$tdItem.name}}_render");
+												masterFormFieldLi.push(field);
+											});
+											</script>
+										</td>
+									{{end}}
+									{{end}}
+								</tr>
+							{{end}}
+						</table>
+					{{end}}
+				{{end}}
+			</div>
 			{{else}}
-				<div id="{{$item.DataSetId}}"></div>
-			{{end}}
-		<script type="text/javascript">
-		YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", "anim", function(Y) {
-			//,"gallery-aui-calendar-datepicker-select"
-			Y.on("domready", function(e) {
-				var columnModel = null;
-				for (var i = 0; i < formTemplateJsonData.FormElemLi.length; i++) {
-					if ((i + "") == "{{$index}}") {
-						columnModel = formTemplateJsonData.FormElemLi[i].ColumnModel;
-						break;
-					}
-				}
-				if (columnModel) {
-					var dataTableManager = new DataTableManager();
-					var dataSourceModelId = formTemplateJsonData.DataSourceModelId;
-					var columnModelName = "";
-					if (!dataSourceModelId) {
-						if (!columnModel.Name) {
-							columnModelName = "columnModel_{{$index}}";
-						} else {
-							columnModelName = columnModel.Name;
-						}
-					} else {
-						columnModelName = columnModel.DataSetId;
-					}
-					var isRender = true;
-					var isRenderList = false;
-					var items = dataBo[columnModelName] || [];
-					if (!dataSourceModelId) {
-						isRenderList = !columnModel.DisplayMode || columnModel.DisplayMode == "list";
-						isRender = isRenderList;
-					} else {
-						if (columnModel.DataSetId == "A") {
-							isRenderList = false;
-							items = dataBo[columnModelName] || {};
-						} else {
-							isRenderList = !columnModel.DisplayMode || columnModel.DisplayMode == "list";
+				{{if $item.Text}}
+					<div>{{$item.Text}}</div>
+				{{end}}
+				{{if $item.ColumnModel.Toolbar.ButtonLi}}
+					<div>
+					{{range $tbarIndex, $tbarItem := $item.ColumnModel.Toolbar.ButtonLi}}
+						{{if eq $tbarItem.Mode "fn"}}
+							<input type="button" value="{{$tbarItem.Text}}" class="{{$tbarItem.IconCls}}" onclick="{{$tbarItem.Handler}}('{{$item.DataSetId}}')"/>
+						{{end}}
+						{{if eq $tbarItem.Mode "url"}}
+							<input type="button" value="{{$tbarItem.Text}}" class="{{$tbarItem.IconCls}}" onclick="location.href='{{$tbarItem.Handler}}'"/>
+						{{end}}
+						{{if eq $tbarItem.Mode "url^"}}
+							<input type="button" value="{{$tbarItem.Text}}" class="{{$tbarItem.IconCls}}" onclick="alert('需要用弹出{{$tbarItem.Handler}}')"/>
+						{{end}}
+					{{end}}
+					</div>
+				{{end}}
+				{{if eq $tResult.formTemplate.DataSourceModelId ""}}
+					{{if eq $item.Name ""}}
+						<div id="columnModel_{{$index}}"></div>
+					{{else}}
+						<div id="{{$item.Name}}_{{$index}}"></div>
+					{{end}}
+				{{else}}
+					<div id="{{$item.DataSetId}}_{{$index}}"></div>
+				{{end}}
+			<script type="text/javascript">
+				YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", "anim", function(Y) {
+					//,"gallery-aui-calendar-datepicker-select"
+					var columnModel = null;
+					for (var i = 0; i < formTemplateJsonData.FormElemLi.length; i++) {
+						if ((i + "") == "{{$index}}") {
+							columnModel = formTemplateJsonData.FormElemLi[i].ColumnModel;
+							break;
 						}
 					}
-					if (isRender) {
-						if (isRenderList) {
-							var param = {
-								data:items,
-								columnModel:columnModel,
-								render:"#" + columnModelName,
-								url:"",
-								totalResults: dataBo.totalResults || 50,
-								pageSize: 10000,
-								paginatorContainer : null,
-								paginatorTemplate : null
-							};
-							// 表格的编辑控件,需要dataSource,
-							if (dataSourceJson) {
-								param["dataSourceJson"] = dataSourceJson;
+					if (columnModel) {
+						var dataTableManager = new DataTableManager();
+						var dataSourceModelId = formTemplateJsonData.DataSourceModelId;
+						var columnModelName = "";
+						if (!dataSourceModelId) {
+							if (!columnModel.Name) {
+								columnModelName = "columnModel_{{$index}}";
+							} else {
+								columnModelName = columnModel.Name;
 							}
-							dataTableManager.createDataGrid(Y, param);
-							gridPanelDict[columnModelName] = dataTableManager;
 						} else {
-							// renderForm,
+							columnModelName = columnModel.DataSetId;
+							if (!columnModel.DataSetId) {
+								console.log("dataSourceModelId:" + dataSourceModelId + ", exist columnModel which dataSetId is empty");
+							}
+						}
+						var isRender = true;
+						var isRenderList = false;
+						var items = dataBo[columnModelName] || [];
+						if (!dataSourceModelId) {
+							isRenderList = !columnModel.DisplayMode || columnModel.DisplayMode == "list";
+							isRender = isRenderList;
+						} else {
+							if (columnModel.DataSetId == "A") {
+								isRenderList = false;
+								items = dataBo[columnModelName] || {};
+							} else {
+								isRenderList = !columnModel.DisplayMode || columnModel.DisplayMode == "list";
+							}
+						}
+						if (isRender) {
+							if (isRenderList) {
+								var param = {
+									data:items,
+									columnModel:columnModel,
+									columnModelName:columnModelName,
+									render:"#" + columnModelName + "_{{$index}}",
+									url:"",
+									totalResults: dataBo.totalResults || 50,
+									pageSize: 10000,
+									paginatorContainer : null,
+									paginatorTemplate : null
+								};
+								// 表格的编辑控件,需要dataSource,
+								if (dataSourceJson) {
+									param["dataSourceJson"] = dataSourceJson;
+								}
+								dataTableManager.createDataGrid(Y, param);
+								gridPanelDict[columnModelName] = dataTableManager;
+							} else {
+								// renderForm,不实现,放到主数据集中处理
+								console.log("detailDataSet which dataSetId is:" + columnModelName + " can't render to form,");
+							}
 						}
 					}
-				}
-			});
-		});
-		</script>
+				});
+				</script>
+			{{end}}
 		{{end}}
 	{{end}}
 	<div style="display: none">

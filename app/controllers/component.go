@@ -476,6 +476,10 @@ func (c Component) Tab() revel.Result {
 	return c.Render()
 }
 
+func (c Component) QuickTest() revel.Result {
+	return c.Render()
+}
+
 func (c Component) DialogTest() revel.Result {
 	return c.Render()
 }

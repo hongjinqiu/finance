@@ -6,19 +6,21 @@ import (
 
 type SysUserInterceptor struct{}
 
-func (o SysUserInterceptor) BeforeBuildQuery(paramMap *map[string]string) {
-	(*paramMap)["nick"] = ""
+func (o SysUserInterceptor) BeforeBuildQuery(paramMap map[string]string) map[string]string {
+	paramMap["nick"] = ""
+	return paramMap
 }
 
-func (o SysUserInterceptor) AfterBuildQuery(queryLi *[]map[string]interface{}) {
-	*queryLi = append(*queryLi, map[string]interface{}{
+func (o SysUserInterceptor) AfterBuildQuery(queryLi []map[string]interface{}) []map[string]interface{} {
+	queryLi = append(queryLi, map[string]interface{}{
 		"age": 20,
 	})
+	return queryLi
 }
 
-func (o SysUserInterceptor) ParseAfterQueryData(items *[]interface{}) {
-	for i, _ := range *items {
-		item := (*items)[i].(map[string]interface{})
+func (o SysUserInterceptor) AfterQueryData(dataSetId string, items []interface{}) []interface{}  {
+	for i, _ := range items {
+		item := items[i].(map[string]interface{})
 		item["UNIT_NAME"] = "单位名称aaa"
 		item["numTest"] = 1000 * 1000 + 0.12345678901
 		item["numTest1"] = 1000 * 1000 + 0.12345678901
@@ -30,8 +32,8 @@ func (o SysUserInterceptor) ParseAfterQueryData(items *[]interface{}) {
 		item["numTest7"] = 1000 * 1000 + 0.12345678901
 		item["numTest8"] = 1000 * 1000 + 0.12345678901
 	}
-	for i, _ := range *items {
-		item := (*items)[i].(map[string]interface{})
+	for i, _ := range items {
+		item := items[i].(map[string]interface{})
 		if i == 0{
 			item["currency"] = map[string]interface{} {
 				"prefix": "$",
@@ -52,19 +54,20 @@ func (o SysUserInterceptor) ParseAfterQueryData(items *[]interface{}) {
 			}
 		}
 	}
-	for i, _ := range *items {
-		item := (*items)[i].(map[string]interface{})
+	for i, _ := range items {
+		item := items[i].(map[string]interface{})
 		item["dateTest"] = 20131020
 		item["dateTimeTest"] = int64(20131020114825)
 	}
-	for i, _ := range *items {
-		item := (*items)[i].(map[string]interface{})
+	for i, _ := range items {
+		item := items[i].(map[string]interface{})
 		item["boolTest"] = true
 		item["boolTest2"] = false
 	}
-	for i, _ := range *items {
-		item := (*items)[i].(map[string]interface{})
+	for i, _ := range items {
+		item := items[i].(map[string]interface{})
 		item["nestDictTest1"] = 1
 	}
+	return items
 }
 

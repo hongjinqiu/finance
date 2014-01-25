@@ -1,0 +1,31 @@
+var gridPanelDict = {};
+存放数据集表格
+gridPanelDict["B"]
+gridPanelDict["C"]
+
+dtManager.formDtManager,存放弹出的grid,
+dtManager.formDtManager.record.formFieldDict,存放类似于PTextField的渲染器,以key为关键字
+
+grid里面formatter的参数o的数据结构
+o: {
+	className: "",
+	column: {
+		_id: "",
+		_yuid: "",
+		allowHTML: "",
+		id,
+		key,
+		label,
+	},
+	data: {
+		
+	},
+	record:{
+		get:function(){},
+		set:function(){},
+	},
+	rowClass: "",
+	rowIndex: 0,
+	value: xxxxx,
+}
+

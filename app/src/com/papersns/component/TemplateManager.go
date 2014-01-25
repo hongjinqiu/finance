@@ -5,8 +5,8 @@ import "github.com/robfig/revel"
 import (
 	"com/papersns/dictionary"
 	. "com/papersns/interceptor"
-	. "com/papersns/script"
 	"com/papersns/mongo"
+	. "com/papersns/script"
 	"com/papersns/tree"
 	"encoding/json"
 	"encoding/xml"
@@ -43,7 +43,6 @@ type SelectorTemplateInfo struct {
 
 type TemplateManager struct{}
 
-// TODO, byTest
 func (o TemplateManager) GetListTemplateInfoLi() []ListTemplateInfo {
 	listTemplateInfo := []ListTemplateInfo{}
 	if len(gListTemplateDict) == 0 {
@@ -51,14 +50,13 @@ func (o TemplateManager) GetListTemplateInfoLi() []ListTemplateInfo {
 	}
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
-	
+
 	for _, item := range gListTemplateDict {
 		listTemplateInfo = append(listTemplateInfo, item)
 	}
 	return listTemplateInfo
 }
 
-// TODO, byTest
 func (o TemplateManager) RefretorListTemplateInfo() []ListTemplateInfo {
 	o.clearListTemplate()
 	o.loadListTemplate()
@@ -69,7 +67,6 @@ func (o TemplateManager) RefretorListTemplateInfo() []ListTemplateInfo {
 	return listTemplateInfo
 }
 
-// TODO, byTest
 func (o TemplateManager) GetListTemplate(id string) ListTemplate {
 	return o.GetListTemplateInfo(id).ListTemplate
 }
@@ -105,7 +102,6 @@ func (o TemplateManager) GetListTemplateInfo(id string) ListTemplateInfo {
 	panic(id + " not exists in ListTemplate list")
 }
 
-// TODO bytest,
 func (o TemplateManager) findListTemplateInfo(id string) (ListTemplateInfo, bool) {
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
@@ -118,7 +114,6 @@ func (o TemplateManager) findListTemplateInfo(id string) (ListTemplateInfo, bool
 	return ListTemplateInfo{}, false
 }
 
-// TODO, byTest
 func (o TemplateManager) clearListTemplate() {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -126,7 +121,6 @@ func (o TemplateManager) clearListTemplate() {
 	gListTemplateDict = map[string]ListTemplateInfo{}
 }
 
-// TODO, byTest
 func (o TemplateManager) loadListTemplate() {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -150,7 +144,6 @@ func (o TemplateManager) loadListTemplate() {
 	}
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSingleListTemplateWithLock(path string) (ListTemplateInfo, error) {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -158,7 +151,6 @@ func (o TemplateManager) loadSingleListTemplateWithLock(path string) (ListTempla
 	return o.loadSingleListTemplate(path)
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSingleListTemplate(path string) (ListTemplateInfo, error) {
 	file, err := os.Open(path)
 	defer file.Close()
@@ -177,13 +169,10 @@ func (o TemplateManager) loadSingleListTemplate(path string) (ListTemplateInfo, 
 		return ListTemplateInfo{}, err
 	}
 
-	// TODO byTest
 	if listTemplate.Adapter.Name != "" {
 		classMethod := listTemplate.Adapter.Name + ".ApplyAdapter"
 		commonMethod := CommonMethod{}
-		paramLi := []interface{}{}
-		var param interface{} = listTemplate
-		paramLi = append(paramLi, param)
+		paramLi := []interface{}{listTemplate}
 		values := commonMethod.Parse(classMethod, paramLi)
 		listTemplate = values[0].Interface().(ListTemplate)
 	}
@@ -204,7 +193,7 @@ func (o TemplateManager) GetSelectorTemplateInfoLi() []SelectorTemplateInfo {
 	}
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
-	
+
 	for _, item := range gSelectorTemplateDict {
 		selectorTemplateInfo = append(selectorTemplateInfo, item)
 	}
@@ -356,10 +345,9 @@ func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTempla
 		if listTemplate.Adapter.Name != "" {
 			classMethod := listTemplate.Adapter.Name + ".ApplyAdapter"
 			commonMethod := CommonMethod{}
-			paramLi := []interface{}{}
-			var param interface{} = listTemplate
-			paramLi = append(paramLi, param)
-			commonMethod.Parse(classMethod, paramLi)
+			paramLi := []interface{}{listTemplate}
+			values := commonMethod.Parse(classMethod, paramLi)
+			listTemplate = values[0].Interface().(ListTemplate)
 		}
 
 		selectorTemplateInfo := SelectorTemplateInfo{
@@ -375,17 +363,16 @@ func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTempla
 	return SelectorTemplateInfo{}, nil
 }
 
-
 // TODO, byTest
 func (o TemplateManager) GetFormTemplateInfoLi() []FormTemplateInfo {
 	formTemplateInfo := []FormTemplateInfo{}
 	if len(gFormTemplateDict) == 0 {
 		o.loadFormTemplate()
 	}
-	
+
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
-	
+
 	for _, item := range gFormTemplateDict {
 		formTemplateInfo = append(formTemplateInfo, item)
 	}
@@ -511,16 +498,6 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 		return FormTemplateInfo{}, err
 	}
 
-	// TODO byTest
-	if formTemplate.Adapter.Name != "" {
-		classMethod := formTemplate.Adapter.Name + ".ApplyAdapter"
-		commonMethod := CommonMethod{}
-		paramLi := []interface{}{}
-		var param interface{} = formTemplate
-		paramLi = append(paramLi, param)
-		commonMethod.Parse(classMethod, paramLi)
-	}
-
 	for i, _ := range formTemplate.FormElemLi {
 		formElem := &formTemplate.FormElemLi[i]
 		if formElem.XMLName.Local == "html" {
@@ -553,6 +530,15 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 		}
 	}
 
+	// TODO byTest
+	if formTemplate.Adapter.Name != "" {
+		classMethod := formTemplate.Adapter.Name + ".ApplyAdapter"
+		commonMethod := CommonMethod{}
+		paramLi := []interface{}{formTemplate}
+		values := commonMethod.Parse(classMethod, paramLi)
+		formTemplate = values[0].Interface().(FormTemplate)
+	}
+
 	formTemplateInfo := FormTemplateInfo{
 		Path:         path,
 		FormTemplate: formTemplate,
@@ -563,7 +549,7 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 
 func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	interceptorManager := InterceptorManager{}
-	interceptorManager.ParseBeforeBuildQuery(listTemplate.BeforeBuildQuery, &paramMap)
+	paramMap = interceptorManager.ParseBeforeBuildQuery(listTemplate.BeforeBuildQuery, paramMap)
 
 	queryMap := map[string]interface{}{}
 	queryLi := []map[string]interface{}{}
@@ -573,13 +559,15 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	reduce := listTemplate.DataProvider.Reduce
 	fixBsonQuery := listTemplate.DataProvider.FixBsonQuery
 
-	fixBsonQueryMap := map[string]interface{}{}
-	err := json.Unmarshal([]byte(fixBsonQuery), &fixBsonQueryMap)
-	if err != nil {
-		panic(err)
-	}
+	if fixBsonQuery != "" {
+		fixBsonQueryMap := map[string]interface{}{}
+		err := json.Unmarshal([]byte(fixBsonQuery), &fixBsonQueryMap)
+		if err != nil {
+			panic(err)
+		}
 
-	queryLi = append(queryLi, fixBsonQueryMap)
+		queryLi = append(queryLi, fixBsonQueryMap)
+	}
 
 	queryParameters := listTemplate.QueryParameterGroup.QueryParameterLi
 	queryParameterBuilder := QueryParameterBuilder{}
@@ -587,15 +575,18 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		if queryParameter.Editor != "" && queryParameter.Restriction != "" {
 			name := queryParameter.Name
 			if paramMap[name] != "" {
-				if listTemplate.Adapter.Name != "" {
-					classMethod := listTemplate.Adapter.Name + ".ApplyQueryParameter"
-					commonMethod := CommonMethod{}
-					paramLi := []interface{}{}
-					var listTemplateParam interface{} = listTemplate
-					paramLi = append(paramLi, listTemplateParam)
-					var queryParameterParam interface{} = queryParameter
-					paramLi = append(paramLi, queryParameterParam)
-					commonMethod.Parse(classMethod, paramLi)
+				//				if listTemplate.Adapter.Name != "" {
+				//					classMethod := listTemplate.Adapter.Name + ".ApplyQueryParameter"
+				//					commonMethod := CommonMethod{}
+				//					paramLi := []interface{}{}
+				//					var listTemplateParam interface{} = listTemplate
+				//					paramLi = append(paramLi, listTemplateParam)
+				//					var queryParameterParam interface{} = queryParameter
+				//					paramLi = append(paramLi, queryParameterParam)
+				//					commonMethod.Parse(classMethod, paramLi)
+				//				}
+				if listTemplate.QueryParameterGroup.DataSetId != "" {
+					queryParameter.DataSetId = listTemplate.QueryParameterGroup.DataSetId
 				}
 				queryParameterMap := queryParameterBuilder.buildQuery(queryParameter, paramMap[name])
 				queryLi = append(queryLi, queryParameterMap)
@@ -603,12 +594,13 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		}
 	}
 
-	interceptorManager.ParseAfterBuildQuery(listTemplate.AfterBuildQuery, &queryLi)
+	queryLi = interceptorManager.ParseAfterBuildQuery(listTemplate.AfterBuildQuery, queryLi)
 
 	querySupport := QuerySupport{}
-	queryMap["$and"] = queryLi
 	if len(queryLi) == 1 {
 		queryMap = queryLi[0]
+	} else if len(queryLi) > 1 {
+		queryMap["$and"] = queryLi
 	}
 
 	queryByte, err := json.MarshalIndent(queryMap, "", "\t")
@@ -620,7 +612,8 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) + ",orderBy is:" + orderBy)
 		result := querySupport.Index(collection, queryMap, pageNo, pageSize, orderBy)
 		items := result["items"].([]interface{})
-		interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, &items)
+		items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
+		result["items"] = items
 		return result
 	}
 	mapReduce := mgo.MapReduce{
@@ -640,7 +633,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		item["id"] = item["_id"]
 		items = append(items, item)
 	}
-	interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, &items)
+	items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 	return map[string]interface{}{
 		"totalResults": len(mapReduceLi),
 		"items":        items,
@@ -648,48 +641,58 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 }
 
 func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemplate, items []interface{}) []interface{} {
-	o.applyAdapterColumnName(listTemplate)
+	//	o.applyAdapterColumnName(listTemplate)
 	return o.GetColumnModelDataForColumnModel(listTemplate.ColumnModel, items)
 }
 
-func (o TemplateManager) applyAdapterColumnName(listTemplate ListTemplate) {
-	if listTemplate.Adapter.Name != "" {
-		//ApplyColumnName(listTemplate *ListTemplate, column *Column) {
-		classMethod := listTemplate.Adapter.Name + ".ApplyColumnName"
-		commonMethod := CommonMethod{}
-		paramLi := []interface{}{}
-		var listTemplateParam interface{} = listTemplate
-		paramLi = append(paramLi, listTemplateParam)
-		var idColumn interface{} = listTemplate.ColumnModel.IdColumn
-		paramLi = append(paramLi, idColumn)
-		commonMethod.Parse(classMethod, paramLi)
-		for i, _ := range listTemplate.ColumnModel.ColumnLi {
-			o.recursionApplyAdapterColumnName(listTemplate, listTemplate.ColumnModel.ColumnLi[i])
-		}
-	}
-}
+//func (o TemplateManager) applyAdapterColumnName(listTemplate ListTemplate) {
+//	if listTemplate.Adapter.Name != "" {
+//		//ApplyColumnName(listTemplate *ListTemplate, column *Column) {
+//		classMethod := listTemplate.Adapter.Name + ".ApplyColumnName"
+//		commonMethod := CommonMethod{}
+//		paramLi := []interface{}{}
+//		paramLi = append(paramLi, listTemplate)
+//		paramLi = append(paramLi, listTemplate.ColumnModel.IdColumn)
+//		commonMethod.Parse(classMethod, paramLi)
+//		for i, _ := range listTemplate.ColumnModel.ColumnLi {
+//			o.recursionApplyAdapterColumnName(listTemplate, listTemplate.ColumnModel.ColumnLi[i])
+//		}
+//	}
+//}
 
 // TODO, bytest
-func (o TemplateManager) recursionApplyAdapterColumnName(listTemplate ListTemplate, columnItem Column) {
-	if columnItem.XMLName.Local != "virtual-column" {
-		if columnItem.ColumnModel.ColumnLi != nil {
-			for i, _ := range columnItem.ColumnModel.ColumnLi {
-				o.recursionApplyAdapterColumnName(listTemplate, columnItem.ColumnModel.ColumnLi[i])
-			}
-		} else {
-			commonMethod := CommonMethod{}
-			classMethod := listTemplate.Adapter.Name + ".ApplyColumnName"
-			paramLi := []interface{}{}
-			var listTemplateParam interface{} = listTemplate
-			paramLi = append(paramLi, listTemplateParam)
-			var columnItemParam interface{} = columnItem
-			paramLi = append(paramLi, columnItemParam)
-			commonMethod.Parse(classMethod, paramLi)
+//func (o TemplateManager) recursionApplyAdapterColumnName(listTemplate ListTemplate, columnItem Column) {
+//	if columnItem.XMLName.Local != "virtual-column" {
+//		if columnItem.ColumnModel.ColumnLi != nil {
+//			for i, _ := range columnItem.ColumnModel.ColumnLi {
+//				o.recursionApplyAdapterColumnName(listTemplate, columnItem.ColumnModel.ColumnLi[i])
+//			}
+//		} else {
+//			commonMethod := CommonMethod{}
+//			classMethod := listTemplate.Adapter.Name + ".ApplyColumnName"
+//			paramLi := []interface{}{}
+//			var listTemplateParam interface{} = listTemplate
+//			paramLi = append(paramLi, listTemplateParam)
+//			var columnItemParam interface{} = columnItem
+//			paramLi = append(paramLi, columnItemParam)
+//			commonMethod.Parse(classMethod, paramLi)
+//		}
+//	}
+//}
+
+func (o TemplateManager) setColumnItemDataSetId(columnModel *ColumnModel) {
+	if columnModel.DataSetId != "" {
+		columnModel.IdColumn.DataSetId = columnModel.DataSetId
+		for i, _ := range columnModel.ColumnLi {
+			columnModel.ColumnLi[i].DataSetId = columnModel.DataSetId
 		}
 	}
 }
 
 func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnModel, items []interface{}) []interface{} {
+	// set dataSetId to columnItem.DataSetId
+	o.setColumnItemDataSetId(&columnModel)
+
 	columnModelItems := []interface{}{}
 	expressionParser := ExpressionParser{}
 	for _, item := range items {
@@ -702,9 +705,13 @@ func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnMode
 
 		loopItem := map[string]interface{}{}
 		loopItem[columnModel.CheckboxColumn.Name] = expressionParser.Parse(recordJson, columnModel.CheckboxColumn.Expression)
-		loopItem[columnModel.IdColumn.Name] = o.getValueBySpot(record, columnModel.IdColumn.Name)
-		loopItem["id"] = o.getValueBySpot(record, columnModel.IdColumn.Name)
-		loopItem["_id"] = o.getValueBySpot(record, columnModel.IdColumn.Name)
+		idColumnName := columnModel.IdColumn.Name
+		if columnModel.IdColumn.DataSetId != "" {
+			idColumnName = columnModel.IdColumn.DataSetId + "." + idColumnName
+		}
+		loopItem[columnModel.IdColumn.Name] = o.getValueBySpot(record, idColumnName)
+		loopItem["id"] = o.getValueBySpot(record, idColumnName)
+		loopItem["_id"] = o.getValueBySpot(record, idColumnName)
 		for _, columnItem := range columnModel.ColumnLi {
 			o.GetColumnModelDataForColumnItem(columnItem, record, &loopItem)
 		}
@@ -718,11 +725,17 @@ func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnMode
 func (o TemplateManager) GetColumnModelDataForColumnItem(columnItem Column, record map[string]interface{}, loopItem *map[string]interface{}) {
 	if columnItem.XMLName.Local != "virtual-column" {
 		if columnItem.ColumnModel.ColumnLi != nil {
+			o.setColumnItemDataSetId(&columnItem.ColumnModel)
+
 			for _, columnItemItem := range columnItem.ColumnModel.ColumnLi {
 				o.GetColumnModelDataForColumnItem(columnItemItem, record, loopItem)
 			}
 		} else {
-			(*loopItem)[columnItem.Name] = o.getValueBySpot(record, columnItem.Name)
+			columnItemName := columnItem.Name
+			if columnItem.DataSetId != "" {
+				columnItemName = columnItem.DataSetId + "." + columnItemName
+			}
+			(*loopItem)[columnItem.Name] = o.getValueBySpot(record, columnItemName)
 			o.ApplyDictionaryColumnData(loopItem, columnItem)
 			o.ApplyScriptColumnData(loopItem, record, columnItem)
 		}
@@ -758,16 +771,16 @@ func (o TemplateManager) getValueBySpot(record map[string]interface{}, name stri
 	nameLi := strings.Split(name, ".")
 	for i, _ := range nameLi {
 		if i < len(nameLi)-1 {
-			if current[name] == nil {
+			if current[nameLi[i]] == nil {
 				return nil
 			}
-			if reflect.ValueOf(current[name]).Kind() == reflect.Map {
-				current = current[name].(map[string]interface{})
+			if reflect.ValueOf(current[nameLi[i]]).Kind() == reflect.Map {
+				current = current[nameLi[i]].(map[string]interface{})
 			} else {
 				return nil
 			}
 		} else {
-			return current[name]
+			return current[nameLi[i]]
 		}
 	}
 	return nil

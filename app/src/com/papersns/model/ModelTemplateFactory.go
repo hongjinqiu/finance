@@ -484,6 +484,41 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
 	}
 }
 
+/**
+ * 清除父子双向关联,双向关联会引起json.Marshal死循环
+ */
+func (o ModelTemplateFactory) ClearReverseRelation(dataSource *DataSource) {
+	dataSource.MasterData.Parent = nil
+	for i, _ := range dataSource.DetailDataLi {
+		dataSource.DetailDataLi[i].Parent = nil
+	}
+	dataSource.MasterData.FixField.Parent = nil
+	dataSource.MasterData.BizField.Parent = nil
+
+	modelIterator := ModelIterator{}
+	masterFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.MasterData.FixField)
+	for i, _ := range *masterFixFieldLi {
+		(*masterFixFieldLi)[i].Parent = nil
+	}
+	for i, _ := range dataSource.MasterData.BizField.FieldLi {
+		dataSource.MasterData.BizField.FieldLi[i].Parent = nil
+	}
+
+	for i, _ := range dataSource.DetailDataLi {
+		dataSource.DetailDataLi[i].FixField.Parent = nil
+		dataSource.DetailDataLi[i].BizField.Parent = nil
+
+		detailFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.DetailDataLi[i].FixField)
+		for j, _ := range *detailFixFieldLi {
+			(*detailFixFieldLi)[j].Parent = nil
+		}
+
+		for j, _ := range dataSource.DetailDataLi[i].BizField.FieldLi {
+			dataSource.DetailDataLi[i].BizField.FieldLi[j].Parent = nil
+		}
+	}
+}
+
 func (o ModelTemplateFactory) applyRelationFieldValue(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""

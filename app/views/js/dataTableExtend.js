@@ -160,6 +160,10 @@ DataTableManager.prototype.hideLoadingImg = function() {
 	loadingNode.setStyle("display", "none");
 }
 
+DataTableManager.prototype.doAfterResponse = function() {
+	
+}
+
 DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	var self = this;
 	this.param = param;
@@ -174,7 +178,10 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	var paginatorTemplate = param.paginatorTemplate;
 	
 	var columnManager = new ColumnManager();
-	var columns = columnManager.getColumns(render, columnModel, Y);
+	if (param.columnManager) {
+		columnManager = param.columnManager;
+	}
+	var columns = columnManager.getColumns(param.columnModelName, columnModel, Y);
 
 	//var dataSource = new Y.DataSource.Get({ source: url });
 	var dataSource = new Y.DataSource.IO({
@@ -188,6 +195,7 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 			},
 			response : function(e) {
 				self.hideLoadingImg();
+				self.doAfterResponse();
 			}
 		}
 	});
@@ -253,6 +261,9 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	dt.plug(Y.Plugin.DataTableDataSource, {
 		datasource : dataSource
 	});
+	if (param.plugin) {
+		dt.plug(Y.Plugin.DataTablePFormQuickEdit);
+	}
 	if (paginatorContainer) {
 		dt.get('paginator').get('model').set('totalItems', totalResults);
 	}
@@ -264,12 +275,14 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 
 	this.yInst = Y;
 	var checkboxCssSelector = self.getCheckboxCssSelector();
+	var checkboxAllInnerCssSelector = self.getCheckboxAllInnerCssSelector();
 	dt.delegate("click", function(e) {
 		var checked = e.target.get('checked') || undefined;
 		Y.all(checkboxCssSelector).set("checked", checked ? "checked" : "");
-	}, ".protocol-select-all", dt);
+	}, checkboxAllInnerCssSelector, dt);
 
-	var checkboxItemCssSelector = self.getCheckboxItemCssSelector();
+	var checkboxItemInnerCssSelector = self.getCheckboxInnerCssSelector();
+	var checkboxAllCssSelector = self.getCheckboxAllCssSelector();
 	dt.delegate("click", function(e) {
 		var checkLi = Y.all(checkboxCssSelector).get("checked");
 		var isAllSelect = true;
@@ -281,10 +294,10 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 			}
 		}
 		// 单选没有全部选中的按钮
-		if (Y.one(render + " .protocol-select-all")) {
-			Y.one(render + " .protocol-select-all").set("checked", isAllSelect ? "checked" : "");
+		if (Y.one(checkboxAllCssSelector)) {
+			Y.one(checkboxAllCssSelector).set("checked", isAllSelect ? "checked" : "");
 		}
-	}, checkboxItemCssSelector, dt);
+	}, checkboxItemInnerCssSelector, dt);
 	this.dt = dt;
 	return this;
 //	return dt;
@@ -301,7 +314,7 @@ DataTableManager.prototype.getCheckboxCssSelector = function() {
 	return result;
 }
 
-DataTableManager.prototype.getCheckboxItemCssSelector = function() {
+DataTableManager.prototype.getCheckboxInnerCssSelector = function() {
 	var renderName = this.param.render;
 	var columnModel = this.param.columnModel;
 	var result;
@@ -310,6 +323,15 @@ DataTableManager.prototype.getCheckboxItemCssSelector = function() {
 		"select": columnModel.CheckboxColumn.Name
 	});
 	return result;
+}
+
+DataTableManager.prototype.getCheckboxAllCssSelector = function() {
+	var self = this;
+	return self.param.render + " .protocol-select-all";
+}
+
+DataTableManager.prototype.getCheckboxAllInnerCssSelector = function() {
+	return ".protocol-select-all";
 }
 
 DataTableManager.prototype.getSelectRecordLi = function() {
@@ -330,13 +352,23 @@ DataTableManager.prototype.getSelectRecordLi = function() {
 	return result;
 }
 
-DataTableManager.prototype.doVirtualColumnBtnAction = function(elem, fn){
-	var self = this;
+function doVirtualColumnBtnAction(columnModelName, elem, fn){
+	var self = gridPanelDict[columnModelName];
+	var dt = self.dt;
 	var dt = self.dt;
 	var yInst = self.yInst;
 	var o = dt.getRecord(yInst.one(elem));
 	fn(o);
 }
+
+//DataTableManager.prototype.doVirtualColumnBtnAction = function(columnModelName, elem, fn){
+//	var self = gridPanelDict[columnModelName];
+//	var dt = self.dt;
+//	var dt = self.dt;
+//	var yInst = self.yInst;
+//	var o = dt.getRecord(yInst.one(elem));
+//	fn(o);
+//}
 
 /**
  * 外部一般不会调用这个方法,这个方法主要用于做模型控制台的重构用,其它的一般都是ajax table,自动会有loadingImg动画,

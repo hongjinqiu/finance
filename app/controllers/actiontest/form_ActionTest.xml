@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>ActionTest</id>
+	<data-source-model-id>ActionTest</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>ActionTest表单</description>
+	<scripts>actiontest/actionTestModel.js</scripts>
+	<view-template view="Console/FormSchema.html"/>
+	<toolbar>
+		<button text="列表页" mode="fn" handler="doSave" iconCls="test"></button>
+		<button text="新增" mode="fn" handler="test" iconCls=""></button>
+		<button text="复制" mode="url" handler="doExport"></button>
+		<button text="修改" mode="fn" handler="test" iconCls=""></button>
+		<button text="保存" mode="fn" handler="saveData" iconCls=""></button>
+		<button text="放弃" mode="fn" handler="test" iconCls=""></button>
+		<button text="删除" mode="fn" handler="test" iconCls=""></button>
+		<button text="作废" mode="fn" handler="test" iconCls=""></button>
+		<button text="反作废" mode="fn" handler="test" iconCls=""></button>
+		<button text="刷新" mode="fn" handler="test" iconCls=""></button>
+		<button text="修改日志" mode="fn" handler="test" iconCls=""></button>
+	</toolbar>
+
+	<column-model dataSetId="A" colSpan="4">
+		<id-column name="_id" text="编号" hideable="true" />
+		<auto-column name="id" hideable="true" />
+		
+		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="name" colSpan="2" labelWidth="15%" />
+	</column-model>
+	
+	<column-model dataSetId="B">
+		<toolbar>
+			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="addRow" iconCls="yui3-button btn-show"></button>
+			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+		</toolbar>
+		<id-column name="_id" text="编号" hideable="true" />
+		<auto-column name="id" hideable="true" />
+		
+		<auto-column name="code" />
+		<auto-column name="name" />
+	</column-model>
+	
+	<column-model dataSetId="C">
+		<toolbar>
+			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="addRow" iconCls="yui3-button btn-show"></button>
+			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+		</toolbar>
+		<id-column name="_id" text="编号" hideable="true" />
+		<auto-column name="id" hideable="true" />
+		
+		<auto-column name="code" />
+		<auto-column name="name" />
+	</column-model>
+</form-template>

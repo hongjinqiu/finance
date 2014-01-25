@@ -4,6 +4,7 @@ import "github.com/robfig/revel"
 import (
 	. "com/papersns/component"
 	. "com/papersns/model"
+	. "com/papersns/common"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -187,89 +188,26 @@ func getSummaryDataSourceInfoLi(dataSourceInfoLi []DataSourceInfo) []interface{}
 }
 
 func (c Console) ListSchema() revel.Result {
+	panic("panic test")
 	schemaName := c.Params.Get("@name")
 
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetListTemplate(schemaName)
-
-	// 1.toolbar bo
-	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
-	templateManager.ApplyTreeForQueryParameter(&listTemplate)
-	toolbarBo := templateManager.GetToolbarForListTemplate(listTemplate)
-	paramMap := map[string]string{}
-	for k, v := range c.Params.Form {
-		value := strings.Join(v, ",")
-		if value != "" {
-			paramMap[k] = value
-		}
-	}
-	pageNo := 1
-	pageSize := 10
-	if listTemplate.DataProvider.Size != "" {
-		pageSizeInt, err := strconv.Atoi(listTemplate.DataProvider.Size)
-		if err != nil {
-			panic(err)
-		}
-		pageSize = pageSizeInt
-	}
-	if c.Params.Get("pageNo") != "" {
-		pageNoInt, _ := strconv.ParseInt(c.Params.Get("pageNo"), 10, 0)
-		if pageNoInt > 1 {
-			pageNo = int(pageNoInt)
-		}
-	}
-	if c.Params.Get("pageSize") != "" {
-		pageSizeInt, _ := strconv.ParseInt(c.Params.Get("pageSize"), 10, 0)
-		if pageSizeInt >= 10 {
-			pageSize = int(pageSizeInt)
-		}
-	}
-	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
-
-	//	columns := templateManager.GetColumns(&listTemplate)
-
-	//	columnsByte, err := json.Marshal(columns)
-	//	if err != nil {
-	//		fmt.Printf("error: %v", err)
-	//		return c.Render(err)
-	//	}
-
-	dataBoByte, err := json.Marshal(&dataBo)
-	if err != nil {
-		fmt.Printf("error: %v", err)
-		return c.Render(err)
-	}
-
-	listTemplateByte, err := json.Marshal(&listTemplate)
-	if err != nil {
-		fmt.Printf("error: %v", err)
-		return c.Render(err)
-	}
+	
+	result := c.listSelectorCommon(&listTemplate)
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		callback := c.Params.Get("callback")
 		if callback == "" {
+			dataBo := result["dataBo"]
 			c.Response.ContentType = "application/json; charset=utf-8"
 			return c.RenderJson(&dataBo)
 		}
+		dataBoText := result["dataBoText"].(string)
 		c.Response.ContentType = "text/javascript; charset=utf-8"
-		return c.RenderText(callback + "(" + string(dataBoByte) + ");")
+		return c.RenderText(callback + "(" + dataBoText + ");")
 	} else {
-		showParameterLi := templateManager.GetShowParameterLiForListTemplate(&listTemplate)
-		hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(&listTemplate)
-		result := map[string]interface{}{
-			"pageSize":          pageSize,
-			"listTemplate":      listTemplate,
-			"toolbarBo":         toolbarBo,
-			"showParameterLi":   showParameterLi,
-			"hiddenParameterLi": hiddenParameterLi,
-			//		"dataBo":       dataBo,
-			//		"columns":       columns,
-			"dataBoJson":       template.JS(string(dataBoByte)),
-			"listTemplateJson": template.JS(string(listTemplateByte)),
-			//		"columnsJson":   string(columnsByte),
-		}
 		return c.Render(result)
 	}
 }
@@ -279,11 +217,31 @@ func (c Console) SelectorSchema() revel.Result {
 
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetSelectorTemplate(schemaName)
+	
+	result := c.listSelectorCommon(&listTemplate)
 
+	format := c.Params.Get("format")
+	if strings.ToLower(format) == "json" {
+		callback := c.Params.Get("callback")
+		if callback == "" {
+			dataBo := result["dataBo"]
+			c.Response.ContentType = "application/json; charset=utf-8"
+			return c.RenderJson(&dataBo)
+		}
+		dataBoText := result["dataBoText"].(string)
+		c.Response.ContentType = "text/javascript; charset=utf-8"
+		return c.RenderText(callback + "(" + dataBoText + ");")
+	} else {
+		return c.Render(result)
+	}
+}
+
+func (c Console) listSelectorCommon(listTemplate *ListTemplate) map[string]interface{} {
 	// 1.toolbar bo
-	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
-	templateManager.ApplyTreeForQueryParameter(&listTemplate)
-	toolbarBo := templateManager.GetToolbarForListTemplate(listTemplate)
+	templateManager := TemplateManager{}
+	templateManager.ApplyDictionaryForQueryParameter(listTemplate)
+	templateManager.ApplyTreeForQueryParameter(listTemplate)
+	toolbarBo := templateManager.GetToolbarForListTemplate(*listTemplate)
 	paramMap := map[string]string{}
 	for k, v := range c.Params.Form {
 		value := strings.Join(v, ",")
@@ -312,54 +270,34 @@ func (c Console) SelectorSchema() revel.Result {
 			pageSize = int(pageSizeInt)
 		}
 	}
-	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
-
-	//	columns := templateManager.GetColumns(&listTemplate)
-
-	//	columnsByte, err := json.Marshal(columns)
-	//	if err != nil {
-	//		fmt.Printf("error: %v", err)
-	//		return c.Render(err)
-	//	}
+	dataBo := templateManager.GetBoForListTemplate(listTemplate, paramMap, pageNo, pageSize)
 
 	dataBoByte, err := json.Marshal(&dataBo)
 	if err != nil {
-		fmt.Printf("error: %v", err)
-		return c.Render(err)
+		panic(err)
 	}
 
-	listTemplateByte, err := json.Marshal(&listTemplate)
+	listTemplateByte, err := json.Marshal(listTemplate)
 	if err != nil {
-		fmt.Printf("error: %v", err)
-		return c.Render(err)
+		panic(err)
 	}
-
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		callback := c.Params.Get("callback")
-		if callback == "" {
-			c.Response.ContentType = "application/json; charset=utf-8"
-			return c.RenderJson(&dataBo)
-		}
-		c.Response.ContentType = "text/javascript; charset=utf-8"
-		return c.RenderText(callback + "(" + string(dataBoByte) + ");")
-	} else {
-		showParameterLi := templateManager.GetShowParameterLiForListTemplate(&listTemplate)
-		hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(&listTemplate)
-		result := map[string]interface{}{
-			"pageSize":          pageSize,
-			"listTemplate":      listTemplate,
-			"toolbarBo":         toolbarBo,
-			"showParameterLi":   showParameterLi,
-			"hiddenParameterLi": hiddenParameterLi,
-			//		"dataBo":       dataBo,
-			//		"columns":       columns,
-			"dataBoJson":       template.JS(string(dataBoByte)),
-			"listTemplateJson": template.JS(string(listTemplateByte)),
-			//		"columnsJson":   string(columnsByte),
-		}
-		return c.Render(result)
+	
+	showParameterLi := templateManager.GetShowParameterLiForListTemplate(listTemplate)
+	hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(listTemplate)
+	result := map[string]interface{}{
+		"pageSize":          pageSize,
+		"listTemplate":      listTemplate,
+		"toolbarBo":         toolbarBo,
+		"showParameterLi":   showParameterLi,
+		"hiddenParameterLi": hiddenParameterLi,
+		"dataBo":       dataBo,
+		//		"columns":       columns,
+		"dataBoText":       string(dataBoByte),
+		"dataBoJson":       template.JS(string(dataBoByte)),
+		"listTemplateJson": template.JS(string(listTemplateByte)),
+		//		"columnsJson":   string(columnsByte),
 	}
+	return result
 }
 
 // TODO,by test
@@ -376,23 +314,44 @@ func (c Console) FormSchema() revel.Result {
 		// 光有formTemplate不行,还要有model的内容,才可以渲染数据
 		modelTemplateFactory := ModelTemplateFactory{}
 		dataSource := modelTemplateFactory.GetDataSource(formTemplate.DataSourceModelId)
+		modelTemplateFactory.ClearReverseRelation(&dataSource)
 		dataSourceByte, err := json.Marshal(&dataSource)
 		if err != nil {
 			panic(err)
 		}
 		result["dataSource"] = dataSource
-		result["dataSourceJson"] = template.JS(string(dataSourceByte))
+		commonUtil := CommonUtil{}
+		dataSourceJson := string(dataSourceByte)
+		dataSourceJson = commonUtil.FilterJsonEmptyAttr(dataSourceJson)
+		result["dataSourceJson"] = template.JS(dataSourceJson)
 	}
 	//toolbarBo
 	toolbarBo := map[string]interface{}{}
-	for _, item := range formTemplate.FormElemLi {
+	for i, item := range formTemplate.FormElemLi {
 		if item.XMLName.Local == "toolbar" {
 			toolbarBo[item.Toolbar.Name] = templateManager.GetToolbarBo(item.Toolbar)
+		}
+		// 加入主数据集tag,页面渲染用
+		if item.XMLName.Local == "column-model" && item.ColumnModel.DataSetId == "A" {
+			formTemplate.FormElemLi[i].RenderTag = item.ColumnModel.DataSetId + "_" + fmt.Sprint(i)
 		}
 	}
 	result["toolbarBo"] = toolbarBo
 	dataBo := map[string]interface{}{}
 	result["dataBo"] = dataBo
+	
+	// 主数据集的后台渲染
+	result["masterRenderLi"] = c.getMasterRenderLi(formTemplate)
+//	{
+//		dataBoByte, err := json.Marshal(result["masterRenderLi"])
+//		if err != nil {
+//			panic(err)
+//		}
+//		commonUtil := CommonUtil{}
+//		masterRenderLiJson := string(dataBoByte)
+//		masterRenderLiJson = commonUtil.FilterJsonEmptyAttr(masterRenderLiJson)
+//		result["masterRenderLiJson"] = template.JS(masterRenderLiJson)
+//	}
 
 	formTemplateJsonDataArray, err := json.Marshal(&formTemplate)
 	if err != nil {
@@ -404,9 +363,14 @@ func (c Console) FormSchema() revel.Result {
 		panic(err)
 	}
 
-	result["formTemplateJsonData"] = template.JS(string(formTemplateJsonDataArray))
-	result["dataBoJson"] = template.JS(string(dataBoByte))
-
+	commonUtil := CommonUtil{}
+	formTemplateJsonData := string(formTemplateJsonDataArray)
+	formTemplateJsonData = commonUtil.FilterJsonEmptyAttr(formTemplateJsonData)
+	result["formTemplateJsonData"] = template.JS(formTemplateJsonData)
+	dataBoJson := string(dataBoByte)
+	dataBoJson = commonUtil.FilterJsonEmptyAttr(dataBoJson)
+	result["dataBoJson"] = template.JS(dataBoJson)
+	
 	viewPath := revel.Config.StringDefault("REVEL_VIEW_PATH", "")
 	file, err := os.Open(viewPath + "/" + formTemplate.ViewTemplate.View)
 	defer file.Close()
@@ -418,8 +382,95 @@ func (c Console) FormSchema() revel.Result {
 	if err != nil {
 		panic(err)
 	}
+	funcMap := map[string]interface{}{
+		"eq": func(a, b interface{}) bool {
+			return a == b
+		},
+	}
+	c.Response.ContentType = "text/html; charset=utf-8"
+	tmpl, err := template.New("formSchema").Funcs(funcMap).Parse(string(fileContent))
+	if err != nil {
+		panic(err)
+	}
+	tmplResult := map[string]interface{}{
+		"result": result,
+	}
+	tmpl.Execute(c.Response.Out, tmplResult)
+	return nil
+}
 
-	return c.Render(string(fileContent), result)
+func (c Console) getMasterRenderLi(formTemplate FormTemplate) map[string]interface{} {
+	if formTemplate.DataSourceModelId == "" {
+		return nil
+	}
+	result := map[string]interface{}{}
+	
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(formTemplate.DataSourceModelId)
+	
+	modelIterator := ModelIterator{}
+	var message interface{} = ""
+	for i, item := range formTemplate.FormElemLi {
+		if item.XMLName.Local == "column-model" && item.ColumnModel.DataSetId == "A" {
+			lineColSpan, err := strconv.Atoi(item.ColumnModel.ColSpan)
+			if err != nil {
+				lineColSpan = 1
+			}
+			container := [][]map[string]interface{}{}
+			containerItem := []map[string]interface{}{}
+			lineColSpanSum := 0
+			for _, column := range item.ColumnModel.ColumnLi {
+				if column.XMLName.Local == "html" {
+					columnColSpan, err := strconv.Atoi(column.ColSpan)
+					if err != nil {
+						columnColSpan = 1
+					}
+					containerItem = append(containerItem, map[string]interface{}{
+						"isHtml": "true",
+						"html": column.Html,
+					})
+					lineColSpanSum += columnColSpan
+					if lineColSpanSum >= lineColSpan {
+						container = append(container, containerItem)
+						containerItem = []map[string]interface{}{}
+						lineColSpanSum = lineColSpanSum - lineColSpan
+					}
+				} else {
+					modelIterator.IterateAllField(&dataSource, &message, func(fieldGroup *FieldGroup, result *interface{}){
+						if fieldGroup.IsMasterField() && fieldGroup.Id == column.Name {
+							if column.Hideable != "true" {
+								columnColSpan, err := strconv.Atoi(column.ColSpan)
+								if err != nil {
+									columnColSpan = 1
+								}
+								containerItem = append(containerItem, map[string]interface{}{
+									"isHtml": "false",
+									"required": fmt.Sprint(fieldGroup.AllowEmpty == "false"),
+									"label": column.Text,
+									"name": column.Name,
+									"columnWidth": column.ColumnWidth,
+									"columnSpan": columnColSpan - 1,
+									"labelWidth": column.LabelWidth,
+								})
+								lineColSpanSum += columnColSpan
+								if lineColSpanSum >= lineColSpan {
+									container = append(container, containerItem)
+									containerItem = []map[string]interface{}{}
+									lineColSpanSum = lineColSpanSum - lineColSpan
+								}
+							}
+						} 
+					})
+				}
+			}
+			if 0 < lineColSpanSum && lineColSpanSum < lineColSpan {
+				container = append(container, containerItem)
+			}
+			result[item.DataSetId + "_" + fmt.Sprint(i)] = container
+		}
+	}
+	
+	return result
 }
 
 func (c Console) Refretor() revel.Result {
@@ -600,3 +651,4 @@ func (c Console) RawXml() revel.Result {
 		"message": "可能传入了错误的refretorType:" + refretorType,
 	})
 }
+

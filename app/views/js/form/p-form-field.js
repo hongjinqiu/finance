@@ -538,6 +538,18 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         if (this.get('validateInline') === true) {
             this._enableInlineValidation();
         }
+    },
+    
+    _getDsField: function() {
+    	if (!dataSourceJson) {
+    		return null;
+    	}
+    	
+    	var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		
+    	});
     }
 },
 {
@@ -569,6 +581,11 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
          * @description The name attribute to use on the field
          */
         name: {
+            validator: Y.Lang.isString,
+            writeOnce: true
+        },
+        
+        dataSetId: {
             validator: Y.Lang.isString,
             writeOnce: true
         },

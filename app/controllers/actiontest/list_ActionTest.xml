@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>ActionTest</id>
+	<selector-id>ActionTestSelector</selector-id>
+	<data-source-model-id>ActionTest</data-source-model-id>
+
+	<adapter name="ModelListTemplateAdapter" />
+	<description>ActionTest列表</description>
+	<scripts></scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<toolbar export="true">
+		<button text="新增" mode="fn" handler="doSave" iconCls="test">
+			<expression>test_expression</expression>
+			<button-attribute name="code" value="C" />
+			<button-attribute name="functionId" value="50010" />
+		</button>
+
+		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+			<button-attribute name="code" value="D" />
+			<button-attribute name="functionId" value="50010" />
+		</button>
+
+		<button text="导出" mode="url" handler="doExport">
+			<button-attribute name="code" value="U" />
+			<button-attribute name="functionId" value="10018" />
+		</button>
+
+		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
+		</button>
+	</toolbar>
+
+	<!-- <security functionId="10018"></security> -->
+
+	<!-- <before-build-query>ActionTest.beforeBuildQuery</before-build-query> <after-build-query>ActionTest.afterBuildQuery</after-build-query> -->
+	<!-- <after-query-data>ModelListTemplateInterceptor.AfterQueryData</after-query-data> -->
+
+	<data-provider size="10">
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选ActionTest" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
+		<toolbar>
+			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
+		</toolbar>
+		<checkbox-column name="checkboxSelect" hideable="false">
+			<expression>1 == 1</expression>
+		</checkbox-column>
+		<id-column name="_id" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
+					<expression>1 == 1</expression>
+					<button-attribute name="code" value="U" />
+				</button>
+				<button text="查看" iconCls="ck_btn" mode="url^" handler="/console/formschema.go?@name=ActionTest&amp;id={id}">
+					<expression>1 == 1</expression>
+				</button>
+			</buttons>
+		</virtual-column>
+
+		<auto-column name="id" />
+		
+		<auto-column name="code" />
+		<auto-column name="name" />
+	</column-model>
+
+	<query-parameters dataSetId="A">
+		<query-parameter name="code" auto="true" text=""></query-parameter>
+		<query-parameter name="name" auto="true" text=""></query-parameter>
+	</query-parameters>
+</list-template>

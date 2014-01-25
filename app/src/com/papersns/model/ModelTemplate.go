@@ -4,6 +4,11 @@ import (
 	"encoding/xml"
 )
 
+type DataSourceTest struct {
+	XMLName                 xml.Name     `xml:"datasource"`
+	Id                      string       `xml:"id"`
+}
+
 type DataSource struct {
 	XMLName                 xml.Name     `xml:"datasource"`
 	Id                      string       `xml:"id"`

@@ -61,7 +61,7 @@
 		<!-- <fieldName>createTime</fieldName> -->
 		<displayName>创建时间</displayName>
 		<fieldDataType>LONGINT</fieldDataType>
-		<fieldNumberType>TIME</fieldNumberType>
+		<fieldNumberType>DATETIME</fieldNumberType>
 		<fixReadOnly>true</fixReadOnly>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
@@ -112,7 +112,7 @@
 		<!-- <fieldName>modifyTime</fieldName> -->
 		<displayName>最后修改时间</displayName>
 		<fieldDataType>LONGINT</fieldDataType>
-		<fieldNumberType>TIME</fieldNumberType>
+		<fieldNumberType>DATETIME</fieldNumberType>
 		<fixReadOnly>true</fixReadOnly>
 	</field>
 

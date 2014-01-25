@@ -380,6 +380,13 @@
 		<annotation>
 			<documentation>html代码</documentation>
 		</annotation>
+		<complexType>
+			<simpleContent>
+				<extension base="string">
+					<attribute name="colSpan" type="int" default="1"></attribute>
+				</extension>
+			</simpleContent>
+		</complexType>
 	</element>
 	
 	<element name="column-model">
@@ -622,6 +629,11 @@
 				<documentation>列名称</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="text">
+			<annotation>
+				<documentation>列标题</documentation>
+			</annotation>
+		</attribute>
 		<!-- <attribute name="outName"> <annotation> <documentation>输出列表字段别名</documentation> </annotation> </attribute> -->
 		<attribute name="bson">
 			<annotation>
@@ -629,11 +641,6 @@
 			</annotation>
 		</attribute>
 		<!-- <attribute name="sql"> <annotation> <documentation>字段名称或SQL语句</documentation> </annotation> </attribute> -->
-		<attribute name="text">
-			<annotation>
-				<documentation>列标题</documentation>
-			</annotation>
-		</attribute>
 		<attribute name="align">
 			<annotation>
 				<documentation>对应方式</documentation>
@@ -693,6 +700,8 @@
 		</attribute>
 		<attribute name="colSpan" type="int" default="1"></attribute>
 		<attribute name="width" />
+		<attribute name="columnWidth" />
+		<attribute name="labelWidth" />
 		<attribute name="excelWidth" />
 		<attribute name="renderer" />
 		<attribute name="rendererTemplate" />
@@ -778,6 +787,11 @@
 		<attribute name="name">
 			<annotation>
 				<documentation>名称</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="text">
+			<annotation>
+				<documentation>标题</documentation>
 			</annotation>
 		</attribute>
 		<attribute name="autoLoad" type="boolean">
@@ -891,6 +905,7 @@
 			</simpleType>
 		</attribute>
 		<attribute name="dataSetId"></attribute>
+		<attribute name="colSpan" type="int" default="4"></attribute>
 	</attributeGroup>
 
 	<element name="query-parameters">
