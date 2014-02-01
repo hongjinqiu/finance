@@ -10,6 +10,7 @@ func GetMasterSequenceName(dataSource DataSource) string {
 }
 
 func GetDetailSequenceName(dataSource DataSource, detailData DetailData) string {
-	byte0 := dataSource.Id[0]
-	return strings.ToLower(string(byte0)) + dataSource.Id[1:] + detailData.Id + "Id"
+	return GetMasterSequenceName(dataSource)
+//	byte0 := dataSource.Id[0]
+//	return strings.ToLower(string(byte0)) + dataSource.Id[1:] + detailData.Id + "Id"
 }

@@ -69,7 +69,7 @@
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>20</fieldLength>
 				<defaultValueExpr>code</defaultValueExpr>
-				<relationDS>
+				<!-- <relationDS>
 					<relationItem>
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
@@ -78,7 +78,7 @@
 						<displayField>code,name</displayField>
 						<valueField>_id</valueField>
 					</relationItem>
-				</relationDS>
+				</relationDS> -->
 			</field>
 			<field id="name" extends="NAME_FIELD">
 				<displayName>detailB_昵称</displayName>

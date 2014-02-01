@@ -85,6 +85,18 @@ def initDemoId():
     if not demoId:
         mongoDB.counters.save({'_id': 'demoCId', 'c': 1})
 
+def initActionTestId():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    actionTestId = mongoDB.counters.find_one({'_id': 'actionTestId'})
+    if not actionTestId:
+        mongoDB.counters.save({'_id': 'actionTestId', 'c': 1})
+    actionTestId = mongoDB.counters.find_one({'_id': 'actionTestBId'})
+    if not actionTestId:
+        mongoDB.counters.save({'_id': 'actionTestBId', 'c': 1})
+    actionTestId = mongoDB.counters.find_one({'_id': 'actionTestCId'})
+    if not actionTestId:
+        mongoDB.counters.save({'_id': 'actionTestCId', 'c': 1})
+
 def initDemo():
     initDemoId()
     mongoDB = getThreadLocalMongoDB()['mongoDB']
@@ -196,5 +208,7 @@ if __name__ == '__main__':
     initTest2Id()
     initDemoId()
     initDemo()
+    initActionTestId()
+
 
 

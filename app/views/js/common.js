@@ -20,24 +20,32 @@ function showDialog(config){
 	var callback = config["callback"];
 	var width = config["width"] || 410;
 	var height = config["height"] || 150;
+	var bodyHeight = height - 23 - 40 - 50;
 	var bodyContent = null;
 	var footer = [];
 	if (infoType == "info") {
-		bodyContent = '<div class="message icon-info">' + msg + '</div>';
+		bodyContent = '<div class="message icon-info overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+		footer = [{
+            name     : 'proceed',
+            label    : '确定',
+            action   : 'onOK'
+        }];
+	} else if (infoType == "success") {
+		bodyContent = '<div class="message icon-success overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
             action   : 'onOK'
         }];
 	} else if (infoType == "warn") {
-		bodyContent = '<div class="message icon-warn">' + msg + '</div>';
+		bodyContent = '<div class="message icon-warn overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
             action   : 'onOK'
         }];
 	} else if (infoType == "question") {
-		bodyContent = '<div class="message icon-question">' + msg + '</div>';
+		bodyContent = '<div class="message icon-question overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
 		footer = [{
             name  : 'cancel',
             label : '取消',
@@ -48,7 +56,7 @@ function showDialog(config){
             action   : 'onOK'
         }];
 	} else if (infoType == "error") {
-		bodyContent = '<div class="message icon-error">' + msg + '</div>';
+		bodyContent = '<div class="message icon-error overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
@@ -93,7 +101,7 @@ function showDialog(config){
 	    
 	    dialog.dd.addHandle('.yui3-widget-hd');
 	    dialog.show();
-	    if (infoType == "info" || infoType == "warn" || infoType == "error") {
+	    if (infoType == "info" || infoType == "success" || infoType == "warn" || infoType == "error") {
 	    	dialog.getButton("proceed").focus();
 	    }
 	});
@@ -103,6 +111,17 @@ function showAlert(msg, callback, width, height){
 	showDialog({
 		"infoType": "info",
 		"title": "提示信息",
+		"msg": msg,
+		"callback": callback,
+		"width": width,
+		"height": height
+	});
+}
+
+function showSuccess(msg, callback, width, height){
+	showDialog({
+		"infoType": "success",
+		"title": "成功信息",
 		"msg": msg,
 		"callback": callback,
 		"width": width,
@@ -143,27 +162,36 @@ function showConfirm(msg, callback, width, height){
 	});
 }
 
+/**
+ * 配置demo:
+ * {
+ * 	sync: true | false,
+ * 	method: GET | POST,
+ * 	params: post data,
+ * 	callback: success callback function,
+ * }
+ */
 function ajaxRequest(option){
-	var confirm = {
-		doFailure: "",// function,
-		doError: "",// function,
-		doCallback: "",// function,
-		disableCaching: "",
-		method: "",// post,get
-		reader: "", // json
-		success: "", // function,
-		scope: "",
-		failure: "",// function
-	};
 	// 有用的配置为 doCallback, 自己对failure,error进行提示即可,
 	// url,params,async,scope,
 	YUI().use("node", "event", "json", "io-base", function(Y){
+//		var paramData = Y.JSON.stringify(option["params"]);
+		var paramData = {};
+		if (option.params) {
+			for (var k in option.params) {
+				if (typeof(option.params[k]) == "object") {
+					paramData[k] = Y.JSON.stringify(option.params[k]);
+				} else {
+					paramData[k] = option.params[k];
+				}
+			}
+		}
 		var cfg = {
 				sync: option.sync !== undefined ? option.sync : true,
 						method: option.method || 'POST',
-						data: Y.QueryString.stringify(option["params"]),
+						data: Y.QueryString.stringify(paramData),
 						headers: {
-							'Content-Type': 'application/json',
+							'Content-Type': 'application/x-www-form-urlencoded',
 						},
 						on: {
 							/*start: Dispatch.start,
@@ -171,18 +199,20 @@ function ajaxRequest(option){
 	        end: Dispatch.end*/
 							start: function(){console.log("start");},
 							complete: function(){console.log("complete");},
-							success: function(){console.log("success");},
-							failure: function(id, o, args){
+							success: function(id, o, args){
+								if (option.callback) {
+									option.callback(o);
+								}
+							},
+							failure: function(id, o, args){// failure调用在complete之前,
 								var text = o.responseText;
-								//var reg = /panic\(".*?"\)/.test(text);
-								var reg = /panic\("(.*?)"\)/.test(text);
-								console.log("begin");
-								console.log(reg);
-								console.log(RegExp.$1);
-								console.log("failure");
-								console.log(id);
-								console.log(o);
-								console.log(args);
+								var reg = /panic\(&#34;(.*?)&#34;\)/.test(text);
+								var msg = RegExp.$1;
+								if (msg) {
+									showError(msg);
+								} else {
+									showError(text, null, 600, 400);
+								}
 							},
 							end: function(){console.log("end");}
 						},
@@ -202,7 +232,7 @@ function ajaxRequest(option){
 //	        end: 'baz'
 //	    }
 		};
-		console.log(Y.QueryString.stringify(option["params"]));
+		console.log(Y.QueryString.stringify(paramData));
 		Y.io(option["url"], cfg);
 //		function complete(id, o, args) {
 //			var id = id; // Transaction ID.

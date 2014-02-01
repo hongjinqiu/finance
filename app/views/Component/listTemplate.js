@@ -16,10 +16,11 @@ function getSelectRecordLi() {
 	return dtInst.getSelectRecordLi();
 }
 
-function doVirtualColumnBtnAction(gridPanelId, elem, fn){
-	var inst = gridPanelDict[gridPanelId];
-	return inst.doVirtualColumnBtnAction(elem, fn);
-}
+// 用 dataTableExtend 里面的函数
+//function doVirtualColumnBtnAction(gridPanelId, elem, fn){
+//	var inst = gridPanelDict[gridPanelId];
+//	return inst.doVirtualColumnBtnAction(elem, fn);
+//}
 
 function getQueryString(Y) {
 	var form = Y.one('#queryForm'), query;
@@ -83,11 +84,13 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 //	paginatorContainer : '#pagContC',
 //	paginatorTemplate : '#tmpl-bar',
 		*/
-		
+		var renderName = "#columnModel_1";
+		var columnModelName = renderName.replace("#", "");
 		var param = {
 			data:dataBo.items,
 			columnModel:listTemplate.ColumnModel,
-			render:"#columnModel_1",
+			columnModelName:columnModelName,
+			render:renderName,
 			url:"/console/listschema?@name=" + listTemplate.Id + "&format=json",
 			totalResults: dataBo.totalResults || 1,
 			pageSize: DATA_PROVIDER_SIZE,
@@ -95,7 +98,7 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 			paginatorTemplate : '#tmpl-bar'
 		};
 		dtInst = dataTableManager.createDataGrid(yInst, param);
-		gridPanelDict[param.render.replace("#", "")] = dtInst;
+		gridPanelDict[columnModelName] = dtInst;
 		var queryParameterManager = new QueryParameterManager();
 		queryParameterManager.applyQueryParameter();
 		applyQueryBtnBehavior();

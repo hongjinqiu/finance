@@ -2,69 +2,195 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
-	. "com/papersns/model"
 	. "com/papersns/component"
-	"com/papersns/mongo"
-	"strings"
-	"strconv"
-	"encoding/json"
+	. "com/papersns/model"
 	. "com/papersns/model/handler"
+	"com/papersns/mongo"
+	. "com/papersns/mongo"
+	"com/papersns/global"
+	"encoding/json"
+	"strconv"
+	"strings"
 )
 
 func init() {
 }
 
-type BaseDataAction struct {
-	*revel.Controller
+type IActionSupport interface {
+	beforeNewData(sessionId int, dataSource DataSource)
+	afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	beforeCopyData(sessionId int, dataSource DataSource, srcBo map[string]interface{})
+	afterCopyData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	editValidate(sessionId int, dataSource DataSource, bo map[string]interface{}) (string, bool)
+	beforeEditData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterEditData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow)
+	beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow)
+	beforeGiveUpData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterGiveUpData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	beforeDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	beforeRefreshData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterRefreshData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	beforeCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	beforeUnCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	afterUnCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})
 }
 
-/**
- * 列表页
- */
-//func (baseData BaseDataAction) ListData() revel.Result {
-//	
-//}
+type ActionSupport struct{}
 
-/**
- * 新增
- */
-func (c BaseDataAction) NewData() revel.Result {
-	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
-	c.beforeNewData(dataSource)
-	bo := modelTemplateFactory.GetInstanceByDS(dataSource)
-	c.afterNewData(dataSource, &bo)
+func (o ActionSupport) beforeNewData(sessionId int, dataSource DataSource)                                          {}
+func (o ActionSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{})               {}
+func (o ActionSupport) beforeCopyData(sessionId int, dataSource DataSource, srcBo map[string]interface{})           {}
+func (o ActionSupport) afterCopyData(sessionId int, dataSource DataSource, bo *map[string]interface{})              {}
+func (o ActionSupport) editValidate(sessionId int, dataSource DataSource, bo map[string]interface{}) (string, bool) {
+	return "", true
+}
+func (o ActionSupport) beforeEditData(sessionId int, dataSource DataSource, bo *map[string]interface{})             {}
+func (o ActionSupport) afterEditData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+}
+func (o ActionSupport) beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {}
+func (o ActionSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+}
+func (o ActionSupport) beforeGiveUpData(sessionId int, dataSource DataSource, bo *map[string]interface{})   {}
+func (o ActionSupport) afterGiveUpData(sessionId int, dataSource DataSource, bo *map[string]interface{})    {}
+func (o ActionSupport) beforeDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{})   {}
+func (o ActionSupport) afterDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{})    {}
+func (o ActionSupport) beforeRefreshData(sessionId int, dataSource DataSource, bo *map[string]interface{})  {}
+func (o ActionSupport) afterRefreshData(sessionId int, dataSource DataSource, bo *map[string]interface{})   {}
+func (o ActionSupport) beforeCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})   {}
+func (o ActionSupport) afterCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})    {}
+func (o ActionSupport) beforeUnCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {}
+func (o ActionSupport) afterUnCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})  {}
+
+type BaseDataAction struct {
+	*revel.Controller
+	actionSupport IActionSupport
+}
+
+func (c BaseDataAction) rollbackTxn(sessionId int) {
+	txnId := global.GetGlobalAttr(sessionId, "txnId")
+	if txnId != nil {
+		if x := recover(); x != nil {
+			_, db := global.GetConnection(sessionId)
+			txnManager := TxnManager{db}
+			txnManager.Rollback(txnId.(int))
+			panic(x)
+		}
+	}
+}
+
+func (c BaseDataAction) commitTxn(sessionId int) {
+	txnId := global.GetGlobalAttr(sessionId, "txnId")
+	if txnId != nil {
+		_, db := global.GetConnection(sessionId)
+		txnManager := TxnManager{db}
+		txnManager.Commit(txnId.(int))
+	}
+}
+
+func (c BaseDataAction) renderCommon(bo map[string]interface{}, dataSource DataSource) revel.Result {
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
+			"bo":         bo,
 			"dataSource": dataSource,
 		})
 	}
 	return c.Render()
 }
 
-func (c BaseDataAction) beforeNewData(dataSource DataSource) {
-	
-}
-
-func (c BaseDataAction) afterNewData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
+/**
+ * 列表页
+ */
+//func (baseData BaseDataAction) ListData() revel.Result {
+//
+//}
 
 /**
- * 复制
+ * 新增
  */
-func (c BaseDataAction) CopyData() revel.Result {
+func (c BaseDataAction) NewData() revel.Result {
+	c.actionSupport = ActionSupport{}
+	
+	bo, dataSource := c.newDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) newDataCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+	
+	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	c.actionSupport.beforeNewData(sessionId, dataSource)
+	bo := modelTemplateFactory.GetInstanceByDS(dataSource)
+	c.actionSupport.afterNewData(sessionId, dataSource, &bo)
+
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+
+	c.commitTxn(sessionId)
+	return bo, dataSource
+}
+
+func (c BaseDataAction) GetData() revel.Result {
+	bo, dataSource := c.getDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) getDataCommon() (map[string]interface{}, DataSource) {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		panic(err)
 	}
+
+	querySupport := QuerySupport{}
+	queryMap := map[string]interface{}{
+		"_id": id,
+	}
+	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	if !found {
+		panic("GetData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
+	}
 	
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	return bo, dataSource
+}
+
+/**
+ * 复制
+ */
+func (c BaseDataAction) CopyData() revel.Result {
+	c.actionSupport = ActionSupport{}
+	bo, dataSource := c.copyDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) copyDataCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
+	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	strId := c.Params.Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		panic(err)
+	}
+
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": id,
@@ -73,195 +199,189 @@ func (c BaseDataAction) CopyData() revel.Result {
 	if !found {
 		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &srcBo)
-	c.beforeCopyData(dataSource, srcBo)
+	c.actionSupport.beforeCopyData(sessionId, dataSource, srcBo)
 	dataSource, bo := modelTemplateFactory.GetCopyInstance(dataSourceModelId, srcBo)
-	c.afterCopyData(dataSource, &bo)
-	
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
-			"dataSource": dataSource,
-		})
-	}
-	return c.Render()
-}
+	c.actionSupport.afterCopyData(sessionId, dataSource, &bo)
 
-func (c BaseDataAction) beforeCopyData(dataSource DataSource, srcBo map[string]interface{}) {
-	
-}
-
-func (c BaseDataAction) afterCopyData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
-
-/**
- * 修改验证
- */
-func (c BaseDataAction) editValidate(dataSource DataSource, bo map[string]interface{}) (string, bool) {
-	return "", true
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return bo, dataSource
 }
 
 /**
  * 修改
  */
 func (c BaseDataAction) EditData() revel.Result {
+	c.actionSupport = ActionSupport{}
+	
+	bo, dataSource := c.editDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) editDataCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	jsonBo := c.Params.Get("jsonData")
-	
+
 	bo := map[string]interface{}{}
 	err := json.Unmarshal([]byte(jsonBo), &bo)
 	if err != nil {
 		panic(err)
 	}
+	
 
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	
-	editMessage, isValid := c.editValidate(dataSource, bo)
+
+	editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, bo)
 	if !isValid {
 		panic(editMessage)
 	}
-	
-	c.beforeEditData(dataSource, &bo)
-	
+
+	c.actionSupport.beforeEditData(sessionId, dataSource, &bo)
+
 	financeService := FinanceService{}
-	diffDataRowLi := financeService.SaveData(dataSource, &bo)
-	
-	c.afterEditData(dataSource, &bo, diffDataRowLi)
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
-			"dataSource": dataSource,
-		})
-	}
-	return c.Render()
-}
+	diffDataRowLi := financeService.SaveData(sessionId, dataSource, &bo)
 
-func (c BaseDataAction) beforeEditData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
-
-func (c BaseDataAction) afterEditData(dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
-	
+	c.actionSupport.afterEditData(sessionId, dataSource, &bo, diffDataRowLi)
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return bo, dataSource
 }
 
 /**
  * 保存
  */
 func (c BaseDataAction) SaveData() revel.Result {
-	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	jsonBo := c.Params.Get("jsonData")
-	
+	c.actionSupport = ActionSupport{}
+	bo, dataSource := c.saveCommon()
+
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
+	dataSourceModelId := c.Params.Form.Get("dataSourceModelId")
+	jsonBo := c.Params.Form.Get("jsonData")
+
 	bo := map[string]interface{}{}
 	err := json.Unmarshal([]byte(jsonBo), &bo)
 	if err != nil {
 		panic(err)
 	}
-
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.beforeSaveData(dataSource, &bo)
+	c.actionSupport.beforeSaveData(sessionId, dataSource, &bo)
 
 	financeService := FinanceService{}
-	diffDataRowLi := financeService.SaveData(dataSource, &bo)	
+	diffDataRowLi := financeService.SaveData(sessionId, dataSource, &bo)
+
+	c.actionSupport.afterSaveData(sessionId, dataSource, &bo, diffDataRowLi)
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	
-	c.afterSaveData(dataSource, &bo, diffDataRowLi)
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
-			"dataSource": dataSource,
-		})
+	c.commitTxn(sessionId)
+	
+	querySupport := QuerySupport{}
+	queryMap := map[string]interface{}{
+		"_id": bo["_id"],
 	}
-	return c.Render()
-}
-
-func (c BaseDataAction) beforeSaveData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
-
-func (c BaseDataAction) afterSaveData(dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
-	
+	bo, _ = querySupport.FindByMap(dataSourceModelId, queryMap)
+	return bo, dataSource
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c BaseDataAction) GiveUpData() revel.Result {
+	c.actionSupport = ActionSupport{}
+	bo, dataSource := c.giveUpDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) giveUpDataCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
 	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
 	if !found {
-		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
+		panic("giveUpData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.beforeGiveUpData(dataSource, &bo)
-	c.afterGiveUpData(dataSource, &bo)
-	
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
-			"dataSource": dataSource,
-		})
-	}
-	return c.Render()
-}
+	c.actionSupport.beforeGiveUpData(sessionId, dataSource, &bo)
+	c.actionSupport.afterGiveUpData(sessionId, dataSource, &bo)
 
-func (c BaseDataAction) beforeGiveUpData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
-
-func (c BaseDataAction) afterGiveUpData(dataSource DataSource, bo *map[string]interface{}) {
-	
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return bo, dataSource
 }
 
 /**
  * 删除
  */
 func (c BaseDataAction) DeleteData() revel.Result {
+	c.actionSupport = ActionSupport{}
+	
+	bo, dataSource := c.deleteDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
 	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
 	if !found {
-		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
+		panic("DeleteData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.beforeDeleteData(dataSource, &bo)
-	
+	c.actionSupport.beforeDeleteData(sessionId, dataSource, &bo)
+
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
@@ -269,108 +389,98 @@ func (c BaseDataAction) DeleteData() revel.Result {
 	usedCheck := UsedCheck{}
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
+	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		if fieldGroupLi[0].IsMasterField() {
-			usedCheck.Delete(db, fieldGroupLi, *data)
+			usedCheck.Delete(sessionId, fieldGroupLi, *data)
 		}
 	})
-	
-	err = db.C(dataSourceModelId).Remove(queryMap)
-	if err != nil {
-		panic(err)
+
+	txnManager := TxnManager{db}
+	txnId := global.GetTxnId(sessionId)
+	_, removeResult := txnManager.Remove(txnId, dataSourceModelId, bo)
+	if !removeResult {
+		panic("删除失败")
 	}
 	
-	c.afterDeleteData(dataSource, &bo)
-	
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
-			"dataSource": dataSource,
-		})
-	}
-	return c.Render()
-}
+	c.actionSupport.afterDeleteData(sessionId, dataSource, &bo)
 
-func (c BaseDataAction) beforeDeleteData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
-
-func (c BaseDataAction) afterDeleteData(dataSource DataSource, bo *map[string]interface{}) {
-	
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return bo, dataSource
 }
 
 /**
  * 刷新
  */
 func (c BaseDataAction) RefreshData() revel.Result {
+	c.actionSupport = ActionSupport{}
+	bo, dataSource := c.refreshDataCommon()
+	
+	return c.renderCommon(bo, dataSource)
+}
+
+func (c BaseDataAction) refreshDataCommon() (map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
 	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
 	if !found {
-		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
+		panic("RefreshData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.beforeRefreshData(dataSource, &bo)
-	c.afterRefreshData(dataSource, &bo)
-	
-	format := c.Params.Get("format")
-	if strings.ToLower(format) == "json" {
-		c.Response.ContentType = "application/json; charset=utf-8"
-		return c.RenderJson(map[string]interface{}{
-			"bo": bo,
-			"dataSource": dataSource,
-		})
-	}
-	return c.Render()
-}
+	c.actionSupport.beforeRefreshData(sessionId, dataSource, &bo)
+	c.actionSupport.afterRefreshData(sessionId, dataSource, &bo)
 
-func (c BaseDataAction) beforeRefreshData(dataSource DataSource, bo *map[string]interface{}) {
-	
-}
-
-func (c BaseDataAction) afterRefreshData(dataSource DataSource, bo *map[string]interface{}) {
-	
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return bo, dataSource
 }
 
 /**
- * 修改日志
+ * 被用查询
  */
 func (c BaseDataAction) LogList() revel.Result {
-	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	strId := c.Params.Get("id")
-	id, err := strconv.Atoi(strId)
-	if err != nil {
-		panic(err)
-	}
-	
-	collectionName := "PubReferenceLog"
-	// reference,beReference
-	querySupport := QuerySupport{}
-	query := map[string]interface{}{
-		"beReference": []interface{}{dataSourceModelId,"A", "id",id},
-	}
-	pageNo := 1
-	pageSize := 10
-	orderBy := ""
-	result := querySupport.Index(collectionName, query, pageNo, pageSize, orderBy)
-	
+	result := c.logListCommon()
+
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
 	return c.Render()
+}
+
+func (c BaseDataAction) logListCommon() map[string]interface{} {
+	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	strId := c.Params.Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		panic(err)
+	}
+
+	collectionName := "PubReferenceLog"
+	// reference,beReference
+	querySupport := QuerySupport{}
+	query := map[string]interface{}{
+		"beReference": []interface{}{dataSourceModelId, "A", "id", id},
+	}
+	pageNo := 1
+	pageSize := 10
+	orderBy := ""
+	return querySupport.Index(collectionName, query, pageNo, pageSize, orderBy)
 }

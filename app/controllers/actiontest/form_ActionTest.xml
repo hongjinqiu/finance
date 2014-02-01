@@ -8,16 +8,16 @@
 	<view-template view="Console/FormSchema.html"/>
 	<toolbar>
 		<button text="列表页" mode="fn" handler="doSave" iconCls="test"></button>
-		<button text="新增" mode="fn" handler="test" iconCls=""></button>
-		<button text="复制" mode="url" handler="doExport"></button>
-		<button text="修改" mode="fn" handler="test" iconCls=""></button>
+		<button text="新增" mode="fn" handler="newData" iconCls=""></button>
+		<button text="复制" mode="fn" handler="copyData"></button>
+		<button text="修改" mode="fn" handler="editData" iconCls=""></button>
 		<button text="保存" mode="fn" handler="saveData" iconCls=""></button>
-		<button text="放弃" mode="fn" handler="test" iconCls=""></button>
+		<button text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
 		<button text="删除" mode="fn" handler="test" iconCls=""></button>
-		<button text="作废" mode="fn" handler="test" iconCls=""></button>
-		<button text="反作废" mode="fn" handler="test" iconCls=""></button>
-		<button text="刷新" mode="fn" handler="test" iconCls=""></button>
-		<button text="修改日志" mode="fn" handler="test" iconCls=""></button>
+		<button text="作废" mode="fn" handler="cancelData" iconCls=""></button>
+		<button text="反作废" mode="fn" handler="unCancelData" iconCls=""></button>
+		<button text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
+		<button text="被用查询" mode="fn" handler="logListData" iconCls=""></button>
 	</toolbar>
 
 	<column-model dataSetId="A" colSpan="4">

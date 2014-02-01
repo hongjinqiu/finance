@@ -634,7 +634,8 @@ func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup
 			if content == "" {
 				(*data)[fieldGroup.Id] = 0
 			} else {
-				value, err := strconv.Atoi(content)
+				value, err := strconv.ParseInt(content, 10, 64)
+				//value, err := strconv.Atoi(content)
 				if err != nil {
 					panic(err)
 				}

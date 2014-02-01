@@ -5,6 +5,8 @@ import (
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
+	. "com/papersns/mongo"
+	"com/papersns/global"
 	. "com/papersns/script"
 	"fmt"
 	"labix.org/v2/mgo"
@@ -14,8 +16,11 @@ import (
 
 type FinanceService struct{}
 
-func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface{}) *[]DiffDataRow {
-	strId := fmt.Sprint((*bo)["_id"])
+func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) *[]DiffDataRow {
+	strId := ""
+	if (*bo)["_id"] != nil {
+		strId = fmt.Sprint((*bo)["_id"])
+	}
 	modelTemplateFactory := ModelTemplateFactory{}
 	modelTemplateFactory.ConvertDataType(dataSource, bo)
 	// 主数据集和分录数据校验
@@ -23,10 +28,8 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 	if message != "" {
 		panic(message)
 	}
-	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
-	defer session.Close()
-	if strId == "" {
+	_, db := global.GetConnection(sessionId)
+	if strId == "" || strId == "0" {
 		// 主数据集和分录id赋值,
 		modelIterator := ModelIterator{}
 		var result interface{} = ""
@@ -49,12 +52,11 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 		for i, _ := range diffDataRowLi {
 			fieldGroupLi := diffDataRowLi[i].FieldGroupLi
 			data := diffDataRowLi[i].DestData
-			usedCheck.Insert(db, fieldGroupLi, bo, data)
+			usedCheck.Insert(sessionId, fieldGroupLi, bo, data)
 		}
-		err := db.C(dataSource.Id).Insert(*bo)
-		if err != nil {
-			panic(err)
-		}
+		txnManager := TxnManager{db}
+		txnId := global.GetTxnId(sessionId)
+		txnManager.Insert(txnId, dataSource.Id, *bo)
 
 		return &diffDataRowLi
 	}
@@ -76,7 +78,7 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 		// 分录+id
 		if destData != nil {
 			dataStrId := fmt.Sprint((*destData)["id"])
-			if dataStrId == "" {
+			if dataStrId == "" || dataStrId == "0" {
 				for i, _ := range fieldGroupLi {
 					o.setDataId(db, dataSource, &fieldGroupLi[i], bo, destData)
 				}
@@ -97,11 +99,13 @@ func (o FinanceService) SaveData(dataSource DataSource, bo *map[string]interface
 		fieldGroupLi := diffDataRowLi[i].FieldGroupLi
 		destData := diffDataRowLi[i].DestData
 		srcData := diffDataRowLi[i].SrcData
-		usedCheck.Update(db, fieldGroupLi, bo, destData, srcData)
+		usedCheck.Update(sessionId, fieldGroupLi, bo, destData, srcData)
 	}
-	err = db.C(dataSource.Id).Insert(*bo)
-	if err != nil {
-		panic(err)
+	txnManager := TxnManager{db}
+	txnId := global.GetTxnId(sessionId)
+//	txnManager.Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
+	if _, updateResult := txnManager.Update(txnId, dataSource.Id, *bo); !updateResult {
+		panic("更新失败")
 	}
 	return &diffDataRowLi
 }
@@ -226,7 +230,7 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "REMARK"
 		isFieldLengthLimit := fieldGroup.FieldLength != ""
 		if isDataTypeString && isFieldLengthLimit {
-			limit, err := strconv.Atoi(fmt.Sprint(isFieldLengthLimit))
+			limit, err := strconv.Atoi(fmt.Sprint(fieldGroup.FieldLength))
 			if err != nil {
 				panic(err)
 			}

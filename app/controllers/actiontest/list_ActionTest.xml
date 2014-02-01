@@ -6,7 +6,7 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>ActionTest列表</description>
-	<scripts></scripts>
+	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
@@ -54,6 +54,10 @@
 				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
+				</button>
+				<button text="删除" iconCls="bj_btn" mode="fn" handler="doDeleteRecord">
+					<expression>1 == 1</expression>
+					<button-attribute name="code" value="D" />
 				</button>
 				<button text="查看" iconCls="ck_btn" mode="url^" handler="/console/formschema.go?@name=ActionTest&amp;id={id}">
 					<expression>1 == 1</expression>

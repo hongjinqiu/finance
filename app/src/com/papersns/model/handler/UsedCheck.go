@@ -1,15 +1,20 @@
 package handler
 
 import (
+	"com/papersns/global"
 	. "com/papersns/model"
+	. "com/papersns/mongo"
 	"fmt"
-	"strconv"
 	"labix.org/v2/mgo"
+	"strconv"
 )
 
 type UsedCheck struct{}
 
-func (o UsedCheck) Insert(db *mgo.Database, fieldGroupLi []FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) {
+func (o UsedCheck) Insert(sessionId int, fieldGroupLi []FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) {
+	_, db := global.GetConnection(sessionId)
+	txnManager := TxnManager{db}
+	txnId := global.GetTxnId(sessionId)
 	for _, fieldGroup := range fieldGroupLi {
 		if fieldGroup.IsRelationField() {
 			modelTemplateFactory := ModelTemplateFactory{}
@@ -18,33 +23,31 @@ func (o UsedCheck) Insert(db *mgo.Database, fieldGroupLi []FieldGroup, bo *map[s
 				panic("数据源:" + fieldGroup.GetDataSource().Id + ",数据集:" + fieldGroup.GetDataSetId() + ",字段:" + fieldGroup.Id + ",配置的关联模型列表,不存在返回true的记录")
 			}
 			referenceData := map[string]interface{}{
-				"reference": o.GetSourceReferenceLi(db, fieldGroup, bo),
+				"reference":   o.GetSourceReferenceLi(db, fieldGroup, bo, data),
 				"beReference": o.GetBeReferenceLi(db, fieldGroup, relationItem, data),
 			}
-			err := db.C("PubReferenceLog").Insert(referenceData)
-			if err != nil {
-				panic(err)
-			}
+			txnManager.Insert(txnId, "PubReferenceLog", referenceData)
 		}
 	}
 }
 
-func (o UsedCheck) Update(db *mgo.Database, fieldGroupLi []FieldGroup, bo *map[string]interface{}, destData *map[string]interface{}, srcData map[string]interface{}) {
+func (o UsedCheck) Update(sessionId int, fieldGroupLi []FieldGroup, bo *map[string]interface{}, destData *map[string]interface{}, srcData map[string]interface{}) {
 	if destData != nil && srcData == nil {
-		o.Insert(db, fieldGroupLi, bo, destData)
+		o.Insert(sessionId, fieldGroupLi, bo, destData)
 	} else if destData == nil && srcData != nil {
-		o.Delete(db, fieldGroupLi, srcData)
+		o.Delete(sessionId, fieldGroupLi, srcData)
 	} else if destData != nil && srcData != nil {
 		// 分析字段,如果字段都相等,不过帐,
 		modelTemplateFactory := ModelTemplateFactory{}
 		if modelTemplateFactory.IsDataDifferent(fieldGroupLi, *destData, srcData) {
-			o.Delete(db, fieldGroupLi, srcData)
-			o.Insert(db, fieldGroupLi, bo, destData)
+			o.Delete(sessionId, fieldGroupLi, srcData)
+			o.Insert(sessionId, fieldGroupLi, bo, destData)
 		}
 	}
 }
 
-func (o UsedCheck) Delete(db *mgo.Database, fieldGroupLi []FieldGroup, data map[string]interface{}) {
+func (o UsedCheck) Delete(sessionId int, fieldGroupLi []FieldGroup, data map[string]interface{}) {
+	_, db := global.GetConnection(sessionId)
 	dataSource := fieldGroupLi[0].GetDataSource()
 	id, err := strconv.Atoi(fmt.Sprint(data["id"]))
 	if err != nil {
@@ -56,19 +59,29 @@ func (o UsedCheck) Delete(db *mgo.Database, fieldGroupLi []FieldGroup, data map[
 		"id",
 		id,
 	}
-	db.C("PubReferenceLog").Remove(map[string]interface{}{
-		"reference": referenceQuery,
-	})
+	txnManager := TxnManager{db}
+	txnId := global.GetTxnId(sessionId)
+	count, err := db.C("PubReferenceLog").Find(referenceQuery).Limit(1).Count()
+	if err != nil {
+		panic(err)
+	}
+	println("count is:", count)
+	if count > 0 {
+		_, result := txnManager.RemoveAll(txnId, "PubReferenceLog", map[string]interface{}{
+			"reference": referenceQuery,
+		})
+		if !result {
+			panic("删除失败")
+		}
+	}
 }
-
-
 
 //reference:[[dataSource, dataSet, fieldName, id], [dataSource, dataSet, fieldName, id]]
 //beReference:[[dataSource, dataSet, fieldName, id], [dataSource, dataSet, fieldName, id]]
-func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup, bo *map[string]interface{}) []interface{} {
+func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) []interface{} {
 	masterData := (*bo)["A"].(map[string]interface{})
 	sourceLi := []interface{}{}
-	
+
 	srcDataSourceId := fieldGroup.GetDataSource().Id
 	srcDataSetId := fieldGroup.GetDataSetId()
 	srcFieldName := "id"
@@ -93,7 +106,8 @@ func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup,
 	} else {
 		srcDataSourceId = fieldGroup.GetDataSource().Id
 		srcDataSetId = fieldGroup.GetDataSetId()
-		dataSetData := (*bo)[srcDataSetId].(map[string]interface{})
+		//dataSetData := (*bo)[srcDataSetId].(map[string]interface{})
+		dataSetData := (*data)
 		srcFieldName = "id"
 		iId := fmt.Sprint(dataSetData["id"])
 		id, err := strconv.Atoi(iId)
@@ -102,10 +116,11 @@ func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup,
 		}
 		refLi2 := []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, id}
 		sourceLi = append(sourceLi, refLi2)
-		
+
 		srcDataSourceId = fieldGroup.GetDataSource().Id
 		srcDataSetId = fieldGroup.GetDataSetId()
-		dataSetData = (*bo)[srcDataSetId].(map[string]interface{})
+		//		dataSetData = (*bo)[srcDataSetId].(map[string]interface{})
+		dataSetData = (*data)
 		srcFieldName = fieldGroup.Id
 		iId = fmt.Sprint(dataSetData["id"])
 		id, err = strconv.Atoi(iId)
@@ -117,6 +132,10 @@ func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup,
 	}
 	return sourceLi
 }
+
+//func (o UsedCheck) getDataSetData() {
+//
+//}
 
 //reference:[[dataSource, dataSet, fieldName, id], [dataSource, dataSet, fieldName, id]]
 //beReference:[[dataSource, dataSet, fieldName, id], [dataSource, dataSet, fieldName, id]]
@@ -146,7 +165,7 @@ func (o UsedCheck) GetBeReferenceLi(db *mgo.Database, fieldGroup FieldGroup, rel
 		}
 		sourceLi = append(sourceLi, []interface{}{relationItem.RelationModelId, "A", "id", masterDataId})
 	}
-	
+
 	sourceLi = append(sourceLi, []interface{}{relationItem.RelationModelId, relationItem.RelationDataSetId, "id", relationId})
 	return sourceLi
 }

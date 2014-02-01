@@ -25,6 +25,8 @@ type Console struct {
 }
 
 func (c Console) Summary() revel.Result {
+	println("session is:", c.Session["userId"])
+
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate("Console")
 
@@ -188,7 +190,6 @@ func getSummaryDataSourceInfoLi(dataSourceInfoLi []DataSourceInfo) []interface{}
 }
 
 func (c Console) ListSchema() revel.Result {
-	panic("panic test")
 	schemaName := c.Params.Get("@name")
 
 	templateManager := TemplateManager{}
@@ -303,6 +304,7 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate) map[string]inter
 // TODO,by test
 func (c Console) FormSchema() revel.Result {
 	schemaName := c.Params.Get("@name")
+	strId := c.Params.Get("id")
 
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(schemaName)
@@ -338,6 +340,22 @@ func (c Console) FormSchema() revel.Result {
 	}
 	result["toolbarBo"] = toolbarBo
 	dataBo := map[string]interface{}{}
+	if strId != "" && formTemplate.DataSourceModelId != "" {
+		dataSourceModelId := formTemplate.DataSourceModelId
+		id, err := strconv.Atoi(strId)
+		if err != nil {
+			panic(err)
+		}
+		querySupport := QuerySupport{}
+		queryMap := map[string]interface{}{
+			"_id": id,
+		}
+		bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+		if !found {
+			panic("FormSchema, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
+		}
+		dataBo = bo
+	}
 	result["dataBo"] = dataBo
 	
 	// 主数据集的后台渲染

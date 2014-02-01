@@ -240,9 +240,11 @@ func (o TxnManager) Insert(txnId int, collection string, doc map[string]interfac
 	o.pubTxnCollectionIfNotExist(txnId, collection)
 
 	seqName := GetCollectionSequenceName(collection)
-	sequenceNo := GetSequenceNo(o.DB, seqName)
-	doc["_id"] = sequenceNo
-	doc["id"] = sequenceNo
+	if doc["_id"] == nil {
+		sequenceNo := GetSequenceNo(o.DB, seqName)
+		doc["_id"] = sequenceNo
+		doc["id"] = sequenceNo
+	}
 	doc["txnId"] = txnId
 	doc["pendingTransactions"] = []interface{}{
 		map[string]interface{}{
@@ -458,6 +460,7 @@ func (o TxnManager) remove(txnId int, collection string, doc map[string]interfac
 		}
 		if err := o.DB.C(collection).Update(query, update); err != nil {
 			if err == mgo.ErrNotFound {
+				println("remove return pos0")
 				return nil, false
 			}
 			panic(err)
@@ -465,12 +468,15 @@ func (o TxnManager) remove(txnId int, collection string, doc map[string]interfac
 		result := map[string]interface{}{}
 		if err := o.DB.C(collection).Find(query).One(&result); err != nil {
 			if err == mgo.ErrNotFound {
+				println("remove return pos1")
 				return nil, false
 			}
 			panic(err)
 		}
+		println("remove return pos2")
 		return result, true
 	}
+	println("remove return pos3")
 	return nil, false
 }
 

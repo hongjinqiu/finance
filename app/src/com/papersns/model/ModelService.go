@@ -147,9 +147,11 @@ func (o ModelIterator) iterateDiffDetailDataBo(dataSource DataSource, destBo *ma
 			idStr := fmt.Sprint(dataItem["id"])
 			if idStr != "" && idStr != "0" {
 				id, _ := strconv.Atoi(idStr)
-				destData := (*destDataIdDict)[id].(map[string]interface{})
-				srcData := (*srcDataIdDict)[id].(map[string]interface{})
-				iterateFunc(fieldGroupLi, &destData, srcData, result)
+				if (*srcDataIdDict)[id] != nil {// insert时会加id,因此,需要做srcDataIdDict的空判断
+					destData := (*destDataIdDict)[id].(map[string]interface{})
+					srcData := (*srcDataIdDict)[id].(map[string]interface{})
+					iterateFunc(fieldGroupLi, &destData, srcData, result)
+				}
 			}
 		}
 	}

@@ -38,7 +38,7 @@
 		<fieldDataType>INT</fieldDataType>
 		<fieldInList>false</fieldInList>
 		<listWhereField>false</listWhereField>
-		<allowCopy>true</allowCopy>
+		<allowCopy>false</allowCopy>
 	</field>
 		
 	<field id="FOREIGN_KEY" extends="ROOT_FIELD">

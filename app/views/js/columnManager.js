@@ -159,7 +159,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 									handler: handler,
 									"class": virtualColumn.Buttons.ButtonLi[j].IconCls,
 									href: handler,
-									gridRenderId: columnModelName
+									columnModelName: columnModelName
 								}));
 							});
 						}
