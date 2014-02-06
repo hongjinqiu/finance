@@ -52,6 +52,7 @@ func GetSequenceNo(db *mgo.Database, sequenceName string) int {
 	doc := map[string]interface{}{}
 	_, err := db.C("counters").Find(bson.M{"_id": sequenceName}).Apply(change, &doc)
 	if err != nil {
+		println("^^^^sequenceName is:" + sequenceName)
 		panic(err)
 	}
 	idText := fmt.Sprint(doc["c"])

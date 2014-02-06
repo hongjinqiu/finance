@@ -187,13 +187,11 @@ ModelTemplateFactory.prototype.extendDataSource = function(dataSource, modelExtr
 	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
 		var dataSetConfig = modelExtraInfo[fieldGroup.getDataSetId()];
 		if (dataSetConfig && dataSetConfig[fieldGroup.Id]) {
-			if (dataSetConfig[fieldGroup.Id]) {
-				for (var key in dataSetConfig[fieldGroup.Id]) {
-					if (!fieldGroup.jsConfig) {
-						fieldGroup.jsConfig = {};
-					}
-					fieldGroup.jsConfig[key] = dataSetConfig[fieldGroup.Id][key];
+			for (var key in dataSetConfig[fieldGroup.Id]) {
+				if (!fieldGroup.jsConfig) {
+					fieldGroup.jsConfig = {};
 				}
+				fieldGroup.jsConfig[key] = dataSetConfig[fieldGroup.Id][key];
 			}
 		}
 	});

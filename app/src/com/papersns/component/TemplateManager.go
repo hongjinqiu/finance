@@ -4,7 +4,9 @@ import "github.com/robfig/revel"
 
 import (
 	"com/papersns/dictionary"
+	"com/papersns/global"
 	. "com/papersns/interceptor"
+	"com/papersns/layer"
 	"com/papersns/mongo"
 	. "com/papersns/script"
 	"com/papersns/tree"
@@ -17,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -913,4 +916,76 @@ func (o TemplateManager) ApplyTreeForQueryParameter(listTemplate *ListTemplate) 
 			}
 		}
 	}
+}
+
+func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTemplate) map[string]interface{} {
+	_, db := global.GetConnection(sId)
+
+	result := map[string]interface{}{}
+	layerManager := layer.GetInstance()
+	for _, item := range formTemplate.FormElemLi {
+		if item.XMLName.Local == "column-model" {
+			for _, column := range item.ColumnModel.ColumnLi {
+				if column.Dictionary != "" {
+					layerMap := layerManager.GetLayerBySession(db, column.Dictionary)
+					if layerMap != nil {
+						items := layerMap["items"]
+						if items != nil {
+							result[column.Dictionary] = items
+						} else {
+							result[column.Dictionary] = []interface{}{}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return result
+}
+
+func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interface{}) map[string]interface{} {
+	_, db := global.GetConnection(sId)
+	result := map[string]interface{}{}
+	for _, item := range relationLi {
+		relationId, err := strconv.Atoi(fmt.Sprint(item["relationId"]))
+		if err != nil {
+			panic(err)
+		}
+		selectorId := fmt.Sprint(item["selectorId"])
+		listTemplate := o.GetSelectorTemplate(selectorId)
+		collection := listTemplate.DataProvider.Collection
+		element := map[string]interface{}{}
+		queryMap := map[string]interface{}{
+			"_id": relationId,
+		}
+		queryByte, err := json.MarshalIndent(queryMap, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		log.Println("GetRelationBo,collection:" + collection + ",query is:" + string(queryByte))
+		err = db.C(collection).Find(queryMap).One(&element)
+		if err != nil {
+			if err == mgo.ErrNotFound {
+				continue
+			}
+			panic(err)
+		}
+		items := []interface{}{element}
+		interceptorManager := InterceptorManager{}
+		items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
+		if len(items) > 0 {
+			items = o.GetColumnModelDataForListTemplate(listTemplate, items)
+			element = items[0].(map[string]interface{})
+		} else {
+			continue
+		}
+		if result[selectorId] == nil {
+			result[selectorId] = map[string]interface{}{}
+		}
+		selectorDict := result[selectorId].(map[string]interface{})
+		selectorDict[fmt.Sprint(relationId)] = element
+		result[selectorId] = selectorDict
+	}
+	return result
 }

@@ -44,6 +44,44 @@
 				<fieldLength>40</fieldLength>
 				<defaultValueExpr>nick</defaultValueExpr>
 			</field>
+			<field id="age" extends="INT_FIELD">
+				<displayName>年纪</displayName>
+				<allowEmpty>false</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>100</limitMax>
+			</field>
+			<field id="date" extends="DATE_FIELD">
+				<displayName>日期</displayName>
+				<allowEmpty>false</allowEmpty>
+				<!-- 
+				<fieldNumberType>DATETIME</fieldNumberType>
+				<fieldNumberType>YEAR</fieldNumberType>
+				<fieldNumberType>YEARMONTH</fieldNumberType>
+				<fieldNumberType>DATE</fieldNumberType>
+				<fieldNumberType>TIME</fieldNumberType>
+				 -->
+				<!-- var dateEnumLi = ["YEAR","YEARMONTH","DATE","TIME","DATETIME"]; -->
+			</field>
+			<field id="dicTest" extends="INT_FIELD">
+				<displayName>字典测试</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_DICTTEST</dictionary>
+			</field>
+			<field id="selectTest" extends="INT_FIELD">
+				<displayName>选择测试</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem>
+						<id>SysUserSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>SysUser</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>_id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
 		</bizField>
 	</masterData>
 	<detailData>

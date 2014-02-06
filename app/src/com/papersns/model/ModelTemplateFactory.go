@@ -600,8 +600,12 @@ func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[strin
 
 func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destData map[string]interface{}, srcData map[string]interface{}) bool {
 	for _, item := range fieldGroupLi {
-		if destData[item.Id] != srcData[item.Id] {
-			return true
+		destStrData := fmt.Sprint(destData[item.Id])
+		srcStrData := fmt.Sprint(srcData[item.Id])
+		if destStrData != srcStrData {
+			if item.Id != "modifyTime" {
+				return true
+			}
 		}
 	}
 	return false
@@ -675,3 +679,50 @@ func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup
 		}
 	}
 }
+
+func (o ModelTemplateFactory) GetRelationLi(sId int, dataSource DataSource, bo map[string]interface{}) []map[string]interface{} {
+	if bo["_id"] != nil {
+		id := fmt.Sprint(bo["_id"])
+		if id == "" || id == "0" {
+			return []map[string]interface{}{}
+		}
+	}
+	li := []map[string]interface{}{}
+	
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
+		relationItem, found := fieldGroup.GetRelationItem(bo, *data)
+		if found {
+			if (*data)[fieldGroup.Id] != nil {
+				strRelationId := fmt.Sprint((*data)[fieldGroup.Id])
+				if strRelationId != "" && strRelationId != "0" {
+					relationId, err := strconv.Atoi(strRelationId)
+					if err != nil {
+						panic(err)
+					}
+					isContain := false
+					for _, item := range li {
+						tmpRelationId := fmt.Sprint(item["relationId"])
+						tmpSelectorId := fmt.Sprint(item["selectorId"])
+						if tmpRelationId == strRelationId && tmpSelectorId == relationItem.Id {
+							isContain = true
+							break
+						}
+					}
+					if !isContain {
+						li = append(li, map[string]interface{}{
+							"relationId": relationId,
+							"selectorId": relationItem.Id,
+						})
+					}
+				}
+			}
+			
+		}
+	})
+	
+	return li
+}
+

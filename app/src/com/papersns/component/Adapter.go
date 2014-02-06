@@ -111,7 +111,7 @@ func (o CommonMethod) getColumnXMLName(fieldGroup FieldGroup) string {
 	}
 	if fieldGroup.IsRelationField() {
 		return "select-column"
-	} else if strings.ToLower(fieldGroup.FieldDataType) == "string" {
+	} else if strings.ToLower(fieldGroup.FieldDataType) == "string" || strings.ToLower(fieldGroup.FieldDataType) == "remark" {
 		return "string-column"
 	} else if (isIntField || isFloatField) && !isDateType && fieldGroup.Dictionary == "" {
 		return "number-column"

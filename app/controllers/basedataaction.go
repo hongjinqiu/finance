@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func init() {
@@ -67,6 +68,83 @@ func (o ActionSupport) afterUnCancelData(sessionId int, dataSource DataSource, b
 type BaseDataAction struct {
 	*revel.Controller
 	actionSupport IActionSupport
+}
+
+func (c BaseDataAction) setCreateFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+	var result interface{} = ""
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
+	createTime, err := strconv.ParseInt(time.Now().Format("20060102150405"), 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	_, db := global.GetConnection(sessionId)
+	sysUser := map[string]interface{}{}
+	query := map[string]interface{}{
+		"_id": userId,
+	}
+	err = db.C("SysUser").Find(query).One(&sysUser)
+	if err != nil {
+		panic(err)
+	}
+	modelIterator := ModelIterator{}
+	modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
+		(*data)["createBy"] = userId
+		(*data)["createTime"] = createTime
+		(*data)["createUnit"] = sysUser["createUnit"]
+	})
+}
+
+func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+	var result interface{} = ""
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
+	modifyTime, err := strconv.ParseInt(time.Now().Format("20060102150405"), 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	_, db := global.GetConnection(sessionId)
+	sysUser := map[string]interface{}{}
+	query := map[string]interface{}{
+		"_id": userId,
+	}
+	err = db.C("SysUser").Find(query).One(&sysUser)
+	if err != nil {
+		panic(err)
+	}
+	
+	srcBo := map[string]interface{}{}
+	srcQuery := map[string]interface{}{
+		"_id": (*bo)["_id"],
+	}
+	db.C(dataSource.Id).Find(srcQuery).One(&srcBo)
+	modelIterator := ModelIterator{}
+	modelTemplateFactory := ModelTemplateFactory{}
+	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}){
+		if destData != nil && srcData == nil {
+			(*destData)["createBy"] = userId
+			(*destData)["createTime"] = modifyTime
+			(*destData)["createUnit"] = sysUser["createUnit"]
+		} else if destData == nil && srcData != nil {
+			// 删除,不处理
+		} else if destData != nil && srcData != nil {
+			isMasterData := fieldGroupLi[0].IsMasterField()
+			isDetailDataDiff := (!fieldGroupLi[0].IsMasterField()) && modelTemplateFactory.IsDataDifferent(fieldGroupLi, *destData, srcData)
+			if isMasterData || isDetailDataDiff {
+				(*destData)["createBy"] = srcData["createBy"]
+				(*destData)["createTime"] = srcData["createTime"]
+				(*destData)["createUnit"] = srcData["createUnit"]
+				
+				(*destData)["modifyBy"] = userId
+				(*destData)["modifyTime"] = modifyTime
+				(*destData)["modifyUnit"] = sysUser["createUnit"]
+			}
+		}
+	})
 }
 
 func (c BaseDataAction) rollbackTxn(sessionId int) {
@@ -237,11 +315,10 @@ func (c BaseDataAction) editDataCommon() (map[string]interface{}, DataSource) {
 		panic(err)
 	}
 	
-
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-
+	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, bo)
 	if !isValid {
 		panic(editMessage)
@@ -285,6 +362,7 @@ func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.setCreateFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeSaveData(sessionId, dataSource, &bo)
 
 	financeService := FinanceService{}
@@ -391,7 +469,7 @@ func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, DataSource) 
 	var result interface{} = ""
 	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		if fieldGroupLi[0].IsMasterField() {
-			usedCheck.Delete(sessionId, fieldGroupLi, *data)
+			usedCheck.DeleteAll(sessionId, fieldGroupLi, *data)
 		}
 	})
 

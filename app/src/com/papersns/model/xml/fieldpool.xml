@@ -52,6 +52,7 @@
 		<displayName>创建人</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
+		<allowCopy>false</allowCopy>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
@@ -63,6 +64,7 @@
 		<fieldDataType>LONGINT</fieldDataType>
 		<fieldNumberType>DATETIME</fieldNumberType>
 		<fixReadOnly>true</fixReadOnly>
+		<allowCopy>false</allowCopy>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
@@ -72,6 +74,7 @@
 		<fieldDataType>INT</fieldDataType>
 		<fieldLength>20</fieldLength>
 		<fixReadOnly>true</fixReadOnly>
+		<allowCopy>false</allowCopy>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
@@ -93,7 +96,8 @@
 		<!-- <fieldName>modifyBy</fieldName> -->
 		<displayName>最后修改人</displayName>
 		<fieldDataType>INT</fieldDataType>
-		<fixReadOnly>true</fixReadOnly>	
+		<fixReadOnly>true</fixReadOnly>
+		<allowCopy>false</allowCopy>	
 		<relationDS>
 		</relationDS>
 	</field>
@@ -103,6 +107,7 @@
 		<displayName>最后修改组织</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
+		<allowCopy>false</allowCopy>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
@@ -120,6 +125,7 @@
 		<!-- <fieldName>auditStatus</fieldName> -->
 		<displayName>审核状态</displayName>
 		<fieldDataType>SMALLINT</fieldDataType>
+		<allowCopy>false</allowCopy>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 

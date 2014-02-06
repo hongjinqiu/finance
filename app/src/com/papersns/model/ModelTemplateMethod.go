@@ -2,6 +2,8 @@ package model
 
 import (
 	"reflect"
+	. "com/papersns/script"
+	"encoding/json"
 )
 
 func (o FieldGroup) IsMasterField() bool {
@@ -23,23 +25,37 @@ func (o FieldGroup) IsRelationField() bool {
 	return len(o.RelationDS.RelationItemLi) > 0
 }
 
-/*
-func (o FieldGroup) GetRelationItem() (RelationItem, bool) {
+func (o FieldGroup) GetRelationItem(bo map[string]interface{}, data map[string]interface{}) (RelationItem, bool) {
 	expressionParser := ExpressionParser{}
+	boJsonData, err := json.Marshal(bo)
+	if err != nil {
+		panic(err)
+	}
+	boJson := string(boJsonData)
 	for _, item := range o.RelationDS.RelationItemLi {
 		if item.RelationExpr.Mode == "python" {
-			if expressionParser.Parse("", item.RelationExpr.Content) {
+			dataJsonData, err := json.Marshal(data)
+			if err != nil {
+				panic(err)
+			}
+			dataJson := string(dataJsonData)
+			content := expressionParser.ParseModel(boJson, dataJson, item.RelationExpr.Content)
+			if content == "true" {
 				return item, true
 			}
-		} else if item.RelationExpr.Mode == "text" {
-			// TODO
+		} else if item.RelationExpr.Mode == "" || item.RelationExpr.Mode == "text" {
+			if item.RelationExpr.Content == "true" {
+				return item, true
+			}
 		} else if item.RelationExpr.Mode == "golang" {
-			// TODO
+			content := expressionParser.ParseGolang(bo, data, item.RelationExpr.Content)
+			if content == "true" {
+				return item, true
+			}
 		}
 	}
 	return RelationItem{}, false
 }
-*/
 
 func (o FieldGroup) GetMasterData() (MasterData, bool) {
 	if o.IsMasterField() {

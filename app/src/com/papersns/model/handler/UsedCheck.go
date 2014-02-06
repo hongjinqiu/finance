@@ -47,7 +47,34 @@ func (o UsedCheck) Update(sessionId int, fieldGroupLi []FieldGroup, bo *map[stri
 }
 
 func (o UsedCheck) Delete(sessionId int, fieldGroupLi []FieldGroup, data map[string]interface{}) {
-	_, db := global.GetConnection(sessionId)
+	dataSource := fieldGroupLi[0].GetDataSource()
+	id, err := strconv.Atoi(fmt.Sprint(data["id"]))
+	if err != nil {
+		panic(err)
+	}
+	if !fieldGroupLi[0].IsMasterField() {
+		referenceQuery := []interface{}{
+			dataSource.Id,
+			fieldGroupLi[0].GetDataSetId(),
+			"id",
+			id,
+		}
+		o.deleteReference(sessionId, referenceQuery)
+	} else {
+		for _, fieldGroup := range fieldGroupLi {
+			if fieldGroup.IsRelationField() {
+				srcDataSourceId := fieldGroup.GetDataSource().Id
+				srcDataSetId := fieldGroup.GetDataSetId()
+				//		dataSetData = (*bo)[srcDataSetId].(map[string]interface{})
+				srcFieldName := fieldGroup.Id
+				referenceQuery := []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, id}
+				o.deleteReference(sessionId, referenceQuery)
+			}
+		}
+	}
+}
+
+func (o UsedCheck) DeleteAll(sessionId int, fieldGroupLi []FieldGroup, data map[string]interface{}) {
 	dataSource := fieldGroupLi[0].GetDataSource()
 	id, err := strconv.Atoi(fmt.Sprint(data["id"]))
 	if err != nil {
@@ -59,13 +86,19 @@ func (o UsedCheck) Delete(sessionId int, fieldGroupLi []FieldGroup, data map[str
 		"id",
 		id,
 	}
+	o.deleteReference(sessionId, referenceQuery)
+}
+
+func (o UsedCheck) deleteReference(sessionId int, referenceQuery []interface{}) {
+	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
-	count, err := db.C("PubReferenceLog").Find(referenceQuery).Limit(1).Count()
+	count, err := db.C("PubReferenceLog").Find(map[string]interface{}{
+		"reference": referenceQuery,
+	}).Limit(1).Count()
 	if err != nil {
 		panic(err)
 	}
-	println("count is:", count)
 	if count > 0 {
 		_, result := txnManager.RemoveAll(txnId, "PubReferenceLog", map[string]interface{}{
 			"reference": referenceQuery,

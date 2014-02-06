@@ -256,7 +256,7 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
      * @description Syncs the fieldNode and this instances attributes
      */
     _syncFieldNode: function() {
-        var nodeType = this.INPUT_TYPE || this.name.split('-')[0];
+        var nodeType = this.INPUT_TYPE || this.name.split('-')[1];
         if (!nodeType) {
             return;
         }
@@ -446,6 +446,7 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
     },
 
     initializer: function() {
+    	var self = this;
         this.publish('blur');
         this.publish('change');
         this.publish('focus');
@@ -453,6 +454,18 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         this.publish('nodeReset');
 
         this._initialValue = this.get('value');
+        if (dataSourceJson) {
+        	var modelIterator = new ModelIterator();
+        	var result = "";
+        	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+        		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+        			if (fieldGroup.AllowEmpty != "true") {
+        				self.set("required", true);
+        			}
+        		}
+        	});
+        	self.set("validator", dsFormFieldValidator);
+        }
     },
 
     destructor: function(config) {
@@ -525,6 +538,24 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             this._syncDisabled();
         },
         this));
+        
+        // 应用上js相关的操作,
+        var self = this;
+        var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			if (fieldGroup.jsConfig && fieldGroup.jsConfig.listeners) {
+    				for (var key in fieldGroup.jsConfig.listeners) {
+    					self._fieldNode.on(key, function(key) {
+    						return function(e) {
+    							fieldGroup.jsConfig.listeners[key](e, self);
+    						}
+    					}(key));
+    				}
+    			}
+    		}
+    	});
     },
 
     syncUI: function() {

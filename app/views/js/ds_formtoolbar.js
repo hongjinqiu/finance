@@ -46,8 +46,9 @@ function editData() {//保存
 				"A": {
 					"_id": 26,
 					"id": 26,
-					"code": "testCode主数据集测试11",
-					"name": "testName主数据集测试11",
+					"code": "testCode主数据集",
+					"name": "testName主数据集",
+					"selectTest": 15
 				},
 				"B": [{
 					"_id": 27,
@@ -56,6 +57,8 @@ function editData() {//保存
 					"name": "testNameB分录B修改测试",
 				}],
 				"C": [{
+					"_id": 134,
+					"id": 134,
 					"code": "testCodeC分录C修改测试",
 					"name": "testNameC分录C修改测试",
 				}]
@@ -179,7 +182,7 @@ function cancelData() {
 	ajaxRequest({
 		url: "/ActionTest/CancelData?format=json"
 		,params: {
-			"id": 26,
+			"id": 153,
 			"dataSourceModelId": "ActionTest"
 		},
 		callback: function(o) {
@@ -193,7 +196,7 @@ function unCancelData() {
 	ajaxRequest({
 		url: "/ActionTest/UnCancelData?format=json"
 		,params: {
-			"id": 26,
+			"id": 153,
 			"dataSourceModelId": "ActionTest"
 		},
 		callback: function(o) {
@@ -215,4 +218,10 @@ function getData() {
 			showSuccess(o.responseText);
 		}
 	});
+}
+
+function test() {
+	var relationManager = new RelationManager();
+	relationManager.getRelationBo("SysUserSelector", 16);
+	return;
 }

@@ -66,6 +66,8 @@
 		</virtual-column>
 
 		<auto-column name="id" />
+		<auto-column name="code" />
+		<auto-column name="name" />
 		<string-column name="stringColumn" auto="true" />
 		<auto-column name="moneyNumberColumn" />
 		<auto-column name="priceNumberColumn" />

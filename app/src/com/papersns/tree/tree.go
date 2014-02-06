@@ -64,7 +64,7 @@ func (o TreeManager) GetTreeBySession(db *mgo.Database, code string) map[string]
 		return o.GetSysUserTree(db, code)
 	}
 	
-	return map[string]interface{}{}
+	return nil
 }
 
 func (o TreeManager) GetSysUserTree(db *mgo.Database, code string) map[string]interface{} {

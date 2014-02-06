@@ -10,6 +10,7 @@ DataTableManager.prototype.doAfterResponse = function() {
 function syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi) {
 	nodeLi.each(function(node, index, nodeLi) {
 		if (node.get("checked")) {
+			g_selectionManager.addSelectionBo(dataGrid.getRecord(node).toJSON());
 			var id = dataGrid.getRecord(node).get("id");
 			// 是否添加
 			var idInputItem = Y.one("#selectionResult .selectionItem input[value='" + id + "']");
@@ -71,14 +72,16 @@ function syncCheckboxWhenChangeSelection(Y, dataGrid) {
 	var itemCheckLi = checkboxItemLi.get("checked");
 	var checkboxAllCssSelector = dtInst.getCheckboxAllCssSelector();
 	var checkAllNode = yInst.one(checkboxAllCssSelector);
-	var isAllChecked = itemCheckLi.every(function(value){return value});
-	if (isAllChecked) {
-		if (!checkAllNode.get("checked")) {
-			checkAllNode.set("checked", isAllChecked);
-		}
-	} else {
-		if (checkAllNode.get("checked")) {
-			checkAllNode.set("checked", isAllChecked);
+	if (checkAllNode) {
+		var isAllChecked = itemCheckLi.every(function(value){return value});
+		if (isAllChecked) {
+			if (!checkAllNode.get("checked")) {
+				checkAllNode.set("checked", isAllChecked);
+			}
+		} else {
+			if (checkAllNode.get("checked")) {
+				checkAllNode.set("checked", isAllChecked);
+			}
 		}
 	}
 }
@@ -100,7 +103,34 @@ YUI().use("node", "event", function(Y) {
 		}, checkboxAllInnerCssSelector, dataGrid);
 		
 		Y.one("#confirmBtn").on("click", function(e){
-			syncCheckboxWhenChangeSelection(Y, dataGrid);
+//			syncCheckboxWhenChangeSelection(Y, dataGrid);
+			if (parent && parent.g_relationManager) {
+				var selectorId = listTemplate.Id;
+				var selectValueLi = Y.all("#selectionResult .selectionItem input").get("value");
+				if (!selectValueLi || selectValueLi.length == 0) {
+					showAlert("请先选择");
+				} else {
+					for (var i = 0; i < selectValueLi.length; i++) {
+						if (selectionBo[selectValueLi[i]]) {
+							parent.g_relationManager.addRelationBo(selectorId, selectionBo[selectValueLi[i]]);
+						}
+					}
+					parent.s_selection(selectValueLi);
+					parent.s_closeDialog();
+				}
+			} else {
+				alert("找不到父窗口，无法赋值！");
+			}
 		});
+		// TODO,取得父函数的queryFunc,并设置到页面上的hidden field里面,然后再refresh,
+		if (parent && parent.s_queryFunc) {
+			var queryDict = parent.s_queryFunc()
+			for (var key in queryDict) {
+				if (document.getElementById(key)) {
+					document.getElementById(key).value = queryDict[key];
+				}
+			}
+		}
+		gridPanelDict["columnModel_1"].dt.refreshPaginator();
 	});
 });

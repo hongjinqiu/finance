@@ -2,11 +2,11 @@ package controllers
 
 //import "github.com/robfig/revel"
 import (
+	"com/papersns/global"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
 	. "com/papersns/mongo"
-	"com/papersns/global"
 	. "com/papersns/script"
 	"fmt"
 	"labix.org/v2/mgo"
@@ -103,7 +103,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 	}
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
-//	txnManager.Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
+	//	txnManager.Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
 	if _, updateResult := txnManager.Update(txnId, dataSource.Id, *bo); !updateResult {
 		panic("更新失败")
 	}

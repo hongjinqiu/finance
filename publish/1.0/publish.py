@@ -200,6 +200,22 @@ def initDemo():
                 'C': cLi,
             })
 
+def initPubReferenceLogId():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    id = mongoDB.counters.find_one({'_id': 'pubReferenceLogId'})
+    if not id:
+        mongoDB.counters.save({'_id': 'pubReferenceLogId', 'c': 1})
+
+def initSysUser():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    for item in mongoDB.SysUser.find():
+        item['A'] = {
+            '_id': item['_id'],
+            'id': item['id'],
+            'code': 'code' + str(random.randint(0,100)),
+            'name': 'name' + str(random.randint(0,100)),
+        }
+        mongoDB.SysUser.save(item)
 
 if __name__ == '__main__':
     initDictionary()
@@ -209,6 +225,6 @@ if __name__ == '__main__':
     initDemoId()
     initDemo()
     initActionTestId()
-
-
+    initPubReferenceLogId()
+    initSysUser()
 

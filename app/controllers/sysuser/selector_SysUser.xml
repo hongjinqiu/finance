@@ -41,7 +41,7 @@
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
-	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id" dataSetId="A">
+	<column-model selectionMode="radio" selectionTitle="已选用户" selectionTemplate="{code},{name}" rownumber="true" bsonOrderBy="_id" dataSetId="A">
 		<toolbar>
 			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
 		</toolbar>
@@ -66,21 +66,9 @@
 		</virtual-column>
 
 		<auto-column name="id" />
-		<string-column name="id" auto="true" />
+		<auto-column name="code" />
+		<auto-column name="name" />
 		<string-column name="nick" auto="true" />
-		<number-column name="numTest" auto="true"></number-column>
-		<date-column name="dateTest" auto="true" />
-		<boolean-column name="boolTest" auto="true" />
-		<dictionary-column name="dictTest" auto="true" dictionary="" />
-		<string-column name="nestTest" text="嵌套测试">
-			<column-model>
-				<script-column name="nest1" text="嵌套1" script="record.get('nick').encode('utf8')"></script-column>
-				<dictionary-column name="nestDictTest1" dictionary="D_DICTTEST"></dictionary-column>
-			</column-model>
-		</string-column>
-		<select-column name="" displayField="" valueField="" selectorName="" selectionMode="single" queryFunc="">
-			<listeners change="" selection="" unSelection="" />
-		</select-column>
 	</column-model>
 
 	<query-parameters dataSetId="A">

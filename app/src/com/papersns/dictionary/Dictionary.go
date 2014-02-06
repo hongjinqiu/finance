@@ -71,7 +71,7 @@ func (o DictionaryManager) GetDictionaryBySession(db *mgo.Database, code string)
 	err := c.Find(queryMap).One(&result)
 	if err != nil {
 		if err == mgo.ErrNotFound {
-			panic("code [" + code + "] not found")
+			return nil
 		}
 		panic(err)
 	}

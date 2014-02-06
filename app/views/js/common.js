@@ -11,6 +11,71 @@ CommonUtil.prototype.getFuncOrString = function(text) {
 }
 
 /**
+ * config: title,url
+ */
+function showModalDialog(config) {
+	YUI().use("node", "panel", "dd-plugin", function(Y) {
+		var title = config["title"];
+		var url = config["url"];
+	//	node.getComputedStyle("width")
+		var width = 700;
+		var height = 500;
+			var node = Y.one("window");
+	//		width = parseInt(node.getComputedStyle("width"));
+	//		height = parseInt(node.getComputedStyle("height"));
+			width = parseInt(node.get("winWidth"));
+			height = parseInt(node.get("winHeight"));
+		var frameWidth = width - 40;
+		if (frameWidth <= 0) {
+			frameWidth = 100;
+		}
+		var frameHeight = height - 40;
+		if (frameHeight <= 0) {
+			frameHeight = 100;
+		}
+//	var bodyContent = null;
+		var bodyContent = "<iframe src='{src}' frameborder='0' style='width:100%;height:100%;overflow: auto;'></iframe>";
+		bodyContent = Y.Lang.sub(bodyContent, {
+			src: url
+//			,width: frameWidth
+//			,height: frameHeight
+		});
+	    var dialog = new Y.Panel({
+	        contentBox : Y.Node.create('<div id="dialog" />'),
+	        headerContent: title,
+	        bodyContent: bodyContent,
+	        width      : frameWidth,
+	        height: frameHeight,
+	        zIndex     : 6,
+	        centered   : true,
+	        modal      : true, // modal behavior
+	        render     : '.popupModelDialog',
+	        visible    : false, // make visible explicitly with .show()
+	        plugins      : [Y.Plugin.Drag],
+	        buttons: [
+	                  {
+	                      value: "close",// string or html string
+	                      action: function(e) {
+	                          e.preventDefault();
+	                          dialog.hide();
+	                      },
+	                      section: Y.WidgetStdMod.HEADER
+	                  }
+	              ]
+	    });
+
+	    dialog.hide = function() {
+	    	window.s_dialog = null;
+			return this.destroy();
+		}
+	    
+	    dialog.dd.addHandle('.yui3-widget-hd');
+	    dialog.show();
+	    window.s_dialog = dialog;
+	});
+}
+
+/**
  * infoType:info,error,question,warn
  */
 function showDialog(config){
@@ -187,52 +252,40 @@ function ajaxRequest(option){
 			}
 		}
 		var cfg = {
-				sync: option.sync !== undefined ? option.sync : true,
-						method: option.method || 'POST',
-						data: Y.QueryString.stringify(paramData),
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-						},
-						on: {
-							/*start: Dispatch.start,
-	        complete: Dispatch.complete,
-	        end: Dispatch.end*/
-							start: function(){console.log("start");},
-							complete: function(){console.log("complete");},
-							success: function(id, o, args){
-								if (option.callback) {
-									option.callback(o);
-								}
-							},
-							failure: function(id, o, args){// failure调用在complete之前,
-								var text = o.responseText;
-								var reg = /panic\(&#34;(.*?)&#34;\)/.test(text);
-								var msg = RegExp.$1;
-								if (msg) {
-									showError(msg);
-								} else {
-									showError(text, null, 600, 400);
-								}
-							},
-							end: function(){console.log("end");}
-						},
-//						context: Dispatch,
-//	    form: {
-//	        id: formObject,
-//	        useDisabled: true,
-//	        upload: true
-//	    },
-//	    xdr: {
-//	        use: 'flash',
-//	        dataType: 'xml'
-//	    },
-//	    arguments: {
-//	        start: 'foo',
-//	        complete: 'bar',
-//	        end: 'baz'
-//	    }
+			sync: option.sync !== undefined ? option.sync : true,
+			method: option.method || 'POST',
+			data: Y.QueryString.stringify(paramData),
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			on: {
+				start: function(){
+//								console.log("start");
+				},
+				complete: function(){
+//								console.log("complete");
+				},
+				success: function(id, o, args){
+					if (option.callback) {
+						option.callback(o);
+					}
+				},
+				failure: function(id, o, args){// failure调用在complete之前,
+					var text = o.responseText;
+					var reg = /panic\(&#34;(.*?)&#34;\)/.test(text);
+					var msg = RegExp.$1;
+					if (msg) {
+						showError(msg);
+					} else {
+						showError(text, null, 600, 400);
+					}
+				},
+				end: function(){
+//								console.log("end");
+				}
+			},
 		};
-		console.log(Y.QueryString.stringify(paramData));
+//		console.log(Y.QueryString.stringify(paramData));
 		Y.io(option["url"], cfg);
 //		function complete(id, o, args) {
 //			var id = id; // Transaction ID.
@@ -253,56 +306,120 @@ function ajaxRequest(option){
 	});
 }
 
-/*
- * This is an example configuration object with all properties defined.
- *
- * method: This transaction will use HTTP POST.
- * data: "user=yahoo" is the POST data.
- * headers: Object of HTTP request headers for this transaction.  The
- *          first header defines "Content-Type" and the second is a
- *          custom header.
- * on: Object of defined event handlers for "start", "complete",
- *     and "end".  These handlers are methods of an object
- *     named "Dispatch".
- * context: Event handlers will execute in the proper object context,
- *          so usage 'this' will reference Dispatch.
- * form: Object specifying the HTML form to be serialized into a key-value
- *       string and sent as data; and, informing io to include disabled
- *       HTML form fields as part of the data.  If input type of "file"
- *       is present, setting the upload property to "true" will create an
- *       alternate transport, to submit the HTML form with the
- *       selected files.
- * xdr: Instructs io to use the defined transport, in this case Flash,
- *      to make a cross-domain request for this transaction.
- * arguments: Object of data, passed as an argument to the event
- *            handlers.
+/**
+ * datasource field validator
  */
-/*
-var cfg = {
-    method: 'POST',
-    data: 'user=yahoo',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    on: {
-        start: Dispatch.start,
-        complete: Dispatch.complete,
-        end: Dispatch.end
-    },
-    context: Dispatch,
-    form: {
-        id: formObject,
-        useDisabled: true,
-        upload: true
-    },
-    xdr: {
-        use: 'flash',
-        dataType: 'xml'
-    },
-    arguments: {
-        start: 'foo',
-        complete: 'bar',
-        end: 'baz'
-    }
-};
-*/
+function dsFormFieldValidator(value, formFieldObj) {
+	var modelIterator = new ModelIterator();
+	var messageLi = [];
+	var result = "";
+	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+		if (fieldGroup.Id == formFieldObj.get("name") && fieldGroup.getDataSetId() == formFieldObj.get("dataSetId")) {
+			messageLi = dsFieldGroupValidator(value, fieldGroup);
+		}
+	});
+	
+	if (messageLi.length > 0) {
+		formFieldObj.set("error", messageLi.join("<br />"));
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+ * 数据源字段 fieldGroup 的验证器,返回messageLi
+ * @param value
+ * @param fieldGroup
+ */
+function dsFieldGroupValidator(value, fieldGroup) {
+	var messageLi = [];
+	if (fieldGroup.AllowEmpty != "true") {
+		if (value === "" || value === null || value === undefined) {
+			messageLi.push(fieldGroup.DisplayName + "不允许空值");
+			return messageLi;
+		}
+	}
+	
+	var isDataTypeNumber = false;
+	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "DECIMAL";
+	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "FLOAT";
+	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "INT";
+	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "LONGINT";
+	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "MONEY";
+	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "SMALLINT";
+	var isUnLimit = fieldGroup.LimitOption == "" || fieldGroup.LimitOption == "unLimit";
+	var dateEnumLi = ["YEAR","YEARMONTH","DATE","TIME","DATETIME"];
+	var isDate = false;
+	for (var i = 0; i < dateEnumLi.length; i++) {
+		if (dateEnumLi[i] == fieldGroup.FieldNumberType) {
+			isDate = true;
+		}
+	}
+	if (isDataTypeNumber && isDate) {
+		if (fieldGroup.FieldNumberType == "YEAR") {
+			if (!/^\d{4}$/.test(value)) {
+				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970");
+				return messageLi;
+			}
+		} else if (fieldGroup.FieldNumberType == "YEARMONTH") {
+			if (!/^\d{4}-\d{2}$/.test(value)) {
+				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970-01");
+				return messageLi;
+			}
+		} else if (fieldGroup.FieldNumberType == "DATE") {
+			if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970-01-02");
+				return messageLi;
+			}
+		} else if (fieldGroup.FieldNumberType == "TIME") {
+			if (!/^\d{2}:\d{2}:\d{2}$/.test(value)) {
+				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：03:04:05");
+				return messageLi;
+			}
+		} else if (fieldGroup.FieldNumberType == "DATETIME") {
+			if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
+				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970-01-02 03:04:05");
+				return messageLi;
+			}
+		}
+	} else if (isDataTypeNumber && !isUnLimit) {
+		if (!/^-?\d*(\.\d*)?$/.test(value)) {
+			messageLi.push(fieldGroup.DisplayName + "必须由数字小数点组成");
+			return messageLi;
+		}
+		var fieldValueFloat = parseFloat(value);
+		if (fieldGroup.LimitOption == "limitMax") {
+			var maxValue = parseFloat(fieldGroup.LimitMax);
+			if (maxValue < fieldValueFloat) {
+				messageLi.push(fieldGroup.DisplayName + "超出最大值" + fieldGroup.LimitMax);
+			}
+		} else if (fieldGroup.LimitOption == "limitMin") {
+			var minValue = parseFloat(fieldGroup.LimitMin);
+			if (fieldValueFloat < minValue) {
+				messageLi.push(fieldGroup.DisplayName + "小于最小值" + fieldGroup.LimitMin);
+			}
+		} else if (fieldGroup.LimitOption == "limitRange") {
+			var minValue = parseFloat(fieldGroup.LimitMin);
+			var maxValue = parseFloat(fieldGroup.LimitMax);
+			if (fieldValueFloat < minValue || maxValue < fieldValueFloat) {
+				messageLi.push(fieldGroup.DisplayName+"超出范围("+fieldGroup.LimitMin+"~"+fieldGroup.LimitMax+")");
+			}
+		}
+	} else {
+		var isDataTypeString = false;
+		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "STRING";
+		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "REMARK";
+		var isFieldLengthLimit = fieldGroup.FieldLength != "";
+		if (isDataTypeString && isFieldLengthLimit) {
+			var limit = parseFloat(fieldGroup.FieldLength);
+			if (value.length > limit) {
+				messageLi.push(fieldGroup.DisplayName+"长度超出最大值"+fieldGroup.FieldLength);
+			}
+		}
+	}
+	return messageLi;
+}
+
+
+

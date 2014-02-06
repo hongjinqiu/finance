@@ -1,28 +1,84 @@
-var demoModel = {
+var modelExtraInfo = {
 	"A" : {
-		"nick" : {
-			"jsConfig" : {
+		"code" : {
+			displayField : "",
+			valueField : "",
+			selectorName : "",
+			selectionMode : "single",
+			listeners : {
+				focus : function(e, formFieldObj) {
+					console.log("A focus");
+				}
+				,blur : function(e, formFieldObj) {
+					console.log("A blur");
+				}
+				,change : function(e, formFieldObj) {
+					console.log("A change");
+				}
+				,dblclick : function(e, formFieldObj) {
+					console.log("A dblclick");
+				}
+				,keydown : function(e, formFieldObj) {
+					console.log("A keydown");
+				}
+				,
+				click : function(e, formFieldObj) {
+					console.log("A click");
+				}
+			},
+			defaultValueExprForJs : function() {
+			},
+			calcValueExprForJs : function() {
+			},
+			triggerEditor : function() {
+			},
+			validator : function() {
 
 			}
+		},
+		"selectTest" : {
+			/*selection: function(selectValueLi, formObj) {
+				console.log("in selection");
+				console.log(selectValueLi);
+				console.log(formObj);
+				console.log("end selection");
+			}*/
 		}
 	},
 	"B" : {
-		"attachCount" : {
-			"jsConfig" : {
-				displayField : "",
-				valueField : "",
-				selectorName : "",
-				selectionMode : "single",
-				listeners : {},
-				defaultValueExprForJs : function() {
+		"code" : {
+			displayField : "",
+			valueField : "",
+			selectorName : "",
+			selectionMode : "single",
+			listeners : {
+				focus : function(e, formFieldObj) {
+					console.log("focus");
 				},
-				calcValueExprForJs : function() {
+				blur : function(e, formFieldObj) {
+					console.log("blur");
 				},
-				triggerEditor : function() {
+				change : function(e, formFieldObj) {
+					console.log("change");
 				},
-				validator: function() {
-					
+				dblclick : function(e, formFieldObj) {
+					console.log("dblclick");
+				},
+				keydown : function(e, formFieldObj) {
+					console.log("keydown");
+				},
+				click : function(e, formFieldObj) {
+					console.log("click");
 				}
+			},
+			defaultValueExprForJs : function() {
+			},
+			calcValueExprForJs : function() {
+			},
+			triggerEditor : function() {
+			},
+			validator : function() {
+
 			}
 		}
 	}

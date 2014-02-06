@@ -319,3 +319,46 @@ table {
 .overflowAuto {
 	overflow: auto;
 }
+
+.trigger_input {
+	float: left;
+}
+
+.trigger_select {
+    background-position: center center;
+    background-repeat: no-repeat;
+    display: block;
+    float: left;
+    height: 16px;
+    margin: 5px 8px 0 0;
+    width: 16px;
+    background-image: url("../img/img_list.png");
+    color: #006699;
+    outline: medium none;
+    text-decoration: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.trigger_delete, .trigger_view {
+	background-position: center center;
+    background-repeat: no-repeat;
+    display: block;
+    float: left;
+    height: 16px;
+    margin: 2px 8px 0 0;
+    width: 16px;
+    color: #006699;
+    outline: medium none;
+    text-decoration: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.trigger_view {
+	background-image: url("../img/ck_btn.gif");
+}
+
+.trigger_delete {
+	background-image: url("../img/kw_dele.png");
+}

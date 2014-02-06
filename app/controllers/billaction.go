@@ -126,6 +126,7 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeCancelData(sessionId, dataSource, &bo)
 	mainData := bo["A"].(map[string]interface{})
 	mainData["billStatus"] = 4
@@ -180,6 +181,7 @@ func (c BillAction) unCancelDataCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeUnCancelData(sessionId, dataSource, &bo)
 	mainData := bo["A"].(map[string]interface{})
 	mainData["billStatus"] = 0

@@ -141,7 +141,7 @@ func (c App) ComboView() revel.Result {
 func (c App) FormJS() revel.Result {
 	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
 	content := ""
-	formJsLi := []string{"js/form/p-form-field.js", "js/form/p-text-field.js"}
+	formJsLi := []string{"js/form/p-form-field.js","js/form/p-text-field.js","js/form/p-hidden-field.js","js/form/p-checkbox-field.js","js/form/p-radio-field.js","js/form/p-choice-field.js","js/form/p-select-field.js","js/form/p-trigger-field.js"}
 	for _, k := range formJsLi {
 		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
 			panic("fileName is:" + k + ", expect ends with .js or .css")
