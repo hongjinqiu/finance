@@ -46,15 +46,9 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     _getTempValueCommon: function(modelIteratorFunc, formTempFunc) {
     	var self = this;
     	var selectorName = null;
-    	var modelIterator = new ModelIterator();
     	var result = "";
-        modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
-    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
-    			selectorName = modelIteratorFunc(fieldGroup);
-    		}
-    	});
-        if (!selectorName && formTemplateJsonData) {
-        	var name = this.get("name");
+    	if (formTemplateJsonData) {
+    		var name = this.get("name");
     		var dataSetId = this.get("dataSetId");
     		for (var i = 0; i < formTemplateJsonData.FormElemLi.length; i++) {
     			var formElem = formTemplateJsonData.FormElemLi[i];
@@ -72,7 +66,15 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     				}
     			}
     		}
-        }
+    	}
+    	if (!selectorName) {
+    		var modelIterator = new ModelIterator();
+    		modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    			if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    				selectorName = modelIteratorFunc(fieldGroup);
+    			}
+    		});
+    	}
         return selectorName;
     },
     
@@ -154,23 +156,28 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
                 //this._fieldNode.set('value', e.newVal + "_测试值");
                 var selectorId = this._getSelectorId();
                 var relationManager = new RelationManager();
-                var relationItem = relationManager.getRelationBo(selectorId, e.newVal);
-            	var displayField = this._getDisplayField();
-            	var value = "";
-            	if (displayField.indexOf("{") > -1) {
-            		value = Y.Lang.sub(displayField, relationItem);
-            	} else {
-            		var keyLi = displayField.split(',');
-            		for (var i = 0; i < keyLi.length; i++) {
-            			if (relationItem[keyLi[i]]) {
-            				value += relationItem[keyLi[i]] + ",";
-            			}
-            		}
-            		if (value) {
-            			value = value.substr(0, value.length - 1);
-            		}
-            	}
-            	this._fieldNode.set('value', value);
+                var li = e.newVal.split(",");
+                var valueLi = [];
+                for (var i = 0; i < li.length; i++) {
+                	var value = "";
+                	var relationItem = relationManager.getRelationBo(selectorId, li[i]);
+                	var displayField = this._getDisplayField();
+                	if (displayField.indexOf("{") > -1) {
+                		value = Y.Lang.sub(displayField, relationItem);
+                	} else {
+                		var keyLi = displayField.split(',');
+                		for (var j = 0; j < keyLi.length; j++) {
+                			if (relationItem[keyLi[j]]) {
+                				value += relationItem[keyLi[j]] + ",";
+                			}
+                		}
+                		if (value) {
+                			value = value.substr(0, value.length - 1);
+                		}
+                	}
+                	valueLi.push(value);
+                }
+            	this._fieldNode.set('value', valueLi.join(";"));
             }
         },
         this));
@@ -179,27 +186,14 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     		var self = this;
     		var modelIterator = new ModelIterator();
         	var result = "";
-        	window.s_selection = null;
-            modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
-        		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
-        			if (fieldGroup.jsConfig && fieldGroup.jsConfig.selection) {
-        				window.s_selection = function(selectValueLi){
-        					fieldGroup.jsConfig.selection(selectValueLi, self);
-        				};
-        			}
-        			if (fieldGroup.jsConfig && fieldGroup.jsConfig.queryFunc) {
-        				window.s_queryFunc = fieldGroup.jsConfig.queryFunc;
-        			}
-        		}
-        	});
-            if (!window.s_selection) {
-            	window.s_selection = function(selectValueLi) {
-            		self.set("value", selectValueLi.join(","));
-//            		console.log(self);
-//            		showAlert("选回值:" + selectValueLi.join(","));
-            	}
-            }
-            var url = "/console/selectorschema?@name={NAME_VALUE}&@id={ID_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}@entrance=true";
+        	window.s_selection = function(selectValueLi) {
+        		self._getSelectionAction()(selectValueLi, self);
+        	};
+        	window.s_queryFunc = function() {
+        		self._getQueryFunc()();
+        	};
+        	
+            var url = "/console/selectorschema?@name={NAME_VALUE}&@id={ID_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}";
             url = url.replace("{NAME_VALUE}", this._getSelectorId());
             url = url.replace("{ID_VALUE}", this.get('value'));
             url = url.replace("{MULTI_VALUE}", this.get('multi'));
@@ -212,18 +206,52 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     			if (window.s_dialog) {
     				window.s_dialog.hide();
     			}
+    			window.s_dialog = null;
+    			window.s_selection = null;
+    			window.s_queryFunc = null;
     		}
     	}, this));
     	
     	if (!this.get("multi")) {
     		this._viewNode.on("click", Y.bind(function(e) {
-    			showAlert("查看单击");
+    			var value = this.get("value");
+    			if (!value) {
+    				showAlert("没有数据，无法查看详情");
+    			} else {
+    				var selectorId = this._getSelectorId();
+    				var relationManager = new RelationManager();
+    				var relationItem = relationManager.getRelationBo(selectorId, value);
+    				var url = relationBo[selectorId]["url"];
+    				url = Y.Lang.sub(url, relationItem);
+    				if (url) {
+    					showModalDialog({
+    						"title": this._getText(),
+    						"url": url
+    					});
+    				} else {
+    					showAlert("url为空，无法打开详情页面");
+    				}
+    			}
     		}, this));
     	}
     	
     	this._deleteNode.on("click", Y.bind(function(e) {
-    		showAlert("删除单击");
+    		var self = this;
+    		self._getUnSelectionAction()(self);
     	}, this));
+    },
+    
+    _syncReadonly: function(e) {
+    	//Y.PDateField.superclass._syncReadonly.apply(this, arguments);
+    	
+    	var value = this.get('readonly');
+        if (value === true) {
+        	this._selectNode.setStyle("display", "none");
+        	this._deleteNode.setStyle("display", "none");
+        } else {
+        	this._selectNode.setStyle("display", "");
+        	this._deleteNode.setStyle("display", "");
+        }
     },
     
     _syncSelectNode: function() {
@@ -231,7 +259,7 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     		this._selectNode.setAttrs({
     			href: "javascript:void(0);",
     			title: "多选",
-    			id: this.get('id') + Y.PFormField.FIELD_ID_SUFFIX
+    			id: Y.guid() + Y.PFormField.FIELD_ID_SUFFIX
     		});
     	}
     },
@@ -241,7 +269,7 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     		this._viewNode.setAttrs({
     			href: "javascript:void(0);",
     			title: "查看",
-    			id: this.get('id') + Y.PFormField.FIELD_ID_SUFFIX
+    			id: Y.guid() + Y.PFormField.FIELD_ID_SUFFIX
     		});
     	}
     },
@@ -251,9 +279,15 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     		this._deleteNode.setAttrs({
     			href: "javascript:void(0);",
     			title: "删除",
-    			id: this.get('id') + Y.PFormField.FIELD_ID_SUFFIX
+    			id: Y.guid() + Y.PFormField.FIELD_ID_SUFFIX
     		});
     	}
+    },
+    
+    _syncFieldNode: function() {
+    	Y.PTriggerField.superclass._syncFieldNode.apply(this, arguments);
+    	
+    	this._fieldNode.setAttribute("readonly", "readonly");
     },
     
     syncUI: function() {
@@ -264,15 +298,84 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     	this._syncDeleteNode();
     },
     
+    _getSelectionAction: function() {
+    	var self = this;
+    	var selectionAction = null;
+    	var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			selectionAction = fieldGroup.jsConfig.selection;
+    		}
+    	});
+    	return selectionAction;
+    },
+    
+    _getUnSelectionAction: function() {
+    	var self = this;
+    	var unSelectionAction = null;
+    	var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			unSelectionAction = fieldGroup.jsConfig.unSelection;
+    		}
+    	});
+    	return unSelectionAction;
+    },
+    
+    _getQueryFunc: function() {
+    	var self = this;
+    	var queryFunc = null;
+    	var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			if (fieldGroup.jsConfig && fieldGroup.jsConfig.queryFunc) {
+    				queryFunc = fieldGroup.jsConfig.queryFunc;
+    			}
+    		}
+    	});
+    	return queryFunc;
+    },
+    
+    _setDefaultSelectAction: function() {
+    	var self = this;
+		var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			if (!fieldGroup.jsConfig) {
+    				fieldGroup.jsConfig = {};
+    			}
+    			if (!fieldGroup.jsConfig.selection) {
+    				fieldGroup.jsConfig.selection = function(selectValueLi, formObj) {
+    					if (!selectValueLi || selectValueLi.length == 0) {
+    						self._getUnSelectionAction()(self);
+    					} else {
+    						formObj.set("value", selectValueLi.join(","));
+    					}
+    				}
+    			}
+    			if (!fieldGroup.jsConfig.unSelection) {
+    				fieldGroup.jsConfig.unSelection = function(formObj) {
+    					formObj.set("value", "");
+    				}
+    			}
+    		}
+    	});
+    },
+    
     initializer: function() {
     	Y.PTriggerField.superclass.initializer.apply(this, arguments);
     	
     	var selectionMode = this._getSelectionMode();
-    	if (selectonMode == "multi") {
+    	if (selectionMode == "multi") {
     		this.set("multi", true);
     	} else {
     		this.set("multi", false);
     	}
+    	this._setDefaultSelectAction();
     },
 
 },
@@ -299,9 +402,12 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
                 }
                 var selectorId = this._getSelectorId();
                 var relationManager = new RelationManager();
-                var relationBo = relationManager.getRelationBo(selectorId, val);
-                if (!relationBo) {
-                	return false;
+                var li = val.split(",");
+                for (var i = 0; i < li.length; i++) {
+                	var relationBo = relationManager.getRelationBo(selectorId, li[i]);
+                	if (!relationBo) {
+                		return false;
+                	}
                 }
                 return true;
             }

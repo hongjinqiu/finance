@@ -20,7 +20,7 @@ func (o QueryParameterBuilder) buildQuery(queryParameter QueryParameter, value s
 		"combo":         o.intOrFloatOrStringCmpMap(),
 		"combotree":     o.intOrFloatOrStringCmpMap(),
 		"displayfield":  nil,
-		"hidden":        o.intOrFloatOrStringCmpMap(),
+		"hidden":        o.intOrFloatOrStringOrLikeCmpMap(),
 		"htmleditor":    o.stringCmpMap(),
 		"checkbox":      o.intOrFloatOrStringCmpMap(),
 		"checkboxgroup": o.intOrFloatOrStringCmpMap(),
@@ -107,6 +107,29 @@ func (o QueryParameterBuilder) intOrFloatOrStringCmpMap() map[string]Restriction
 		"not_like":       nil,
 		"not_left_like":  nil,
 		"not_right_like": nil,
+	}
+}
+
+func (o QueryParameterBuilder) intOrFloatOrStringOrLikeCmpMap() map[string]RestrictionEditorFunc {
+	return map[string]RestrictionEditorFunc{
+		"eq":             o.intOrFloatOrStringCmp("$eq"),
+		"nq":             o.intOrFloatOrStringCmp("$ne"),
+		"ge":             o.intOrFloatOrStringCmp("$gte"),
+		"le":             o.intOrFloatOrStringCmp("$lte"),
+		"gt":             o.intOrFloatOrStringCmp("$gt"),
+		"lt":             o.intOrFloatOrStringCmp("$lt"),
+		"null":           o.nullCmp("$eq"),
+		"not_null":       o.nullCmp("$ne"),
+		"exist":          o.existNotExistCmp(true),
+		"not_exist":      o.existNotExistCmp(false),
+		"in":             o.intOrFloatOrStringInCmp("$in"),
+		"not_in":         o.intOrFloatOrStringInCmp("$nin"),
+		"like":           o.regexpCmp("$regex"),
+		"left_like":      o.regexpCmp("$regex"),
+		"right_like":     o.regexpCmp("$regex"),
+		"not_like":       o.regexpCmp("$regex"),
+		"not_left_like":  o.regexpCmp("$regex"),
+		"not_right_like": o.regexpCmp("$regex"),
 	}
 }
 

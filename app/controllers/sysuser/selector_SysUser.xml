@@ -37,7 +37,7 @@
 
 	<data-provider size="10">
 		<collection>SysUser</collection><!-- mongoDB collection name -->
-		<fix-bson-query>{"_id": {"$gte": 15}}</fix-bson-query><!-- mongoDB fix query, json format -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
@@ -59,7 +59,7 @@
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={id}">
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={id}">
 					<expression>1 == 1</expression>
 				</button>
 			</buttons>
@@ -72,6 +72,8 @@
 	</column-model>
 
 	<query-parameters dataSetId="A">
+		<query-parameter name="name" auto="true" text="" editor="hidden"></query-parameter>
+		<query-parameter name="code" auto="true" text=""></query-parameter>
 		<query-parameter name="nick" auto="true" text=""></query-parameter>
 		<query-parameter name="dept_id" auto="true" text=""></query-parameter>
 		<query-parameter name="type" auto="true" text=""></query-parameter>
@@ -82,7 +84,7 @@
 		<query-parameter name="treeUrlTest" auto="true" text=""></query-parameter>
 		<query-parameter name="checkboxTest" auto="true" text=""></query-parameter>
 		<query-parameter name="radioTest" auto="true" text=""></query-parameter>
-		<query-parameter name="_id" auto="true" text=""></query-parameter>
+		<query-parameter name="id" auto="true" text=""></query-parameter>
 		<query-parameter name="nestTest" text="">
 			<parameter-attribute name="config" value="{}" />
 			<parameter-attribute name="listeners" value="{}" />

@@ -2,7 +2,7 @@
 			<div class="queryTitle">查询参数</div>
 			<form action="/component/listtemplate" method="post" name="queryForm" id="queryForm">
 				{{range $index, $item := .result.hiddenParameterLi}}
-					<input type="hidden" name="{{$item.Name}}" value="{{$item.Value}}" />
+					<input type="hidden" id="{{$item.Name}}" name="{{$item.Name}}" value="{{$item.Value}}" />
 				{{end}}
 				<div id="queryContent" class="queryContent">
 					<table class="queryMain" cellspacing="0" cellpadding="0" border="0">

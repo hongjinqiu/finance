@@ -92,6 +92,15 @@ Y.PChoiceField = Y.Base.create('p-choice-field', Y.PFormField, [Y.WidgetParent, 
             });
         }
     },
+    
+    _syncReadonly: function(e) {
+        var dis = this.get('readonly');
+        if (dis === true) {
+            this._fieldNode.setAttribute('disabled', 'disabled');
+        } else {
+            this._fieldNode.removeAttribute('disabled');
+        }
+    },
 
     /**
      * @method _afterChoicesChange
@@ -170,6 +179,11 @@ Y.PChoiceField = Y.Base.create('p-choice-field', Y.PFormField, [Y.WidgetParent, 
                 this._syncFieldNode();
             }
         });
+        
+        this.after('readonlyChange', Y.bind(function(e) {
+        	this._syncReadonly();
+        },
+        this));
     }
 
 },

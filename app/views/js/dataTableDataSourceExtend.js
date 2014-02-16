@@ -85,3 +85,12 @@ DataTableManager.prototype.createAddRowGrid = function() {
 				dialog.show();
 			});
 }
+
+/**
+ * 点击新增,新增一行
+ */
+function g_addRow(dataSetId) {
+	gridPanelDict[dataSetId].createAddRowGrid();
+}
+
+

@@ -575,7 +575,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	queryParameters := listTemplate.QueryParameterGroup.QueryParameterLi
 	queryParameterBuilder := QueryParameterBuilder{}
 	for _, queryParameter := range queryParameters {
-		if queryParameter.Editor != "" && queryParameter.Restriction != "" {
+		if queryParameter.Editor != "" && queryParameter.Restriction != "" && queryParameter.UseIn != "none" {
 			name := queryParameter.Name
 			if paramMap[name] != "" {
 				//				if listTemplate.Adapter.Name != "" {
@@ -985,7 +985,23 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 		}
 		selectorDict := result[selectorId].(map[string]interface{})
 		selectorDict[fmt.Sprint(relationId)] = element
+		if selectorDict["url"] == nil {
+			selectorDict["url"] = o.GetViewUrl(listTemplate)
+		}
 		result[selectorId] = selectorDict
 	}
 	return result
+}
+
+func (o TemplateManager) GetViewUrl(listTemplate ListTemplate) string {
+	for _, item := range listTemplate.ColumnModel.ColumnLi {
+		if item.Buttons.ButtonLi != nil {
+			for _, buttonItem := range item.Buttons.ButtonLi {
+				if buttonItem.Name == "btn_view" {
+					return fmt.Sprint(buttonItem.Handler)
+				}
+			}
+		}
+	}
+	return ""
 }

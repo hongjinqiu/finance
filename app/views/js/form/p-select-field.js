@@ -48,7 +48,7 @@ Y.PSelectField = Y.Base.create('p-select-field', Y.PChoiceField, [Y.WidgetParent
         },
         this);
     },
-
+    
     /**
 	 * @method _syncFieldNode
 	 * @protected
@@ -91,7 +91,7 @@ Y.PSelectField = Y.Base.create('p-select-field', Y.PChoiceField, [Y.WidgetParent
                 value: val
             });
 
-            if (currentVal == val) {
+            if ((currentVal + "") === (val + "")) {
                 node.setAttrs({
                     selected: true,
                     defaultSelected: true

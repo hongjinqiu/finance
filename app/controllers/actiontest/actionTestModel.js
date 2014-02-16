@@ -37,6 +37,12 @@ var modelExtraInfo = {
 			}
 		},
 		"selectTest" : {
+			queryFunc: function() {
+				return {
+					code: "0",
+					name: "0"
+				};
+			}
 			/*selection: function(selectValueLi, formObj) {
 				console.log("in selection");
 				console.log(selectValueLi);
@@ -84,6 +90,46 @@ var modelExtraInfo = {
 	}
 };
 
-function addRow(dataSetId) {
-	gridPanelDict[dataSetId].createAddRowGrid();
+/**
+ * 选择按钮,弹窗选择
+ */
+function actionTestBSelect(dataSetId) {
+//	gridPanelDict[dataSetId].createAddRowGrid();
+//	console.log("g_popupSelect");
+
+//	var modelIterator = new ModelIterator();
+//	var result = "";
+	window.s_selection = function(selectValueLi) {
+		console.log("s_selection");
+		console.log(selectValueLi);
+	};
+	/*
+	window.s_queryFunc = function() {
+		return {};
+	};
+	*/
+	
+    var url = "/console/selectorschema?@name={NAME_VALUE}&@multi={MULTI_VALUE}";
+    url = url.replace("{NAME_VALUE}", "SysUserSelector");
+    url = url.replace("{MULTI_VALUE}", "true");
+    var title = "";
+    for (var i = 0; i < dataSourceJson.DetailDataLi.length; i++) {
+    	if (dataSourceJson.DetailDataLi[i].Id == dataSetId) {
+    		title = dataSourceJson.DetailDataLi[i].DisplayName;
+    		break;
+    	}
+    }
+	var dialog = showModalDialog({
+		"title": title,
+		"url": url
+	});
+	window.s_closeDialog = function() {
+		if (window.s_dialog) {
+			window.s_dialog.hide();
+		}
+		window.s_dialog = null;
+		window.s_selection = null;
+		window.s_queryFunc = null;
+	}
 }
+

@@ -362,3 +362,18 @@ table {
 .trigger_delete {
 	background-image: url("../img/kw_dele.png");
 }
+
+.trigger_date {
+	-moz-box-sizing: border-box;
+	display: block;
+	cursor: pointer;
+    overflow: hidden;
+    border-color: #B5B8C8;
+    border-style: solid;
+    border-width: 0 0 1px;
+    width: 17px;
+    background-image: url("../img/date-trigger.gif");
+    height: 16px;
+    float: left;
+}
+

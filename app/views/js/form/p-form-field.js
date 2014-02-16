@@ -143,6 +143,24 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         }
         return false;
     },
+    
+    _validateReadonly: function(val) {
+    	if (!Y.Lang.isBoolean(val)) {
+    		return false;
+    	}
+    	var self = this;
+    	var modelIterator = new ModelIterator();
+    	var result = "";
+    	var validateResult = true;
+    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			if (fieldGroup.FixReadOnly == "true" && !val) {
+    				validateResult = false;
+    			}
+    		}
+    	});
+    	return validateResult;
+    },
 
     /**
      * @method _renderNode
@@ -290,6 +308,15 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             this._fieldNode.setAttribute('disabled', 'disabled');
         } else {
             this._fieldNode.removeAttribute('disabled');
+        }
+    },
+    
+    _syncReadonly: function(e) {
+        var value = this.get('readonly');
+        if (value === true) {
+            this._fieldNode.setAttribute('readonly', 'readonly');
+        } else {
+            this._fieldNode.removeAttribute('readonly');
         }
     },
 
@@ -462,6 +489,7 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         			if (fieldGroup.AllowEmpty != "true") {
         				self.set("required", true);
         			}
+        			self.set("readonly", fieldGroup.FixReadOnly == "true");
         		}
         	});
         	self.set("validator", dsFormFieldValidator);
@@ -490,6 +518,11 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             if (e.src != 'ui') {
                 this._fieldNode.set('value', e.newVal);
             }
+        },
+        this));
+        
+        this.after('readonlyChange', Y.bind(function(e) {
+        	this._syncReadonly();
         },
         this));
 
@@ -565,23 +598,13 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         this._syncFieldNode();
         this._syncError();
         this._syncDisabled();
+        this._syncReadonly();
 
         if (this.get('validateInline') === true) {
             this._enableInlineValidation();
         }
-    },
-    
-    _getDsField: function() {
-    	if (!dataSourceJson) {
-    		return null;
-    	}
-    	
-    	var modelIterator = new ModelIterator();
-    	var result = "";
-    	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
-    		
-    	});
     }
+    
 },
 {
     /**
@@ -713,6 +736,16 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         requiredLabel : {
             value : '',
             validator : Y.Lang.isString
+        },
+        
+        /**
+         * 是否只读
+         */
+        readonly : {
+            value : false,
+            validator : function(val) {
+                return this._validateReadonly(val);
+            }
         }
     },
 

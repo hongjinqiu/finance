@@ -74,6 +74,10 @@ function applyDateLocale(Y) {
 	}
 }
 
+function getDsUrl(listTemplate) {
+	return "/console/listschema?@name=" + listTemplate.Id + "&format=json";
+}
+
 YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", "anim", function(Y) {
 	//,"gallery-aui-calendar-datepicker-select"
 	Y.on("domready", function(e) {
@@ -91,7 +95,7 @@ YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "dat
 			columnModel:listTemplate.ColumnModel,
 			columnModelName:columnModelName,
 			render:renderName,
-			url:"/console/listschema?@name=" + listTemplate.Id + "&format=json",
+			url:getDsUrl(listTemplate),
 			totalResults: dataBo.totalResults || 1,
 			pageSize: DATA_PROVIDER_SIZE,
 			paginatorContainer : '#pagContC',

@@ -4,11 +4,14 @@ function RelationManager() {
 /**
  * 开窗选回后,加入到relationBo中
  */
-RelationManager.prototype.addRelationBo = function(selectorId, obj) {
+RelationManager.prototype.addRelationBo = function(selectorId, url, obj) {
 	if (!relationBo[selectorId]) {
 		relationBo[selectorId] = {};
 	}
 	relationBo[selectorId][obj["id"]] = obj;
+	if (url) {
+		relationBo[selectorId]["url"] = url;
+	}
 }
 
 RelationManager.prototype.getRelationBo = function(selectorId, id) {
@@ -31,7 +34,8 @@ RelationManager.prototype.getRelationBo = function(selectorId, id) {
 				var data = Y.JSON.parse(o.responseText);
 				result = data["result"];
 				if (result) {
-					self.addRelationBo(selectorId, result);
+					var url = data["url"];
+					self.addRelationBo(selectorId, url, result);
 				}
 			});
 		}

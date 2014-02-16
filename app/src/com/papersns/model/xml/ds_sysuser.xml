@@ -39,7 +39,7 @@
 				<defaultValueExpr>code</defaultValueExpr>
 			</field>
 			<field id="name" extends="NAME_FIELD">
-				<displayName>昵称</displayName>
+				<displayName>名称</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>40</fieldLength>
 				<defaultValueExpr>名称测试</defaultValueExpr>

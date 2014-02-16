@@ -29,21 +29,23 @@
 		<auto-column name="dicTest" colSpan="2" labelWidth="15%" columnWidth="35%">
 			<!-- <column-attribute name="editor" value="radiofield"/> -->
 		</auto-column>
-		<auto-column name="selectTest" colSpan="2" />
+		<!-- <auto-column name="selectTest" colSpan="2" /> -->
+		<select-column name="selectTest" colSpan="2" auto="true" selectionMode="single"></select-column>
+		<auto-column name="age" colSpan="2" />
+		<auto-column name="date" colSpan="2">
+			<column-attribute name="editor" value="datefield"/>
+		</auto-column>
 		<!-- 
 		<auto-column name="name" colSpan="2" labelWidth="15%" />
 		<auto-column name="age" colSpan="2" />
 		<auto-column name="date" colSpan="2" />
-		<auto-column name="date" colSpan="2">
-			<column-attribute name="editor" value="checkbox"/>
-		</auto-column>
 		 -->
 	</column-model>
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
-			<button text="新增" mode="fn" handler="addRow" iconCls="yui3-button btn-show"></button>
+			<button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
 			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
 		</toolbar>
 		<id-column name="_id" text="编号" hideable="true" />
@@ -56,7 +58,7 @@
 	<column-model dataSetId="C">
 		<toolbar>
 			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
-			<button text="新增" mode="fn" handler="addRow" iconCls="yui3-button btn-show"></button>
+			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
 			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
 		</toolbar>
 		<id-column name="_id" text="编号" hideable="true" />

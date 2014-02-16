@@ -141,7 +141,7 @@ func (c App) ComboView() revel.Result {
 func (c App) FormJS() revel.Result {
 	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
 	content := ""
-	formJsLi := []string{"js/form/p-form-field.js","js/form/p-text-field.js","js/form/p-hidden-field.js","js/form/p-checkbox-field.js","js/form/p-radio-field.js","js/form/p-choice-field.js","js/form/p-select-field.js","js/form/p-trigger-field.js"}
+	formJsLi := []string{"js/form/p-form-field.js","js/form/p-text-field.js","js/form/p-hidden-field.js","js/form/p-checkbox-field.js","js/form/p-radio-field.js","js/form/p-choice-field.js","js/form/p-select-field.js","js/form/p-trigger-field.js","js/form/p-number-field.js","js/form/p-display-field.js","js/form/p-textarea-field.js","js/form/p-date-field.js"}
 	for _, k := range formJsLi {
 		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
 			panic("fileName is:" + k + ", expect ends with .js or .css")
@@ -172,7 +172,7 @@ func (c App) FormJS() revel.Result {
 		}
 	}
 	prefix := "YUI.add('papersns-form', function(Y) {\n"
-	suffix := "}, '1.1.0' ,{requires:['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection']});\n"
+	suffix := "}, '1.1.0' ,{requires:['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection', 'overlay', 'calendar', 'datatype-date']});\n"
 	content = prefix + content + suffix
 
 	acceptEncoding := c.Request.Header.Get("Accept-Encoding")

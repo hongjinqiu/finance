@@ -196,7 +196,7 @@ func (c Console) ListSchema() revel.Result {
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetListTemplate(schemaName)
 	
-	result := c.listSelectorCommon(&listTemplate)
+	result := c.listSelectorCommon(&listTemplate, true)
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -222,10 +222,13 @@ func (c Console) SelectorSchema() revel.Result {
 
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetSelectorTemplate(schemaName)
+	c.setSelectionMode(&listTemplate)
+	c.setDisplayField(&listTemplate)
+	result := c.listSelectorCommon(&listTemplate, false)
 	
-	result := c.listSelectorCommon(&listTemplate)
-	
-	selectionBo := map[string]interface{}{}
+	selectionBo := map[string]interface{}{
+		"url": templateManager.GetViewUrl(listTemplate),
+	}
 	ids := c.Params.Get("@id")
 	if ids != "" {
 		relationLi := []map[string]interface{}{}
@@ -259,9 +262,6 @@ func (c Console) SelectorSchema() revel.Result {
 	selectionBoJson = commonUtil.FilterJsonEmptyAttr(selectionBoJson)
 	result["selectionBoJson"] = template.JS(selectionBoJson)
 	
-	c.setSelectionMode(&listTemplate)
-	c.setDisplayField(&listTemplate)
-
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		callback := c.Params.Get("callback")
@@ -305,7 +305,7 @@ func (c Console) setDisplayField(listTemplate *ListTemplate) {
 	}
 }
 
-func (c Console) listSelectorCommon(listTemplate *ListTemplate) map[string]interface{} {
+func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) map[string]interface{} {
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
 	templateManager.ApplyDictionaryForQueryParameter(listTemplate)
@@ -344,7 +344,8 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate) map[string]inter
 		"totalResults": 0,
 		"items":        []interface{}{},
 	}
-	if c.Params.Get("@entrance") != "true" {
+	//if c.Params.Get("@entrance") != "true" {
+	if isGetBo {
 		dataBo = templateManager.GetBoForListTemplate(listTemplate, paramMap, pageNo, pageSize)
 	}
 
@@ -612,15 +613,18 @@ func (c Console) Relation() revel.Result {
 	}
 	relationBo := templateManager.GetRelationBo(sessionId, relationLi)
 	var result interface{} = nil
+	var url interface{} = nil
 	if relationBo[selectorId] != nil {
 		selRelationBo := relationBo[selectorId].(map[string]interface{})
 		if selRelationBo[id] != nil {
 			result = selRelationBo[id]
+			url = selRelationBo["url"]
 		}
 	}
 	c.Response.ContentType = "application/json; charset=utf-8"
 	return c.RenderJson(map[string]interface{}{
 		"result": result,
+		"url": url,
 	})
 }
 

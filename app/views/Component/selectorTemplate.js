@@ -7,28 +7,33 @@ DataTableManager.prototype.doAfterResponse = function() {
 	});
 }
 
+function syncSelection(Y, record) {
+	// 是否添加
+	var id = record["id"];
+	var idInputItem = Y.one("#selectionResult .selectionItem input[value='" + id + "']");
+	if (!idInputItem) {
+		var tempLi = ['<div class="selectionItem">'];
+		tempLi.push('<div class="left">{display}</div>');
+		tempLi.push('<div class="right" onclick="removeSelection(this)"><input type="hidden" name="selectionId" value="{id}" /></div>');
+		tempLi.push('</div>');
+		
+		var display = Y.Lang.sub(listTemplate.ColumnModel.SelectionTemplate, record);
+		
+		var tempContent = Y.Lang.sub(tempLi.join(""), {
+			"display": display,
+			"id": id
+		});
+		
+		Y.one("#selectionResult").setHTML(Y.one("#selectionResult").getHTML() + tempContent);
+	}
+}
+
 function syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi) {
 	nodeLi.each(function(node, index, nodeLi) {
 		if (node.get("checked")) {
-			g_selectionManager.addSelectionBo(dataGrid.getRecord(node).toJSON());
-			var id = dataGrid.getRecord(node).get("id");
-			// 是否添加
-			var idInputItem = Y.one("#selectionResult .selectionItem input[value='" + id + "']");
-			if (!idInputItem) {
-				var tempLi = ['<div class="selectionItem">'];
-				tempLi.push('<div class="left">{display}</div>');
-				tempLi.push('<div class="right" onclick="removeSelection(this)"><input type="hidden" name="selectionId" value="{id}" /></div>');
-				tempLi.push('</div>');
-				
-				var display = Y.Lang.sub(listTemplate.ColumnModel.SelectionTemplate, dataGrid.getRecord(node).getAttrs());
-				
-				var tempContent = Y.Lang.sub(tempLi.join(""), {
-					"display": display,
-					"id": id
-				});
-				
-				Y.one("#selectionResult").setHTML(Y.one("#selectionResult").getHTML() + tempContent);
-			}
+			var record = dataGrid.getRecord(node).toJSON();
+			g_selectionManager.addSelectionBo(record);
+			syncSelection(Y, record);
 		} else {
 			// 是否删除
 			var id = dataGrid.getRecord(node).get("id");
@@ -86,6 +91,24 @@ function syncCheckboxWhenChangeSelection(Y, dataGrid) {
 	}
 }
 
+/**
+ * form页面传id进来,后端将其放置到selectionBo中,选择器要回显这些内容放到选择区域内,并同步到选择框中
+ */
+function syncCallbackSelection() {
+	if (selectionBo) {
+		for (var key in selectionBo) {
+			if (key != "url") {
+				syncSelection(dtInst.yInst, selectionBo[key]);
+			}
+		}
+		syncCheckboxWhenChangeSelection(dtInst.yInst, dtInst.dt);
+	}
+}
+
+function getDsUrl(listTemplate) {
+	return "/console/selectorschema?@name=" + listTemplate.Id + "&format=json";
+}
+
 YUI().use("node", "event", function(Y) {
 	Y.on("domready", function(e) {
 		var dataGrid = dtInst.dt;
@@ -108,21 +131,26 @@ YUI().use("node", "event", function(Y) {
 				var selectorId = listTemplate.Id;
 				var selectValueLi = Y.all("#selectionResult .selectionItem input").get("value");
 				if (!selectValueLi || selectValueLi.length == 0) {
-					showAlert("请先选择");
+					//showAlert("请先选择");
+					parent.s_selection([]);
 				} else {
 					for (var i = 0; i < selectValueLi.length; i++) {
 						if (selectionBo[selectValueLi[i]]) {
-							parent.g_relationManager.addRelationBo(selectorId, selectionBo[selectValueLi[i]]);
+							parent.g_relationManager.addRelationBo(selectorId, selectionBo["url"], selectionBo[selectValueLi[i]]);
 						}
 					}
 					parent.s_selection(selectValueLi);
-					parent.s_closeDialog();
 				}
+				parent.s_closeDialog();
 			} else {
 				alert("找不到父窗口，无法赋值！");
 			}
 		});
-		// TODO,取得父函数的queryFunc,并设置到页面上的hidden field里面,然后再refresh,
+		Y.one("#clearBtn").on("click", function(e){
+			Y.one("#selectionResult").setHTML("");
+			syncCheckboxWhenChangeSelection(Y, dtInst.dt);
+		});
+		// 取得父函数的queryFunc,并设置到页面上的hidden field里面,最后调用refresh,应用这些参数查询数据
 		if (parent && parent.s_queryFunc) {
 			var queryDict = parent.s_queryFunc()
 			for (var key in queryDict) {
@@ -131,6 +159,13 @@ YUI().use("node", "event", function(Y) {
 				}
 			}
 		}
-		gridPanelDict["columnModel_1"].dt.refreshPaginator();
+		// 同步selectionBo到选择区域,
+		syncCallbackSelection();
+		
+		//if (parent || location.href.indexOf("@entrance=true") > -1) {
+			gridPanelDict["columnModel_1"].dt.refreshPaginator();
+		//}
 	});
 });
+
+
