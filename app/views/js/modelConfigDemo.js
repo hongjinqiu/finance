@@ -28,20 +28,19 @@ var sysUserModel = {
 				keydown: function(e){},
 				click: function(e){}
 			},
-//			defaultValueExprForJs : function(bo, data) {},// 整个业务对象,单行数据
-//			calcValueExprForJs : function(bo, data) {},// 整个业务对象,单行数据,
 			formatter: function(o){},// 数据集字段函数,接受o作为参数,
+			defaultValueExprForJs : function(bo, data) {},// 整个业务对象,单行数据
+			calcValueExprForJs : function(bo, data) {}// 整个业务对象,单行数据,
 //			validate: function(bo, data) {}// 业务的validate,覆盖不了字段上的validate方法,放到带数据集上处理,
 		},
-		"jsConfig": {
-			listeners: {},
-			beforeedit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),editor里面有record,
-			validateedit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),editor里面有record,
-			edit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e)
-			canceledit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e)
-			celldblclick: function() {},// 暂不实现
-			validate: function(bo, data) {}// 整条记录的validate
-		}
+		afterNewData: function(dataSource, bo){},// defaultValueExprForJs->calcValueExprForJs->afterNewData->calcValueExprForJs
+		listeners: {},
+		beforeedit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),editor里面有record,
+		validateedit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),editor里面有record,
+		edit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e)
+		canceledit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e)
+		celldblclick: function() {},// 暂不实现
+		validate: function(bo, data) {}// 整条记录的validate
 	}
 };
 

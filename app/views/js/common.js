@@ -10,6 +10,8 @@ CommonUtil.prototype.getFuncOrString = function(text) {
 	return text;
 }
 
+var panelZIndex = 6;
+
 /**
  * config: title,url
  */
@@ -46,7 +48,7 @@ function showModalDialog(config) {
 	        bodyContent: bodyContent,
 	        width      : frameWidth,
 	        height: frameHeight,
-	        zIndex     : 6,
+	        zIndex     : (++panelZIndex),
 	        centered   : true,
 	        modal      : true, // modal behavior
 	        render     : '.popupModelDialog',
@@ -136,7 +138,7 @@ function showDialog(config){
 	        bodyContent: bodyContent,
 	        width      : width,
 	        height: height,
-	        zIndex     : 6,
+	        zIndex     : (++panelZIndex),
 	        centered   : true,
 	        modal      : true, // modal behavior
 	        render     : '.popupDialog',
@@ -315,7 +317,11 @@ function dsFormFieldValidator(value, formFieldObj) {
 	var result = "";
 	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
 		if (fieldGroup.Id == formFieldObj.get("name") && fieldGroup.getDataSetId() == formFieldObj.get("dataSetId")) {
-			messageLi = dsFieldGroupValidator(value, fieldGroup);
+			var displayValue = "";
+			if (formFieldObj.getDisplayValue) {
+				displayValue = formFieldObj.getDisplayValue();
+			}
+			messageLi = dsFieldGroupValidator(value, displayValue, fieldGroup);
 		}
 	});
 	
@@ -327,12 +333,17 @@ function dsFormFieldValidator(value, formFieldObj) {
 	return true;
 }
 
+function isNumber(value) {
+	return /^-?\d*(\.\d*)?$/.test(value);
+}
+
 /**
  * 数据源字段 fieldGroup 的验证器,返回messageLi
+ * 其中,日期控件传的是 input 框里面的值,而不是value,日期控件,get("value")时,其取回的是yyyyMMdd,
  * @param value
  * @param fieldGroup
  */
-function dsFieldGroupValidator(value, fieldGroup) {
+function dsFieldGroupValidator(value, displayValue, fieldGroup) {
 	var messageLi = [];
 	if (fieldGroup.AllowEmpty != "true") {
 		if (value === "" || value === null || value === undefined) {
@@ -357,6 +368,7 @@ function dsFieldGroupValidator(value, fieldGroup) {
 		}
 	}
 	if (isDataTypeNumber && isDate) {
+		value = displayValue;
 		if (fieldGroup.FieldNumberType == "YEAR") {
 			if (!/^\d{4}$/.test(value)) {
 				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970");

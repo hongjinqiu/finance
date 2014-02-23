@@ -190,7 +190,10 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
         		self._getSelectionAction()(selectValueLi, self);
         	};
         	window.s_queryFunc = function() {
-        		self._getQueryFunc()();
+        		var f = self._getQueryFunc();
+        		if (f) {
+        			f();
+        		}
         	};
         	
             var url = "/console/selectorschema?@name={NAME_VALUE}&@id={ID_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}";

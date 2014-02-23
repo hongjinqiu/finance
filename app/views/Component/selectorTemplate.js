@@ -163,7 +163,7 @@ YUI().use("node", "event", function(Y) {
 		syncCallbackSelection();
 		
 		//if (parent || location.href.indexOf("@entrance=true") > -1) {
-			gridPanelDict["columnModel_1"].dt.refreshPaginator();
+		gridPanelDict["columnModel_1"].dt.refreshPaginator();
 		//}
 	});
 });

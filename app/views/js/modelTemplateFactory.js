@@ -195,6 +195,25 @@ ModelTemplateFactory.prototype.extendDataSource = function(dataSource, modelExtr
 			}
 		}
 	});
+	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
+		var dataSetConfig = modelExtraInfo[dataSet.Id];
+		if (dataSetConfig) {
+			for (var key in dataSetConfig) {
+				var isFieldGroupConfig = false;
+				modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
+					if (!isFieldGroupConfig && fieldGroup.Id == key) {
+						isFieldGroupConfig = true;
+					}
+				});
+				if (!isFieldGroupConfig) {
+					if (!dataSet.jsConfig) {
+						dataSet.jsConfig = {};
+					}
+					dataSet.jsConfig[key] = dataSetConfig[key];
+				}
+			}
+		}
+	});
 }
 
 /**
@@ -211,4 +230,112 @@ ModelTemplateFactory.prototype.enhanceDataSource = function(dataSource) {
 	this._applyGetDataSetId(dataSource);
 }
 
+ModelTemplateFactory.prototype.applyDataSetDefaultValue = function(dataSource, dataSetId, bo, data) {
+	var self = this;
+	var modelIterator = new ModelIterator();
+	var result = "";
+	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
+		if (fieldGroup.getDataSetId() == dataSetId) {
+			var mode = fieldGroup.DefaultValueExpr.Mode;
+			var content = fieldGroup.DefaultValueExpr.Content;
+			if (fieldGroup.jsConfig && fieldGroup.jsConfig.defaultValueExprForJs) {
+				data[fieldGroup.Id] = fieldGroup.jsConfig.defaultValueExprForJs(bo, data);
+			} else if ((mode == "text" || !mode) && content) {
+				self.applyFieldGroupValueByString(fieldGroup, data, content);
+			}
+		}
+	});
+}
+
+ModelTemplateFactory.prototype.applyDataSetCalcValue = function(dataSource, dataSetId, bo, data) {
+	var self = this;
+	var modelIterator = new ModelIterator();
+	var result = "";
+	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
+		if (fieldGroup.getDataSetId() == dataSetId) {
+			var mode = fieldGroup.CalcValueExpr.Mode;
+			var content = fieldGroup.CalcValueExpr.Content;
+			if (fieldGroup.jsConfig && fieldGroup.jsConfig.calcValueExprForJs) {
+				data[fieldGroup.Id] = fieldGroup.jsConfig.calcValueExprForJs(bo, data);
+			} else if ((mode == "text" || !mode) && content) {
+				self.applyFieldGroupValueByString(fieldGroup, data, content);
+			}
+		}
+	});
+}
+
+ModelTemplateFactory.prototype.applyDataSetCopyValue = function(dataSource, dataSetId, srcData, destData) {
+	var self = this;
+	var modelIterator = new ModelIterator();
+	var result = "";
+	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
+		if (fieldGroup.getDataSetId() == dataSetId) {
+			if (fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true") {
+				if (srcData[fieldGroup.Id]) {
+					destData[fieldGroup.Id] = srcData[fieldGroup.Id];
+				}
+			}
+		}
+	});
+}
+
+ModelTemplateFactory.prototype.applyFieldGroupValueByString = function(fieldGroup, data, content) {
+	var stringArray = ["STRING", "REMARK"];
+	for (var i = 0; i < stringArray.length; i++) {
+		if (stringArray[i] == fieldGroup.FieldDataType) {
+			data[fieldGroup.Id] = content;
+			return;
+		}
+	}
+	var intArray = ["SMALLINT", "INT", "LONGINT"];
+	for (var i = 0; i < intArray.length; i++) {
+		if (intArray[i] == fieldGroup.FieldDataType) {
+			if (content == "") {
+				data[fieldGroup.Id] = 0;
+			} else {
+				if (isNumber(content)) {
+					data[fieldGroup.Id] = parseInt(content);
+				} else {
+					console.log("赋值错误,fieldGroup.dataSetId=" + fieldGroup.getDataSetId() + ", fieldGroup.Id=" + fieldGroup.Id + ", expect type is:" + intArray.join(",") + ", but value=" + content);
+				}
+			}
+			return
+		}
+	}
+	var floatArray = ["FLOAT", "MONEY", "DECIMAL"];
+	for (var i = 0; i < floatArray.length; i++) {
+		if (floatArray[i] == fieldGroup.FieldDataType) {
+			if (content == "") {
+				data[fieldGroup.Id] = 0;
+			} else {
+				if (isNumber(content)) {
+					data[fieldGroup.Id] = parseFloat(content);
+				} else {
+					console.log("赋值错误,fieldGroup.dataSetId=" + fieldGroup.getDataSetId() + ", fieldGroup.Id=" + fieldGroup.Id + ", expect type is:" + floatArray.join(",") + ", but value=" + content);
+				}
+			}
+			return
+		}
+	}
+	var boolArray = ["BOOLEAN"];
+	for (var i = 0; i < boolArray.length; i++) {
+		if (boolArray[i] == fieldGroup.FieldDataType) {
+			if (content == "") {
+				data[fieldGroup.Id] = false
+			} else {
+				if (content == "true") {
+					data[fieldGroup.Id] = true
+				} else {
+					data[fieldGroup.Id] = false
+				}
+			}
+			return
+		}
+	}
+}
+
+var g_sequenceNo = 1;
+ModelTemplateFactory.prototype.getSequenceNo = function() {
+	return "gridId" + (++g_sequenceNo);
+}
 

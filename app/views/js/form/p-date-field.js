@@ -77,8 +77,23 @@ Y.PDateField = Y.Base.create('p-date-field', Y.PFormField, [Y.WidgetParent, Y.Wi
     	
     	var dtdate = Y.DataType.Date;
 		this._calendar.on("selectionChange", function (ev) {
+			var templateIterator = new TemplateIterator();
+			var result = "";
+			var dbPattern = "";
+			templateIterator.iterateAnyTemplateColumn(self.get("dataSetId"), result, function(column, result) {
+				if (column.Name == self.get("name")) {
+					dbPattern = column.DbPattern;
+					return true;
+				}
+				return false;
+			});
+			
+			var columnManager = new ColumnManager();
+			var displayPattern = columnManager.convertDate2DisplayPattern(dbPattern);
 			var newDate = ev.newSelection[0];
-			self.set("value", dtdate.format(newDate));
+			self.set("value", dtdate.format(newDate, {
+				format: displayPattern
+			}));
 			self._destroyOverlay();
 		});
 		this._overlay.show();
@@ -101,6 +116,73 @@ Y.PDateField = Y.Base.create('p-date-field', Y.PFormField, [Y.WidgetParent, Y.Wi
     bindUI: function() {
     	var self = this;
     	Y.PDateField.superclass.bindUI.apply(this, arguments);
+    	
+    	this._fieldNode.detach('change');
+    	this._fieldNode.detach('blur');
+    	
+    	this.detach('valueChange');
+    	
+    	this._fieldNode.on('change', Y.bind(function(e) {
+    		var value = this._fieldNode.get('value');
+    		value = value.replace(/[-\/]/gi, "");
+            this.set('value', value, {
+                src: 'ui'
+            });
+        },
+        this));
+    	
+    	this._fieldNode.on('blur', Y.bind(function(e) {
+    		var value = this._fieldNode.get('value');
+    		value = value.replace(/[-\/]/gi, "");
+            this.set('value', value, {
+                src: 'ui'
+            });
+        },
+        this));
+    	
+    	this.on('valueChange', Y.bind(function(e) {
+            if (e.src != 'ui') {
+            	var dbPattern = "";
+            	var displayPattern = "";
+            	var templateIterator = new TemplateIterator();
+    			var result = "";
+    			templateIterator.iterateAnyTemplateColumn(self.get("dataSetId"), result, function(column, result) {
+    				if (column.Name == self.get("name")) {
+    					dbPattern = column.DbPattern;
+    					displayPattern = column.DisplayPattern;
+    					return true;
+    				}
+    				return false;
+    			});
+    			var value = e.newVal;
+    			var index = 0;
+    			index = dbPattern.indexOf("yyyy");
+    			var yyyy = value.substr(index, 4);
+    			index = dbPattern.indexOf("MM");
+    			var MM = value.substr(index, 2);
+    			index = dbPattern.indexOf("dd");
+    			var dd = value.substr(index, 2);
+    			index = dbPattern.indexOf("HH");
+    			var HH = value.substr(index, 2);
+    			index = dbPattern.indexOf("mm");
+    			var mm = value.substr(index, 2);
+    			index = dbPattern.indexOf("ss");
+    			var ss = value.substr(index, 2);
+    			
+    			var displayValue = displayPattern;
+    			displayValue = displayValue.replace("yyyy", yyyy);
+    			displayValue = displayValue.replace("MM", MM);
+    			displayValue = displayValue.replace("dd", dd);
+    			displayValue = displayValue.replace("HH", HH);
+    			displayValue = displayValue.replace("mm", mm);
+    			displayValue = displayValue.replace("ss", ss);
+    			displayValue = displayValue.replace(/[a-z]/gi, "");
+    			displayValue = displayValue.replace(/^[-\/]*|[-\/]*$/gi, "");
+                this._fieldNode.set('value', displayValue);
+            }
+        },
+        this));
+    	
 
     	this._fieldNode.on('focus', Y.bind(function () {
     		this._createAndShowOverlay();
@@ -119,6 +201,10 @@ Y.PDateField = Y.Base.create('p-date-field', Y.PFormField, [Y.WidgetParent, Y.Wi
     			this._destroyOverlay();
     		}
     	}, this));
+    },
+    
+    getDisplayValue: function(e) {
+    	return this._fieldNode.get('value');
     },
     
     _syncReadonly: function(e) {

@@ -377,3 +377,6 @@ table {
     float: left;
 }
 
+.alignLeft {
+	text-align: left;
+}

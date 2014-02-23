@@ -224,7 +224,11 @@ func (c Console) SelectorSchema() revel.Result {
 	listTemplate := templateManager.GetSelectorTemplate(schemaName)
 	c.setSelectionMode(&listTemplate)
 	c.setDisplayField(&listTemplate)
-	result := c.listSelectorCommon(&listTemplate, false)
+	isGetBo := false
+	if c.Params.Get("format") != "" {
+		isGetBo = true
+	}
+	result := c.listSelectorCommon(&listTemplate, isGetBo)
 	
 	selectionBo := map[string]interface{}{
 		"url": templateManager.GetViewUrl(listTemplate),

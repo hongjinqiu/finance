@@ -102,10 +102,10 @@ ColumnManager.prototype.createCheckboxColumn = function(columnModel) {
 				label:      '选择',
 				//formatter:      '<input type="radio" name="' + key + '" />'
 				formatter:function(o) {
-					if (o.value) {
-						return '<input type="radio" name="' + key + '" />';
+					if (o.value === false) {
+						return "";
 					}
-					return "";
+					return '<input type="radio" name="' + key + '" />';
 				}
 				//,emptyCellValue: '<input type="checkbox"/>'
 			};
@@ -116,10 +116,10 @@ ColumnManager.prototype.createCheckboxColumn = function(columnModel) {
 				label:      '<input type="checkbox" class="protocol-select-all" title="全部选中"/>',
 				//formatter:      '<input type="checkbox" />'
 				formatter:function(o) {
-					if (o.value) {
-						return '<input type="checkbox" />';
+					if (o.value === false) {
+						return "";
 					}
-					return "";
+					return '<input type="checkbox" />';
 				}
 				//,emptyCellValue: '<input type="checkbox"/>'
 			};
@@ -139,7 +139,10 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 			formatter:      function(virtualColumn){
 				return function(o){
 					var htmlLi = [];
-					var buttonBoLi = o.value[virtualColumn.Buttons.XMLName.Local];
+					var buttonBoLi = null;
+					if (o.value) {
+						buttonBoLi = o.value[virtualColumn.Buttons.XMLName.Local];
+					}
 					for (var j = 0; j < virtualColumn.Buttons.ButtonLi.length; j++) {
 						var btnTemplate = null;
 						if (virtualColumn.Buttons.ButtonLi[j].Mode == "fn") {
@@ -149,7 +152,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 						} else {
 							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
 						}
-						if (buttonBoLi[j]["isShow"]) {
+						if (!buttonBoLi || buttonBoLi[j]["isShow"]) {
 							YUI().use("node", function(Y){
 								// handler进行值的预替换,
 								var handler = virtualColumn.Buttons.ButtonLi[j].Handler;

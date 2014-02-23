@@ -77,16 +77,30 @@ var modelExtraInfo = {
 					console.log("click");
 				}
 			},
-			defaultValueExprForJs : function() {
+			/*defaultValueExprForJs : function(bo, data) {
+				return "this is code in js";
 			},
-			calcValueExprForJs : function() {
-			},
+			calcValueExprForJs : function(bo, data) {
+				return data["name"] + " re calc test";
+				return "this is code in calc value";
+			},*/
 			triggerEditor : function() {
 			},
 			validator : function() {
 
 			}
-		}
+		},
+		afterNewData: function(bo, data){
+			console.log("after new data");
+		} 
+		/*,
+		defaultValueExprForJs : function(bo, data) {
+			return {};
+		},// 整个业务对象,单行数据
+		calcValueExprForJs : function(bo, data) {
+			return {};
+		}// 整个业务对象,单行数据,
+		*/
 	}
 };
 
@@ -100,8 +114,16 @@ function actionTestBSelect(dataSetId) {
 //	var modelIterator = new ModelIterator();
 //	var result = "";
 	window.s_selection = function(selectValueLi) {
-		console.log("s_selection");
-		console.log(selectValueLi);
+		var relationManager = new RelationManager();
+		var li = [];
+		for (var i = 0; i < selectValueLi.length; i++) {
+			var data = relationManager.getRelationBo("SysUserSelector", selectValueLi[i]);
+			li.push({
+				"code": data.code,
+				"name": data.name
+			});
+		}
+		gridPanelDict["B"].dt.addRows(li);
 	};
 	/*
 	window.s_queryFunc = function() {
@@ -132,4 +154,10 @@ function actionTestBSelect(dataSetId) {
 		window.s_queryFunc = null;
 	}
 }
+
+YUI().use("node", "event", function(Y) {
+	Y.on("domready", function(e) {
+		enableDisableToolbarBtn();
+	});
+});
 

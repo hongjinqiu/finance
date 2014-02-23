@@ -7,23 +7,24 @@
 	<scripts>actiontest/actionTestModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
 	<toolbar>
-		<button text="列表页" mode="fn" handler="doSave" iconCls="test"></button>
-		<button text="新增" mode="fn" handler="newData" iconCls=""></button>
-		<button text="复制" mode="fn" handler="copyData"></button>
-		<button text="修改" mode="fn" handler="editData" iconCls=""></button>
-		<button text="保存" mode="fn" handler="saveData" iconCls=""></button>
-		<button text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
-		<button text="删除" mode="fn" handler="test" iconCls=""></button>
-		<button text="作废" mode="fn" handler="cancelData" iconCls=""></button>
-		<button text="反作废" mode="fn" handler="unCancelData" iconCls=""></button>
-		<button text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
-		<button text="被用查询" mode="fn" handler="logListData" iconCls=""></button>
-		<button text="测试" mode="fn" handler="test" iconCls=""></button>
+		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=ActionTest" iconCls="test"></button>
+		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>
+		<button name="copyBtn" text="复制" mode="fn" handler="copyData"></button>
+		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
+		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
+		<button name="delBtn" text="删除" mode="fn" handler="test" iconCls=""></button>
+		<button name="cancelBtn" text="作废" mode="fn" handler="cancelData" iconCls=""></button>
+		<button name="unCancelBtn" text="反作废" mode="fn" handler="unCancelData" iconCls=""></button>
+		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logListData" iconCls=""></button>
+		<button name="testBtn" text="测试" mode="fn" handler="test" iconCls=""></button>
 	</toolbar>
 
 	<column-model dataSetId="A" colSpan="4">
 		<id-column name="_id" text="编号" hideable="true" />
 		<auto-column name="id" hideable="true" />
+		<auto-column name="billStatus" hideable="true" />
 		
 		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
 		<auto-column name="dicTest" colSpan="2" labelWidth="15%" columnWidth="35%">
@@ -40,19 +41,32 @@
 		<auto-column name="age" colSpan="2" />
 		<auto-column name="date" colSpan="2" />
 		 -->
+		
 	</column-model>
-	
+
 	<column-model dataSetId="B">
 		<toolbar>
 			<button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button>
 			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
-			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
+			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
 		</toolbar>
+		<checkbox-column name="checkboxSelect" hideable="false" />
 		<id-column name="_id" text="编号" hideable="true" />
+		<virtual-column name="FUN_C" text="操作">
+			<buttons>
+				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
+				<button text="复制" mode="fn" handler="g_copyRow" iconCls="test"></button>
+				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
+			</buttons>
+		</virtual-column>
 		<auto-column name="id" hideable="true" />
-		
 		<auto-column name="code" />
 		<auto-column name="name" />
+		<auto-column name="dicTest" />
+		<auto-column name="date" />
+		<auto-column name="age" />
+		<auto-column name="selectTest" />
 	</column-model>
 	
 	<column-model dataSetId="C">

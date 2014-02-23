@@ -1,24 +1,47 @@
-DataTableManager.prototype.createAddRowGrid = function() {
+DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 	var self = this;
 	YUI(formQuickEditJsConfig).use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema",
 			"datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json', 'datasource-io', 'model-sync-rest',
 			"gallery-datatable-paginator", 'gallery-paginator-view', "listtemplate-paginator", "datatype-date-format", "io-base", "anim", "panel", "dd-plugin",
 			"papersns-form-quickedit", function(Y) {
-				var dataTableManager = new DataTableManager();
+				var pluginDataTableManager = new DataTableManager();
 				var doPopupConfirm = function() {
-					var li = dataTableManager.dt.pqe.getRecords();
-					{
-						for (var i = 0; i < li.length; i++) {
-							delete li[i].id
+					var li = pluginDataTableManager.dt.pqe.getRecords();
+					// 输入中有,输出中没有,删除
+					for (var i = 0; i < inputDataLi.length; i++) {
+						var isIn = false;
+						for (var j = 0; j < li.length; j++) {
+							if (inputDataLi[i].id == li[j].id) {
+								isIn = true;
+								break;
+							}
+						}
+						if (!isIn) {
+							self.dt.removeRow(inputDataLi[i].id);
+						}
+					}
+					
+					for (var i = 0; i < li.length; i++) {
+						var record = self.dt.getRecord(li[i].id);
+						if (record) {
+							for (var key in li[i]) {
+								record.set(key, li[i][key]);
+							}
 						}
 					}
 					self.dt.addRows(li);
 				};
+				var bodyHtmlLi = [];
+				bodyHtmlLi.push("<div class='alignLeft'>");
+				bodyHtmlLi.push("<input type='button' value='新增' class='' onclick='g_pluginAddRow(\"" + self.param.columnModelName + "\")'/>");
+				bodyHtmlLi.push("<input type='button' value='删除' class='' onclick='g_pluginRemoveRow(\"" + self.param.columnModelName + "\")'/>");
+				bodyHtmlLi.push("</div>");
+				bodyHtmlLi.push('<div style="overflow: auto" id="' + self.param.columnModelName + "_addrow" + '"></div>');
 
 				var dialog = new Y.Panel({
 					contentBox : Y.Node.create('<div id="detail-grid-addrow-dialog" />'),
 					headerContent : "新增" + self.param.columnModel.Text,
-					bodyContent : '<div style="overflow: auto" id="' + self.param.columnModelName + "_addrow" + '"></div>',
+					bodyContent : bodyHtmlLi.join(""),
 					width : 1000,
 					zIndex : 6,
 					centered : true,
@@ -29,11 +52,11 @@ DataTableManager.prototype.createAddRowGrid = function() {
 					buttons : {
 						footer : [ {
 							name : 'cancel',
-							label : 'Cancel',
+							label : '取消',
 							action : 'onCancel'
 						}, {
 							name : 'proceed',
-							label : 'OK',
+							label : '确定',
 							action : 'onOK'
 						} ]
 					}
@@ -59,6 +82,7 @@ DataTableManager.prototype.createAddRowGrid = function() {
 				}
 
 				dialog.hide = function() {
+					gridPanelDict[self.param.columnModelName + "_addrow"] = null;
 					return this.destroy();
 				}
 
@@ -66,8 +90,12 @@ DataTableManager.prototype.createAddRowGrid = function() {
 				//		Y.one('#dialog .message').setHTML('mnopq Are you sure you want to [take some action]?');
 				//		Y.one('#dialog .message').set('className', 'message icon-bubble');
 				dialog.callback = doPopupConfirm;
+				var data = [{}];
+				if (inputDataLi) {
+					data = inputDataLi;
+				}
 				var param = {
-					data : [ {} ],
+					data : data,
 					columnModel : self.param.columnModel,
 					columnModelName : self.param.columnModelName + "_addrow",// 用于virtualColumn的btn,onclick,回找grid的,暂时没用,
 					render : "#" + self.param.columnModelName + "_addrow",// 用panel里面的东东,
@@ -76,21 +104,141 @@ DataTableManager.prototype.createAddRowGrid = function() {
 					pageSize : 10000,
 					paginatorContainer : null,
 					paginatorTemplate : null,
-					columnManager : new ColumnDataSourceManager(self),
+					//columnManager : new ColumnDataSourceManager(self),
 					plugin : Y.Plugin.DataTablePFormQuickEdit
 				};
 
-				dataTableManager.createDataGrid(Y, param);
-
+				pluginDataTableManager.createDataGrid(Y, param);
+				gridPanelDict[self.param.columnModelName + "_addrow"] = pluginDataTableManager;
 				dialog.show();
 			});
+}
+
+function doPluginVirtualColumnBtnAction(columnModelName, elem, fn){
+	var self = gridPanelDict[columnModelName + "_addrow"];
+	var dt = self.dt;
+	var yInst = self.yInst;
+	var o = dt.getRecord(yInst.one(elem));
+	fn(o, columnModelName);
+}
+
+/**
+ * 插件表头新增,新增一行
+ */
+function g_pluginAddRow(dataSetId) {
+	var formManager = new FormManager();
+	var data = formManager.getDataSetNewData(dataSetId);
+	gridPanelDict[dataSetId + "_addrow"].dt.addRow(data);
+}
+
+/**
+ * 插件表头删除,删除多行
+ */
+function g_pluginRemoveRow(dataSetId) {
+	var selectRecordLi = gridPanelDict[dataSetId + "_addrow"].getSelectRecordLi();
+	if (selectRecordLi.length == 0) {
+		showAlert("请先选择");
+	} else {
+		for (var i = 0; i < selectRecordLi.length; i++) {
+			gridPanelDict[dataSetId + "_addrow"].dt.removeRow(selectRecordLi[i]);
+		}
+	}
+}
+
+/**
+ * 点击删除,删除一行
+ */
+function g_pluginRemoveSingleRow(o, dataSetId) {
+	gridPanelDict[dataSetId + "_addrow"].dt.removeRow(o);
+}
+
+/**
+ * 点击行项复制,复制一行
+ */
+function g_pluginCopyRow(o, dataSetId) {
+//	var inputDataLi = [];
+	var formManager = new FormManager();
+	var id = o.get("id");
+	var li = gridPanelDict[dataSetId + "_addrow"].dt.pqe.getRecords();
+	var data = {};
+	for (var i = 0; i < li.length; i++) {
+		if (li[i].id == id) {
+			data = li[i];
+			break;
+		}
+	}
+	var data = formManager.getDataSetCopyData(dataSetId, data);
+//	inputDataLi.push(data);
+	gridPanelDict[dataSetId + "_addrow"].dt.addRow(data);
 }
 
 /**
  * 点击新增,新增一行
  */
 function g_addRow(dataSetId) {
-	gridPanelDict[dataSetId].createAddRowGrid();
+	var inputDataLi = [];
+	var formManager = new FormManager();
+	var data = formManager.getDataSetNewData(dataSetId);
+	inputDataLi.push(data);
+	gridPanelDict[dataSetId].createAddRowGrid(inputDataLi);
 }
+
+/**
+ * 点击删除,删除多行
+ */
+function g_removeRow(dataSetId) {
+	var selectRecordLi = gridPanelDict[dataSetId].getSelectRecordLi();
+	if (selectRecordLi.length == 0) {
+		showAlert("请先选择");
+	} else {
+		for (var i = 0; i < selectRecordLi.length; i++) {
+			gridPanelDict[dataSetId].dt.removeRow(selectRecordLi[i]);
+		}
+	}
+}
+
+/**
+ * 点击删除,删除一行
+ */
+function g_removeSingleRow(o, dataSetId) {
+	gridPanelDict[dataSetId].dt.removeRow(o);
+}
+
+/**
+ * 点击行项编辑,编辑一行
+ */
+function g_editSingleRow(o, dataSetId) {
+	var inputDataLi = [];
+	inputDataLi.push(o.toJSON());
+	gridPanelDict[dataSetId].createAddRowGrid(inputDataLi);
+}
+
+/**
+ * 点击行项复制,复制一行
+ */
+function g_copyRow(o, dataSetId) {
+	var inputDataLi = [];
+	var formManager = new FormManager();
+	var data = formManager.getDataSetCopyData(dataSetId, o.toJSON());
+	inputDataLi.push(data);
+	gridPanelDict[dataSetId].createAddRowGrid(inputDataLi);
+}
+
+/**
+ * 点击表格头编辑,编辑多行
+ */
+function g_editRow(dataSetId) {
+	var selectRecordLi = gridPanelDict[dataSetId].getSelectRecordLi();
+	if (selectRecordLi.length == 0) {
+		showAlert("请先选择");
+	} else {
+		var inputDataLi = [];
+		for (var i = 0; i < selectRecordLi.length; i++) {
+			inputDataLi.push(selectRecordLi[i].toJSON());
+		}
+		gridPanelDict[dataSetId].createAddRowGrid(inputDataLi);
+	}
+}
+
 
 

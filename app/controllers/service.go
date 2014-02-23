@@ -3,6 +3,7 @@ package controllers
 //import "github.com/robfig/revel"
 import (
 	"com/papersns/global"
+	. "com/papersns/common"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
@@ -18,8 +19,12 @@ type FinanceService struct{}
 
 func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) *[]DiffDataRow {
 	strId := ""
-	if (*bo)["_id"] != nil {
-		strId = fmt.Sprint((*bo)["_id"])
+	if (*bo)["id"] != nil {
+		commonUtil := CommonUtil{}
+		tmpStrId := fmt.Sprint((*bo)["id"])
+		if commonUtil.IsNumber(tmpStrId) {
+			strId = fmt.Sprint((*bo)["id"])
+		}
 	}
 	modelTemplateFactory := ModelTemplateFactory{}
 	modelTemplateFactory.ConvertDataType(dataSource, bo)

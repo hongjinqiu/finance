@@ -1,3 +1,6 @@
+/**
+ * 没用到,应该会废弃掉
+ */
 function ColumnDataSourceManager() {
 }
 

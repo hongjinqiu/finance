@@ -225,3 +225,61 @@ function test() {
 	relationManager.getRelationBo("SysUserSelector", 16);
 	return;
 }
+
+function enableDisableToolbarBtn() {
+	if (g_formStatus == "view") {
+		var viewEnableBtnLi = ["listBtn","newBtn","copyBtn","editBtn","delBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
+		var viewDisableBtnLi = ["saveBtn","giveUpBtn"];
+		for (var i = 0; i < viewEnableBtnLi.length; i++) {
+			var btn = document.getElementById(viewEnableBtnLi[i]);
+			if (btn) {
+				btn.disabled = "";
+			}
+		}
+		var cancelBtn = document.getElementById("cancelBtn");
+		if (cancelBtn && masterFormFieldDict["billStatus"]) {
+			if (masterFormFieldDict["billStatus"].get("value") == "0") {
+				cancelBtn.disabled = "";
+			} else {
+				cancelBtn.disabled = "disabled";
+			}
+		}
+		var unCancelBtn = document.getElementById("unCancelBtn");
+		if (unCancelBtn && masterFormFieldDict["billStatus"]) {
+			if (masterFormFieldDict["billStatus"].get("value") == "4") {
+				unCancelBtn.disabled = "";
+			} else {
+				unCancelBtn.disabled = "disabled";
+			}
+		}
+		
+		for (var i = 0; i < viewDisableBtnLi.length; i++) {
+			var btn = document.getElementById(viewDisableBtnLi[i]);
+			if (btn) {
+				btn.disabled = "disabled";
+			}
+		}
+	} else {
+		var editEnableBtnLi = ["listBtn","saveBtn","giveUpBtn"];
+		var editDisableBtnLi = ["newBtn","copyBtn","editBtn","delBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
+		for (var i = 0; i < editEnableBtnLi.length; i++) {
+			var btn = document.getElementById(editEnableBtnLi[i]);
+			if (btn) {
+				btn.disabled = "";
+				console.log("enable");
+			}
+		}
+		for (var i = 0; i < editDisableBtnLi.length; i++) {
+			var btn = document.getElementById(editDisableBtnLi[i]);
+			if (btn) {
+				btn.disabled = "disabled";
+				console.log("disable");
+			}
+		}
+	}
+}
+
+
+
+
+

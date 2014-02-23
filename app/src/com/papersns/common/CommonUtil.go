@@ -17,3 +17,8 @@ func (o CommonUtil) FilterJsonEmptyAttr(jsonString string) string {
 	
 	return result
 }
+
+func (o CommonUtil) IsNumber(str string) bool {
+	regx := regexp.MustCompile(`^\d*$`)
+	return regx.MatchString(str)
+}

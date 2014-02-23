@@ -166,7 +166,7 @@ func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 	} else if column.XMLName.Local == "date-column" {
 		if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("DATE") {
 			if column.DisplayPattern == "" {
-				column.DisplayPattern = "yyyyMMdd" //需要从业务中查找,是一个系统配置,TODO,
+				column.DisplayPattern = "yyyy-MM-dd" //需要从业务中查找,是一个系统配置,TODO,
 			}
 			if column.DbPattern == "" {
 				column.DbPattern = "yyyyMMdd"
@@ -187,14 +187,14 @@ func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 			}
 		} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("YEARMONTH") {
 			if column.DisplayPattern == "" {
-				column.DisplayPattern = "yyyyMM" //需要从业务中查找,是一个系统配置,TODO,
+				column.DisplayPattern = "yyyy-MM" //需要从业务中查找,是一个系统配置,TODO,
 			}
 			if column.DbPattern == "" {
 				column.DbPattern = "yyyyMM"
 			}
 		} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("TIME") {
 			if column.DisplayPattern == "" {
-				column.DisplayPattern = "HHmmss" //需要从业务中查找,是一个系统配置,TODO,
+				column.DisplayPattern = "HH:mm:ss" //需要从业务中查找,是一个系统配置,TODO,
 			}
 			if column.DbPattern == "" {
 				column.DbPattern = "HHmmss"

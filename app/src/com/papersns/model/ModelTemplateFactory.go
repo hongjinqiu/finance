@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	. "com/papersns/script"
+	. "com/papersns/common"
 )
 
 var rwlock sync.RWMutex = sync.RWMutex{}
@@ -681,9 +682,10 @@ func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup
 }
 
 func (o ModelTemplateFactory) GetRelationLi(sId int, dataSource DataSource, bo map[string]interface{}) []map[string]interface{} {
-	if bo["_id"] != nil {
-		id := fmt.Sprint(bo["_id"])
-		if id == "" || id == "0" {
+	if bo["id"] != nil {
+		id := fmt.Sprint(bo["id"])
+		commonUtil := CommonUtil{}
+		if !commonUtil.IsNumber(id) || id == "" || id == "0" {
 			return []map[string]interface{}{}
 		}
 	}

@@ -10,11 +10,7 @@
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<button text="新增" mode="fn" handler="doSave" iconCls="test">
-			<expression>test_expression</expression>
-			<button-attribute name="code" value="C" />
-			<button-attribute name="functionId" value="50010" />
-		</button>
+		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
 
 		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
 			<button-attribute name="code" value="D" />

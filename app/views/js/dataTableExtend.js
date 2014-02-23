@@ -258,11 +258,12 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 		}
 	}
 	var dt = new Y.DataTable(gridConfig);
+	dt.dataSetId = columnModel.DataSetId;
 	dt.plug(Y.Plugin.DataTableDataSource, {
 		datasource : dataSource
 	});
 	if (param.plugin) {
-		dt.plug(Y.Plugin.DataTablePFormQuickEdit);
+		dt.plug(param.plugin);
 	}
 	if (paginatorContainer) {
 		dt.get('paginator').get('model').set('totalItems', totalResults);
@@ -355,10 +356,9 @@ DataTableManager.prototype.getSelectRecordLi = function() {
 function doVirtualColumnBtnAction(columnModelName, elem, fn){
 	var self = gridPanelDict[columnModelName];
 	var dt = self.dt;
-	var dt = self.dt;
 	var yInst = self.yInst;
 	var o = dt.getRecord(yInst.one(elem));
-	fn(o);
+	fn(o, columnModelName);
 }
 
 //DataTableManager.prototype.doVirtualColumnBtnAction = function(columnModelName, elem, fn){

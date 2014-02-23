@@ -83,4 +83,13 @@ ModelIterator.prototype._iterateDetailDataBo = function(dataSource, bo, result, 
 	}
 }
 
+function IterateFunc(dataSet, result){}
+
+ModelIterator.prototype.iterateAllDataSet = function(dataSource, result, iterateFunc) {
+	var self = this;
+	iterateFunc(dataSource.MasterData, result);
+	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+		iterateFunc(dataSource.DetailDataLi[i], result);
+	}
+}
 
