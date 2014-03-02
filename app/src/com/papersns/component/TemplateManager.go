@@ -109,10 +109,8 @@ func (o TemplateManager) findListTemplateInfo(id string) (ListTemplateInfo, bool
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
 
-	for _, item := range gListTemplateDict {
-		if item.ListTemplate.Id == id {
-			return item, true
-		}
+	if gListTemplateDict[id].Path != "" {
+		return gListTemplateDict[id], true
 	}
 	return ListTemplateInfo{}, false
 }
@@ -257,10 +255,8 @@ func (o TemplateManager) findSelectorTemplateInfo(id string) (SelectorTemplateIn
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
 
-	for _, item := range gSelectorTemplateDict {
-		if item.ListTemplate.Id == id {
-			return item, true
-		}
+	if gSelectorTemplateDict[id].Path != "" {
+		return gSelectorTemplateDict[id], true
 	}
 	return SelectorTemplateInfo{}, false
 }
@@ -434,10 +430,8 @@ func (o TemplateManager) findFormTemplateInfo(id string) (FormTemplateInfo, bool
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
 
-	for _, item := range gFormTemplateDict {
-		if item.FormTemplate.Id == id {
-			return item, true
-		}
+	if gFormTemplateDict[id].Path != "" {
+		return gFormTemplateDict[id], true
 	}
 	return FormTemplateInfo{}, false
 }

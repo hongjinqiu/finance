@@ -30,14 +30,11 @@ RelationManager.prototype.getRelationBo = function(selectorId, id) {
 		url : "/console/relation?selectorId=" + selectorId + "&id=" + id + "&date=" + new Date(),
 		method: "GET",
 		callback : function(o) {
-			YUI().use("node", "event", "json", "io-base", function(Y){
-				var data = Y.JSON.parse(o.responseText);
-				result = data["result"];
-				if (result) {
-					var url = data["url"];
-					self.addRelationBo(selectorId, url, result);
-				}
-			});
+			result = o["result"];
+			if (result) {
+				var url = o["url"];
+				self.addRelationBo(selectorId, url, result);
+			}
 		}
 	});
 	return result;

@@ -182,6 +182,7 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 		columnManager = param.columnManager;
 	}
 	var columns = columnManager.getColumns(param.columnModelName, columnModel, Y);
+	
 
 	//var dataSource = new Y.DataSource.Get({ source: url });
 	var dataSource = new Y.DataSource.IO({

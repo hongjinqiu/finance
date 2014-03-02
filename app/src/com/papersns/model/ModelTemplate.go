@@ -20,6 +20,7 @@ type DataSource struct {
 	InUsedDenyEdit          string       `xml:"inUsedDenyEdit"`
 	ActionNameSpace         string       `xml:"actionNameSpace"`
 	ListUrl                 string       `xml:"listUrl"`
+	CollectionName          string       `xml:"collectionName"`
 	BillTypeField           string       `xml:"billTypeField"`
 	BillTypeParamDataSource string       `xml:"billTypeParamDataSource"`
 	HasCheckField           string       `xml:"hasCheckField"`

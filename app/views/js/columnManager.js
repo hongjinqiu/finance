@@ -1,3 +1,5 @@
+var g_errorLog = {};
+
 function ColumnManager() {
 }
 
@@ -56,8 +58,11 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 				suffix : ""
 			});
 		} else {
-			console.log(o);
-			console.log("在系统参数和本行记录中,没有找到currencyField:" + currencyField);
+			if (!g_errorLog[o.column.key]) {
+				g_errorLog[o.column.key] = o.column.label;
+				console.log(o);
+				console.log("在系统参数和本行记录中,没有找到currencyField:" + currencyField);
+			}
 		}
 	} else if (o.column.isPercent == "true") {// 本位币
 		return yInst.DataType.Number.format(o.value, {
@@ -129,6 +134,8 @@ ColumnManager.prototype.createCheckboxColumn = function(columnModel) {
 }
 
 ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnModel, columnIndex) {
+	var self = this;
+	var yInst = self.yInst;
 	var i = columnIndex;
 	if (columnModel.ColumnLi[i].XMLName.Local == "virtual-column" && columnModel.ColumnLi[i].Hideable != "true") {
 		var virtualColumn = columnModel.ColumnLi[i];
@@ -153,18 +160,17 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
 						}
 						if (!buttonBoLi || buttonBoLi[j]["isShow"]) {
-							YUI().use("node", function(Y){
-								// handler进行值的预替换,
-								var handler = virtualColumn.Buttons.ButtonLi[j].Handler;
-								handler = Y.Lang.sub(handler, o.data);
-								htmlLi.push(Y.Lang.sub(btnTemplate, {
-									value: virtualColumn.Buttons.ButtonLi[j].Text,
-									handler: handler,
-									"class": virtualColumn.Buttons.ButtonLi[j].IconCls,
-									href: handler,
-									columnModelName: columnModelName
-								}));
-							});
+							// handler进行值的预替换,
+							var Y = yInst;
+							var handler = virtualColumn.Buttons.ButtonLi[j].Handler;
+							handler = Y.Lang.sub(handler, o.data);
+							htmlLi.push(Y.Lang.sub(btnTemplate, {
+								value: virtualColumn.Buttons.ButtonLi[j].Text,
+								handler: handler,
+								"class": virtualColumn.Buttons.ButtonLi[j].IconCls,
+								href: handler,
+								columnModelName: columnModelName
+							}));
 						}
 					}
 					return htmlLi.join("");
@@ -293,8 +299,11 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 			}
 		};
 	} else {
-		console.log(columnConfig);
-		console.log("日期字段未同时配置dbPattern和displayPattern");
+		if (!g_errorLog[columnConfig.Name]) {
+			g_errorLog[columnConfig.Name] = columnConfig.Text;
+			console.log(columnConfig);
+			console.log("日期字段未同时配置dbPattern和displayPattern");
+		}
 	}
 	return {
 		key: columnConfig.Name,
@@ -326,8 +335,14 @@ ColumnManager.prototype.createDictionaryColumn = function(columnConfig) {
 			if (dictionaryValue !== undefined && dictionaryValue !== null) {
 				return dictionaryValue;
 			}
-			console.log(columnConfig);
-			console.log("字典字段没找到_DICTIONARY_NAME,code:" + o.value);
+			if (!g_errorLog[columnConfig.Name + "_DICTIONARY_NAME"]) {
+				g_errorLog[columnConfig.Name + "_DICTIONARY_NAME"] = columnConfig.Name;
+				console.log(o);
+				console.log(o.data);
+				console.log(columnConfig);
+				console.log(columnConfig.Name + "_DICTIONARY_NAME");
+				console.log("字典字段没找到_DICTIONARY_NAME,code:" + o.value);
+			}
 			return o.value;
 		}
 	};
@@ -407,6 +422,10 @@ ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
 				columns.push(virtualColumn);
 			}
 		}
+//		if (i == 2) {
+//			console.log(column);
+//			break;
+//		}
 	}
 	return columns;
 }

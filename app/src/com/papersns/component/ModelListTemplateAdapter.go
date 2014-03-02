@@ -46,18 +46,17 @@ func (o ModelListTemplateAdapter) ApplyAdapter(iListTemplate interface{}) ListTe
 // TODO, bytest
 func (o ModelListTemplateAdapter) applyDataProvider(dataSource DataSource, listTemplate *ListTemplate) {
 	if listTemplate.DataProvider.Collection == "" {
-		listTemplate.DataProvider.Collection = dataSource.Id
+		modelTemplateFactory := ModelTemplateFactory{}
+		listTemplate.DataProvider.Collection = modelTemplateFactory.GetCollectionName(dataSource)
 	}
 }
 
-// TODO, bytest
 func (o ModelListTemplateAdapter) applyColumnModel(dataSource DataSource, listTemplate *ListTemplate) {
 	var result interface{} = ""
 	commonMethod := CommonMethod{}
 	commonMethod.recursionApplyColumnModel(dataSource, &listTemplate.ColumnModel, &result)
 }
 
-// TODO, bytest
 func (o ModelListTemplateAdapter) applyQueryParameter(dataSource DataSource, listTemplate *ListTemplate) {
 	commonMethod := CommonMethod{}
 	var result interface{} = ""

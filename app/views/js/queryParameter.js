@@ -1,7 +1,7 @@
 function QueryParameterManager() {}
 
 QueryParameterManager.prototype.applyQueryParameter = function() {
-	YUI().use("node", "event", function(Y){
+	YUI(g_financeModule).use("finance-module", function(Y){
 		var columnManager = new ColumnManager();
 		for (var i = 0; i < listTemplate.QueryParameterGroup.QueryParameterLi.length; i++) {
 			var queryParameterManager = new QueryParameterManager();
@@ -40,7 +40,7 @@ QueryParameterManager.prototype.applyQueryParameter = function() {
 }
 
 QueryParameterManager.prototype.applyQueryParameterObserve = function(queryParameter) {
-	YUI().use("node", "event", "json", "io-base", function(Y){
+	YUI(g_financeModule).use("finance-module", function(Y){
 		if (queryParameter.ParameterAttributeLi) {
 			for (var j = 0; j < queryParameter.ParameterAttributeLi.length; j++) {
 				if (queryParameter.ParameterAttributeLi[j].Name == "observe") {

@@ -6,8 +6,10 @@ function ModelTemplateFactory() {
  */
 ModelTemplateFactory.prototype._applyReverseRelation = function(dataSource) {
 	dataSource.MasterData.Parent = dataSource;
-	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		dataSource.DetailDataLi[i].Parent = dataSource;
+	if (dataSource.DetailDataLi) {
+		for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+			dataSource.DetailDataLi[i].Parent = dataSource;
+		}
 	}
 	dataSource.MasterData.FixField.Parent = dataSource.MasterData;
 	dataSource.MasterData.BizField.Parent = dataSource.MasterData;
@@ -19,17 +21,19 @@ ModelTemplateFactory.prototype._applyReverseRelation = function(dataSource) {
 	for (var i = 0; i < dataSource.MasterData.BizField.FieldLi.length; i++) {
 		dataSource.MasterData.BizField.FieldLi[i].Parent = dataSource.MasterData.BizField;
 	}
-	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		dataSource.DetailDataLi[i].FixField.Parent = dataSource.DetailDataLi[i];
-		dataSource.DetailDataLi[i].BizField.Parent = dataSource.DetailDataLi[i];
-		
-		var detailFixFieldLi = modelIterator.getFixFieldLi(dataSource.DetailDataLi[i].FixField);
-		for (var j = 0; j < detailFixFieldLi.length; j++) {
-			detailFixFieldLi[j].Parent = dataSource.DetailDataLi[i].FixField;
-		}
-		
-		for (var j = 0; j < dataSource.DetailDataLi[i].BizField.FieldLi.length; j++) {
-			dataSource.DetailDataLi[i].BizField.FieldLi[j].Parent = dataSource.DetailDataLi[i].BizField;
+	if (dataSource.DetailDataLi) {
+		for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+			dataSource.DetailDataLi[i].FixField.Parent = dataSource.DetailDataLi[i];
+			dataSource.DetailDataLi[i].BizField.Parent = dataSource.DetailDataLi[i];
+			
+			var detailFixFieldLi = modelIterator.getFixFieldLi(dataSource.DetailDataLi[i].FixField);
+			for (var j = 0; j < detailFixFieldLi.length; j++) {
+				detailFixFieldLi[j].Parent = dataSource.DetailDataLi[i].FixField;
+			}
+			
+			for (var j = 0; j < dataSource.DetailDataLi[i].BizField.FieldLi.length; j++) {
+				dataSource.DetailDataLi[i].BizField.FieldLi[j].Parent = dataSource.DetailDataLi[i].BizField;
+			}
 		}
 	}
 }
@@ -50,17 +54,19 @@ ModelTemplateFactory.prototype._applyIsMasterField = function(dataSource) {
 			return true;
 		}
 	}
-	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		var detailFixFieldLi = modelIterator.getFixFieldLi(dataSource.DetailDataLi[i].FixField);
-		for (var j = 0; j < detailFixFieldLi.length; j++) {
-			detailFixFieldLi[j].isMasterField = function() {
-				return false;
+	if (dataSource.DetailDataLi) {
+		for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+			var detailFixFieldLi = modelIterator.getFixFieldLi(dataSource.DetailDataLi[i].FixField);
+			for (var j = 0; j < detailFixFieldLi.length; j++) {
+				detailFixFieldLi[j].isMasterField = function() {
+					return false;
+				}
 			}
-		}
-		
-		for (var j = 0; j < dataSource.DetailDataLi[i].BizField.FieldLi.length; j++) {
-			dataSource.DetailDataLi[i].BizField.FieldLi[j].isMasterField = function() {
-				return false;
+			
+			for (var j = 0; j < dataSource.DetailDataLi[i].BizField.FieldLi.length; j++) {
+				dataSource.DetailDataLi[i].BizField.FieldLi[j].isMasterField = function() {
+					return false;
+				}
 			}
 		}
 	}

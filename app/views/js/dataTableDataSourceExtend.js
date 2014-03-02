@@ -1,9 +1,7 @@
 DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 	var self = this;
-	YUI(formQuickEditJsConfig).use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema",
-			"datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json', 'datasource-io', 'model-sync-rest',
-			"gallery-datatable-paginator", 'gallery-paginator-view', "listtemplate-paginator", "datatype-date-format", "io-base", "anim", "panel", "dd-plugin",
-			"papersns-form-quickedit", function(Y) {
+	YUI(g_financeModule).use("finance-module",
+			 function(Y) {
 				var pluginDataTableManager = new DataTableManager();
 				var doPopupConfirm = function() {
 					var li = pluginDataTableManager.dt.pqe.getRecords();

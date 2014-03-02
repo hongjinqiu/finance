@@ -45,7 +45,7 @@
 				<defaultValueExpr>名称测试</defaultValueExpr>
 			</field>
 			<field id="nick" extends="NAME_FIELD">
-				<displayName>昵称</displayName>
+				<displayName>名称</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>40</fieldLength>
 				<defaultValueExpr>nick</defaultValueExpr>
@@ -118,7 +118,7 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
-						<valueField>_id</valueField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
 			</field>
@@ -222,7 +222,7 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
-						<valueField>_id</valueField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
 			</field>
@@ -326,7 +326,7 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
-						<valueField>_id</valueField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
 			</field>

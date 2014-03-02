@@ -1,4 +1,4 @@
-function doDeleteRecord(o) {
+function g_deleteRecord(o) {
 	var url = "/" + listTemplate.DataSourceModelId + "/DeleteData?format=json";
 	ajaxRequest({
 		url: url
@@ -12,3 +12,4 @@ function doDeleteRecord(o) {
 		}
 	});
 }
+

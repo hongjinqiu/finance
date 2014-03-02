@@ -16,7 +16,7 @@ var panelZIndex = 6;
  * config: title,url
  */
 function showModalDialog(config) {
-	YUI().use("node", "panel", "dd-plugin", function(Y) {
+	YUI(g_financeModule).use("finance-module", function(Y) {
 		var title = config["title"];
 		var url = config["url"];
 	//	node.getComputedStyle("width")
@@ -131,7 +131,7 @@ function showDialog(config){
         }];
 	}
 	
-	YUI().use("panel", "dd-plugin", function(Y) {
+	YUI(g_financeModule).use("finance-module", function(Y) {
 	    var dialog = new Y.Panel({
 	        contentBox : Y.Node.create('<div id="dialog" />'),
 	        headerContent: title,
@@ -241,7 +241,7 @@ function showConfirm(msg, callback, width, height){
 function ajaxRequest(option){
 	// 有用的配置为 doCallback, 自己对failure,error进行提示即可,
 	// url,params,async,scope,
-	YUI().use("node", "event", "json", "io-base", function(Y){
+	YUI(g_financeModule).use("finance-module", function(Y){
 //		var paramData = Y.JSON.stringify(option["params"]);
 		var paramData = {};
 		if (option.params) {
@@ -269,7 +269,16 @@ function ajaxRequest(option){
 				},
 				success: function(id, o, args){
 					if (option.callback) {
-						option.callback(o);
+						try {
+							if (o.responseText) {
+								option.callback(Y.JSON.parse(o.responseText));
+							} else {
+								option.callback({});
+							}
+						} catch (e) {
+							console.error(option["url"]);
+							console.error(e);
+						}
 					}
 				},
 				failure: function(id, o, args){// failure调用在complete之前,
@@ -308,130 +317,19 @@ function ajaxRequest(option){
 	});
 }
 
-/**
- * datasource field validator
- */
-function dsFormFieldValidator(value, formFieldObj) {
-	var modelIterator = new ModelIterator();
-	var messageLi = [];
-	var result = "";
-	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
-		if (fieldGroup.Id == formFieldObj.get("name") && fieldGroup.getDataSetId() == formFieldObj.get("dataSetId")) {
-			var displayValue = "";
-			if (formFieldObj.getDisplayValue) {
-				displayValue = formFieldObj.getDisplayValue();
-			}
-			messageLi = dsFieldGroupValidator(value, displayValue, fieldGroup);
+function g_setMasterFormFieldStatus(status) {
+	if (status == "view") {
+		for (var key in masterFormFieldDict) {
+			
 		}
-	});
-	
-	if (messageLi.length > 0) {
-		formFieldObj.set("error", messageLi.join("<br />"));
-		return false;
 	}
-	
-	return true;
 }
 
 function isNumber(value) {
 	return /^-?\d*(\.\d*)?$/.test(value);
 }
 
-/**
- * 数据源字段 fieldGroup 的验证器,返回messageLi
- * 其中,日期控件传的是 input 框里面的值,而不是value,日期控件,get("value")时,其取回的是yyyyMMdd,
- * @param value
- * @param fieldGroup
- */
-function dsFieldGroupValidator(value, displayValue, fieldGroup) {
-	var messageLi = [];
-	if (fieldGroup.AllowEmpty != "true") {
-		if (value === "" || value === null || value === undefined) {
-			messageLi.push(fieldGroup.DisplayName + "不允许空值");
-			return messageLi;
-		}
-	}
-	
-	var isDataTypeNumber = false;
-	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "DECIMAL";
-	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "FLOAT";
-	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "INT";
-	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "LONGINT";
-	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "MONEY";
-	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "SMALLINT";
-	var isUnLimit = fieldGroup.LimitOption == "" || fieldGroup.LimitOption == "unLimit";
-	var dateEnumLi = ["YEAR","YEARMONTH","DATE","TIME","DATETIME"];
-	var isDate = false;
-	for (var i = 0; i < dateEnumLi.length; i++) {
-		if (dateEnumLi[i] == fieldGroup.FieldNumberType) {
-			isDate = true;
-		}
-	}
-	if (isDataTypeNumber && isDate) {
-		value = displayValue;
-		if (fieldGroup.FieldNumberType == "YEAR") {
-			if (!/^\d{4}$/.test(value)) {
-				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970");
-				return messageLi;
-			}
-		} else if (fieldGroup.FieldNumberType == "YEARMONTH") {
-			if (!/^\d{4}-\d{2}$/.test(value)) {
-				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970-01");
-				return messageLi;
-			}
-		} else if (fieldGroup.FieldNumberType == "DATE") {
-			if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970-01-02");
-				return messageLi;
-			}
-		} else if (fieldGroup.FieldNumberType == "TIME") {
-			if (!/^\d{2}:\d{2}:\d{2}$/.test(value)) {
-				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：03:04:05");
-				return messageLi;
-			}
-		} else if (fieldGroup.FieldNumberType == "DATETIME") {
-			if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) {
-				messageLi.push(fieldGroup.DisplayName + "格式错误，正确格式类似于：1970-01-02 03:04:05");
-				return messageLi;
-			}
-		}
-	} else if (isDataTypeNumber && !isUnLimit) {
-		if (!/^-?\d*(\.\d*)?$/.test(value)) {
-			messageLi.push(fieldGroup.DisplayName + "必须由数字小数点组成");
-			return messageLi;
-		}
-		var fieldValueFloat = parseFloat(value);
-		if (fieldGroup.LimitOption == "limitMax") {
-			var maxValue = parseFloat(fieldGroup.LimitMax);
-			if (maxValue < fieldValueFloat) {
-				messageLi.push(fieldGroup.DisplayName + "超出最大值" + fieldGroup.LimitMax);
-			}
-		} else if (fieldGroup.LimitOption == "limitMin") {
-			var minValue = parseFloat(fieldGroup.LimitMin);
-			if (fieldValueFloat < minValue) {
-				messageLi.push(fieldGroup.DisplayName + "小于最小值" + fieldGroup.LimitMin);
-			}
-		} else if (fieldGroup.LimitOption == "limitRange") {
-			var minValue = parseFloat(fieldGroup.LimitMin);
-			var maxValue = parseFloat(fieldGroup.LimitMax);
-			if (fieldValueFloat < minValue || maxValue < fieldValueFloat) {
-				messageLi.push(fieldGroup.DisplayName+"超出范围("+fieldGroup.LimitMin+"~"+fieldGroup.LimitMax+")");
-			}
-		}
-	} else {
-		var isDataTypeString = false;
-		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "STRING";
-		isDataTypeString = isDataTypeString || fieldGroup.FieldDataType == "REMARK";
-		var isFieldLengthLimit = fieldGroup.FieldLength != "";
-		if (isDataTypeString && isFieldLengthLimit) {
-			var limit = parseFloat(fieldGroup.FieldLength);
-			if (value.length > limit) {
-				messageLi.push(fieldGroup.DisplayName+"长度超出最大值"+fieldGroup.FieldLength);
-			}
-		}
-	}
-	return messageLi;
-}
+
 
 
 

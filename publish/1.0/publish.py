@@ -8,10 +8,38 @@ if '..' not in sys.path:
    sys.path.append('..')
 
 # Switch to the directory of your project. (Optional.)
-os.chdir(os.path.abspath(os.curdir))
-os.environ['DJANGO_SETTINGS_MODULE'] = "settings"
+#os.chdir(os.path.abspath(os.curdir))
+#os.environ['DJANGO_SETTINGS_MODULE'] = "settings"
 
-from common.urlUtil import *
+#from common.urlUtil import *
+import pymongo,threading
+from dictionary import *
+from sequence import *
+
+threadLocal = threading.local()
+MONGODB_HOST = 'localhost'
+MONGODB_PORT = 27017
+MONGODB_ADDRESS = 'localhost:27017'
+MONGODB_DATABASE_NAME = 'aftermarket2'
+MONGODB_USER = None
+MONGODB_PASSWORD = None
+
+def getThreadLocalMongoDB():
+    if not hasattr(threadLocal, 'mongoDict'):
+        #con = pymongo.Connection(MONGODB_HOST, MONGODB_PORT)
+        con = pymongo.Connection(MONGODB_ADDRESS)
+        if MONGODB_USER:
+            con[MONGODB_DATABASE_NAME].authenticate(MONGODB_USER, MONGODB_PASSWORD)
+        threadLocal.mongoDict = {
+            'mongoDB': con[MONGODB_DATABASE_NAME],
+            'con': con
+        }
+    return threadLocal.mongoDict
+        
+def closeThreadLocalMongoDB():
+    if hasattr(threadLocal, 'mongoDict'):
+        threadLocal.mongoDict['con'].disconnect()
+        del threadLocal.mongoDict
 
 def initDictionaryId():
     mongoDB = getThreadLocalMongoDB()['mongoDB']
@@ -22,8 +50,23 @@ def initDictionaryId():
 def initDictionary():
     initDictionaryId()
     mongoDB = getThreadLocalMongoDB()['mongoDB']
-    if True:
-        mongoDB.PubDictionary.remove({'code': 'D_DICTTEST'})
+    li = getDictionaryLi()
+    codeLi = [item["code"] for item in li]
+    mongoDB.PubDictionary.remove({'_id': {'$nin': codeLi}})
+    for item in li:
+        if not mongoDB.PubDictionary.find_one({'code': item["code"]}):
+            seq = mongoDB.counters.find_and_modify(query={'_id': 'pubDictionaryId'}, update={'$inc': {'c': 1}})
+            item["_id"] = seq["c"]
+            item["id"] = seq["c"]
+            mongoDB.PubDictionary.save(item)
+        else:
+            dictionaryItem = mongoDB.PubDictionary.find_one({'code': item["code"]})
+            for subItem in item:
+                if subItem != "id" and subItem != "_id":
+                    dictionaryItem[subItem] = item[subItem]
+            mongoDB.PubDictionary.save(dictionaryItem)
+            
+
     if not mongoDB.PubDictionary.find_one({'code': 'D_DICTTEST'}):
         seq = mongoDB.counters.find_and_modify(query={'_id': 'pubDictionaryId'}, update={'$inc': {'c': 1}})
         mongoDB.PubDictionary.save({
@@ -55,50 +98,16 @@ def initDictionary():
             }],
         })
 
-def initTransactionsId():
+def initSequence():
     mongoDB = getThreadLocalMongoDB()['mongoDB']
-    dictionaryId = mongoDB.counters.find_one({'_id': 'transactionsId'})
-    if not dictionaryId:
-        mongoDB.counters.save({'_id': 'transactionsId', 'c': 1})
-
-def initTest1Id():
-    mongoDB = getThreadLocalMongoDB()['mongoDB']
-    dictionaryId = mongoDB.counters.find_one({'_id': 'test1Id'})
-    if not dictionaryId:
-        mongoDB.counters.save({'_id': 'test1Id', 'c': 1})
-
-def initTest2Id():
-    mongoDB = getThreadLocalMongoDB()['mongoDB']
-    dictionaryId = mongoDB.counters.find_one({'_id': 'test2Id'})
-    if not dictionaryId:
-        mongoDB.counters.save({'_id': 'test2Id', 'c': 1})
-
-def initDemoId():
-    mongoDB = getThreadLocalMongoDB()['mongoDB']
-    demoId = mongoDB.counters.find_one({'_id': 'demoId'})
-    if not demoId:
-        mongoDB.counters.save({'_id': 'demoId', 'c': 1})
-    demoId = mongoDB.counters.find_one({'_id': 'demoBId'})
-    if not demoId:
-        mongoDB.counters.save({'_id': 'demoBId', 'c': 1})
-    demoId = mongoDB.counters.find_one({'_id': 'demoCId'})
-    if not demoId:
-        mongoDB.counters.save({'_id': 'demoCId', 'c': 1})
-
-def initActionTestId():
-    mongoDB = getThreadLocalMongoDB()['mongoDB']
-    actionTestId = mongoDB.counters.find_one({'_id': 'actionTestId'})
-    if not actionTestId:
-        mongoDB.counters.save({'_id': 'actionTestId', 'c': 1})
-    actionTestId = mongoDB.counters.find_one({'_id': 'actionTestBId'})
-    if not actionTestId:
-        mongoDB.counters.save({'_id': 'actionTestBId', 'c': 1})
-    actionTestId = mongoDB.counters.find_one({'_id': 'actionTestCId'})
-    if not actionTestId:
-        mongoDB.counters.save({'_id': 'actionTestCId', 'c': 1})
+    li = getSequenceLi()
+    idLi = [item["_id"] for item in li]
+    mongoDB.counters.remove({'_id': {'$nin': idLi}})
+    for item in li:
+        if not mongoDB.counters.find_one({'_id': item["_id"]}):
+            mongoDB.counters.save(item)
 
 def initDemo():
-    initDemoId()
     mongoDB = getThreadLocalMongoDB()['mongoDB']
     codeLi = []
     for i in range(25):
@@ -200,12 +209,6 @@ def initDemo():
                 'C': cLi,
             })
 
-def initPubReferenceLogId():
-    mongoDB = getThreadLocalMongoDB()['mongoDB']
-    id = mongoDB.counters.find_one({'_id': 'pubReferenceLogId'})
-    if not id:
-        mongoDB.counters.save({'_id': 'pubReferenceLogId', 'c': 1})
-
 def initSysUser():
     mongoDB = getThreadLocalMongoDB()['mongoDB']
     for item in mongoDB.SysUser.find():
@@ -218,13 +221,7 @@ def initSysUser():
         mongoDB.SysUser.save(item)
 
 if __name__ == '__main__':
+    initSequence()
     initDictionary()
-    initTransactionsId()
-    initTest1Id()
-    initTest2Id()
-    initDemoId()
     initDemo()
-    initActionTestId()
-    initPubReferenceLogId()
     initSysUser()
-

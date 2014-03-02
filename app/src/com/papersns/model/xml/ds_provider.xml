@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>Provider</id>
+	<displayName>供应商</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName></collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="code" extends="CODE_FIELD">
+				<displayName>代码</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fieldLength>20</fieldLength>
+			</field>
+			<field id="name" extends="NAME_FIELD">
+				<displayName>名称</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fieldLength>40</fieldLength>
+			</field>
+			<field id="providerTypeId" extends="INT_FIELD">
+				<displayName>供应商类别</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem>
+						<id>ProviderTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>ProviderType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="type" extends="INT_FIELD">
+				<displayName>类型</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_CURRENT_OBJECT_TYPE</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field>
+			<field id="taxRegNo" extends="STRING_FIELD">
+				<displayName>税务登记证号/身份证号</displayName>
+				<fieldLength>20</fieldLength>
+			</field>
+			<field id="officePhone" extends="STRING_FIELD">
+				<displayName>办公电话</displayName>
+				<fieldLength>20</fieldLength>
+			</field>
+			<field id="fax" extends="STRING_FIELD">
+				<displayName>传真号</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="linkBy" extends="STRING_FIELD">
+				<displayName>联系人</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="linkMobile" extends="STRING_FIELD">
+				<displayName>联系人手机号</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="address" extends="STRING_FIELD">
+				<displayName>联系地址</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="qq" extends="STRING_FIELD">
+				<displayName>QQ</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="zipCode" extends="STRING_FIELD">
+				<displayName>邮政编码</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="email" extends="STRING_FIELD">
+				<displayName>电子邮件</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="url" extends="STRING_FIELD">
+				<displayName>网址</displayName>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="status" extends="INT_FIELD">
+				<displayName>状态</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_CUSTOMER_STATUS</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

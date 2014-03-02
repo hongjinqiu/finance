@@ -1,6 +1,6 @@
 DataTableManager.prototype.doAfterResponse = function() {
 	// this is a total HACK, should figure a better way than Y.later ...
-	YUI().use("node", "event", function(Y) {
+	YUI(g_financeModule).use("finance-module", function(Y) {
 		Y.later( 25, self, function(){
 			syncCheckboxWhenChangeSelection(Y, dtInst.dt);
 		} );
@@ -51,7 +51,7 @@ function syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi) {
 }
 
 function removeSelection(elem) {
-	YUI().use("node", "event", function(Y) {
+	YUI(g_financeModule).use("finance-module", function(Y) {
 		Y.one(elem).ancestor(".selectionItem").remove();
 		syncCheckboxWhenChangeSelection(Y, dtInst.dt);
 	});
@@ -106,66 +106,77 @@ function syncCallbackSelection() {
 }
 
 function getDsUrl(listTemplate) {
-	return "/console/selectorschema?@name=" + listTemplate.Id + "&format=json";
+	var id = listTemplate.SelectorId;
+	if (!id) {
+		id = listTemplate.Id;
+	}
+	return "/console/selectorschema?@name=" + id + "&format=json";
 }
 
-YUI().use("node", "event", function(Y) {
-	Y.on("domready", function(e) {
-		var dataGrid = dtInst.dt;
-		var checkboxItemInnerCssSelector = dtInst.getCheckboxInnerCssSelector();
-		var checkboxCssSelector = dtInst.getCheckboxCssSelector();
-		dataGrid.delegate("click", function(e) {
-			var nodeLi = yInst.all(checkboxCssSelector);
-			syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi);
-		}, checkboxItemInnerCssSelector, dataGrid);
-
-		var checkboxAllInnerCssSelector = dtInst.getCheckboxAllInnerCssSelector();
-		dataGrid.delegate("click", function(e) {
-			var nodeLi = yInst.all(checkboxCssSelector);
-			syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi);
-		}, checkboxAllInnerCssSelector, dataGrid);
-		
-		Y.one("#confirmBtn").on("click", function(e){
+function selectorMain() {
+	if (typeof(main) !== "undefined") {
+		main();
+	}
+//	YUI().use("node", "event", function(Y) {
+//		Y.on("domready", function(e) {
+			YUI(g_financeModule).use("finance-module", function(Y){
+				var dataGrid = dtInst.dt;
+				var checkboxItemInnerCssSelector = dtInst.getCheckboxInnerCssSelector();
+				var checkboxCssSelector = dtInst.getCheckboxCssSelector();
+				dataGrid.delegate("click", function(e) {
+					var nodeLi = yInst.all(checkboxCssSelector);
+					syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi);
+				}, checkboxItemInnerCssSelector, dataGrid);
+				
+				var checkboxAllInnerCssSelector = dtInst.getCheckboxAllInnerCssSelector();
+				dataGrid.delegate("click", function(e) {
+					var nodeLi = yInst.all(checkboxCssSelector);
+					syncSelectionWhenChangeCheckbox(Y, dataGrid, nodeLi);
+				}, checkboxAllInnerCssSelector, dataGrid);
+				
+				Y.one("#confirmBtn").on("click", function(e){
 //			syncCheckboxWhenChangeSelection(Y, dataGrid);
-			if (parent && parent.g_relationManager) {
-				var selectorId = listTemplate.Id;
-				var selectValueLi = Y.all("#selectionResult .selectionItem input").get("value");
-				if (!selectValueLi || selectValueLi.length == 0) {
-					//showAlert("请先选择");
-					parent.s_selection([]);
-				} else {
-					for (var i = 0; i < selectValueLi.length; i++) {
-						if (selectionBo[selectValueLi[i]]) {
-							parent.g_relationManager.addRelationBo(selectorId, selectionBo["url"], selectionBo[selectValueLi[i]]);
+					if (parent && parent.g_relationManager) {
+						var selectorId = listTemplate.Id;
+						var selectValueLi = Y.all("#selectionResult .selectionItem input").get("value");
+						if (!selectValueLi || selectValueLi.length == 0) {
+							//showAlert("请先选择");
+							parent.s_selection([]);
+						} else {
+							for (var i = 0; i < selectValueLi.length; i++) {
+								if (selectionBo[selectValueLi[i]]) {
+									parent.g_relationManager.addRelationBo(selectorId, selectionBo["url"], selectionBo[selectValueLi[i]]);
+								}
+							}
+							parent.s_selection(selectValueLi);
+						}
+						parent.s_closeDialog();
+					} else {
+						alert("找不到父窗口，无法赋值！");
+					}
+				});
+				Y.one("#clearBtn").on("click", function(e){
+					Y.one("#selectionResult").setHTML("");
+					syncCheckboxWhenChangeSelection(Y, dtInst.dt);
+				});
+				// 取得父函数的queryFunc,并设置到页面上的hidden field里面,最后调用refresh,应用这些参数查询数据
+				if (parent && parent.s_queryFunc) {
+					var queryDict = parent.s_queryFunc()
+					for (var key in queryDict) {
+						if (document.getElementById(key)) {
+							document.getElementById(key).value = queryDict[key];
 						}
 					}
-					parent.s_selection(selectValueLi);
 				}
-				parent.s_closeDialog();
-			} else {
-				alert("找不到父窗口，无法赋值！");
-			}
-		});
-		Y.one("#clearBtn").on("click", function(e){
-			Y.one("#selectionResult").setHTML("");
-			syncCheckboxWhenChangeSelection(Y, dtInst.dt);
-		});
-		// 取得父函数的queryFunc,并设置到页面上的hidden field里面,最后调用refresh,应用这些参数查询数据
-		if (parent && parent.s_queryFunc) {
-			var queryDict = parent.s_queryFunc()
-			for (var key in queryDict) {
-				if (document.getElementById(key)) {
-					document.getElementById(key).value = queryDict[key];
-				}
-			}
-		}
-		// 同步selectionBo到选择区域,
-		syncCallbackSelection();
-		
-		//if (parent || location.href.indexOf("@entrance=true") > -1) {
-		gridPanelDict["columnModel_1"].dt.refreshPaginator();
-		//}
-	});
-});
+				// 同步selectionBo到选择区域,
+				syncCallbackSelection();
+				
+				//if (parent || location.href.indexOf("@entrance=true") > -1) {
+				gridPanelDict["columnModel_1"].dt.refreshPaginator();
+				//}
+			});
+//		});
+//	});
+}
 
 

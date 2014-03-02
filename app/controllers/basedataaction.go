@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"fmt"
 )
 
 func init() {
@@ -24,7 +25,7 @@ type IActionSupport interface {
 	afterCopyData(sessionId int, dataSource DataSource, bo *map[string]interface{})
 	editValidate(sessionId int, dataSource DataSource, bo map[string]interface{}) (string, bool)
 	beforeEditData(sessionId int, dataSource DataSource, bo *map[string]interface{})
-	afterEditData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow)
+	afterEditData(sessionId int, dataSource DataSource, bo *map[string]interface{})
 	beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{})
 	afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow)
 	beforeGiveUpData(sessionId int, dataSource DataSource, bo *map[string]interface{})
@@ -49,7 +50,7 @@ func (o ActionSupport) editValidate(sessionId int, dataSource DataSource, bo map
 	return "", true
 }
 func (o ActionSupport) beforeEditData(sessionId int, dataSource DataSource, bo *map[string]interface{})             {}
-func (o ActionSupport) afterEditData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+func (o ActionSupport) afterEditData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 }
 func (o ActionSupport) beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {}
 func (o ActionSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
@@ -121,9 +122,10 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 	srcQuery := map[string]interface{}{
 		"_id": (*bo)["_id"],
 	}
-	db.C(dataSource.Id).Find(srcQuery).One(&srcBo)
-	modelIterator := ModelIterator{}
 	modelTemplateFactory := ModelTemplateFactory{}
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	db.C(collectionName).Find(srcQuery).One(&srcBo)
+	modelIterator := ModelIterator{}
 	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}){
 		if destData != nil && srcData == nil {
 			(*destData)["createBy"] = userId
@@ -169,6 +171,13 @@ func (c BaseDataAction) commitTxn(sessionId int) {
 }
 
 func (c BaseDataAction) renderCommon(bo map[string]interface{}, dataSource DataSource) revel.Result {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
+		if (*data)[fieldGroup.Id] != nil {
+			(*data)[fieldGroup.Id] = fmt.Sprint((*data)[fieldGroup.Id])
+		}
+	})
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		c.Response.ContentType = "application/json; charset=utf-8"
@@ -234,13 +243,14 @@ func (c BaseDataAction) getDataCommon() (map[string]interface{}, DataSource) {
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("GetData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
@@ -273,13 +283,14 @@ func (c BaseDataAction) copyDataCommon() (map[string]interface{}, DataSource) {
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	srcBo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	srcBo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("CopyData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &srcBo)
 	c.actionSupport.beforeCopyData(sessionId, dataSource, srcBo)
 	dataSource, bo := modelTemplateFactory.GetCopyInstance(dataSourceModelId, srcBo)
@@ -291,7 +302,7 @@ func (c BaseDataAction) copyDataCommon() (map[string]interface{}, DataSource) {
 }
 
 /**
- * 修改
+ * 修改,只取数据,没涉及到数据库保存,涉及到数据库保存的方法是SaveData,
  */
 func (c BaseDataAction) EditData() revel.Result {
 	c.actionSupport = ActionSupport{}
@@ -307,29 +318,32 @@ func (c BaseDataAction) editDataCommon() (map[string]interface{}, DataSource) {
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
-	jsonBo := c.Params.Get("jsonData")
-
-	bo := map[string]interface{}{}
-	err := json.Unmarshal([]byte(jsonBo), &bo)
+	strId := c.Params.Get("id")
+	id, err := strconv.Atoi(strId)
 	if err != nil {
 		panic(err)
 	}
 	
+	querySupport := QuerySupport{}
+	queryMap := map[string]interface{}{
+		"_id": id,
+	}
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
+	if !found {
+		panic("RefreshData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
+	}
+	
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, bo)
 	if !isValid {
 		panic(editMessage)
 	}
 
 	c.actionSupport.beforeEditData(sessionId, dataSource, &bo)
-
-	financeService := FinanceService{}
-	diffDataRowLi := financeService.SaveData(sessionId, dataSource, &bo)
-
-	c.actionSupport.afterEditData(sessionId, dataSource, &bo, diffDataRowLi)
+	c.actionSupport.afterEditData(sessionId, dataSource, &bo)
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return bo, dataSource
@@ -362,10 +376,20 @@ func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.setCreateFixFieldValue(sessionId, dataSource, &bo)
+	strId := modelTemplateFactory.GetStrId(bo)
+	if strId == "" || strId == "0" {
+		c.setCreateFixFieldValue(sessionId, dataSource, &bo)
+	} else {
+		c.setModifyFixFieldValue(sessionId, dataSource, &bo)
+		editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, bo)
+		if !isValid {
+			panic(editMessage)
+		}
+	}
+	
 	c.actionSupport.beforeSaveData(sessionId, dataSource, &bo)
-
 	financeService := FinanceService{}
+
 	diffDataRowLi := financeService.SaveData(sessionId, dataSource, &bo)
 
 	c.actionSupport.afterSaveData(sessionId, dataSource, &bo, diffDataRowLi)
@@ -377,7 +401,8 @@ func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
 	queryMap := map[string]interface{}{
 		"_id": bo["_id"],
 	}
-	bo, _ = querySupport.FindByMap(dataSourceModelId, queryMap)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, _ = querySupport.FindByMap(collectionName, queryMap)
 	return bo, dataSource
 }
 
@@ -407,13 +432,14 @@ func (c BaseDataAction) giveUpDataCommon() (map[string]interface{}, DataSource) 
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("giveUpData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.actionSupport.beforeGiveUpData(sessionId, dataSource, &bo)
 	c.actionSupport.afterGiveUpData(sessionId, dataSource, &bo)
@@ -450,13 +476,14 @@ func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, DataSource) 
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("DeleteData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.actionSupport.beforeDeleteData(sessionId, dataSource, &bo)
 
@@ -513,13 +540,14 @@ func (c BaseDataAction) refreshDataCommon() (map[string]interface{}, DataSource)
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("RefreshData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 	
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.actionSupport.beforeRefreshData(sessionId, dataSource, &bo)
 	c.actionSupport.afterRefreshData(sessionId, dataSource, &bo)

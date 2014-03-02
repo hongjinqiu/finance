@@ -51,7 +51,7 @@
 			<!-- python language -->
 		</checkbox-column>
 		<!-- <id-column name="EMPEGRESS_ID" text="编号" hideable="true" /> -->
-		<id-column name="_id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -65,7 +65,6 @@
 			</buttons>
 		</virtual-column>
 
-		<auto-column name="id" />
 		<auto-column name="code" />
 		<auto-column name="name" />
 		<string-column name="stringColumn" auto="true" />
@@ -131,7 +130,7 @@
 		<query-parameter name="treeUrlTest" auto="true" text=""></query-parameter>
 		<query-parameter name="checkboxTest" auto="true" text=""></query-parameter>
 		<query-parameter name="radioTest" auto="true" text=""></query-parameter>
-		<query-parameter name="_id" auto="true" text=""></query-parameter>
+		<query-parameter name="id" auto="true" text=""></query-parameter>
 		<query-parameter name="nestTest" text="">
 			<parameter-attribute name="config" value="{}" />
 			<parameter-attribute name="listeners" value="{}" />

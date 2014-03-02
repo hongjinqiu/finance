@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>CashAccount</id>
+	<selector-id>CashAccountSelector</selector-id>
+	<data-source-model-id>CashAccount</data-source-model-id>
+
+	<adapter name="ModelListTemplateAdapter" />
+	<description>现金帐户列表</description>
+	<scripts>js/ds_listtoolbar.js</scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<toolbar export="true">
+		<button text="新增" mode="url" handler="/console/formschema?@name=CashAccount" iconCls="test" />
+
+		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+		</button>
+	</toolbar>
+
+	<data-provider size="10">
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选现金帐户" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
+		<checkbox-column name="checkboxSelect" hideable="false">
+			<expression>1 == 1</expression>
+		</checkbox-column>
+		<id-column name="id" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=CashAccount&amp;id={id}">
+				</button>
+				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				</button>
+				<button text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=CashAccount&amp;id={id}&amp;formStatus=view">
+				</button>
+			</buttons>
+		</virtual-column>
+
+		<auto-column name="code" />
+		<auto-column name="name" />
+		<auto-column name="mnemonicNo" />
+		<auto-column name="currencyTypeId" />
+		<auto-column name="dutyBy" />
+	</column-model>
+
+	<query-parameters dataSetId="A">
+		<query-parameter name="code" auto="true" text=""></query-parameter>
+		<query-parameter name="name" auto="true" text=""></query-parameter>
+		<query-parameter name="mnemonicNo" auto="true" text=""></query-parameter>
+		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
+		<query-parameter name="dutyBy" auto="true" text=""></query-parameter>
+	</query-parameters>
+</list-template>

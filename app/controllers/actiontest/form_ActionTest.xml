@@ -13,29 +13,29 @@
 		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
 		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
 		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
-		<button name="delBtn" text="删除" mode="fn" handler="test" iconCls=""></button>
+		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button>
 		<button name="cancelBtn" text="作废" mode="fn" handler="cancelData" iconCls=""></button>
 		<button name="unCancelBtn" text="反作废" mode="fn" handler="unCancelData" iconCls=""></button>
 		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
-		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logListData" iconCls=""></button>
-		<button name="testBtn" text="测试" mode="fn" handler="test" iconCls=""></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
 	</toolbar>
-
+	
 	<column-model dataSetId="A" colSpan="4">
-		<id-column name="_id" text="编号" hideable="true" />
-		<auto-column name="id" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 		<auto-column name="billStatus" hideable="true" />
 		
 		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
 		<auto-column name="dicTest" colSpan="2" labelWidth="15%" columnWidth="35%">
-			<!-- <column-attribute name="editor" value="radiofield"/> -->
+			
 		</auto-column>
-		<!-- <auto-column name="selectTest" colSpan="2" /> -->
 		<select-column name="selectTest" colSpan="2" auto="true" selectionMode="single"></select-column>
 		<auto-column name="age" colSpan="2" />
 		<auto-column name="date" colSpan="2">
 			<column-attribute name="editor" value="datefield"/>
 		</auto-column>
+		
+		<!-- 
+		 -->
 		<!-- 
 		<auto-column name="name" colSpan="2" labelWidth="15%" />
 		<auto-column name="age" colSpan="2" />
@@ -52,7 +52,7 @@
 			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false" />
-		<id-column name="_id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作">
 			<buttons>
 				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
@@ -60,7 +60,6 @@
 				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
 			</buttons>
 		</virtual-column>
-		<auto-column name="id" hideable="true" />
 		<auto-column name="code" />
 		<auto-column name="name" />
 		<auto-column name="dicTest" />
@@ -75,8 +74,7 @@
 			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
 			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
 		</toolbar>
-		<id-column name="_id" text="编号" hideable="true" />
-		<auto-column name="id" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 		
 		<auto-column name="code" />
 		<auto-column name="name" />

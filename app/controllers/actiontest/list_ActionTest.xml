@@ -43,27 +43,30 @@
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression>1 == 1</expression>
 		</checkbox-column>
-		<id-column name="_id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
+				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}">
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button text="删除" iconCls="bj_btn" mode="fn" handler="doDeleteRecord">
+				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="D" />
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url^" handler="/console/formschema.go?@name=ActionTest&amp;id={id}">
+				<button text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
 					<expression>1 == 1</expression>
 				</button>
 			</buttons>
 		</virtual-column>
 
-		<auto-column name="id" />
 		<auto-column name="code" />
 		<auto-column name="name" />
+		<auto-column name="dicTest" />
+		<auto-column name="selectTest" />
+		<auto-column name="age" />
+		<auto-column name="date" />
 	</column-model>
 
 	<query-parameters dataSetId="A">

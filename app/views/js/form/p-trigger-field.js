@@ -149,14 +149,15 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
     	
     	this.on('valueChange', Y.bind(function(e) {
             if (e.src != 'ui') {
-            	if (!e.newVal) {
+            	var newValue = e.newVal + "";
+            	if (!newValue || parseInt(newValue) <= 0) {
             		this._fieldNode.set('value', "");
             		return;
             	}
                 //this._fieldNode.set('value', e.newVal + "_测试值");
                 var selectorId = this._getSelectorId();
                 var relationManager = new RelationManager();
-                var li = e.newVal.split(",");
+                var li = newValue.split(",");
                 var valueLi = [];
                 for (var i = 0; i < li.length; i++) {
                 	var value = "";
@@ -403,6 +404,7 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.PFormField, [Y.WidgetParent
                 if (!val) {
                 	return true;
                 }
+                val = val + "";
                 var selectorId = this._getSelectorId();
                 var relationManager = new RelationManager();
                 var li = val.split(",");

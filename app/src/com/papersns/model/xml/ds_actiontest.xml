@@ -8,8 +8,8 @@
 	<accountBookIdField></accountBookIdField>
 	<modelType>BASE</modelType>
 	<inUsedDenyEdit>false</inUsedDenyEdit>
-	<actionNameSpace>/finance/actiontest</actionNameSpace>
-	<listUrl>/console/listschema.go?@name=ActionTest</listUrl>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
 	<collectionName></collectionName>
 	<billTypeField></billTypeField>
 	<billTypeParamDataSource></billTypeParamDataSource>
@@ -39,7 +39,7 @@
 				<defaultValueExpr>code</defaultValueExpr>
 			</field>
 			<field id="name" extends="NAME_FIELD">
-				<displayName>昵称</displayName>
+				<displayName>名称</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>40</fieldLength>
 				<defaultValueExpr>nick</defaultValueExpr>
@@ -50,10 +50,12 @@
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>100</limitMax>
+				<defaultValueExpr>5</defaultValueExpr>
 			</field>
 			<field id="date" extends="DATE_FIELD">
 				<displayName>日期</displayName>
 				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>20140225</defaultValueExpr>
 				<!-- 
 				<fieldNumberType>DATETIME</fieldNumberType>
 				<fieldNumberType>YEAR</fieldNumberType>
@@ -67,10 +69,12 @@
 				<displayName>字典测试</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_DICTTEST</dictionary>
+				<defaultValueExpr>0</defaultValueExpr>
 			</field>
 			<field id="selectTest" extends="INT_FIELD">
 				<displayName>选择测试</displayName>
 				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>12</defaultValueExpr>
 				<relationDS>
 					<relationItem>
 						<id>SysUserSelector</id>
@@ -78,7 +82,7 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
-						<valueField>_id</valueField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
 			</field>
@@ -115,7 +119,7 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
-						<valueField>_id</valueField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS> -->
 			</field>
@@ -129,10 +133,12 @@
 				<displayName>字典测试</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_DICTTEST</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
 			</field>
 			<field id="date" extends="DATE_FIELD">
 				<displayName>日期</displayName>
 				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>20140225</defaultValueExpr>
 			</field>
 			<field id="age" extends="INT_FIELD">
 				<displayName>年纪</displayName>
@@ -140,10 +146,12 @@
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>100</limitMax>
+				<defaultValueExpr>15</defaultValueExpr>
 			</field>
 			<field id="selectTest" extends="INT_FIELD">
 				<displayName>选择测试</displayName>
 				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>12</defaultValueExpr>
 				<relationDS>
 					<relationItem>
 						<id>SysUserSelector</id>
@@ -151,14 +159,14 @@
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
-						<valueField>_id</valueField>
+						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
 			</field>
-			<field id="stringTest" extends="STRING_FIELD">
+			<!-- <field id="stringTest" extends="STRING_FIELD">
 				<displayName>字符串测试</displayName>
 				<allowEmpty>false</allowEmpty>
-			</field>
+			</field> -->
 		</bizField>
 	</detailData>
 	<detailData>

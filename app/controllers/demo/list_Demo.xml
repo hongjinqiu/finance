@@ -47,7 +47,7 @@
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression>1 == 1</expression>
 		</checkbox-column>
-		<id-column name="_id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -61,8 +61,6 @@
 			</buttons>
 		</virtual-column>
 
-		<auto-column name="id" />
-		
 		<auto-column name="code" />
 		<auto-column name="name" />
 		

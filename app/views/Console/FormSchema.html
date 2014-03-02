@@ -20,22 +20,6 @@
 		root : 'yui.3.12.0/',
 		gallery: 'gallery-2013.09.18-18-49'
 	};
-	var formJsConfig = {
-		modules: {
-	        "papersns-form": {
-	            fullpath: '/app/FormJS',
-	            requires: ['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection']
-	        }
-	    }
-	};
-	var formQuickEditJsConfig = {
-		modules: {
-	        "papersns-form-quickedit": {
-	            fullpath: '/app/comboview?js/form/p-form-quickedit.js',
-	            requires: ["datatable-base", "papersns-form"]
-	        }
-	    }	
-	};
 	// 系统参数
 	var sysParam = {
 		localCurrency: {
@@ -49,7 +33,7 @@
 	};
 </script>
 <script src="/app/combo?yui.3.12.0/yui/yui-min.js" type="text/javascript"></script>
-<script type="text/javascript" src="/app/comboview?js/common.js&js/dataTableExtend.js&js/dataTableDataSourceExtend.js&js/columnManager.js&js/columnDataSourceManager.js&js/ds_formtoolbar.js&js/modelService.js&js/modelTemplateFactory.js&js/ds_formFieldFactory.js&js/relationManager.js&js/templateService.js&js/formManager.js&{{.result.formTemplate.Scripts}}"></script>
+<script type="text/javascript" src="/app/comboview?js/moduleConfig.js&js/common.js&js/dataTableExtend.js&js/dataTableDataSourceExtend.js&js/columnManager.js&js/columnDataSourceManager.js&js/ds_formtoolbar.js&js/modelService.js&js/modelTemplateFactory.js&js/ds_formFieldFactory.js&js/relationManager.js&js/templateService.js&js/formManager.js&{{.result.formTemplate.Scripts}}"></script>
 <script type="text/javascript">
 	var dataBo = {{.result.dataBoJson}};
 	var formTemplateJsonData = {{.result.formTemplateJsonData}};
@@ -81,6 +65,7 @@
 	var masterFormFieldDict = {};
 	var gridPanelDict = {};
 	var g_formStatus = "{{.result.formStatus}}";// 表单状态,view或""
+	var g_id = "{{.result.id}}";// 表单状态,view或""
 	//var masterRenderLiJson = {{.result.masterRenderLiJson}};
 </script>
 </head>
@@ -126,7 +111,7 @@
 				 -->
 				<div id="{{$item.ColumnModel.DataSetId}}_{{$item.ColumnModel.IdColumn.Name}}_render" style="display: none"></div>
 				<script type="text/javascript">
-				YUI(formJsConfig).use("node", "event", "papersns-form", function(Y) {
+				YUI(g_financeModule).use("finance-module", function(Y) {
 					var formFieldFactory = new FormFieldFactory();
 					var field = formFieldFactory.getFormField(Y, '{{$item.ColumnModel.IdColumn.Name}}', '{{$item.ColumnModel.DataSetId}}');
 					field.render("#{{$item.ColumnModel.DataSetId}}_{{$item.ColumnModel.IdColumn.Name}}_render");
@@ -142,7 +127,7 @@
 						 -->
 						<div id="{{$item.ColumnModel.DataSetId}}_{{$hiddenItem.Name}}_render" style="display: none"></div>
 						<script type="text/javascript">
-						YUI(formJsConfig).use("node", "event", "papersns-form", function(Y) {
+						YUI(g_financeModule).use("finance-module", function(Y) {
 							var formFieldFactory = new FormFieldFactory();
 							var field = formFieldFactory.getFormField(Y, '{{$hiddenItem.Name}}', '{{$item.ColumnModel.DataSetId}}');
 							field.render("#{{$item.ColumnModel.DataSetId}}_{{$hiddenItem.Name}}_render");
@@ -168,7 +153,7 @@
 										<td width="{{$tdItem.columnWidth}}" colspan="{{$tdItem.columnSpan}}">
 											<div id="{{$item.DataSetId}}_{{$tdItem.name}}_render"></div>
 											<script type="text/javascript">
-											YUI(formJsConfig).use("node", "event", "papersns-form", function(Y) {
+											YUI(g_financeModule).use("finance-module", function(Y) {
 												var formFieldFactory = new FormFieldFactory();
 												var field = formFieldFactory.getFormField(Y, '{{$tdItem.name}}', '{{$item.DataSetId}}');
 												field.render("#{{$item.DataSetId}}_{{$tdItem.name}}_render");
@@ -190,7 +175,15 @@
 					<div>{{$item.Text}}</div>
 				{{end}}
 				{{if $item.ColumnModel.Toolbar.ButtonLi}}
-					<div>
+					{{if eq $tResult.formTemplate.DataSourceModelId ""}}
+						{{if eq $item.Name ""}}
+							<div id="columnModel_{{$index}}_tbar">
+						{{else}}
+							<div id="{{$item.Name}}_tbar">
+						{{end}}
+					{{else}}
+						<div id="{{$item.DataSetId}}_tbar">
+					{{end}}
 					{{range $tbarIndex, $tbarItem := $item.ColumnModel.Toolbar.ButtonLi}}
 						{{if eq $tbarItem.Mode "fn"}}
 							<input type="button" value="{{$tbarItem.Text}}" class="{{$tbarItem.IconCls}}" onclick="{{$tbarItem.Handler}}('{{$item.DataSetId}}')"/>
@@ -214,7 +207,7 @@
 					<div id="{{$item.DataSetId}}_{{$index}}"></div>
 				{{end}}
 			<script type="text/javascript">
-				YUI().use("node", "event", 'array-extras', 'querystring-stringify', "json", "datatable", "datasource-get", "datasource-jsonschema", "datatable-datasource", "datatable-sort", "datatable-scroll", "cssbutton", 'cssfonts', 'dataschema-json','datasource-io','model-sync-rest',"gallery-datatable-paginator",'gallery-paginator-view',"listtemplate-paginator","datatype-date-format", "io-base", "anim", function(Y) {
+				YUI(g_financeModule).use("finance-module", function(Y) {
 					//,"gallery-aui-calendar-datepicker-select"
 					var columnModel = null;
 					for (var i = 0; i < formTemplateJsonData.FormElemLi.length; i++) {
@@ -286,5 +279,10 @@
 	<div style="display: none">
 		<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>
 	</div>
+	<script type="text/javascript">
+		if (typeof(main) !== "undefined") {
+			main();
+		}
+	</script>
 </body>
 </html>

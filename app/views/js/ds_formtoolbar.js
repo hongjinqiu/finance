@@ -1,207 +1,168 @@
-function masterValidate() {
-	var message = "";
-	
-	
-	
-	return {
-		"result": true,
-		"message": message
-	};
-}
-
-function detailValidate() {
-	var message = "";
-//	var store = gridPanel.getStore();
-//	store.each(function(record, index) {
-//		// 预算科目维度为金额时，若金额不为0，单价和数量是均空或者均有值，否则报错
-//		if (record.get('BUDGET_DIMENSION') == "01") {// 01:金额,02:数量
-//			if (parseFloat(record.get('AMT')) != 0) {
-//				var allEmpty = (record.get('UP') == "" || parseFloat(record.get('UP')) == 0) && (record.get('QTY') == "" || parseFloat(record.get('QTY')) == 0);
-//				var allNotNull = (record.get('UP') != "" && parseFloat(record.get('UP')) != 0) && (record.get('QTY') != "" || parseFloat(record.get('QTY')) != 0);
-//				if (!allEmpty && !allNotNull) {
-//					message += "请先完善序号为" + (index + 1) + "的数据，预算科目维度为金额，金额不为0，单价和数量必须是均空或者均有值;<br />";
-//				}
-//			}
-//		}
-//		var amtOccurs = parseFloat(record.get("AMT_OCCUR") || "0");
-//		if (amtOccurs == 0) {
-//			message += "请先完善序号为" + (index + 1) + "的数据，发生额不能为0;<br />";
-//		}
-//	});
-	return {
-		"result": true,
-		"message": message
-	};
-}
-
-function editData() {//保存
+function editData() {//修改
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/EditData?format=json"
+		url: "/" + dataSourceJson.Id + "/EditData?format=json"
 		,params: {
-			"age": 20,
-			"dataSourceModelId": "ActionTest",
-			"jsonData": {
-				"_id": 26,
-				"id": 26,
-				"A": {
-					"_id": 26,
-					"id": 26,
-					"code": "testCode主数据集",
-					"name": "testName主数据集",
-					"selectTest": 15
-				},
-				"B": [{
-					"_id": 27,
-					"id": 27,
-					"code": "testCodeB分录B修改测试",
-					"name": "testNameB分录B修改测试",
-				}],
-				"C": [{
-					"_id": 134,
-					"id": 134,
-					"code": "testCodeC分录C修改测试",
-					"name": "testNameC分录C修改测试",
-				}]
-			}
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			showSuccess("保存数据成功");
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("edit");
 		}
 	});
 }
 
 function saveData() {//保存
-	ajaxRequest({
-		url: "/ActionTest/SaveData?format=json"
-		,params: {
-			"age": 20,
-			"dataSourceModelId": "ActionTest",
-			"jsonData": {
-				"A": {
-					"code": "testCode主数据集",
-					"name": "testName主数据集",
-				},
-				"B": [{
-					"code": "testCodeB分录B",
-					"name": "testNameB分录B",
-				}],
-				"C": [{
-					"code": "testCodeC分录C",
-					"name": "testNameC分录C",
-				}]
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
+	var validateResult = formManager.dsFormValidator(dataSourceJson, bo);
+	if (!validateResult.result) {
+		showError(validateResult.message);
+	} else {
+		ajaxRequest({
+			url: "/" + dataSourceJson.Id + "/SaveData?format=json"
+			,params: {
+				"dataSourceModelId": dataSourceJson.Id,
+				"jsonData": bo
+			},
+			callback: function(o) {
+				showSuccess("保存数据成功");
+				formManager.setFormStatus("view");
+				formManager.loadData2Form(dataSourceJson, o.bo);
 			}
-		},
-		callback: function(o) {
-			showSuccess("保存数据成功");
-		}
-	});
-	masterValidResult = masterValidate();
-	if (masterValidResult.result) {
-		var detailValidateResult = detailValidate();
-		if (detailValidateResult.result) {
-//			Ext.MessageBox.alert('提示信息', message);
-//			return;
-		}
-		
-		// showMask
-		// ajaxRequest save
-		// hideMask
+		});
 	}
 }
 
-function newData() {//新增
+function newData() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/NewData?format=json"
+		url: "/" + dataSourceJson.Id + "/NewData?format=json"
 		,params: {
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("edit");
 		}
 	});
 }
 
 function copyData() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/CopyData?format=json"
+		url: "/" + dataSourceJson.Id + "/CopyData?format=json"
 		,params: {
-			"id": 26,
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("edit");
 		}
 	});
 }
 
 function giveUpData() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/GiveUpData?format=json"
+		url: "/" + dataSourceJson.Id + "/GiveUpData?format=json"
 		,params: {
-			"id": 26,
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("view");
 		}
 	});
+}
+
+function deleteData() {
+	showWarning("您确定要删除吗？", function(){
+		var formManager = new FormManager();
+		var bo = formManager.getBo();
+		ajaxRequest({
+			url: "/" + dataSourceJson.Id + "/DeleteData?format=json"
+			,params: {
+				"dataSourceModelId": dataSourceJson.Id,
+				"id": bo["id"]
+			},
+			callback: function(o) {
+				location.href = "/console/listschema?@name=" + dataSourceJson.Id;
+			}
+		});
+	})
 }
 
 function refreshData() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/RefreshData?format=json"
+		url: "/" + dataSourceJson.Id + "/RefreshData?format=json"
 		,params: {
-			"id": 26,
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("view");
 		}
 	});
 }
 
-function logListData() {
+function logList() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/LogList?format=json"
+		url: "/" + dataSourceJson.Id + "/LogList?format=json"
 		,params: {
-			"id": 26,
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			YUI(g_financeModule).use("finance-module", function(Y) {
+				showAlert(Y.JSON.stringify(o));
+			});
 		}
 	});
 }
 
 function cancelData() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/CancelData?format=json"
+		url: "/" + dataSourceJson.Id + "/CancelData?format=json"
 		,params: {
-			"id": 153,
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			showSuccess("作废数据成功");
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("view");
 		}
 	});
 }
 
 function unCancelData() {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
 	ajaxRequest({
-		url: "/ActionTest/UnCancelData?format=json"
+		url: "/" + dataSourceJson.Id + "/UnCancelData?format=json"
 		,params: {
-			"id": 153,
-			"dataSourceModelId": "ActionTest"
+			"dataSourceModelId": dataSourceJson.Id,
+			"id": bo["id"]
 		},
 		callback: function(o) {
-			console.log(o);
-			showSuccess(o.responseText);
+			showSuccess("反作废数据成功");
+			formManager.loadData2Form(dataSourceJson, o.bo);
+			formManager.setFormStatus("view");
 		}
 	});
 }
@@ -226,7 +187,17 @@ function test() {
 	return;
 }
 
-function enableDisableToolbarBtn() {
+function ToolbarManager(){}
+
+function setBorderTmp(btn, status) {
+	if (status == "disabled") {
+		btn.style.border = "1px solid black";
+	} else {
+		btn.style.border = "1px solid red";
+	}
+}
+
+ToolbarManager.prototype.enableDisableToolbarBtn = function() {
 	if (g_formStatus == "view") {
 		var viewEnableBtnLi = ["listBtn","newBtn","copyBtn","editBtn","delBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
 		var viewDisableBtnLi = ["saveBtn","giveUpBtn"];
@@ -234,22 +205,27 @@ function enableDisableToolbarBtn() {
 			var btn = document.getElementById(viewEnableBtnLi[i]);
 			if (btn) {
 				btn.disabled = "";
+				setBorderTmp(btn, "");
 			}
 		}
 		var cancelBtn = document.getElementById("cancelBtn");
 		if (cancelBtn && masterFormFieldDict["billStatus"]) {
 			if (masterFormFieldDict["billStatus"].get("value") == "0") {
 				cancelBtn.disabled = "";
+				setBorderTmp(cancelBtn, "");
 			} else {
 				cancelBtn.disabled = "disabled";
+				setBorderTmp(cancelBtn, "disabled");
 			}
 		}
 		var unCancelBtn = document.getElementById("unCancelBtn");
 		if (unCancelBtn && masterFormFieldDict["billStatus"]) {
 			if (masterFormFieldDict["billStatus"].get("value") == "4") {
 				unCancelBtn.disabled = "";
+				setBorderTmp(unCancelBtn, "");
 			} else {
 				unCancelBtn.disabled = "disabled";
+				setBorderTmp(unCancelBtn, "disabled");
 			}
 		}
 		
@@ -257,6 +233,7 @@ function enableDisableToolbarBtn() {
 			var btn = document.getElementById(viewDisableBtnLi[i]);
 			if (btn) {
 				btn.disabled = "disabled";
+				setBorderTmp(btn, "disabled");
 			}
 		}
 	} else {
@@ -266,14 +243,14 @@ function enableDisableToolbarBtn() {
 			var btn = document.getElementById(editEnableBtnLi[i]);
 			if (btn) {
 				btn.disabled = "";
-				console.log("enable");
+				setBorderTmp(btn, "");
 			}
 		}
 		for (var i = 0; i < editDisableBtnLi.length; i++) {
 			var btn = document.getElementById(editDisableBtnLi[i]);
 			if (btn) {
 				btn.disabled = "disabled";
-				console.log("disable");
+				setBorderTmp(btn, "disabled");
 			}
 		}
 	}

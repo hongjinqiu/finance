@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>CashAccount</id>
+	<data-source-model-id>CashAccount</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>现金帐户表单</description>
+	<scripts>cashaccount/cashAccountModel.js</scripts>
+	<view-template view="Console/FormSchema.html"/>
+	<toolbar>
+		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=CashAccount" iconCls="test"></button>
+		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>
+		<button name="copyBtn" text="复制" mode="fn" handler="copyData"></button>
+		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
+		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
+		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button>
+		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
+	</toolbar>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<id-column name="id" text="编号" hideable="true" />
+		
+		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="name" colSpan="2" labelWidth="15%" />
+		<auto-column name="mnemonicNo" colSpan="2" labelWidth="13%" />
+	</column-model>
+
+	<html>
+		<![CDATA[
+			<div>基本信息</div>
+		]]>
+	</html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="currencyTypeId" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="dutyBy" colSpan="2" labelWidth="15%" />
+		<auto-column name="storeAddress" colSpan="2" />
+		<auto-column name="amtSecureBalance" colSpan="2" />
+		<auto-column name="amtOriginalCurrencyBalance" colSpan="2" />
+		<auto-column name="amtLimits" colSpan="2" />
+		<auto-column name="limitsControl" colSpan="2" />
+	</column-model>
+	
+</form-template>

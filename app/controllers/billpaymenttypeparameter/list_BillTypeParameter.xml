@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>BillTypeParameter</id>
+	<selector-id>BillTypeParameterSelector</selector-id>
+	<data-source-model-id></data-source-model-id>
+
+	<description>单据类型参数列表</description>
+	<scripts>js/ds_listtoolbar.js</scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<toolbar export="true">
+		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
+
+		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+			<button-attribute name="code" value="D" />
+			<button-attribute name="functionId" value="50010" />
+		</button>
+
+		<button text="导出" mode="url" handler="doExport">
+			<button-attribute name="code" value="U" />
+			<button-attribute name="functionId" value="10018" />
+		</button>
+
+		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
+		</button>
+	</toolbar>
+
+	<!-- <security functionId="10018"></security> -->
+
+	<!-- <before-build-query>ActionTest.beforeBuildQuery</before-build-query> <after-build-query>ActionTest.afterBuildQuery</after-build-query> -->
+	<!-- <after-query-data>ModelListTemplateInterceptor.AfterQueryData</after-query-data> -->
+
+	<data-provider size="10">
+		<collection>BillTypeParameter</collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选单据类型参数" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
+		<checkbox-column name="checkboxSelect" hideable="false">
+			<expression>1 == 1</expression>
+		</checkbox-column>
+		<id-column name="id" text="id" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}">
+					<expression>1 == 1</expression>
+					<button-attribute name="code" value="U" />
+				</button>
+				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+					<expression>1 == 1</expression>
+					<button-attribute name="code" value="D" />
+				</button>
+				<button text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
+					<expression>1 == 1</expression>
+				</button>
+			</buttons>
+		</virtual-column>
+
+		<dictionary-column dictionary="D_BILL_TYPE_PARAMETER" name="type" text="类型" />
+		<dictionary-column dictionary="D_FIN_BUSI_PROPERTY" name="property" text="预设业务属性" />
+	</column-model>
+
+	<query-parameters dataSetId="A">
+		<query-parameter name="type" text="类型" auto="true" editor="combo" restriction="eq">
+			<parameter-attribute name="dictionary" value="D_BILL_TYPE_PARAMETER"/>
+		</query-parameter>
+		<query-parameter name="property" text="预设业务属性" auto="true" editor="combo" restriction="eq">
+			<parameter-attribute name="dictionary" value="D_FIN_BUSI_PROPERTY"/>
+		</query-parameter>
+	</query-parameters>
+</list-template>

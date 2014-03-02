@@ -3,7 +3,6 @@ package controllers
 //import "github.com/robfig/revel"
 import (
 	"com/papersns/global"
-	. "com/papersns/common"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
@@ -18,15 +17,10 @@ import (
 type FinanceService struct{}
 
 func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) *[]DiffDataRow {
-	strId := ""
-	if (*bo)["id"] != nil {
-		commonUtil := CommonUtil{}
-		tmpStrId := fmt.Sprint((*bo)["id"])
-		if commonUtil.IsNumber(tmpStrId) {
-			strId = fmt.Sprint((*bo)["id"])
-		}
-	}
 	modelTemplateFactory := ModelTemplateFactory{}
+	
+	strId := modelTemplateFactory.GetStrId(*bo)
+	
 	modelTemplateFactory.ConvertDataType(dataSource, bo)
 	// 主数据集和分录数据校验
 	message := o.validateBO((dataSource), (*bo))
@@ -61,7 +55,8 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 		}
 		txnManager := TxnManager{db}
 		txnId := global.GetTxnId(sessionId)
-		txnManager.Insert(txnId, dataSource.Id, *bo)
+		collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+		txnManager.Insert(txnId, collectionName, *bo)
 
 		return &diffDataRowLi
 	}
@@ -72,7 +67,8 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 	modelIterator := ModelIterator{}
 	srcBo := map[string]interface{}{}
 	var result interface{} = ""
-	err = db.C(dataSource.Id).Find(map[string]interface{}{"id": id}).One(&srcBo)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	err = db.C(collectionName).Find(map[string]interface{}{"_id": id}).One(&srcBo)
 	if err != nil {
 		panic(err)
 	}
@@ -109,7 +105,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
 	//	txnManager.Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
-	if _, updateResult := txnManager.Update(txnId, dataSource.Id, *bo); !updateResult {
+	if _, updateResult := txnManager.Update(txnId, collectionName, *bo); !updateResult {
 		panic("更新失败")
 	}
 	return &diffDataRowLi
@@ -120,7 +116,7 @@ func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, field
 		if fieldGroup.IsMasterField() {
 			masterSeqName := GetMasterSequenceName((dataSource))
 			masterSeqId := mongo.GetSequenceNo(db, masterSeqName)
-			(*data)["_id"] = masterSeqId
+//			(*data)["_id"] = masterSeqId
 			(*data)["id"] = masterSeqId
 			(*bo)["_id"] = masterSeqId
 			(*bo)["id"] = masterSeqId
@@ -129,7 +125,7 @@ func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, field
 			if found {
 				detailSeqName := GetDetailSequenceName((dataSource), detailData)
 				detailSeqId := mongo.GetSequenceNo(db, detailSeqName)
-				(*data)["_id"] = detailSeqId
+//				(*data)["_id"] = detailSeqId
 				(*data)["id"] = detailSeqId
 			}
 		}

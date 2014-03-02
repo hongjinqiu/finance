@@ -492,7 +492,8 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         			self.set("readonly", fieldGroup.FixReadOnly == "true");
         		}
         	});
-        	self.set("validator", dsFormFieldValidator);
+        	var formManager = new FormManager();
+        	self.set("validator", formManager.dsFormFieldValidator);
         }
     },
 
@@ -652,7 +653,16 @@ Y.PFormField = Y.Base.create('p-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
          */
         value: {
             value: '',
-            validator: Y.Lang.isString
+            //validator: Y.Lang.isString
+            validator: function(val) {
+            	return Y.Lang.isString(val) || Y.Lang.isNumber(val);
+            },
+            setter: function(val) {
+            	if (val === undefined || val === null) {
+            		val = "";
+            	}
+            	return val + "";
+            }
         },
 
         /**

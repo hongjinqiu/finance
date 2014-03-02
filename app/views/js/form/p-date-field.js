@@ -154,7 +154,7 @@ Y.PDateField = Y.Base.create('p-date-field', Y.PFormField, [Y.WidgetParent, Y.Wi
     				}
     				return false;
     			});
-    			var value = e.newVal;
+    			var value = e.newVal + "";
     			var index = 0;
     			index = dbPattern.indexOf("yyyy");
     			var yyyy = value.substr(index, 4);

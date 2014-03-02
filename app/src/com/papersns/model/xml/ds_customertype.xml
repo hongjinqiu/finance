@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>CustomerType</id>
+	<displayName>客户类别</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName></collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="code" extends="CODE_FIELD">
+				<displayName>代码</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fieldLength>20</fieldLength>
+			</field>
+			<field id="name" extends="NAME_FIELD">
+				<displayName>名称</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fieldLength>40</fieldLength>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

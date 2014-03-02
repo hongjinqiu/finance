@@ -118,13 +118,14 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, DataSource) {
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("CancelData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeCancelData(sessionId, dataSource, &bo)
@@ -144,7 +145,7 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	
-	bo, _ = querySupport.FindByMap(dataSourceModelId, queryMap)
+	bo, _ = querySupport.FindByMap(collectionName, queryMap)
 	return bo, dataSource
 }
 
@@ -173,13 +174,14 @@ func (c BillAction) unCancelDataCommon() (map[string]interface{}, DataSource) {
 	queryMap := map[string]interface{}{
 		"_id": id,
 	}
-	bo, found := querySupport.FindByMap(dataSourceModelId, queryMap)
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	bo, found := querySupport.FindByMap(collectionName, queryMap)
 	if !found {
 		panic("UnCancelData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 
-	modelTemplateFactory := ModelTemplateFactory{}
-	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeUnCancelData(sessionId, dataSource, &bo)
@@ -199,6 +201,6 @@ func (c BillAction) unCancelDataCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	
-	bo, _ = querySupport.FindByMap(dataSourceModelId, queryMap)
+	bo, _ = querySupport.FindByMap(collectionName, queryMap)
 	return bo, dataSource
 }

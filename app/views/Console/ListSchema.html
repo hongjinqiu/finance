@@ -33,7 +33,7 @@
 		thousandsSeparator: ","
 	};
 </script>
-<script type="text/javascript" src="/app/comboview?js/common.js&js/dataTableExtend.js&js/columnManager.js&js/queryParameter.js&Component/listTemplate.js&{{.result.listTemplate.Scripts}}"></script>
+<script type="text/javascript" src="/app/comboview?js/moduleConfig.js&js/common.js&js/dataTableExtend.js&js/columnManager.js&js/queryParameter.js&Component/listTemplate.js&{{.result.listTemplate.Scripts}}"></script>
 </head>
 
 <body class="yui3-skin-sam">
@@ -49,5 +49,10 @@
 	<div style="display: none">
 		<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>
 	</div>
+	<script type="text/javascript">
+		if (typeof(main) !== "undefined") {
+			main();
+		}
+	</script>
 </body>
 </html>

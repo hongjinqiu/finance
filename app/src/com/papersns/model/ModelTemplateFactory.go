@@ -96,10 +96,8 @@ func (o ModelTemplateFactory) findDataSourceInfo(id string) (DataSourceInfo, boo
 	rwlock.RLock()
 	defer rwlock.RUnlock()
 
-	for _, item := range gDataSourceDict {
-		if item.DataSource.Id == id {
-			return item, true
-		}
+	if gDataSourceDict[id].Path != "" {
+		return gDataSourceDict[id], true
 	}
 	return DataSourceInfo{}, false
 }
@@ -612,6 +610,27 @@ func (o ModelTemplateFactory) IsDataDifferent(fieldGroupLi []FieldGroup, destDat
 	return false
 }
 
+func (o ModelTemplateFactory) GetStrId(bo map[string]interface{}) string {
+	strId := ""
+	if bo["id"] != nil {
+		commonUtil := CommonUtil{}
+		tmpStrId := fmt.Sprint(bo["id"])
+		if commonUtil.IsNumber(tmpStrId) {
+			strId = fmt.Sprint(bo["id"])
+		}
+	} else {
+		masterData := bo["A"].(map[string]interface{})
+		if masterData["id"] != nil {
+			commonUtil := CommonUtil{}
+			tmpStrId := fmt.Sprint(masterData["id"])
+			if commonUtil.IsNumber(tmpStrId) {
+				strId = fmt.Sprint(masterData["id"])
+			}
+		}
+	}
+	return strId
+}
+
 func (o ModelTemplateFactory) ConvertDataType(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
@@ -622,6 +641,11 @@ func (o ModelTemplateFactory) ConvertDataType(dataSource DataSource, bo *map[str
 		}
 		o.applyFieldGroupValueByString(fieldGroup, data, content)
 	})
+	strId := o.GetStrId(*bo)
+	if strId != "" {
+		(*bo)["_id"], _ = strconv.Atoi(strId)
+		(*bo)["id"], _ = strconv.Atoi(strId)
+	}
 }
 
 // TODO applyFieldGroupValue by default,
@@ -634,9 +658,10 @@ func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup
 		}
 	}
 	intArray := []string{"SMALLINT", "INT", "LONGINT"}
+	commonUtil := CommonUtil{}
 	for _, intItem := range intArray {
 		if intItem == fieldGroup.FieldDataType {
-			if content == "" {
+			if content == "" || !commonUtil.IsNumber(content) {
 				(*data)[fieldGroup.Id] = 0
 			} else {
 				value, err := strconv.ParseInt(content, 10, 64)
@@ -728,3 +753,9 @@ func (o ModelTemplateFactory) GetRelationLi(sId int, dataSource DataSource, bo m
 	return li
 }
 
+func (o ModelTemplateFactory) GetCollectionName(dataSource DataSource) string {
+	if dataSource.CollectionName != "" {
+		return dataSource.CollectionName
+	}
+	return dataSource.Id
+}

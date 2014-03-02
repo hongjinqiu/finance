@@ -76,7 +76,7 @@ function(key, values) {
 			<!-- python language -->
 		</checkbox-column>
 		<!-- <id-column name="EMPEGRESS_ID" text="编号" hideable="true" /> -->
-		<id-column name="_id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -89,7 +89,6 @@ function(key, values) {
 				</button>
 			</buttons>
 		</virtual-column>
-		<string-column name="id" text="ID" />
 		<string-column name="nick" text="昵称" />
 		<number-column name="numTest" text="金额" prefix="￥" decimalPlaces="2" decimalSeparator="." thousandsSeparator="," suffix=""></number-column>
 		<!-- 
@@ -156,7 +155,7 @@ function(key, values) {
 			<parameter-attribute name="dictionary" value="D_DICTTEST" />
 		</query-parameter>
 		
-		<query-parameter name="_id" text="主键" restriction="eq" editor="hidden">
+		<query-parameter name="id" text="主键" restriction="eq" editor="hidden">
 		</query-parameter>
 	</query-parameters>
 </list-template>

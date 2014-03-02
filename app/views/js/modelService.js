@@ -21,10 +21,12 @@ ModelIterator.prototype.iterateAllField = function(dataSource, result, iterateFu
 	for (var i = 0; i < fieldGroupLi.length; i++) {
 		iterateFunc(fieldGroupLi[i], result);
 	}
-	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		var fieldGroupLi = self._getDataSetFieldGroupLi(dataSource.DetailDataLi[i].FixField, dataSource.DetailDataLi[i].BizField);
-		for (var j = 0; j < fieldGroupLi.length; j++) {
-			iterateFunc(fieldGroupLi[j], result);
+	if (dataSource.DetailDataLi) {
+		for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+			var fieldGroupLi = self._getDataSetFieldGroupLi(dataSource.DetailDataLi[i].FixField, dataSource.DetailDataLi[i].BizField);
+			for (var j = 0; j < fieldGroupLi.length; j++) {
+				iterateFunc(fieldGroupLi[j], result);
+			}
 		}
 	}
 }
@@ -72,13 +74,15 @@ ModelIterator.prototype._iterateMasterDataBo = function(dataSource, bo, result, 
 
 ModelIterator.prototype._iterateDetailDataBo = function(dataSource, bo, result, iterateFunc) {
 	var self = this;
-	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		var item = dataSource.DetailDataLi[i];
-		var fieldGroupLi = self._getDataSetFieldGroupLi(item.FixField, item.BizField);
-		var dataLi = bo[item.Id];
-		for (var j = 0; j < dataLi.length; j++) {
-			var data = dataLi[j];
-			iterateFunc(fieldGroupLi, data, j, result);
+	if (dataSource.DetailDataLi) {
+		for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+			var item = dataSource.DetailDataLi[i];
+			var fieldGroupLi = self._getDataSetFieldGroupLi(item.FixField, item.BizField);
+			var dataLi = bo[item.Id];
+			for (var j = 0; j < dataLi.length; j++) {
+				var data = dataLi[j];
+				iterateFunc(fieldGroupLi, data, j, result);
+			}
 		}
 	}
 }
@@ -88,8 +92,10 @@ function IterateFunc(dataSet, result){}
 ModelIterator.prototype.iterateAllDataSet = function(dataSource, result, iterateFunc) {
 	var self = this;
 	iterateFunc(dataSource.MasterData, result);
-	for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
-		iterateFunc(dataSource.DetailDataLi[i], result);
+	if (dataSource.DetailDataLi) {
+		for (var i = 0; i < dataSource.DetailDataLi.length; i++) {
+			iterateFunc(dataSource.DetailDataLi[i], result);
+		}
 	}
 }
 

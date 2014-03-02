@@ -284,6 +284,7 @@
 		<displayName>代码</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>20</fieldLength>
+		<allowCopy>false</allowCopy>
 	</field>	
 	
 	<field id="NAME_FIELD" extends="ROOT_FIELD">
