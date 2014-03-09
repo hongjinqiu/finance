@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>RFormTest</id>
+	<data-source-model-id>AccountInOut</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>RFormTest</description>
+	<scripts></scripts>
+	<view-template view="Console/FormSchema.html"/>
+	
+	<html>
+		<![CDATA[
+			<div id="form_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RFormField({
+						label: "form_field：",
+						name: "formField",
+						value: "formFieldValue"
+					});
+					field.render("#form_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['formField'] = field;
+				});
+			</script>
+			
+			<div id="text_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RTextField({
+						label: "text_field：",
+						name: "textField",
+						value: "textFieldValue"
+					});
+					field.render("#text_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['textField'] = field;
+				});
+			</script>
+			
+			<div id="textarea_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RTextareaField({
+						label: "textarea_field：",
+						name: "textareaField",
+						value: "textareaFieldValue"
+					});
+					field.render("#textarea_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['textareaField'] = field;
+				});
+			</script>
+			
+			<div id="display_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RDisplayField({
+						label: "display_field：",
+						name: "displayField",
+						value: "displayFieldValue"
+					});
+					field.render("#display_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['displayField'] = field;
+				});
+			</script>
+			
+			<div id="hidden_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RHiddenField({
+						label: "hidden_field：",
+						name: "hiddenField",
+						value: "hiddenFieldValue2"
+					});
+					//field.render("#hidden_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['hiddenField'] = field;
+				});
+			</script>
+			
+			<div id="number_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RNumberField({
+						label: "number_field：",
+						name: "numberField",
+						value: "numberFieldValue2"
+					});
+					field.render("#number_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['numberField'] = field;
+				});
+			</script>
+			
+			<div id="choice_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RChoiceField({
+						label: "choice_field：",
+						name: "choiceField",
+						multi: true,
+						choices: [{
+							label: "选项1",
+							value: 0
+						},{
+							label: "选项2",
+							value: 1
+						},{
+							label: "选项3",
+							value: 2
+						}]
+					});
+					field.render("#choice_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['choiceField'] = field;
+				});
+			</script>
+			
+			<div id="select_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RSelectField({
+						label: "select_field：",
+						name: "selectField",
+						//multi: true,
+						choices: [{
+							label: "选项1",
+							value: 0
+						},{
+							label: "选项2",
+							value: 1
+						},{
+							label: "选项3",
+							value: 2
+						}]
+					});
+					field.render("#select_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['selectField'] = field;
+				});
+			</script>
+			
+			<div id="date_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RDateField({
+						name: "dateField",
+						value: "dateFieldValue2",
+						dbPattern: "yyyyMMdd",
+						displayPattern: "yyyy-MM-dd"
+					});
+					field.render("#date_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['dateField'] = field;
+				});
+			</script>
+			
+			<!--
+			<select-column name="receiveBankId" 
+				text="开户银行" 
+				displayField="code,name" 
+				valueField="id" 
+				selectorName="BankSelector" 
+				selectionMode="single" />
+			-->
+			<div style="clear: both"></div>
+			<div id="trigger_field"></div>
+			<script type="text/javascript">
+				YUI(g_financeModule).use("finance-module", function(Y) {
+					var field = new Y.RTriggerField({
+						name: "triggerField",
+						value: "",
+						multi: function() {
+							return false;
+						},
+						selectorName: function() {
+							return "BankSelector";
+						},
+						displayField: function() {
+							return "code,name";
+						},
+						valueField: function() {
+							return "id";
+						},
+						selectFunc: function(selectValueLi, formObj) {
+							if (!selectValueLi || selectValueLi.length == 0) {
+	    						formObj.get("unSelectFunc")(formObj);
+	    					} else {
+	    						formObj.set("value", selectValueLi.join(","));
+	    					}
+						},
+						unSelectFunc: function(formObj) {
+							formObj.set("value", "");
+						},
+						queryFunc: function() {
+							return {};
+						},
+						selectorTitle: function() {
+							return "开户银行";
+						}
+					});
+					field.render("#trigger_field");
+					masterFormFieldLi.push(field);
+					masterFormFieldDict['triggerField'] = field;
+				});
+			</script>
+		]]>
+	</html>
+</form-template>

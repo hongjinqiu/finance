@@ -51,7 +51,7 @@
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="D" />
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
 					<expression>1 == 1</expression>
 				</button>
 			</buttons>

@@ -3,7 +3,7 @@
 	<id>CashAccount</id>
 	<data-source-model-id>CashAccount</data-source-model-id>
 	<adapter name="ModelFormTemplateAdapter" />
-	<description>现金帐户表单</description>
+	<description>现金账户表单</description>
 	<scripts>cashaccount/cashAccountModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
 	<toolbar>

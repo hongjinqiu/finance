@@ -33,7 +33,7 @@
 				</button>
 				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=IncomeItem&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=IncomeItem&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>

@@ -45,7 +45,7 @@
 	if (dataSourceJson) {
 		var modelTemplateFactory = new ModelTemplateFactory();
 		modelTemplateFactory.enhanceDataSource(dataSourceJson);
-		if (typeof(modelExtraInfo) != undefined) {
+		if (typeof(modelExtraInfo) != "undefined") {
 			modelTemplateFactory.extendDataSource(dataSourceJson, modelExtraInfo);
 		}
 	}

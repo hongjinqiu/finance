@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
 	<id>CashAccount</id>
-	<displayName>现金帐户</displayName>
+	<displayName>现金账户</displayName>
 	<systemId>FINANCE</systemId>
 	<codeFieldName></codeFieldName>
 	<businessDateField></businessDateField>

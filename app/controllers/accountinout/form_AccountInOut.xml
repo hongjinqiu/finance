@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>AccountInOut</id>
+	<data-source-model-id>AccountInOut</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>资金汇总表</description>
+	<scripts>accountinout/accountInOutModel.js</scripts>
+	<view-template view="Console/FormSchema.html"/>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="accountId" text="银行账户" colSpan="2" labelWidth="15%" columnWidth="35%"></auto-column>
+		<html colSpan="2">
+			<![CDATA[
+				<td width="15%">
+					<input type="radio" id="queryByDate" name="queryMode" value="1" checked="checked" />
+					<label for="queryByDate">按日期查询</label>
+				</td>
+				<td>
+					单据日期：
+					<div id="A_billDateBegin_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PDateField({
+							name : "billDateBegin",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_billDateBegin_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['billDateBegin'] = field;
+					});
+					</script>
+					～
+					<div id="A_billDateEnd_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PDateField({
+							name : "billDateEnd",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_billDateEnd_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['billDateEnd'] = field;
+					});
+					</script>
+				</td>
+			]]>
+		</html>
+		<html colSpan="2">
+			<![CDATA[
+				<td width="15%">
+					现金账户
+				</td>
+				<td>
+					<div id="A_cashAccount_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PTriggerField({
+							name : "cashAccount",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_cashAccount_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['cashAccount'] = field;
+					});
+					</script>
+				</td>
+			]]>
+		</html>
+		<html colSpan="2">
+			<![CDATA[
+				<td width="15%">
+					<input type="radio" id="queryByPeriod" name="queryMode" value="2" checked="checked" />
+					<label for="queryByPeriod">按期间查询</label>
+				</td>
+				<td>
+					会计期间：
+					<div id="A_accountingYearStart_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PSelectField({
+							name : "accountingYearStart",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_accountingYearStart_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['accountingYearStart'] = field;
+					});
+					</script>
+					年
+					<div id="A_accountingPeriodStart_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PSelectField({
+							name : "accountingPeriodStart",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_accountingPeriodStart_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['accountingPeriodStart'] = field;
+					});
+					</script>
+					期
+					～
+					<div id="A_accountingYearEnd_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PSelectField({
+							name : "accountingYearEnd",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_accountingYearEnd_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['accountingYearEnd'] = field;
+					});
+					</script>
+					年
+					<div id="A_accountingPeriodEnd_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PSelectField({
+							name : "accountingPeriodEnd",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_accountingPeriodEnd_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['accountingPeriodEnd'] = field;
+					});
+					</script>
+					期
+				</td>
+			]]>
+		</html>
+		<auto-column name="currencyTypeId" colSpan="2"></auto-column>
+		<html colSpan="2">
+			<![CDATA[
+				<td width="15%">
+					银行账户属性
+				</td>
+				<td>
+					<div id="A_accountProperty_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PSelectField({
+							name : "accountProperty",
+							//dataSetId: dataSetId,
+							validateInline: true
+						});
+						field.render("#A_accountProperty_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['accountProperty'] = field;
+					});
+					</script>
+				</td>
+			]]>
+		</html>
+		<html colSpan="4">
+			<![CDATA[
+				<td colspan="4">
+					<div id="A_displayMode_render"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var field = new Y.PChoiceField({
+							name : "displayMode",
+							label: "无余额无发生额不显示",
+							//dataSetId: dataSetId,
+							validateInline: true,
+							multi: true
+						});
+						field.render("#A_displayMode_render");
+						masterFormFieldLi.push(field);
+						masterFormFieldDict['displayMode'] = field;
+					});
+					</script>
+				</td>
+			]]>
+		</html>
+	</column-model>
+	
+	<toolbar>
+		<button name="listBtn" text="载入资料" mode="url" handler="/console/listschema?@name=CurrencyType" iconCls="test"></button>
+		<button name="newBtn" text="明细查询" mode="fn" handler="newData" iconCls=""></button>
+		<button name="copyBtn" text="导出Excel" mode="fn" handler="copyData"></button>
+	</toolbar>
+	
+	<column-model dataSetId="A">
+		<id-column name="id" text="编号" hideable="true" />
+		
+		<auto-column name="accountType" />
+		<select-column name="accountId" text="账户代码" auto="true" displayField="code"></select-column>
+		<string-column name="accountName" text="账户名称"></string-column>
+		<auto-column name="currencyTypeId" />
+		<number-column name="origBalance" text="上期结余"></number-column>
+		<auto-column name="amtIncrease" />
+		<auto-column name="amtReduce" />
+		<number-column name="finalBalance" text="期末结余"></number-column>
+		<number-column name="increaseCount" text="增加笔数"></number-column>
+		<number-column name="reduceCount" text="减少笔数"></number-column>
+		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="ACCOUNT_PROPERTY" text="账户属性"></dictionary-column>
+		<select-column name="bankId" text="开户银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single"></select-column>
+		<string-column name="bankAccount" text="银行账号"></string-column>
+		<select-column name="dutyBy" text="责任人" displayField="code,name" valueField="id" selectorName="SysUserSelector" selectionMode="single"></select-column>
+		<number-column name="amtSecureBalance" text="安全余额"></number-column>
+		<number-column name="amtLimits" text="限额"></number-column>
+	</column-model>
+
+</form-template>

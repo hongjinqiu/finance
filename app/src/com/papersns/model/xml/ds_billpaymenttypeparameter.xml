@@ -32,13 +32,22 @@
 			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
-			<field id="type" extends="INT_FIELD">
+			<field id="billTypeId" extends="INT_FIELD">
 				<displayName>单据类型</displayName>
 				<allowEmpty>false</allowEmpty>
-				<dictionary>D_BILL_TYPE_PARAMETER</dictionary>
-				<defaultValueExpr>2</defaultValueExpr>
+				<defaultValueExpr>1</defaultValueExpr>
 				<fixHide>true</fixHide>
 				<fixReadOnly>true</fixReadOnly>
+				<relationDS>
+					<relationItem>
+						<id>BillTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>BillType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
 			</field>
 			<field id="property" extends="INT_FIELD">
 				<displayName>预设业务属性</displayName>

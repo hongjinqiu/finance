@@ -13,8 +13,8 @@ var sysUserModel = {
 			valueField : "",// 可以为函数
 			selectorName : "",// 可以为函数
 			selectionMode : "single",// single|multi
-			selection: function(datas){},// 单多选回调
-			unSelection: function(){},// 单多选回调
+			selectFunc: function(datas){},// 单多选回调
+			unSelectFunc: function(){},// 单多选回调
 			queryFunc: function(){},// 单多选回调
 			listeners : {// 会用yui.on调用,
 				focus: function(e){},

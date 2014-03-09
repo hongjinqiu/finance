@@ -5,7 +5,7 @@
 	<data-source-model-id>BankAccount</data-source-model-id>
 
 	<adapter name="ModelListTemplateAdapter" />
-	<description>银行帐户列表</description>
+	<description>银行账户列表</description>
 	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
@@ -21,7 +21,7 @@
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
-	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选银行帐户" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选银行账户" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression>1 == 1</expression>
 		</checkbox-column>
@@ -33,7 +33,7 @@
 				</button>
 				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=BankAccount&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=BankAccount&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -41,7 +41,7 @@
 		<auto-column name="code" />
 		<auto-column name="name" />
 		<auto-column name="mnemonicNo" />
-		<auto-column name="openBankId" />
+		<auto-column name="bankId" />
 		<auto-column name="bankAccount" />
 		<auto-column name="linkBy" />
 		<auto-column name="bankPhone" />
@@ -53,7 +53,7 @@
 		<query-parameter name="code" auto="true" text=""></query-parameter>
 		<query-parameter name="name" auto="true" text=""></query-parameter>
 		<query-parameter name="mnemonicNo" auto="true" text=""></query-parameter>
-		<query-parameter name="openBankId" auto="true" text=""></query-parameter>
+		<query-parameter name="bankId" auto="true" text=""></query-parameter>
 		<query-parameter name="bankAccount" auto="true" text=""></query-parameter>
 		<query-parameter name="linkBy" auto="true" text=""></query-parameter>
 		<query-parameter name="bankPhone" auto="true" text=""></query-parameter>

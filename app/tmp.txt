@@ -1,1 +1,12 @@
-"node","widget-base","widget-htmlparser","io-form","widget-parent","widget-child","base-build","substitute","io-upload-iframe","collection","overlay","calendar","datatype-date","event","json","datatable","datasource-get","datasource-jsonschema","datatable-datasource","datatable-sort","datatable-scroll","cssbutton","gallery-datatable-paginator","listtemplate-paginator","datatype-date-format","io-base","anim","array-extras","querystring-stringify","cssfonts","dataschema-json","datasource-io","model-sync-rest","gallery-paginator-view","tabview","panel","dd-plugin","resize-plugin","gallery-layout","gallery-quickedit","gallery-paginator","datatable-base"
+r-form-field.js,finish,					pass,
+r-text-field.js,finish,					pass,
+r-textarea-field.js,finish,				pass,
+r-display-field.js,finish,				pass,
+r-hidden-field.js,finish,				pass,
+r-number-field.js,finish,				pass,
+r-choice-field.js,finish,				pass,
+r-radio-field.js,finish,				pass,
+r-checkbox-field.js,finish,				pass,
+r-select-field.js,finish,				pass,
+r-date-field.js,finish,					pass,
+r-trigger-field.js,finish,				

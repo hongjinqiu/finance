@@ -201,7 +201,7 @@ func (c Console) ListSchema() revel.Result {
 	listTemplate := templateManager.GetListTemplate(schemaName)
 
 	result := c.listSelectorCommon(&listTemplate, true)
-
+	
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		callback := c.Params.Get("callback")
@@ -241,6 +241,10 @@ func (c Console) SelectorSchema() revel.Result {
 	if ids != "" {
 		relationLi := []map[string]interface{}{}
 		strIdLi := strings.Split(ids, ",")
+		selectorId := listTemplate.SelectorId
+		if selectorId == "" {
+			selectorId = listTemplate.Id
+		}
 		for _, item := range strIdLi {
 			if item != "" {
 				id, err := strconv.Atoi(item)
@@ -249,17 +253,16 @@ func (c Console) SelectorSchema() revel.Result {
 				}
 				relationLi = append(relationLi, map[string]interface{}{
 					"relationId": id,
-					"selectorId": listTemplate.Id,
+					"selectorId": selectorId,
 				})
 			}
 		}
 		templateManager := TemplateManager{}
 		relationBo := templateManager.GetRelationBo(sessionId, relationLi)
-		if relationBo[listTemplate.Id] != nil {
-			selectionBo = relationBo[listTemplate.Id].(map[string]interface{})
+		if relationBo[selectorId] != nil {
+			selectionBo = relationBo[selectorId].(map[string]interface{})
 		}
 	}
-
 	selectionBoByte, err := json.Marshal(&selectionBo)
 	if err != nil {
 		panic(err)
@@ -366,8 +369,11 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	if err != nil {
 		panic(err)
 	}
+	
+	queryParameterRenderLi := c.getQueryParameterRenderLi(*listTemplate)
 
-	showParameterLi := templateManager.GetShowParameterLiForListTemplate(listTemplate)
+	//showParameterLi := templateManager.GetShowParameterLiForListTemplate(listTemplate)
+	showParameterLi := []QueryParameter{}
 	hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(listTemplate)
 	result := map[string]interface{}{
 		"pageSize":          pageSize,
@@ -375,6 +381,7 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		"toolbarBo":         toolbarBo,
 		"showParameterLi":   showParameterLi,
 		"hiddenParameterLi": hiddenParameterLi,
+		"queryParameterRenderLi": queryParameterRenderLi,
 		"dataBo":            dataBo,
 		//		"columns":       columns,
 		"dataBoText":       string(dataBoByte),
@@ -609,6 +616,34 @@ func (c Console) getMasterRenderLi(formTemplate FormTemplate) map[string]interfa
 	}
 
 	return result
+}
+
+func (c Console) getQueryParameterRenderLi(listTemplate ListTemplate) [][]map[string]interface{} {
+	lineColSpan := 6
+	container := [][]map[string]interface{}{}
+	containerItem := []map[string]interface{}{}
+	lineColSpanSum := 0
+	listTemplateIterator := ListTemplateIterator{}
+	var result interface{} = ""
+	listTemplateIterator.IterateTemplateQueryParameter(listTemplate, &result, func(queryParameter QueryParameter, result *interface{}){
+		if queryParameter.Editor != "hidden" {
+			columnColSpan := 2
+			containerItem = append(containerItem, map[string]interface{}{
+				"label":       queryParameter.Text,
+				"name":        queryParameter.Name,
+			})
+			lineColSpanSum += columnColSpan
+			if lineColSpanSum >= lineColSpan {
+				container = append(container, containerItem)
+				containerItem = []map[string]interface{}{}
+				lineColSpanSum = lineColSpanSum - lineColSpan
+			}
+		}
+	})
+	if 0 < lineColSpanSum && lineColSpanSum < lineColSpan {
+		container = append(container, containerItem)
+	}
+	return container
 }
 
 func (c Console) Relation() revel.Result {

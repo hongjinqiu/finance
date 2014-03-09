@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>BankAccountInit</id>
+	<data-source-model-id>AccountInit</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>银行账户初始化表单</description>
+	<scripts>bankaccountinit/bankAccountInitModel.js</scripts>
+	<view-template view="Console/FormSchema.html"/>
+	<toolbar>
+		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=BankAccountInit" iconCls="test"></button>
+		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>
+		<button name="copyBtn" text="复制" mode="fn" handler="copyData"></button>
+		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
+		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
+		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button>
+		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
+	</toolbar>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<id-column name="id" text="编号" hideable="true" />
+		
+		<select-column name="bankAccountIdSel" text="账户名称" displayField="code,name" valueField="id" selectorName="BankAccountSelector" selectionMode="multi">
+		</select-column>
+	</column-model>
+
+	<column-model dataSetId="A" colSpan="4">
+		<toolbar>
+			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
+			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
+			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
+		</toolbar>
+		<checkbox-column name="checkboxSelect" hideable="false" />
+		<id-column name="id" text="编号" hideable="true" />
+		<virtual-column name="FUN_C" text="操作">
+			<buttons>
+				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
+				<button text="复制" mode="fn" handler="g_copyRow" iconCls="test"></button>
+				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
+			</buttons>
+		</virtual-column>
+		<auto-column name="accountType" />
+		<auto-column name="accountId" />
+		<string-column name="name" text="账户名称" />
+		<select-column name="bankId" text="开户银行" displayField="code,name" valueField="id" selectorName="BankSelector">
+		</select-column>
+		<string-column name="bankAccount" text="银行帐号" />
+		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="accountProperty" text="账户属性"></dictionary-column>
+		<auto-column name="currencyTypeId" />
+		<auto-column name="exchangeRateShow" />
+		<auto-column name="exchangeRate" />
+		<auto-column name="amtEarly" />
+	</column-model>
+</form-template>

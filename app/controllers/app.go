@@ -141,7 +141,11 @@ func (c App) ComboView() revel.Result {
 func (c App) FormJS() revel.Result {
 	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
 	content := ""
-	formJsLi := []string{"js/form/p-form-field.js","js/form/p-text-field.js","js/form/p-hidden-field.js","js/form/p-checkbox-field.js","js/form/p-radio-field.js","js/form/p-choice-field.js","js/form/p-select-field.js","js/form/p-trigger-field.js","js/form/p-number-field.js","js/form/p-display-field.js","js/form/p-textarea-field.js","js/form/p-date-field.js"}
+	formJsLi := []string{"js/rootform/r-form-field.js","js/rootform/r-text-field.js","js/rootform/r-hidden-field.js","js/rootform/r-checkbox-field.js","js/rootform/r-radio-field.js","js/rootform/r-choice-field.js","js/rootform/r-select-field.js","js/rootform/r-trigger-field.js","js/rootform/r-number-field.js","js/rootform/r-display-field.js","js/rootform/r-textarea-field.js","js/rootform/r-date-field.js"}
+	pFormJsLi := []string{"js/form/p-form-field.js","js/form/p-text-field.js","js/form/p-hidden-field.js","js/form/p-checkbox-field.js","js/form/p-radio-field.js","js/form/p-choice-field.js","js/form/p-select-field.js","js/form/p-trigger-field.js","js/form/p-number-field.js","js/form/p-display-field.js","js/form/p-textarea-field.js","js/form/p-date-field.js"}
+	for _, k := range pFormJsLi {
+		formJsLi = append(formJsLi, k)
+	}
 	for _, k := range formJsLi {
 		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
 			panic("fileName is:" + k + ", expect ends with .js or .css")

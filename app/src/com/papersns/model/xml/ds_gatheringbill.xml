@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>GatheringBill</id>
+	<displayName>收款单</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName></collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="billDate" extends="DATE_FIELD">
+				<displayName>单据日期</displayName>
+				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+			</field>
+			<field id="billNo" extends="STRING_FIELD">
+				<displayName>单据编号</displayName>
+				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="property" extends="INT_FIELD">
+				<displayName>业务属性</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_FIN_BUSI_PROPERTY</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field>
+			<field id="billTypeId" extends="INT_FIELD">
+				<displayName>单据类型</displayName>
+				<allowEmpty>false</allowEmpty>
+				<!-- <defaultValueExpr>1</defaultValueExpr> -->
+				<fixReadOnly>true</fixReadOnly>
+				<relationDS>
+					<relationItem>
+						<id>BillTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>BillType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="accountId" extends="INT_FIELD">
+				<displayName>收款账户</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<relationDS>
+					<relationItem>
+						<id>BankAccountSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>BankAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem>
+						<id>CashAccountSelector</id>
+						<relationExpr>false</relationExpr>
+						<relationModelId>CashAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="balanceDate" extends="DATE_FIELD">
+				<displayName>结算日期</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+			</field>
+			<field id="balanceTypeId" extends="INT_FIELD">
+				<displayName>结算方式</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<relationDS>
+					<relationItem>
+						<id>BalanceTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>BalanceType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="balanceNo" extends="STRING_FIELD">
+				<displayName>结算号</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="chamberlainType" extends="INT_FIELD">
+				<displayName>收款对象类型</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_FIN_OBJECT_TYPE</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field>
+			<field id="chamberlainId" extends="INT_FIELD">
+				<displayName>收款对象</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<relationDS><!-- 客户,供应商,人员 -->
+					<relationItem>
+						<id>CustomerSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>Customer</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem>
+						<id>ProviderSelector</id>
+						<relationExpr>false</relationExpr>
+						<relationModelId>Provider</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem>
+						<id>SysUserSelector</id>
+						<relationExpr>false</relationExpr>
+						<relationModelId>SysUser</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="chamberlainDesc" extends="STRING_FIELD">
+				<displayName>收款对象描述</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="sysUserId" extends="INT_FIELD">
+				<displayName>采购/业务员</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<relationDS>
+					<relationItem>
+						<id>SysUserSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>SysUser</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="articleId" extends="INT_FIELD">
+				<displayName>项目</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<relationDS>
+					<relationItem>
+						<id>ArticleSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>Article</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="currencyTypeId" extends="INT_FIELD">
+				<displayName>币别</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem>
+						<id>CurrencyTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>CurrencyType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="exchangeRateShow" extends="STRING_FIELD">
+				<displayName>汇率</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fieldLength>20</fieldLength>
+			</field>
+			<field id="exchangeRate" extends="FLOAT_FIELD">
+				<displayName>汇率隐藏</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fixHide>true</fixHide>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>100</limitMax>
+			</field>
+			<field id="amtGathering" extends="FLOAT_FIELD">
+				<displayName>收款金额</displayName>
+				<allowEmpty>false</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="amtAgainst" extends="FLOAT_FIELD">
+				<displayName>已冲销金额</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="amtNotAgainst" extends="FLOAT_FIELD">
+				<displayName>未冲销金额</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="chamberlainName" extends="STRING_FIELD">
+				<displayName>付款人全称</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>20</fieldLength>
+			</field>
+			<field id="bankId" extends="STRING_FIELD">
+				<displayName>银行代码</displayName>
+				<relationDS>
+					<relationItem>
+						<id>BankSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>Bank</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="bankShort" extends="STRING_FIELD">
+				<displayName>银行名称</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="bankAccount" extends="STRING_FIELD">
+				<displayName>银行帐号</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="linkman" extends="STRING_FIELD">
+				<displayName>联系人</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="linkPhone" extends="STRING_FIELD">
+				<displayName>联系电话</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>50</fieldLength>
+			</field>
+			<!-- <field id="isEffective" extends="INT_FIELD">
+				<displayName>是否已生效</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_FIN_CREATE_STATUS</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field> -->
+		</bizField>
+	</masterData>
+	<detailData>
+		<id>B</id>
+		<displayName>收款费用信息</displayName>
+		<allowEmptyRow>false</allowEmptyRow>
+		<allowCopy>true</allowCopy>
+		<readonly>false</readonly>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="accountType" extends="INT_FIELD">
+				<displayName>费用账户类型</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_FEE_ACCOUNT_TYPE</dictionary>
+				<defaultValueExpr>2</defaultValueExpr>
+			</field>
+			<field id="accountId" extends="INT_FIELD">
+				<displayName>费用账户</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem>
+						<id>CashAccountSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>CashAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem>
+						<id>BankAccountSelector</id>
+						<relationExpr>false</relationExpr>
+						<relationModelId>BankAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="incomeItemId" extends="INT_FIELD">
+				<displayName>费用项目</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem>
+						<id>IncomeItemSelector</id>
+						<relationExpr>true</relationExpr>
+						<relationModelId>IncomeItem</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="amtFee" extends="FLOAT_FIELD">
+				<displayName>费用金额</displayName>
+				<allowEmpty>false</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+		</bizField>
+	</detailData>
+</datasource>

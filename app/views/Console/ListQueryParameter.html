@@ -6,6 +6,36 @@
 				{{end}}
 				<div id="queryContent" class="queryContent">
 					<table class="queryMain" cellspacing="0" cellpadding="0" border="0">
+						{{range $index, $item := .result.queryParameterRenderLi}}
+							<tr>
+								{{range $tdIndex, $tdItem := $item}}
+									<td width="">
+										{{$tdItem.label}}
+									</td>
+									<td width="" colspan="">
+										<div id="q_{{$tdItem.name}}_render">{{$tdItem.name}}</div>
+										<script type="text/javascript">
+										YUI(g_financeModule).use("finance-module", function(Y) {
+											
+										});
+										</script>
+									</td>
+								{{end}}
+								{{if eq $index 0}}
+									<td>
+										<input style="display: inline;" class="btnMore" id="btnMore" value="更多条件" type="button" />
+										<input style="display: none;" id="btnUp" class="btnUp" value="收回" type="button" />
+										<input type="button" value="查询" id="queryBtn" class="queryBtn" />
+										<input type="button" value="重置" class="queryReset" />
+									</td>
+								{{else}}
+									<td>&nbsp;</td>
+								{{end}}
+							</tr>
+						{{end}}
+					</table>
+					<!-- 
+					<table class="queryMain" cellspacing="0" cellpadding="0" border="0">
 					{{$parameterLen := len .result.showParameterLi}}
 					{{range $index, $queryParameter := .result.showParameterLi}}
 						{{if residue $index 2 0}}
@@ -155,6 +185,7 @@
 						{{end}}
 					{{end}}
 					</table>
+					 -->
 				</div>
 			</form>
 		</div>

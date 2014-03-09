@@ -15,12 +15,13 @@ if '..' not in sys.path:
 import pymongo,threading
 from dictionary import *
 from sequence import *
+from initdata import *
 
 threadLocal = threading.local()
 MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
 MONGODB_ADDRESS = 'localhost:27017'
-MONGODB_DATABASE_NAME = 'aftermarket2'
+MONGODB_DATABASE_NAME = 'aftermarket'
 MONGODB_USER = None
 MONGODB_PASSWORD = None
 
@@ -106,6 +107,14 @@ def initSequence():
     for item in li:
         if not mongoDB.counters.find_one({'_id': item["_id"]}):
             mongoDB.counters.save(item)
+
+def initInitData():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    li = getInitDataLi()
+    for item in li:
+        for subItem in item['items']:
+            data = mongoDB[item['name']].find_one({'_id': subItem['_id']})
+            mongoDB[item['name']].save(subItem)
 
 def initDemo():
     mongoDB = getThreadLocalMongoDB()['mongoDB']
@@ -223,5 +232,6 @@ def initSysUser():
 if __name__ == '__main__':
     initSequence()
     initDictionary()
+    initInitData()
     initDemo()
     initSysUser()

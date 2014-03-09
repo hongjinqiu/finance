@@ -3,7 +3,7 @@
 	<id>BankAccount</id>
 	<data-source-model-id>BankAccount</data-source-model-id>
 	<adapter name="ModelFormTemplateAdapter" />
-	<description>银行帐户表单</description>
+	<description>银行账户表单</description>
 	<scripts>bankaccount/bankAccountModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
 	<toolbar>
@@ -33,7 +33,7 @@
 	</html>
 	
 	<column-model dataSetId="A" colSpan="6">
-		<auto-column name="openBankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<auto-column name="bankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<auto-column name="bankAccount" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<auto-column name="linkBy" colSpan="2" labelWidth="13%" />
 		<auto-column name="bankAddress" colSpan="4" />

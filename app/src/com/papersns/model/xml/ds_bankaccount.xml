@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
 	<id>BankAccount</id>
-	<displayName>银行帐户</displayName>
+	<displayName>银行账户</displayName>
 	<systemId>FINANCE</systemId>
 	<codeFieldName></codeFieldName>
 	<businessDateField></businessDateField>
@@ -47,7 +47,7 @@
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>20</fieldLength>
 			</field>
-			<field id="openBankId" extends="INT_FIELD">
+			<field id="bankId" extends="INT_FIELD">
 				<displayName>开户银行</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
@@ -87,7 +87,7 @@
 				<fieldLength>60</fieldLength>
 			</field>
 			<field id="dutyBy" extends="INT_FIELD">
-				<displayName>帐户责任人</displayName>
+				<displayName>账户责任人</displayName>
 				<allowEmpty>true</allowEmpty>
 				<relationDS>
 					<relationItem>
@@ -101,7 +101,7 @@
 				</relationDS>
 			</field>
 			<field id="accountProperty" extends="INT_FIELD">
-				<displayName>帐户属性</displayName>
+				<displayName>账户属性</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_FIN_ACCOUNT_PROPERTY</dictionary>
 				<defaultValueExpr>1</defaultValueExpr>
@@ -110,7 +110,7 @@
 	</masterData>
 	<detailData>
 		<id>B</id>
-		<displayName>帐户币别</displayName>
+		<displayName>账户币别</displayName>
 		<allowEmptyRow>false</allowEmptyRow>
 		<allowCopy>true</allowCopy>
 		<readonly>false</readonly>

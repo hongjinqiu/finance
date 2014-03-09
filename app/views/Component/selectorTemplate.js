@@ -137,18 +137,21 @@ function selectorMain() {
 				Y.one("#confirmBtn").on("click", function(e){
 //			syncCheckboxWhenChangeSelection(Y, dataGrid);
 					if (parent && parent.g_relationManager) {
-						var selectorId = listTemplate.Id;
+						var selectorId = listTemplate.SelectorId;
+						if (!selectorId) {
+							selectorId = listTemplate.Id;
+						}
 						var selectValueLi = Y.all("#selectionResult .selectionItem input").get("value");
 						if (!selectValueLi || selectValueLi.length == 0) {
 							//showAlert("请先选择");
-							parent.s_selection([]);
+							parent.s_selectFunc([]);
 						} else {
 							for (var i = 0; i < selectValueLi.length; i++) {
 								if (selectionBo[selectValueLi[i]]) {
 									parent.g_relationManager.addRelationBo(selectorId, selectionBo["url"], selectionBo[selectValueLi[i]]);
 								}
 							}
-							parent.s_selection(selectValueLi);
+							parent.s_selectFunc(selectValueLi);
 						}
 						parent.s_closeDialog();
 					} else {

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>AccountUnInit</id>
+	<data-source-model-id>CashAccount</data-source-model-id>
+	<adapter name="ModelFormTemplateAdapter" />
+	<description>反结束初始化表单</description>
+	<scripts>accountuninit/accountUnInitModel.js</scripts>
+	<view-template view="Console/FormSchema.html"/>
+	
+	<column-model dataSetId="A" colSpan="1">
+		<id-column name="id" text="编号" hideable="true" />
+		
+		<html>
+			<![CDATA[
+				<td>
+					<input type="radio" id="endInit" name="endInit" value="1" checked="checked" />
+					<label for="endInit">反结束初始化</label>
+				</td>
+			]]>
+		</html>
+	</column-model>
+
+	<toolbar>
+		<button name="listBtn" text="取消" mode="url" handler="/console/listschema?@name=AccountEndInit" iconCls="test"></button>
+		<button name="newBtn" text="开始" mode="fn" handler="newData" iconCls=""></button>
+	</toolbar>
+</form-template>
