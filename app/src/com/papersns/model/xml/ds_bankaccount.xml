@@ -51,9 +51,10 @@
 				<displayName>开户银行</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="Bank">
 						<id>BankSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>Bank</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -90,9 +91,10 @@
 				<displayName>账户责任人</displayName>
 				<allowEmpty>true</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -131,9 +133,10 @@
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>true</allowCopy>
 				<relationDS>
-					<relationItem>
+					<relationItem name="CurrencyType">
 						<id>CurrencyTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>CurrencyType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

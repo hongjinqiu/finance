@@ -1,17 +1,17 @@
 #!/usr/bin/python
 #encoding=utf8
 
-import json,sys
+import json,sys,exceptions,traceback
 
 def trueOrFalse(jsonString, action):
-    record = json.loads(jsonString)
+    data = json.loads(jsonString)
     return str(eval(action) == True)
     
 def validate(text, action):
     return str(eval(action) == True)
 
 def parseString(jsonString, action):
-    record = json.loads(jsonString)
+    data = json.loads(jsonString)
     return str(eval(action))
     
 def parseModel(bo, data, action):
@@ -21,12 +21,16 @@ def parseModel(bo, data, action):
 
 #trueOrFalse "\"{\\\"name\\\": \\\"test\\\"}\"" "\"record[\\\"name\\\"] == \\\"test\\\"\""
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
-        sys.exit('input invalidate, len(argv) must == 3')
-        
-    methodName = sys.argv[1]
-    jsonString = sys.argv[2]
-    action = sys.argv[3]
-    
-    print eval('%s(%s,%s)' % (methodName, jsonString, action))
-    
+#    if len(sys.argv) < 6:
+#        sys.exit('input invalidate, len(argv) must == 3')
+
+    command = sys.argv[1] + '(' + ','.join(['"' + item + '"' for item in sys.argv[2:]]) + ')'
+    try:
+        print eval(command)
+    except exceptions.Exception:
+        fOut = open('error.txt', 'w')
+        fOut.write(command)
+        fOut.write('\n')
+        fOut.write(traceback.format_exc())
+        fOut.close()
+        raise exceptions.Exception(command)

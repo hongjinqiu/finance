@@ -76,9 +76,10 @@
 				<allowEmpty>false</allowEmpty>
 				<defaultValueExpr>12</defaultValueExpr>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -113,9 +114,10 @@
 				<defaultValueExpr>code</defaultValueExpr>
 				<allowCopy>true</allowCopy>
 				<!-- <relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -153,9 +155,10 @@
 				<allowEmpty>false</allowEmpty>
 				<defaultValueExpr>12</defaultValueExpr>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

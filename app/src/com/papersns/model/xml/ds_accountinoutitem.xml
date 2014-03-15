@@ -44,17 +44,19 @@
 				<displayName>账户</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
-					<relationItem>
+					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
 						<relationExpr>false</relationExpr>
+						<jsRelationExpr>false</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code</displayField>
@@ -66,9 +68,10 @@
 				<displayName>币别</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="CurrencyType">
 						<id>CurrencyTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>CurrencyType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -110,9 +113,10 @@
 				<fixHide>true</fixHide>
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
-					<relationItem>
+					<relationItem name="BillType">
 						<id>BillTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>BillType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -129,17 +133,19 @@
 				<displayName>单据</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="GatheringBill">
 						<id>GatheringBillSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>GatheringBill</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>billNo</displayField>
 						<valueField>id</valueField>
 					</relationItem>
-					<relationItem>
+					<relationItem name="PayBill">
 						<id>PayBillSelector</id>
 						<relationExpr>false</relationExpr>
+						<jsRelationExpr>false</jsRelationExpr>
 						<relationModelId>PayBill</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>billNo</displayField>

@@ -2,7 +2,6 @@ package layer
 
 import (
 	"com/papersns/dictionary"
-	"com/papersns/tree"
 	"labix.org/v2/mgo"
 	"com/papersns/mongo"
 )
@@ -26,8 +25,8 @@ func (o LayerManager) GetLayerBySession(db *mgo.Database, code string) map[strin
 	dictionaryManager := dictionary.GetInstance()
 	result := dictionaryManager.GetDictionaryBySession(db, code)
 	if result == nil {
-		treeManager := tree.GetInstance()
-		result = treeManager.GetTreeBySession(db, code)
+		programDictionaryManager := dictionary.GetProgramDictionaryInstance()
+		result = programDictionaryManager.GetProgramDictionaryBySession(db, code)
 	}
 	return result
 }

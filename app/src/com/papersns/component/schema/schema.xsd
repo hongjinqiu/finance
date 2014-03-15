@@ -409,6 +409,7 @@
 								<element ref="tns:editor" minOccurs="0">
 								</element>
 								<element ref="tns:column-model" minOccurs="0" />
+								<element ref="tns:relationDS" minOccurs="0"></element>
 							</sequence>
 							<attributeGroup ref="tns:column-attributes" />
 						</complexType>
@@ -570,8 +571,10 @@
 							<sequence>
 								<element ref="tns:editor" minOccurs="0"></element>
 								<element ref="tns:listeners" minOccurs="0"></element>
+								<element ref="tns:relationDS" minOccurs="0"></element>
 							</sequence>
 							<attributeGroup ref="tns:column-attributes" />
+							<!-- 
 							<attribute name="displayField"></attribute>
 							<attribute name="valueField"></attribute>
 							<attribute name="selectorName"></attribute>
@@ -584,6 +587,7 @@
 								</simpleType>
 							</attribute>
 							<attribute name="queryFunc"></attribute>
+							 -->
 						</complexType>
 					</element>
 					<element ref="tns:html" />
@@ -735,6 +739,11 @@
 				<documentation>是否导出</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="dsFieldMap" type="string" default="">
+			<annotation>
+				<documentation>数据源字段映射,通常用于关联字段copyField的自动生成</documentation>
+			</annotation>
+		</attribute>
 	</attributeGroup>
 
 	<element name="editor">
@@ -758,7 +767,78 @@
 			<attribute name="unSelection"></attribute>
 		</complexType>
 	</element>
-
+	
+	<element name="relationDS">
+		<complexType>
+			<sequence>
+				<element name="relationItem" minOccurs="0" maxOccurs="unbounded">
+					<complexType>
+						<sequence>
+							<element name="relationExpr" default="true" minOccurs="0" maxOccurs="1">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="mode" default="text">
+												<simpleType>
+													<restriction base="string">
+														<enumeration value="text" />
+														<enumeration value="python" />
+														<enumeration value="golang" />
+													</restriction>
+												</simpleType>
+											</attribute>
+										</extension>
+									</simpleContent>
+								</complexType>
+							</element>
+							<element name="jsRelationExpr" default="true" minOccurs="0" maxOccurs="1">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="mode" default="text">
+												<simpleType>
+													<restriction base="string">
+														<enumeration value="text" />
+														<enumeration value="js" />
+														<enumeration value="function" />
+														<enumeration value="functionName" />
+													</restriction>
+												</simpleType>
+											</attribute>
+										</extension>
+									</simpleContent>
+								</complexType>
+							</element>
+							<element name="relationConfig" minOccurs="0" maxOccurs="1">
+								<complexType>
+									<attribute name="selectorName"></attribute>
+									<attribute name="displayField"></attribute>
+									<attribute name="valueField"></attribute>
+									<attribute name="selectionMode">
+										<simpleType>
+											<restriction base="string">
+												<enumeration value="single"></enumeration>
+												<enumeration value="multi"></enumeration>
+											</restriction>
+										</simpleType>
+									</attribute>
+									<attribute name="selectorTitle"></attribute>
+								</complexType>
+							</element>
+							<element name="copyConfig" minOccurs="0" maxOccurs="unbounded">
+								<complexType>
+									<attribute name="copyColumnName"></attribute>
+									<attribute name="copyValueField"></attribute>
+								</complexType>
+							</element>
+						</sequence>
+						<attribute name="name" use="required"></attribute>
+					</complexType>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+	
 	<attributeGroup name="boolean-column-attributes">
 		<annotation>
 			<documentation>布尔列属性组</documentation>
@@ -924,8 +1004,8 @@
 									<attribute name="name" use="required">
 										<simpleType>
 											<restriction base="string">
-												<enumeration value="inFormat"></enumeration>
-												<enumeration value="queryFormat"></enumeration>
+												<enumeration value="displayPattern"></enumeration>
+												<enumeration value="dbPattern"></enumeration>
 												<enumeration value="maxDate"></enumeration>
 												<enumeration value="minDate"></enumeration>
 												<enumeration value="dictionary"></enumeration>
@@ -946,6 +1026,24 @@
 										</simpleType>
 									</attribute>
 									<attribute name="value" use="required"></attribute>
+								</complexType>
+							</element>
+							<element ref="tns:relationDS" minOccurs="0"></element>
+							<element name="defaultValueExpr" minOccurs="0" maxOccurs="1">
+								<complexType>
+									<simpleContent>
+										<extension base="string">
+											<attribute name="mode" default="text">
+												<simpleType>
+													<restriction base="string">
+														<enumeration value="text" />
+														<enumeration value="python" />
+														<enumeration value="golang" />
+													</restriction>
+												</simpleType>
+											</attribute>
+										</extension>
+									</simpleContent>
 								</complexType>
 							</element>
 						</sequence>
@@ -969,19 +1067,19 @@
 			<simpleType>
 				<restriction base="string">
 					<enumeration value="textfield"></enumeration>
-					<enumeration value="textarea"></enumeration>
+					<enumeration value="textareafield"></enumeration>
 					<enumeration value="numberfield"></enumeration>
 					<enumeration value="datefield"></enumeration>
-					<enumeration value="combo"></enumeration>
+					<enumeration value="combofield"></enumeration>
 					<enumeration value="combotree"></enumeration>
 					<enumeration value="displayfield"></enumeration>
-					<enumeration value="hidden"></enumeration>
+					<enumeration value="hiddenfield"></enumeration>
 					<enumeration value="htmleditor"></enumeration>
-					<enumeration value="checkbox"></enumeration>
+					<enumeration value="checkboxfield"></enumeration>
 					<enumeration value="checkboxgroup"></enumeration>
-					<enumeration value="radio"></enumeration>
+					<enumeration value="radiofield"></enumeration>
 					<enumeration value="radiogroup"></enumeration>
-					<enumeration value="trigger"></enumeration><!-- 弹窗选择 -->
+					<enumeration value="triggerfield"></enumeration><!-- 弹窗选择 -->
 				</restriction>
 			</simpleType>
 		</attribute>

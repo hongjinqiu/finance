@@ -3,7 +3,7 @@ package component
 import (
 	. "com/papersns/model"
 	"strings"
-	"encoding/json"
+//	"encoding/json"
 )
 
 type ModelListTemplateAdapter struct{}
@@ -79,7 +79,7 @@ func (o ModelListTemplateAdapter) applyQueryParameter(dataSource DataSource, lis
 					}
 					if fieldGroup.FixHide == "true" {
 						if queryParameter.Editor == "" {
-							queryParameter.Editor = "hidden"
+							queryParameter.Editor = "hiddenfield"
 						}
 					}
 					xmlName := commonMethod.getColumnXMLName(*fieldGroup)
@@ -96,7 +96,7 @@ func (o ModelListTemplateAdapter) applyQueryParameter(dataSource DataSource, lis
 func (o ModelListTemplateAdapter) applyQueryParameterAttr(xmlName string, queryParameter *QueryParameter) {
 	if xmlName == "select-column" {
 		if queryParameter.Editor == "" {
-			queryParameter.Editor = "trigger"
+			queryParameter.Editor = "triggerfield"
 		}
 		if queryParameter.Restriction == "" {
 			queryParameter.Restriction = "in"
@@ -124,7 +124,7 @@ func (o ModelListTemplateAdapter) applyQueryParameterAttr(xmlName string, queryP
 		}
 	} else if xmlName == "dictionary-column" {
 		if queryParameter.Editor == "" {
-			queryParameter.Editor = "combo"
+			queryParameter.Editor = "combofield"
 		}
 		if queryParameter.Restriction == "" {
 			queryParameter.Restriction = "eq"
@@ -134,35 +134,8 @@ func (o ModelListTemplateAdapter) applyQueryParameterAttr(xmlName string, queryP
 
 func (o ModelListTemplateAdapter) applyQueryParameterSubAttr(xmlName string, fieldGroup FieldGroup, queryParameter *QueryParameter) {
 	if xmlName == "select-column" {
-		relationItem := fieldGroup.RelationDS.RelationItemLi[0]
-		hasConfig := false
-		if queryParameter.ParameterAttributeLi != nil {
-			for _, attrItem := range queryParameter.ParameterAttributeLi {
-				if attrItem.Name == "config" {
-					hasConfig = true
-					break
-				}
-			}
-		}
-		if !hasConfig {
-			if queryParameter.ParameterAttributeLi == nil {
-				queryParameter.ParameterAttributeLi = []ParameterAttribute{}
-			}
-			parameterAttribute := ParameterAttribute{}
-			parameterAttribute.Name = "config"
-			selectValue := map[string]interface{}{
-				"displayField": relationItem.DisplayField,
-				"valueField": relationItem.ValueField,
-				"selectorName": relationItem.Id,
-				"selectionMode": "multi",
-			}
-			data, err := json.Marshal(selectValue)
-			if err != nil {
-				panic(err)
-			}
-			parameterAttribute.Value = string(data)
-			queryParameter.ParameterAttributeLi = append(queryParameter.ParameterAttributeLi, parameterAttribute)
-		}
+		commonMethod := CommonMethod{}
+		queryParameter.CRelationDS = commonMethod.getCRelationDS(queryParameter.CRelationDS, fieldGroup.RelationDS)
 	} else if xmlName == "string-column" {
 		// do nothing
 	} else if xmlName == "number-column" {
@@ -172,13 +145,13 @@ func (o ModelListTemplateAdapter) applyQueryParameterSubAttr(xmlName string, fie
 		hasQueryFormat := false
 		if queryParameter.ParameterAttributeLi != nil {
 			for _, attrItem := range queryParameter.ParameterAttributeLi {
-				if attrItem.Name == "inFormat" {
+				if attrItem.Name == "displayPattern" {
 					hasInFormat = true
 					break
 				}
 			}
 			for _, attrItem := range queryParameter.ParameterAttributeLi {
-				if attrItem.Name == "queryFormat" {
+				if attrItem.Name == "dbPattern" {
 					hasQueryFormat = true
 					break
 				}
@@ -190,23 +163,23 @@ func (o ModelListTemplateAdapter) applyQueryParameterSubAttr(xmlName string, fie
 			}
 			if !hasInFormat {
 				parameterAttribute := ParameterAttribute{}
-				parameterAttribute.Name = "inFormat"
+				parameterAttribute.Name = "displayPattern"
 				if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("DATE") {
-					parameterAttribute.Value = "yyyyMMdd"//需要从业务中查找,是一个系统配置,TODO,
+					parameterAttribute.Value = "yyyy-MM-dd"//需要从业务中查找,是一个系统配置,TODO,
 				} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("DATETIME") {
 					parameterAttribute.Value = "yyyy-MM-dd HH:mm:ss"//需要从业务中查找,是一个系统配置,TODO,
 				} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("YEAR") {
 					parameterAttribute.Value = "yyyy"
 				} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("YEARMONTH") {
-					parameterAttribute.Value = "yyyyMM"//需要从业务中查找,是一个系统配置,TODO,
+					parameterAttribute.Value = "yyyy-MM"//需要从业务中查找,是一个系统配置,TODO,
 				} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("TIME") {
-					parameterAttribute.Value = "HHmmss"//需要从业务中查找,是一个系统配置,TODO,
+					parameterAttribute.Value = "HH:mm:ss"//需要从业务中查找,是一个系统配置,TODO,
 				}
 				queryParameter.ParameterAttributeLi = append(queryParameter.ParameterAttributeLi, parameterAttribute)
 			}
 			if !hasQueryFormat {
 				parameterAttribute := ParameterAttribute{}
-				parameterAttribute.Name = "queryFormat"
+				parameterAttribute.Name = "dbPattern"
 				if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("DATE") {
 					parameterAttribute.Value = "yyyyMMdd"
 				} else if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("DATETIME") {

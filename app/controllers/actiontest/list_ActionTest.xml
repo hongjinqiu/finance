@@ -73,7 +73,7 @@
 		<query-parameter name="code" auto="true" text=""></query-parameter>
 		<query-parameter name="name" auto="true" text=""></query-parameter>
 		<query-parameter name="name" auto="true" text="">
-			<parameter-attribute name="inFormat" value=""/>
+			<parameter-attribute name="displayPattern" value=""/>
 		</query-parameter>
 	</query-parameters>
 </list-template>

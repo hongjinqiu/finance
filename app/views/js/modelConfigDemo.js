@@ -13,8 +13,8 @@ var sysUserModel = {
 			valueField : "",// 可以为函数
 			selectorName : "",// 可以为函数
 			selectionMode : "single",// single|multi
-			selectFunc: function(datas){},// 单多选回调
-			unSelectFunc: function(){},// 单多选回调
+			selectFunc: function(datas, formObj){},// 单多选回调
+			unSelectFunc: function(formObj){},// 单多选回调
 			queryFunc: function(){},// 单多选回调
 			listeners : {// 会用yui.on调用,
 				focus: function(e){},
@@ -44,5 +44,30 @@ var sysUserModel = {
 	}
 };
 
+var listTemplateExtraInfo = {
+	"ColumnModel" : {
 
-
+	},
+	"QueryParameter" : {
+		"currencyTypeId" : {
+//				selectFunc : function(datas, formObj) {
+//				},// 单多选回调
+//				unSelectFunc : function(formObj) {
+//				},// 单多选回调
+			queryFunc : function() {
+				return {
+					"code": "RMB",
+					"name": "人"
+				};
+			},// 单多选回调
+			listeners : {
+				click: function(e, formObj){
+					console.log("click");
+				},
+				valueChange: function(e, formObj) {
+					console.log("value cc change outside");
+				}
+			}
+		}
+	}
+};

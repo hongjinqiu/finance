@@ -78,9 +78,9 @@ function getDsUrl(listTemplate) {
 	return "/console/listschema?@name=" + listTemplate.Id + "&format=json";
 }
 
-function main() {
+function listMain() {
 	YUI(g_financeModule).use("finance-module", function(Y){
-			applyDateLocale(Y);
+			//applyDateLocale(Y);
 			yInst = Y;
 			var dataTableManager = new DataTableManager();
 			/*
@@ -104,6 +104,7 @@ function main() {
 			gridPanelDict[columnModelName] = dtInst;
 			var queryParameterManager = new QueryParameterManager();
 			queryParameterManager.applyQueryParameter();
+			queryParameterManager.applyQueryDefaultValue();
 			applyQueryBtnBehavior();
 	});
 }
@@ -130,17 +131,33 @@ $("#btn_more").click(function(){
 	$("#btn_up").css("display","none");	
 	$("#search1").slideUp();
 		 */
+		var duration = 0.4;
 		Y.one("#btnMore").on("click", function(e){
+			var trCount = Y.all("#queryMain .queryLine").size();
+			if (trCount > 1) {
+				var myAnim = new Y.Anim({
+					node: '#queryContent',
+					to: {
+						height: 26 * trCount
+					},
+					duration: duration
+				});
+				myAnim.run();
+			}
+			Y.one("#btnMore").setStyle("display", "none");
+			Y.one("#btnUp").setStyle("display", "");
+		});
+		Y.one("#btnUp").on("click", function(e){
 			var myAnim = new Y.Anim({
 				node: '#queryContent',
 				to: {
-					height: 104
-				}
+					height: 22
+				},
+				duration: duration
 			});
 			myAnim.run();
-		});
-		Y.one("#btnUp").on("click", function(e){
-			
+			Y.one("#btnMore").setStyle("display", "");
+			Y.one("#btnUp").setStyle("display", "none");
 		});
 	});
 }

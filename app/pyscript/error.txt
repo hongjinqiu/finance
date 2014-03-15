@@ -1,0 +1,9 @@
+parseModel("{\"A\":{\"amtLimits\":0,\"amtOriginalCurrencyBalance\":0,\"amtSecureBalance\":0,\"attachCount\":0,\"code\":\"xm001\",\"createBy\":15,\"createTime\":20140312165546,\"createUnit\":0,\"currencyTypeId\":2,\"dutyBy\":15,\"id\":4,\"limitsControl\":1,\"mnemonicNo\":\"xm001\",\"modifyBy\":0,\"modifyTime\":0,\"modifyUnit\":0,\"name\":\"\u53a6\u95e8001\",\"remark\":\"\",\"storeAddress\":\"test\"},\"_id\":4,\"id\":4,\"pendingTransactions\":[]}","{\"amtLimits\":0,\"amtOriginalCurrencyBalance\":0,\"amtSecureBalance\":0,\"attachCount\":0,\"code\":\"xm001\",\"createBy\":15,\"createTime\":20140312165546,\"createUnit\":0,\"currencyTypeId\":2,\"dutyBy\":15,\"id\":4,\"limitsControl\":1,\"mnemonicNo\":\"xm001\",\"modifyBy\":0,\"modifyTime\":0,\"modifyUnit\":0,\"name\":\"\u53a6\u95e8001\",\"remark\":\"\",\"storeAddress\":\"test\"}","data[\"A\"][\"code\"]==\"xm001\"")
+Traceback (most recent call last):
+  File "expression.py", line 29, in <module>
+    print eval(command)
+  File "<string>", line 1, in <module>
+  File "expression.py", line 20, in parseModel
+    return str(eval(action))
+  File "<string>", line 1, in <module>
+KeyError: 'A'

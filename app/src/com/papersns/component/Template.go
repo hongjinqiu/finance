@@ -12,7 +12,7 @@ type ListTemplate struct {
 	DataSourceModelId   string              `xml:"data-source-model-id"`
 	Adapter             Adapter             `xml:"adapter"`
 	Description         string              `xml:"description"`
-	Scripts             template.HTML       `xml:"scripts"`
+	Scripts             template.URL        `xml:"scripts"`
 	ViewTemplate        ViewTemplate        `xml:"view-template"`
 	Toolbar             Toolbar             `xml:"toolbar"`
 	Security            Security            `xml:"security"`
@@ -25,14 +25,14 @@ type ListTemplate struct {
 }
 
 type FormTemplate struct {
-	XMLName           xml.Name      `xml:"form-template"`
-	Id                string        `xml:"id"`
-	DataSourceModelId string        `xml:"data-source-model-id"`
-	Adapter           Adapter       `xml:"adapter"`
-	Description       string        `xml:"description"`
-	Scripts           template.HTML `xml:"scripts"`
-	ViewTemplate      ViewTemplate  `xml:"view-template"`
-	FormElemLi        []FormElem    `xml:",any"`
+	XMLName           xml.Name     `xml:"form-template"`
+	Id                string       `xml:"id"`
+	DataSourceModelId string       `xml:"data-source-model-id"`
+	Adapter           Adapter      `xml:"adapter"`
+	Description       string       `xml:"description"`
+	Scripts           template.URL `xml:"scripts"`
+	ViewTemplate      ViewTemplate `xml:"view-template"`
+	FormElemLi        []FormElem   `xml:",any"`
 }
 
 type FormElem struct {
@@ -52,10 +52,10 @@ type Adapter struct {
 }
 
 type ViewTemplate struct {
-	XMLName         xml.Name      `xml:"view-template"`
-	View            string        `xml:"view,attr,omitempty"`
-	SelectorView    string        `xml:"selectorView,attr,omitempty"`
-	SelectorScripts template.HTML `xml:"selectorScripts,attr,omitempty"`
+	XMLName         xml.Name     `xml:"view-template"`
+	View            string       `xml:"view,attr,omitempty"`
+	SelectorView    string       `xml:"selectorView,attr,omitempty"`
+	SelectorScripts template.URL `xml:"selectorScripts,attr,omitempty"`
 }
 
 type Html struct {
@@ -188,6 +188,7 @@ type ColumnAttributeGroup struct {
 	ColSpan          string `xml:"colSpan,attr,omitempty"`
 	ColumnWidth      string `xml:"columnWidth,attr,omitempty"`
 	LabelWidth       string `xml:"labelWidth,attr,omitempty"`
+	DsFieldMap       string `xml:"dsFieldMap,attr,omitempty"`
 	DataSetId        string `xml:"-"`
 }
 
@@ -198,6 +199,7 @@ type Column struct {
 	ColumnAttributeLi []ColumnAttribute `xml:"column-attribute"`
 	Editor            Editor            `xml:"editor"`
 	Listeners         Listeners         `xml:"listeners"`
+	CRelationDS       CRelationDS       `xml:"relationDS"`
 	ColumnAttributeGroup
 	ColumnModel ColumnModel `xml:"column-model"`
 
@@ -227,17 +229,56 @@ type Column struct {
 	Script string `xml:"script,attr,omitempty"`
 
 	// select-column的内容
-	DisplayField  string `xml:"displayField,attr,omitempty"`
-	ValueField    string `xml:"valueField,attr,omitempty"`
-	SelectorName  string `xml:"selectorName,attr,omitempty"`
-	SelectionMode string `xml:"selectionMode,attr,omitempty"`
-	QueryFunc     string `xml:"queryFunc,attr,omitempty"`
+	//	DisplayField  string `xml:"displayField,attr,omitempty"`
+	//	ValueField    string `xml:"valueField,attr,omitempty"`
+	//	SelectorName  string `xml:"selectorName,attr,omitempty"`
+	//	SelectionMode string `xml:"selectionMode,attr,omitempty"`
 }
 
 type Editor struct {
 	XMLName         xml.Name          `xml:"editor"`
 	EditorAttribute []EditorAttribute `xml:"editor_attribute"`
 	Name            string            `xml:"name,attr,omitempty"`
+}
+
+type CRelationDS struct {
+	XMLName         xml.Name        `xml:"relationDS"`
+	CRelationItemLi []CRelationItem `xml:"relationItem"`
+}
+
+type CRelationItem struct {
+	XMLName         xml.Name        `xml:"relationItem"`
+	Name            string          `xml:"name,attr,omitempty"`
+	CRelationExpr   CRelationExpr   `xml:"relationExpr"`
+	CJsRelationExpr CJsRelationExpr `xml:"jsRelationExpr"`
+	CRelationConfig CRelationConfig `xml:"relationConfig"`
+	CCopyConfigLi   []CCopyConfig   `xml:"copyConfig"`
+}
+
+type CRelationConfig struct {
+	XMLName       xml.Name `xml:"relationConfig"`
+	SelectorName  string   `xml:"selectorName,attr,omitempty"`
+	DisplayField  string   `xml:"displayField,attr,omitempty"`
+	ValueField    string   `xml:"valueField,attr,omitempty"`
+	SelectionMode string   `xml:"selectionMode,attr,omitempty"`
+}
+
+type CCopyConfig struct {
+	XMLName        xml.Name `xml:"copyConfig"`
+	CopyColumnName string   `xml:"copyColumnName,attr,omitempty"`
+	CopyValueField string   `xml:"copyValueField,attr,omitempty"`
+}
+
+type CRelationExpr struct {
+	XMLName xml.Name `xml:"relationExpr"`
+	Mode    string   `xml:"mode,attr"`
+	Content string   `xml:",chardata"`
+}
+
+type CJsRelationExpr struct {
+	XMLName xml.Name `xml:"jsRelationExpr"`
+	Mode    string   `xml:"mode,attr"`
+	Content string   `xml:",chardata"`
 }
 
 type Listeners struct {
@@ -281,10 +322,18 @@ type QueryParameter struct {
 	XMLName xml.Name `xml:"query-parameter"`
 
 	ParameterAttributeLi []ParameterAttribute `xml:"parameter-attribute"`
+	CRelationDS          CRelationDS          `xml:"relationDS"`
+	CDefaultValueExpr    CDefaultValueExpr    `xml:"defaultValueExpr"`
 	QueryParamAttributeGroup
 	Dictionary map[string]interface{} `xml:"-"`
 	Tree       map[string]interface{} `xml:"-"`
 	DataSetId  string                 `xml:"-"`
+}
+
+type CDefaultValueExpr struct {
+	XMLName xml.Name `xml:"defaultValueExpr"`
+	Mode    string   `xml:"mode,attr"`
+	Content string   `xml:",chardata"`
 }
 
 type ParameterAttribute struct {

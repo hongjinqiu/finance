@@ -6,10 +6,21 @@ import (
 
 type ListTemplateIterator struct {}
 
+func (o ListTemplateIterator) recursionGetColumnItem(columnModel ColumnModel, columnLi *[]Column) {
+	for _, columnItem := range columnModel.ColumnLi {
+		if columnItem.ColumnModel.ColumnLi != nil {
+			o.recursionGetColumnItem(columnItem.ColumnModel, columnLi)
+		}
+		*columnLi = append(*columnLi, columnItem)
+	}
+}
+
 type IterateTemplateColumnFunc func(column Column, result *interface{})
 
 func (o ListTemplateIterator) IterateTemplateColumn(listTemplate ListTemplate, result *interface{}, iterateFunc IterateTemplateColumnFunc) {
-	for _, item := range listTemplate.ColumnModel.ColumnLi {
+	columnLi := []Column{}
+	o.recursionGetColumnItem(listTemplate.ColumnModel, &columnLi)
+	for _, item := range columnLi {
 		iterateFunc(item, result)
 	}
 }

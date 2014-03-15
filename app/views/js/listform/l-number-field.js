@@ -1,0 +1,1 @@
+Y.LNumberField = Y.Base.create('l-number-field', Y.RNumberField, [Y.WidgetChild]);

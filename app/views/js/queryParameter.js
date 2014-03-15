@@ -1,6 +1,22 @@
 function QueryParameterManager() {}
 
+QueryParameterManager.prototype.applyQueryDefaultValue = function() {
+	YUI(g_financeModule).use("finance-module", function(Y){
+		if (g_defaultBo) {
+			for (var key in g_defaultBo) {
+				var field = g_masterFormFieldDict[key];
+				if (field) {
+					field.set("value", g_defaultBo[key]);
+				}
+			}
+		}
+	});
+}
+
 QueryParameterManager.prototype.applyQueryParameter = function() {
+	if (true) {
+		return;
+	}
 	YUI(g_financeModule).use("finance-module", function(Y){
 		var columnManager = new ColumnManager();
 		for (var i = 0; i < listTemplate.QueryParameterGroup.QueryParameterLi.length; i++) {
@@ -15,23 +31,13 @@ QueryParameterManager.prototype.applyQueryParameter = function() {
 			} else if (queryParameter.Editor == "datefield") {
 				var dateFormat = null;
 				for (var j = 0; j < queryParameter.ParameterAttributeLi.length; j++) {
-					if (queryParameter.ParameterAttributeLi[j].Name == "inFormat") {
+					if (queryParameter.ParameterAttributeLi[j].Name == "displayPattern") {
 						dateFormat = queryParameter.ParameterAttributeLi[j].Value;
 						break;
 					}
 				}
 				if (dateFormat) {
 					dateFormat = columnManager.convertDate2DisplayPattern(dateFormat);
-					/*
-				var calendar = new Y.Calendar({
-					trigger: "#" + queryParameter.Name,
-					//dates: ['09/14/2009', '09/15/2009'],
-					//dateFormat: '%d/%m/%y %A',
-					dateFormat: dateFormat,
-					setValue: true,
-					selectMultipleDates: false
-				}).render();
-					 */
 				}
 			}
 			queryParameterManager.applyQueryParameterObserve(queryParameter);
@@ -98,7 +104,76 @@ QueryParameterManager.prototype.findQueryParameterAttr = function(queryParameter
 	return null;
 }
 
+QueryParameterManager.prototype.getQueryField = function(Y, name) {
+	var listTemplateIterator = new ListTemplateIterator();
+	var result = "";
+	var field = null;
+	listTemplateIterator.iterateAnyTemplateQueryParameter(result, function(queryParameter, result){
+		if (queryParameter.Name == name) {
+			if (queryParameter.Editor == "hiddenfield") {
+				field = new Y.LHiddenField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "textfield") {
+				field = new Y.LTextField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "textareafield") {
+				field = new Y.LTextareaField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "numberfield") {
+				field = new Y.LNumberField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "datefield") {
+				field = new Y.LDateField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "combofield") {
+				field = new Y.LSelectField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "displayfield") {
+				field = new Y.LDisplayField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "checkboxfield") {
+				field = new Y.LChoiceField({
+					name : name,
+					validateInline: true,
+					multi: true
+				});
+			} else if (queryParameter.Editor == "radiofield") {
+				field = new Y.LChoiceField({
+					name : name,
+					validateInline: true
+				});
+			} else if (queryParameter.Editor == "triggerfield") {
+				field = new Y.LTriggerField({
+					name : name,
+					validateInline: true
+				});
+			}
+			return true;
+		}
+		return false;
+	});
+	return field;
+}
 
-
-
+QueryParameterManager.prototype.getQueryFormData = function() {
+	var result = {};
+	for (var key in g_masterFormFieldDict) {
+		result[key] = g_masterFormFieldDict[key].get("value");
+	}
+	return result;
+}
 

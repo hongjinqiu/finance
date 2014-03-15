@@ -514,11 +514,30 @@
 											</simpleContent>
 										</complexType>
 									</element>
+									<element name="jsRelationExpr" default="1">
+										<complexType>
+											<simpleContent>
+												<extension base="string">
+													<attribute name="mode" default="text">
+														<simpleType>
+															<restriction base="string">
+																<enumeration value="text" />
+																<enumeration value="js" />
+																<enumeration value="function" />
+																<enumeration value="functionName" />
+															</restriction>
+														</simpleType>
+													</attribute>
+												</extension>
+											</simpleContent>
+										</complexType>
+									</element>
 									<element name="relationModelId" type="string" default="" />
 									<element name="relationDataSetId" type="string" default="" />
 									<element name="displayField" type="string" default="" />
 									<element name="valueField" type="string" default="" />
 								</sequence>
+								<attribute name="name" use="required"></attribute>
 							</complexType>
 						</element>
 					</sequence>

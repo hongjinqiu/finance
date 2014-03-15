@@ -31,6 +31,7 @@
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
 				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/listschema?@name={id}">
+					<expression></expression>
 				</button>
 				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Component">
 				</button>
@@ -38,7 +39,7 @@
 				</button>
 			</buttons>
 		</virtual-column>
-		<script-column name="ID" text="ID" script="record.get('id')" />
+		<script-column name="ID" text="ID" script="data.get('id')" />
 		<string-column name="name" text="名称"></string-column>
 		<string-column name="module" text="模块"></string-column>
 		<string-column name="path" text="路径"></string-column>
@@ -68,7 +69,7 @@
 				</button>
 			</buttons>
 		</virtual-column>
-		<script-column name="ID" text="ID" script="record.get('id')" />
+		<script-column name="ID" text="ID" script="data.get('id')" />
 		<string-column name="name" text="名称"></string-column>
 		<string-column name="module" text="模块"></string-column>
 		<string-column name="path" text="路径"></string-column>
@@ -99,7 +100,7 @@
 				</button>
 			</buttons>
 		</virtual-column>
-		<script-column name="ID" text="ID" script="record.get('id')" />
+		<script-column name="ID" text="ID" script="data.get('id')" />
 		<string-column name="name" text="名称"></string-column>
 		<string-column name="module" text="模块"></string-column>
 		<string-column name="path" text="路径"></string-column>
@@ -126,7 +127,7 @@
 				</button>
 			</buttons>
 		</virtual-column>
-		<script-column name="ID" text="ID" script="record.get('id')" />
+		<script-column name="ID" text="ID" script="data.get('id')" />
 		<string-column name="name" text="名称"></string-column>
 		<string-column name="module" text="模块"></string-column>
 		<string-column name="path" text="路径"></string-column>

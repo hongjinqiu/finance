@@ -70,7 +70,7 @@ function(key, values) {
 	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id">
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<!-- 
-			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression>
+			<expression>"31" == str(data.get("AUDIT_STATUS"))</expression>
 			 -->
 			<expression>1 == 1</expression>
 			<!-- python language -->
@@ -104,11 +104,11 @@ function(key, values) {
 		
 		<dictionary-column name="dictTest" text="字典测试" dictionary="D_DICTTEST"></dictionary-column>
 		
-		<script-column name="scriptTest" text="脚本列测试" script="str(record.get('id') or '') + ',' + str(record.get('boolTest') or '')"/>
+		<script-column name="scriptTest" text="脚本列测试" script="str(data.get('id') or '') + ',' + str(data.get('boolTest') or '')"/>
 		
 		<string-column name="nestTest" text="嵌套测试">
 			<column-model>
-				<script-column name="nest1" text="嵌套1" script="record.get('nick').encode('utf8')"></script-column>
+				<script-column name="nest1" text="嵌套1" script="data.get('nick').encode('utf8')"></script-column>
 				<dictionary-column name="nestDictTest1" text="子字典测试" dictionary="D_DICTTEST"></dictionary-column>
 			</column-model>
 		</string-column>
@@ -129,13 +129,13 @@ function(key, values) {
 		</query-parameter>
 		
 		<query-parameter name="createTimeBegin" columnName="createTime" text="申请日期从" restriction="ge" editor="datefield">
-			<parameter-attribute name="inFormat" value="yyyy-MM-dd"/>
- 	 		<parameter-attribute name="queryFormat" value="yyyyMMdd"/>
+			<parameter-attribute name="displayPattern" value="yyyy-MM-dd"/>
+ 	 		<parameter-attribute name="dbPattern" value="yyyyMMdd"/>
 		</query-parameter>
 
 		<query-parameter name="createTimeEnd" columnName="createTime" text="申请日期至" restriction="le" editor="datefield">
-			<parameter-attribute name="inFormat" value="yyyyMMdd"/>
- 	 		<parameter-attribute name="queryFormat" value="yyyyMMddHHmmss"/>
+			<parameter-attribute name="displayPattern" value="yyyyMMdd"/>
+ 	 		<parameter-attribute name="dbPattern" value="yyyyMMddHHmmss"/>
 		</query-parameter>
 		
 		<query-parameter name="dictTest" text="字典测试" restriction="eq" editor="combo">

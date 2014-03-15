@@ -11,7 +11,7 @@
 
 	<toolbar export="true">
 		<button text="新增" mode="fn" handler="doSave" iconCls="test">
-			<expression>test_expression</expression>
+			<expression></expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -46,12 +46,12 @@
 			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<!-- <expression>"31" == str(record.get("AUDIT_STATUS"))</expression> -->
+			<!-- <expression>"31" == str(data.get("AUDIT_STATUS"))</expression> -->
 			<expression>1 == 1</expression>
 			<!-- python language -->
 		</checkbox-column>
 		<!-- <id-column name="EMPEGRESS_ID" text="编号" hideable="true" /> -->
-		<id-column name="id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="false" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -93,7 +93,7 @@
 		<dictionary-column name="dictTest" auto="true" dictionary="" />
 		<string-column name="nestTest" text="嵌套测试">
 			<column-model dataSetId="A">
-				<script-column name="nest1" text="嵌套1" script="record.get('nick').encode('utf8')"></script-column>
+				<script-column name="nest1" text="嵌套1" script="data.get('nick').encode('utf8')"></script-column>
 				<auto-column name="dateTest" />
 				<auto-column name="startDate" />
 				<auto-column name="selectTest" />
@@ -110,7 +110,7 @@
 
 	<query-parameters dataSetId="A">
 		<query-parameter name="nick" auto="true" text=""></query-parameter>
-		<query-parameter name="moneyNumberColumn" auto="true" text=""></query-parameter>
+		<!-- <query-parameter name="moneyNumberColumn" auto="true" text=""></query-parameter>
 		
 		<query-parameter name="dateTestBegin" columnName="dateTest" auto="true" text="日期从" restriction="ge"></query-parameter>
 		<query-parameter name="dateTestEnd" columnName="dateTest" auto="true" text="日期至" restriction="le"></query-parameter>
@@ -134,6 +134,6 @@
 		<query-parameter name="nestTest" text="">
 			<parameter-attribute name="config" value="{}" />
 			<parameter-attribute name="listeners" value="{}" />
-		</query-parameter>
+		</query-parameter> -->
 	</query-parameters>
 </list-template>

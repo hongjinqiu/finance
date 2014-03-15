@@ -1,0 +1,1 @@
+Y.LFormField = Y.Base.create('l-form-field', Y.RFormField, [Y.WidgetChild]);

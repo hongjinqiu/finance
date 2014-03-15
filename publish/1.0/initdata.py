@@ -16,6 +16,7 @@ def getBillTypeInitData():
             'name': '付款单',
         }],
     }
+    
 
 def getInitDataLi():
     li = []

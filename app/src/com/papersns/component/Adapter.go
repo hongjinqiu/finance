@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"log"
 )
 
 var rwlock sync.RWMutex = sync.RWMutex{}
@@ -25,7 +26,6 @@ func GetAdapterDict() map[string]reflect.Type {
 
 type CommonMethod struct{}
 
-// TODO, byTest
 func (o CommonMethod) Parse(classMethod string, param []interface{}) []reflect.Value {
 	exprContent := classMethod
 	scriptStruct := strings.Split(exprContent, ".")[0]
@@ -49,27 +49,36 @@ func (o CommonMethod) recursionApplyColumnModel(dataSource DataSource, columnMod
 		column := &columnModel.ColumnLi[i]
 		if column.ColumnModel.ColumnLi == nil {
 			if column.XMLName.Local == "auto-column" || column.Auto == "true" {
-				modelIterator.IterateAllField(&dataSource, result, func(fieldGroup *FieldGroup, result *interface{}) {
-					isApplyColumn := false
-					columnModelDataSetId := columnModel.DataSetId
-					if columnModelDataSetId == "" {
-						columnModelDataSetId = "A"
+				if column.DsFieldMap == "" {
+					modelIterator.IterateAllField(&dataSource, result, func(fieldGroup *FieldGroup, result *interface{}) {
+						isApplyColumn := false
+						columnModelDataSetId := columnModel.DataSetId
+						if columnModelDataSetId == "" {
+							columnModelDataSetId = "A"
+						}
+						isApplyColumn = isApplyColumn || (fieldGroup.GetDataSetId() == columnModelDataSetId && column.Name == fieldGroup.Id)
+						if isApplyColumn {
+							o.applyColumnExtend(*fieldGroup, column)
+						}
+					})
+				} else {
+					textLi := strings.Split(column.DsFieldMap, ".")
+					if len(textLi) != 3 {
+						log.Println("dataSet:" + columnModel.DataSetId + ", column.Name:" + column.Name + ", dsFieldMap:" + column.DsFieldMap + " apply failed, dsFieldMap.len != 3")
+					} else {
+						dataSourceId := textLi[0]
+						dataSetId := textLi[1]
+						fieldId := textLi[2]
+						modelTemplateFactory := ModelTemplateFactory{}
+						outSideDataSource := modelTemplateFactory.GetDataSource(dataSourceId)
+						var outSideResult interface{} = ""
+						modelIterator.IterateAllField(&outSideDataSource, &outSideResult, func(fieldGroup *FieldGroup, result *interface{}) {
+							if fieldGroup.GetDataSetId() == dataSetId && fieldGroup.Id == fieldId {
+								o.applyColumnExtend(*fieldGroup, column)
+							}
+						})
 					}
-					isApplyColumn = isApplyColumn || (fieldGroup.GetDataSetId() == columnModelDataSetId && column.Name == fieldGroup.Id)
-					if isApplyColumn {
-						if column.Text == "" {
-							column.Text = fieldGroup.DisplayName
-						}
-						if column.Hideable == "" {
-							column.Hideable = fieldGroup.FixHide
-						}
-						if column.XMLName.Local == "auto-column" {
-							o.applyAutoColumnXMLName(*fieldGroup, column)
-						}
-
-						o.applyColumnExtend(*fieldGroup, column)
-					}
-				})
+				}
 			}
 		} else {
 			o.recursionApplyColumnModel(dataSource, &column.ColumnModel, result)
@@ -123,22 +132,120 @@ func (o CommonMethod) getColumnXMLName(fieldGroup FieldGroup) string {
 	return ""
 }
 
+func (o CommonMethod) getCRelationDSFromModel(relationItem RelationItem) CRelationItem {
+	cRelationItem := CRelationItem{}
+	cRelationItem.Name = relationItem.Name
+	cRelationItem.CRelationExpr.Mode = relationItem.RelationExpr.Mode
+	cRelationItem.CRelationExpr.Content = relationItem.RelationExpr.Content
+	
+	cRelationItem.CJsRelationExpr.Mode = relationItem.JsRelationExpr.Mode
+	cRelationItem.CJsRelationExpr.Content = relationItem.JsRelationExpr.Content
+	
+	cRelationItem.CRelationConfig.SelectorName = relationItem.Id
+	cRelationItem.CRelationConfig.DisplayField = relationItem.DisplayField
+	cRelationItem.CRelationConfig.ValueField = relationItem.ValueField
+	cRelationItem.CRelationConfig.SelectionMode = "single"
+	
+	return cRelationItem
+}
+
+func (o CommonMethod) getCRelationDS(cRelationDS CRelationDS, relationDS RelationDS) CRelationDS {
+	resultCRelationDS := CRelationDS{}
+	if cRelationDS.CRelationItemLi == nil && relationDS.RelationItemLi != nil {
+		cRelationItemLi := []CRelationItem{}
+		for _, item := range relationDS.RelationItemLi {
+			cRelationItem := o.getCRelationDSFromModel(item)
+			cRelationItemLi = append(cRelationItemLi, cRelationItem)
+		}
+		resultCRelationDS.CRelationItemLi = cRelationItemLi
+	} else if cRelationDS.CRelationItemLi != nil && relationDS.RelationItemLi != nil {
+//		templateManager := TemplateManager{}
+		cRelationItemLi := []CRelationItem{}
+		for i, item := range relationDS.RelationItemLi {
+			cRelationItem := CRelationItem{}
+			
+			isInherit := false
+			columnRelationItem := CRelationItem{}
+			if len(cRelationDS.CRelationItemLi) > i {
+				for _, subItem := range cRelationDS.CRelationItemLi {
+					if subItem.Name == item.Name {
+						isInherit = true
+						columnRelationItem = subItem
+						break
+					}
+				}
+			}
+			if isInherit {
+				cRelationItem.Name = columnRelationItem.Name
+				if columnRelationItem.CRelationExpr.Mode != "" {
+					cRelationItem.CRelationExpr.Mode = columnRelationItem.CRelationExpr.Mode
+				} else {
+					cRelationItem.CRelationExpr.Mode = item.RelationExpr.Mode
+				}
+				if columnRelationItem.CRelationExpr.Content != "" {
+					cRelationItem.CRelationExpr.Content = columnRelationItem.CRelationExpr.Content
+				} else {
+					cRelationItem.CRelationExpr.Content = item.RelationExpr.Content
+				}
+				if columnRelationItem.CJsRelationExpr.Mode != "" {
+					cRelationItem.CJsRelationExpr.Mode = columnRelationItem.CJsRelationExpr.Mode
+				} else {
+					cRelationItem.CJsRelationExpr.Mode = item.JsRelationExpr.Mode
+				}
+				if columnRelationItem.CJsRelationExpr.Content != "" {
+					cRelationItem.CJsRelationExpr.Content = columnRelationItem.CJsRelationExpr.Content
+				} else {
+					cRelationItem.CJsRelationExpr.Content = item.JsRelationExpr.Content
+				}
+				if columnRelationItem.CRelationConfig.SelectorName != "" {
+					cRelationItem.CRelationConfig.SelectorName = columnRelationItem.CRelationConfig.SelectorName
+				} else {
+					cRelationItem.CRelationConfig.SelectorName = item.Id
+				}
+				if columnRelationItem.CRelationConfig.DisplayField != "" {
+					cRelationItem.CRelationConfig.DisplayField = columnRelationItem.CRelationConfig.DisplayField
+				} else {
+					cRelationItem.CRelationConfig.DisplayField = item.DisplayField
+				}
+				if columnRelationItem.CRelationConfig.ValueField != "" {
+					cRelationItem.CRelationConfig.ValueField = columnRelationItem.CRelationConfig.ValueField
+				} else {
+					cRelationItem.CRelationConfig.ValueField = item.ValueField
+				}
+				if columnRelationItem.CRelationConfig.SelectionMode != "" {
+					cRelationItem.CRelationConfig.SelectionMode = columnRelationItem.CRelationConfig.SelectionMode
+				} else {
+					cRelationItem.CRelationConfig.SelectionMode = "single"
+				}
+				
+				if columnRelationItem.CCopyConfigLi != nil {
+					cRelationItem.CCopyConfigLi = columnRelationItem.CCopyConfigLi
+				}
+			} else {
+				cRelationItem = o.getCRelationDSFromModel(item)
+			}
+			
+			cRelationItemLi = append(cRelationItemLi, cRelationItem)
+		}
+		resultCRelationDS.CRelationItemLi = cRelationItemLi
+	}
+	return resultCRelationDS
+}
+
 // TODO, bytest
 func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
+	if column.Text == "" {
+		column.Text = fieldGroup.DisplayName
+	}
+	if column.Hideable == "" {
+		column.Hideable = fieldGroup.FixHide
+	}
+	if column.XMLName.Local == "auto-column" {
+		o.applyAutoColumnXMLName(fieldGroup, column)
+	}
+
 	if column.XMLName.Local == "select-column" {
-		relationItem := fieldGroup.RelationDS.RelationItemLi[0]
-		if column.DisplayField == "" {
-			column.DisplayField = relationItem.DisplayField
-		}
-		if column.ValueField == "" {
-			column.ValueField = relationItem.ValueField
-		}
-		if column.SelectorName == "" {
-			column.SelectorName = relationItem.Id
-		}
-		if column.SelectionMode == "" {
-			column.SelectionMode = "single"
-		}
+		column.CRelationDS = o.getCRelationDS(column.CRelationDS, fieldGroup.RelationDS)
 	} else if column.XMLName.Local == "string-column" {
 		// do nothing
 	} else if column.XMLName.Local == "number-column" {

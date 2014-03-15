@@ -43,7 +43,7 @@ var modelExtraInfo = {
 					name: "0"
 				};
 			}
-			/*selection: function(selectValueLi, formObj) {
+			/*selectFunc: function(selectValueLi, formObj) {
 				console.log("in selection");
 				console.log(selectValueLi);
 				console.log(formObj);

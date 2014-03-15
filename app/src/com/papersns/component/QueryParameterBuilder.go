@@ -14,19 +14,19 @@ type RestrictionEditorFunc func(queryParameter QueryParameter, value string) map
 func (o QueryParameterBuilder) buildQuery(queryParameter QueryParameter, value string) map[string]interface{} {
 	funcMap := map[string]map[string]RestrictionEditorFunc{
 		"textfield":     o.stringCmpMap(),
-		"textarea":      o.stringCmpMap(),
+		"textareafield":      o.stringCmpMap(),
 		"numberfield":   o.intOrFloatCmpMap(),
 		"datefield":     o.dateCmpMap(),
-		"combo":         o.intOrFloatOrStringCmpMap(),
+		"combofield":         o.intOrFloatOrStringCmpMap(),
 		"combotree":     o.intOrFloatOrStringCmpMap(),
 		"displayfield":  nil,
-		"hidden":        o.intOrFloatOrStringOrLikeCmpMap(),
+		"hiddenfield":        o.intOrFloatOrStringOrLikeCmpMap(),
 		"htmleditor":    o.stringCmpMap(),
-		"checkbox":      o.intOrFloatOrStringCmpMap(),
+		"checkboxfield":      o.intOrFloatOrStringCmpMap(),
 		"checkboxgroup": o.intOrFloatOrStringCmpMap(),
-		"radio":         o.intOrFloatOrStringCmpMap(),
+		"radiofield":         o.intOrFloatOrStringCmpMap(),
 		"radiogroup":    o.intOrFloatOrStringCmpMap(),
-		"trigger":       o.intOrFloatCmpMap(),
+		"triggerfield":       o.intOrFloatCmpMap(),
 	}
 	if funcMap[queryParameter.Editor] != nil {
 		if funcMap[queryParameter.Editor][queryParameter.Restriction] != nil {
@@ -278,25 +278,25 @@ func (o QueryParameterBuilder) dateCmp(operator string) RestrictionEditorFunc {
 }
 
 func (o QueryParameterBuilder) dateOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
-	inFormat := "yyyy-MM-dd"
-	queryFormat := "yyyyMMdd"
+	displayPattern := "yyyy-MM-dd"
+	dbPattern := "yyyyMMdd"
 	for _, parameterAttribute := range queryParameter.ParameterAttributeLi {
-		if parameterAttribute.Name == "inFormat" {
-			inFormat = parameterAttribute.Value
+		if parameterAttribute.Name == "displayPattern" {
+			displayPattern = parameterAttribute.Value
 		}
-		if parameterAttribute.Name == "queryFormat" {
-			queryFormat = parameterAttribute.Value
+		if parameterAttribute.Name == "dbPattern" {
+			dbPattern = parameterAttribute.Value
 		}
 	}
-	inFormat = o.replaceDateFormat(inFormat)
-	queryFormat = o.replaceDateFormat(queryFormat)
+	displayPattern = o.replaceDateFormat(displayPattern)
+	dbPattern = o.replaceDateFormat(dbPattern)
 
-	t, err := time.Parse(inFormat, value)
+	t, err := time.Parse(displayPattern, value)
 	if err != nil {
 		panic(err)
 	}
 
-	queryDataStr := t.Format(queryFormat)
+	queryDataStr := t.Format(dbPattern)
 	queryData, err := strconv.ParseInt(queryDataStr, 10, 64)
 	if err != nil {
 		panic(err)

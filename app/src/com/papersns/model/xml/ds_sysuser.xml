@@ -112,9 +112,10 @@
 			<field id="selectTest" extends="INT_FIELD">
 				<displayName>select选择测试</displayName>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -216,9 +217,10 @@
 			<field id="selectTest" extends="INT_FIELD">
 				<displayName>detailB_select选择测试</displayName>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -320,9 +322,10 @@
 			<field id="selectTest" extends="INT_FIELD">
 				<displayName>detailC_select选择测试</displayName>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

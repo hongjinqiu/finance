@@ -46,7 +46,7 @@
 			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<!-- <expression>"31" == str(record.get("AUDIT_STATUS"))</expression> -->
+			<!-- <expression>"31" == str(data.get("AUDIT_STATUS"))</expression> -->
 			<expression>1 == 1</expression>
 			<!-- python language -->
 		</checkbox-column>

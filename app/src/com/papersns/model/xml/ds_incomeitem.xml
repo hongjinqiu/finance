@@ -46,9 +46,10 @@
 				<displayName>类别</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="IncomeType">
 						<id>IncomeTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>IncomeType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -60,9 +61,10 @@
 				<displayName>税率类别</displayName>
 				<allowEmpty>true</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="TaxType">
 						<id>TaxTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>TaxType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -74,9 +76,10 @@
 				<displayName>计量单位</displayName>
 				<allowEmpty>true</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="MeasureUnit">
 						<id>MeasureUnitSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>MeasureUnit</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

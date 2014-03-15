@@ -107,8 +107,6 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
     	
     	this._selectNode.on("click", Y.bind(function(e) {
     		var self = this;
-    		var modelIterator = new ModelIterator();
-        	var result = "";
         	window.s_selectFunc = function(selectValueLi) {
         		var selection = self.get("selectFunc");
         		if (selection) {

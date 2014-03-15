@@ -1,0 +1,1 @@
+Y.LHiddenField = Y.Base.create('l-hidden-field', Y.RHiddenField, [Y.WidgetChild]);

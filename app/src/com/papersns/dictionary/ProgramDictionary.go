@@ -1,4 +1,4 @@
-package tree
+package dictionary
 
 import (
 	"com/papersns/mongo"
@@ -8,19 +8,19 @@ import (
 	"labix.org/v2/mgo"
 )
 
-func GetInstance() TreeManager {
-	return TreeManager{}
+func GetProgramDictionaryInstance() ProgramDictionaryManager {
+	return ProgramDictionaryManager{}
 }
 
-type TreeSort struct {
+type ProgramDictionarySort struct {
 	objLi []map[string]interface{}
 }
 
-func (o TreeSort) Len() int {
+func (o ProgramDictionarySort) Len() int {
 	return len(o.objLi)
 }
 
-func (o TreeSort) Less(i, j int) bool {
+func (o ProgramDictionarySort) Less(i, j int) bool {
 	orderI := o.objLi[i]["order"]
 	if orderI == nil {
 		return false
@@ -43,31 +43,31 @@ func (o TreeSort) Less(i, j int) bool {
 	return order1 <= order2
 }
 
-func (o TreeSort) Swap(i, j int) {
+func (o ProgramDictionarySort) Swap(i, j int) {
 	o.objLi[i], o.objLi[j] = o.objLi[j], o.objLi[i]
 }
 
 
-type TreeManager struct {
+type ProgramDictionaryManager struct {
 }
 
-func (o TreeManager) GetTree(code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetProgramDictionary(code string) map[string]interface{} {
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 	
-	return o.GetTreeBySession(db, code)
+	return o.GetProgramDictionaryBySession(db, code)
 }
 
-func (o TreeManager) GetTreeBySession(db *mgo.Database, code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetProgramDictionaryBySession(db *mgo.Database, code string) map[string]interface{} {
 	if code == "SYSUSER_TREE" {
-		return o.GetSysUserTree(db, code)
+		return o.GetSysUserProgramDictionary(db, code)
 	}
 	
 	return nil
 }
 
-func (o TreeManager) GetSysUserTree(db *mgo.Database, code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetSysUserProgramDictionary(db *mgo.Database, code string) map[string]interface{} {
 	collection := "SysUser"
 	c := db.C(collection)
 	
@@ -93,12 +93,12 @@ func (o TreeManager) GetSysUserTree(db *mgo.Database, code string) map[string]in
 	result["items"] = items
 	
 	// 排序
-	o.sortTree(&result)
+	o.sortProgramDictionary(&result)
 	return result
 }
 
-func (o TreeManager) sortTree(tree *map[string]interface{}) {
-	items := (*tree)["items"]
+func (o ProgramDictionaryManager) sortProgramDictionary(programDictionary *map[string]interface{}) {
+	items := (*programDictionary)["items"]
 	if items != nil {
 		itemsLi := items.([]interface{})
 		itemsMapLi := []map[string]interface{}{}
@@ -106,12 +106,12 @@ func (o TreeManager) sortTree(tree *map[string]interface{}) {
 			tmpObj := itemsLi[i].(map[string]interface{})
 			itemsMapLi = append(itemsMapLi, tmpObj)
 		}
-		dSort := TreeSort{objLi: itemsMapLi}
+		dSort := ProgramDictionarySort{objLi: itemsMapLi}
 		sort.Sort(dSort)
-		(*tree)["items"] = itemsMapLi
+		(*programDictionary)["items"] = itemsMapLi
 		
 		for i,_ := range itemsMapLi {
-			o.sortTree(&(itemsMapLi[i]))
+			o.sortProgramDictionary(&(itemsMapLi[i]))
 		}
 	}
 }

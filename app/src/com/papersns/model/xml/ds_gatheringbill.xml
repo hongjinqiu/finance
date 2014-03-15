@@ -55,9 +55,10 @@
 				<!-- <defaultValueExpr>1</defaultValueExpr> -->
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
-					<relationItem>
+					<relationItem name="BillType">
 						<id>BillTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>BillType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -70,17 +71,19 @@
 				<allowEmpty>true</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
 				<relationDS>
-					<relationItem>
+					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
-					<relationItem>
+					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
 						<relationExpr>false</relationExpr>
+						<jsRelationExpr>false</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -98,9 +101,10 @@
 				<allowEmpty>true</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
 				<relationDS>
-					<relationItem>
+					<relationItem name="BalanceType">
 						<id>BalanceTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>BalanceType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -124,25 +128,28 @@
 				<allowEmpty>true</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
 				<relationDS><!-- 客户,供应商,人员 -->
-					<relationItem>
+					<relationItem name="Customer">
 						<id>CustomerSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>Customer</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
-					<relationItem>
+					<relationItem name="Provider">
 						<id>ProviderSelector</id>
 						<relationExpr>false</relationExpr>
+						<jsRelationExpr>false</jsRelationExpr>
 						<relationModelId>Provider</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>false</relationExpr>
+						<jsRelationExpr>false</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -160,9 +167,10 @@
 				<allowEmpty>true</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
 				<relationDS>
-					<relationItem>
+					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -175,9 +183,10 @@
 				<allowEmpty>true</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
 				<relationDS>
-					<relationItem>
+					<relationItem name="Article">
 						<id>ArticleSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>Article</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -189,9 +198,10 @@
 				<displayName>币别</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="CurrencyType">
 						<id>CurrencyTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>CurrencyType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -241,9 +251,10 @@
 			<field id="bankId" extends="STRING_FIELD">
 				<displayName>银行代码</displayName>
 				<relationDS>
-					<relationItem>
+					<relationItem name="Bank">
 						<id>BankSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>Bank</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -307,17 +318,19 @@
 				<displayName>费用账户</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
-					<relationItem>
+					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
 						<relationExpr>false</relationExpr>
+						<jsRelationExpr>false</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -329,9 +342,10 @@
 				<displayName>费用项目</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="IncomeItem">
 						<id>IncomeItemSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>IncomeItem</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

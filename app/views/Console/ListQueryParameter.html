@@ -2,21 +2,32 @@
 			<div class="queryTitle">查询参数</div>
 			<form action="/component/listtemplate" method="post" name="queryForm" id="queryForm">
 				{{range $index, $item := .result.hiddenParameterLi}}
-					<input type="hidden" id="{{$item.Name}}" name="{{$item.Name}}" value="{{$item.Value}}" />
+					<div id="q_{{$item.Name}}_render" style="display: none"></div>
+					<script type="text/javascript">
+					YUI(g_financeModule).use("finance-module", function(Y) {
+						var queryParameterManager = new QueryParameterManager();
+						var field = queryParameterManager.getQueryField(Y, '{{$item.Name}}');
+						field.render("#q_{{$item.Name}}_render");
+						g_masterFormFieldDict['{{$item.Name}}'] = field;
+					});
+					</script>
 				{{end}}
 				<div id="queryContent" class="queryContent">
-					<table class="queryMain" cellspacing="0" cellpadding="0" border="0">
+					<table id="queryMain" class="queryMain" cellspacing="0" cellpadding="0" border="0">
 						{{range $index, $item := .result.queryParameterRenderLi}}
-							<tr>
+							<tr class="queryLine">
 								{{range $tdIndex, $tdItem := $item}}
 									<td width="">
-										{{$tdItem.label}}
+										{{$tdItem.label}}：
 									</td>
 									<td width="" colspan="">
-										<div id="q_{{$tdItem.name}}_render">{{$tdItem.name}}</div>
+										<div id="q_{{$tdItem.name}}_render"></div>
 										<script type="text/javascript">
 										YUI(g_financeModule).use("finance-module", function(Y) {
-											
+											var queryParameterManager = new QueryParameterManager();
+											var field = queryParameterManager.getQueryField(Y, '{{$tdItem.name}}');
+											field.render("#q_{{$tdItem.name}}_render");
+											g_masterFormFieldDict['{{$tdItem.name}}'] = field;
 										});
 										</script>
 									</td>

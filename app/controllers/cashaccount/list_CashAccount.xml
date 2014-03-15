@@ -6,8 +6,8 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>现金账户列表</description>
-	<scripts>js/ds_listtoolbar.js</scripts>
-	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+	<scripts>js/ds_listtoolbar.js&amp;cashaccount/cashAccountListTemplate.js</scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="cashaccount/cashAccountListTemplate.js" />
 
 	<toolbar export="true">
 		<button text="新增" mode="url" handler="/console/formschema?@name=CashAccount" iconCls="test" />
@@ -41,15 +41,18 @@
 		<auto-column name="code" />
 		<auto-column name="name" />
 		<auto-column name="mnemonicNo" />
-		<auto-column name="currencyTypeId" />
+		<auto-column name="currencyTypeId">
+		</auto-column>
 		<auto-column name="dutyBy" />
 	</column-model>
 
 	<query-parameters dataSetId="A">
+		<query-parameter name="currencyTypeId" auto="true" text="">
+		</query-parameter>
 		<query-parameter name="code" auto="true" text=""></query-parameter>
 		<query-parameter name="name" auto="true" text=""></query-parameter>
 		<query-parameter name="mnemonicNo" auto="true" text=""></query-parameter>
-		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
+		<!-- <query-parameter name="currencyTypeId" auto="true" text=""></query-parameter> -->
 		<query-parameter name="dutyBy" auto="true" text=""></query-parameter>
 	</query-parameters>
 </list-template>

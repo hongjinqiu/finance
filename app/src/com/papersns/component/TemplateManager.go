@@ -3,13 +3,13 @@ package component
 import "github.com/robfig/revel"
 
 import (
-	"com/papersns/dictionary"
+	//	"com/papersns/dictionary"
 	"com/papersns/global"
 	. "com/papersns/interceptor"
 	"com/papersns/layer"
-	"com/papersns/mongo"
+	//	"com/papersns/mongo"
 	. "com/papersns/script"
-	"com/papersns/tree"
+	//	"com/papersns/tree"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -186,7 +186,6 @@ func (o TemplateManager) loadSingleListTemplate(path string) (ListTemplateInfo, 
 	return listTemplateInfo, nil
 }
 
-// TODO, byTest
 func (o TemplateManager) GetSelectorTemplateInfoLi() []SelectorTemplateInfo {
 	selectorTemplateInfo := []SelectorTemplateInfo{}
 	if len(gSelectorTemplateDict) == 0 {
@@ -201,7 +200,6 @@ func (o TemplateManager) GetSelectorTemplateInfoLi() []SelectorTemplateInfo {
 	return selectorTemplateInfo
 }
 
-// TODO, byTest
 func (o TemplateManager) RefretorSelectorTemplateInfo() []SelectorTemplateInfo {
 	o.clearSelectorTemplate()
 	o.loadSelectorTemplate()
@@ -216,7 +214,6 @@ func (o TemplateManager) GetSelectorTemplate(id string) ListTemplate {
 	return o.GetSelectorTemplateInfo(id).ListTemplate
 }
 
-// TODO, byTest
 func (o TemplateManager) GetSelectorTemplateInfo(id string) SelectorTemplateInfo {
 	if revel.Config.StringDefault("mode.dev", "true") == "true" {
 		selectorTemplateInfo, found := o.findSelectorTemplateInfo(id)
@@ -250,7 +247,6 @@ func (o TemplateManager) GetSelectorTemplateInfo(id string) SelectorTemplateInfo
 	panic(id + " not exists in ListTemplate list")
 }
 
-// TODO bytest,
 func (o TemplateManager) findSelectorTemplateInfo(id string) (SelectorTemplateInfo, bool) {
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
@@ -261,7 +257,6 @@ func (o TemplateManager) findSelectorTemplateInfo(id string) (SelectorTemplateIn
 	return SelectorTemplateInfo{}, false
 }
 
-// TODO, byTest
 func (o TemplateManager) clearSelectorTemplate() {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -269,7 +264,6 @@ func (o TemplateManager) clearSelectorTemplate() {
 	gSelectorTemplateDict = map[string]SelectorTemplateInfo{}
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSelectorTemplate() {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -307,7 +301,6 @@ func (o TemplateManager) loadSelectorTemplate() {
 	}
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSingleSelectorTemplateWithLock(path string) (SelectorTemplateInfo, error) {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -315,7 +308,6 @@ func (o TemplateManager) loadSingleSelectorTemplateWithLock(path string) (Select
 	return o.loadSingleSelectorTemplate(path)
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTemplateInfo, error) {
 	file, err := os.Open(path)
 	defer file.Close()
@@ -362,7 +354,6 @@ func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTempla
 	return SelectorTemplateInfo{}, nil
 }
 
-// TODO, byTest
 func (o TemplateManager) GetFormTemplateInfoLi() []FormTemplateInfo {
 	formTemplateInfo := []FormTemplateInfo{}
 	if len(gFormTemplateDict) == 0 {
@@ -378,7 +369,6 @@ func (o TemplateManager) GetFormTemplateInfoLi() []FormTemplateInfo {
 	return formTemplateInfo
 }
 
-// TODO, byTest
 func (o TemplateManager) RefretorFormTemplateInfo() []FormTemplateInfo {
 	o.clearFormTemplate()
 	o.loadFormTemplate()
@@ -393,7 +383,6 @@ func (o TemplateManager) GetFormTemplate(id string) FormTemplate {
 	return o.GetFormTemplateInfo(id).FormTemplate
 }
 
-// TODO, byTest
 func (o TemplateManager) GetFormTemplateInfo(id string) FormTemplateInfo {
 	if revel.Config.StringDefault("mode.dev", "true") == "true" {
 		formTemplateInfo, found := o.findFormTemplateInfo(id)
@@ -425,7 +414,6 @@ func (o TemplateManager) GetFormTemplateInfo(id string) FormTemplateInfo {
 	panic(id + " not exists in FormTemplate list")
 }
 
-// TODO bytest,
 func (o TemplateManager) findFormTemplateInfo(id string) (FormTemplateInfo, bool) {
 	templaterwlock.RLock()
 	defer templaterwlock.RUnlock()
@@ -436,7 +424,6 @@ func (o TemplateManager) findFormTemplateInfo(id string) (FormTemplateInfo, bool
 	return FormTemplateInfo{}, false
 }
 
-// TODO, byTest
 func (o TemplateManager) clearFormTemplate() {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -444,7 +431,6 @@ func (o TemplateManager) clearFormTemplate() {
 	gFormTemplateDict = map[string]FormTemplateInfo{}
 }
 
-// TODO, byTest
 func (o TemplateManager) loadFormTemplate() {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -468,7 +454,6 @@ func (o TemplateManager) loadFormTemplate() {
 	}
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSingleFormTemplateWithLock(path string) (FormTemplateInfo, error) {
 	templaterwlock.Lock()
 	defer templaterwlock.Unlock()
@@ -476,7 +461,6 @@ func (o TemplateManager) loadSingleFormTemplateWithLock(path string) (FormTempla
 	return o.loadSingleFormTemplate(path)
 }
 
-// TODO, byTest
 func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, error) {
 	file, err := os.Open(path)
 	defer file.Close()
@@ -527,7 +511,6 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 		}
 	}
 
-	// TODO byTest
 	if formTemplate.Adapter.Name != "" {
 		classMethod := formTemplate.Adapter.Name + ".ApplyAdapter"
 		commonMethod := CommonMethod{}
@@ -637,7 +620,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 	}
 }
 
-func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemplate, items []interface{}) []interface{} {
+func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemplate, items []interface{}) map[string]interface{} {
 	//	o.applyAdapterColumnName(listTemplate)
 	return o.GetColumnModelDataForColumnModel(listTemplate.ColumnModel, items)
 }
@@ -677,18 +660,37 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemp
 //	}
 //}
 
-func (o TemplateManager) setColumnItemDataSetId(columnModel *ColumnModel) {
-	if columnModel.DataSetId != "" {
-		columnModel.IdColumn.DataSetId = columnModel.DataSetId
-		for i, _ := range columnModel.ColumnLi {
-			columnModel.ColumnLi[i].DataSetId = columnModel.DataSetId
+func (o TemplateManager) GetSelectorInfoForListTemplate(listTemplate ListTemplate) map[string]interface{} {
+	result := map[string]interface{}{}
+	
+	listTemplateIterator := ListTemplateIterator{}
+	var iterateResult interface{} = ""
+	listTemplateIterator.IterateTemplateColumn(listTemplate, &iterateResult, func(column Column, iterateResult *interface{}) {
+		if column.CRelationDS.CRelationItemLi != nil {
+			for _, relationItem := range column.CRelationDS.CRelationItemLi {
+				selectorName := relationItem.CRelationConfig.SelectorName
+				listTemplate := o.GetSelectorTemplate(selectorName)
+				selectorInfo := map[string]interface{}{
+					"Description": listTemplate.Description,
+				}
+				result[selectorName] = selectorInfo
+			}
 		}
-	}
+	})
+
+	return result
 }
 
-func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnModel, items []interface{}) []interface{} {
+func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnModel, items []interface{}) map[string]interface{} {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	
 	// set dataSetId to columnItem.DataSetId
-	o.setColumnItemDataSetId(&columnModel)
+	o.recursionSetDefaultDataSetId(columnModel.DataSetId, &columnModel)
+	columnDict := map[string]Column{}
+	o.recursionGetColumnItem(columnModel, &columnDict)
+	columnNodeDict := o.buildColumnNode(columnDict)
+	relationBo := map[string]interface{}{}
 
 	columnModelItems := []interface{}{}
 	expressionParser := ExpressionParser{}
@@ -709,60 +711,266 @@ func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnMode
 		loopItem[columnModel.IdColumn.Name] = o.getValueBySpot(record, idColumnName)
 		loopItem["id"] = o.getValueBySpot(record, idColumnName)
 		loopItem["_id"] = o.getValueBySpot(record, idColumnName)
-		for _, columnItem := range columnModel.ColumnLi {
-			o.GetColumnModelDataForColumnItem(columnItem, record, &loopItem)
+		for _, columnNode := range columnNodeDict {
+			o.GetColumnModelDataForColumnItem(sessionId, columnNodeDict, columnNode, record, &relationBo, &loopItem)
 		}
 
 		columnModelItems = append(columnModelItems, loopItem)
 	}
 
-	return columnModelItems
+	return map[string]interface{}{
+		"items": columnModelItems,
+		"relationBo": relationBo,
+	}
 }
 
-func (o TemplateManager) GetColumnModelDataForColumnItem(columnItem Column, record map[string]interface{}, loopItem *map[string]interface{}) {
-	if columnItem.XMLName.Local != "virtual-column" {
-		if columnItem.ColumnModel.ColumnLi != nil {
-			o.setColumnItemDataSetId(&columnItem.ColumnModel)
-
-			for _, columnItemItem := range columnItem.ColumnModel.ColumnLi {
-				o.GetColumnModelDataForColumnItem(columnItemItem, record, loopItem)
+func (o TemplateManager) recursionSetDefaultDataSetId(dataSetId string, columnModel *ColumnModel) {
+	if columnModel.ColumnLi != nil {
+		for i, _ := range columnModel.ColumnLi {
+			columnItem := &columnModel.ColumnLi[i]
+			o.recursionSetDefaultDataSetId(dataSetId, &columnItem.ColumnModel)
+			if columnItem.DataSetId == "" {
+				columnItem.DataSetId = dataSetId
 			}
+		}
+	}
+	if columnModel.DataSetId == "" {
+		columnModel.DataSetId = dataSetId
+	}
+}
+
+type ColumnNode struct {
+	preColumnLi []string // 前驱
+	column      Column
+}
+
+func (o TemplateManager) recursionGetColumnItem(columnModel ColumnModel, columnDict *map[string]Column) {
+	for _, columnItem := range columnModel.ColumnLi {
+		if columnItem.ColumnModel.ColumnLi != nil {
+			o.recursionGetColumnItem(columnItem.ColumnModel, columnDict)
+			(*columnDict)[columnItem.Name] = columnItem
 		} else {
+			(*columnDict)[columnItem.Name] = columnItem
+		}
+	}
+}
+
+func (o TemplateManager) buildColumnNode(columnDict map[string]Column) map[string]ColumnNode {
+	columnNodeDict := map[string]ColumnNode{}
+	for _, columnItem := range columnDict {
+		columnNode := ColumnNode{
+			column: columnItem,
+		}
+		for _, subColumnItem := range columnDict {
+			if subColumnItem.XMLName.Local == "select-column" {
+				if subColumnItem.CRelationDS.CRelationItemLi != nil {
+					for _, relationItem := range subColumnItem.CRelationDS.CRelationItemLi {
+						if relationItem.CCopyConfigLi != nil {
+							for _, copyConfig := range relationItem.CCopyConfigLi {
+								if copyConfig.CopyColumnName == columnItem.Name {
+									if columnNode.preColumnLi == nil {
+										columnNode.preColumnLi = []string{}
+									}
+									isIn := false
+									for _, preColumnItem := range columnNode.preColumnLi {
+										if subColumnItem.Name == preColumnItem {
+											isIn = true
+											break
+										}
+									}
+									if !isIn {
+										columnNode.preColumnLi = append(columnNode.preColumnLi, subColumnItem.Name)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		columnNodeDict[columnItem.Name] = columnNode
+	}
+	return columnNodeDict
+}
+
+func (o TemplateManager) parseModelExpression(bo map[string]interface{}, data map[string]interface{}, mode string, content string) string {
+	expressionParser := ExpressionParser{}
+	if mode == "" || mode == "text" {
+		return content
+	} else if mode == "python" {
+		dataJsonData, err := json.Marshal(&data)
+		if err != nil {
+			panic(err)
+		}
+		dataJson := string(dataJsonData)
+		boJsonData, _ := json.Marshal(&bo)
+		boJson := string(boJsonData)
+		return expressionParser.ParseModel(boJson, dataJson, content)
+	} else if mode == "golang" {
+		return expressionParser.ParseGolang(bo, data, content)
+	}
+	return ""
+}
+
+func (o TemplateManager) applyCopyValueField(sessionId int, preColumnName string, columnItem Column, relationItem CRelationItem, record map[string]interface{}, relationBo *map[string]interface{}, loopItem *map[string]interface{}) {
+	for _, copyConfig := range relationItem.CCopyConfigLi {
+		if copyConfig.CopyColumnName == columnItem.Name {
+			selectorName := relationItem.CRelationConfig.SelectorName
+			if (*relationBo)[selectorName] != nil {
+				selectorDict := (*relationBo)[selectorName].(map[string]interface{})
+				if (*loopItem)[preColumnName] != nil {
+					id := fmt.Sprint((*loopItem)[preColumnName])
+					if selectorDict[id] != nil {
+						selectorData := selectorDict[id].(map[string]interface{})
+						valueFieldLi := strings.Split(copyConfig.CopyValueField, ",")
+						valueLi := []string{}
+						for _, valueField := range valueFieldLi {
+							if selectorData[valueField] != nil {
+								valueLi = append(valueLi, fmt.Sprint(selectorData[valueField]))
+							}
+						}
+						(*loopItem)[columnItem.Name] = strings.Join(valueLi, ",")
+						//如果是select-column,取rs中的值出来,放到relationBo里面,
+						if columnItem.XMLName.Local == "select-column" {
+							if (*loopItem)[columnItem.Name] != nil {
+								valueStr := fmt.Sprint((*loopItem)[columnItem.Name])
+								if valueStr != "" {
+									value, err := strconv.Atoi(valueStr)
+									if err != nil {
+										panic(err)
+									}
+									o.applyRelationBoBySelectField(sessionId, columnItem, value, record, relationBo)
+								}
+							}
+						}
+					}
+				}
+			}
+			break
+		}
+	}
+}
+
+func (o TemplateManager) getData4Expression(column Column, record map[string]interface{}) map[string]interface{} {
+	if column.DataSetId == "A" {
+		return record["A"].(map[string]interface{})
+	}
+	return record
+}
+
+func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNodeDict map[string]ColumnNode, columnNode ColumnNode, record map[string]interface{}, relationBo *map[string]interface{}, loopItem *map[string]interface{}) {
+	columnItem := columnNode.column
+	if columnNode.preColumnLi != nil {
+		for _, name := range columnNode.preColumnLi {
+			o.GetColumnModelDataForColumnItem(sessionId, columnNodeDict, columnNodeDict[name], record, relationBo, loopItem)
+		}
+		// 算完前驱,算自身,
+		for _, name := range columnNode.preColumnLi {
+			preColumnNode := columnNodeDict[name]
+			relationLi := preColumnNode.column.CRelationDS.CRelationItemLi
+			if relationLi != nil {
+				for _, relationItem := range relationLi {
+					mode := relationItem.CRelationExpr.Mode
+					exprContent := relationItem.CRelationExpr.Content
+					bo := record
+					data := o.getData4Expression(columnItem, record)
+					content := o.parseModelExpression(bo, data, mode, exprContent)
+					if strings.ToLower(content) == "true" {
+						if relationItem.CCopyConfigLi != nil {
+							o.applyCopyValueField(sessionId, name, columnItem, relationItem, record, relationBo, loopItem)
+						}
+						break
+					}
+				}
+			}
+		}
+	} else {
+		if columnItem.XMLName.Local != "virtual-column" {
 			columnItemName := columnItem.Name
 			if columnItem.DataSetId != "" {
 				columnItemName = columnItem.DataSetId + "." + columnItemName
 			}
 			(*loopItem)[columnItem.Name] = o.getValueBySpot(record, columnItemName)
-			o.ApplyDictionaryColumnData(loopItem, columnItem)
+			//o.ApplyDictionaryColumnData(loopItem, columnItem)
 			o.ApplyScriptColumnData(loopItem, record, columnItem)
-		}
-	} else {
-		if (*loopItem)[columnItem.Name] == nil {
-			virtualColumn := map[string]interface{}{}
-			buttons := []interface{}{}
-			virtualColumn["buttons"] = buttons
-			(*loopItem)[columnItem.Name] = virtualColumn
-		}
+			// 如果是select-column,取rs中的值出来,放到relationBo里面,
+			if columnItem.XMLName.Local == "select-column" {
+				if (*loopItem)[columnItem.Name] != nil {
+					valueStr := fmt.Sprint((*loopItem)[columnItem.Name])
+					if valueStr != "" {
+						value, err := strconv.Atoi(valueStr)
+						if err != nil {
+							panic(err)
+						}
+						o.applyRelationBoBySelectField(sessionId, columnItem, value, record, relationBo)
+					}
+				}
+			}
+		} else {
+			if (*loopItem)[columnItem.Name] == nil {
+				virtualColumn := map[string]interface{}{}
+				buttons := []interface{}{}
+				virtualColumn["buttons"] = buttons
+				(*loopItem)[columnItem.Name] = virtualColumn
+			}
 
-		recordJsonByte, err := json.Marshal(record)
-		if err != nil {
-			panic(err)
-		}
-		recordJson := string(recordJsonByte)
+			recordJsonByte, err := json.Marshal(record)
+			if err != nil {
+				panic(err)
+			}
+			recordJson := string(recordJsonByte)
 
-		expressionParser := ExpressionParser{}
-		for _, buttonItem := range columnItem.Buttons.ButtonLi {
-			button := map[string]interface{}{}
-			button["isShow"] = expressionParser.Parse(recordJson, buttonItem.Expression)
-			virtualColumn := (*loopItem)[columnItem.Name].(map[string]interface{})
-			buttons := virtualColumn["buttons"].([]interface{})
-			buttons = append(buttons, button)
-			virtualColumn["buttons"] = buttons // append will generate a new reference, so must reset value
+			expressionParser := ExpressionParser{}
+			for _, buttonItem := range columnItem.Buttons.ButtonLi {
+				button := map[string]interface{}{}
+				button["isShow"] = expressionParser.Parse(recordJson, buttonItem.Expression)
+				virtualColumn := (*loopItem)[columnItem.Name].(map[string]interface{})
+				buttons := virtualColumn["buttons"].([]interface{})
+				buttons = append(buttons, button)
+				virtualColumn["buttons"] = buttons // append will generate a new reference, so must reset value
+			}
 		}
 	}
 }
 
-// TODO, byTest
+func (o TemplateManager) applyRelationBoBySelectField(sessionId int, column Column, value int, data map[string]interface{}, relationBo *map[string]interface{}) {
+	if column.CRelationDS.CRelationItemLi != nil {
+		for _, relationItem := range column.CRelationDS.CRelationItemLi {
+			mode := relationItem.CRelationExpr.Mode
+			exprContent := relationItem.CRelationExpr.Content
+			bo := data
+			data4Expression := o.getData4Expression(column, data)
+			content := o.parseModelExpression(bo, data4Expression, mode, exprContent)
+			if strings.ToLower(content) == "true" {
+				selectorName := relationItem.CRelationConfig.SelectorName
+				if (*relationBo)[selectorName] != nil {
+					selectorDict := (*relationBo)[selectorName].(map[string]interface{})
+					if selectorDict[fmt.Sprint(value)] != nil {
+						continue
+					}
+				}
+				li := []map[string]interface{}{}
+				li = append(li, map[string]interface{}{
+					"relationId": value,
+					"selectorId": selectorName,
+				})
+				singleRelationBo := o.GetRelationBo(sessionId, li)
+				if singleRelationBo[selectorName] != nil {
+					singleRelationItem := singleRelationBo[selectorName].(map[string]interface{})
+					if (*relationBo)[selectorName] == nil {
+						(*relationBo)[selectorName] = map[string]interface{}{}
+					}
+					relationItem := (*relationBo)[selectorName].(map[string]interface{})
+					for k, v := range singleRelationItem {
+						relationItem[k] = v
+					}
+					(*relationBo)[selectorName] = relationItem
+				}
+			}
+		}
+	}
+}
+
 func (o TemplateManager) getValueBySpot(record map[string]interface{}, name string) interface{} {
 	current := record
 	nameLi := strings.Split(name, ".")
@@ -783,24 +991,24 @@ func (o TemplateManager) getValueBySpot(record map[string]interface{}, name stri
 	return nil
 }
 
-func (o TemplateManager) ApplyDictionaryColumnData(loopItem *map[string]interface{}, columnItem Column) {
-	dictionaryManager := dictionary.GetInstance()
-	if columnItem.XMLName.Local == "dictionary-column" {
-		dictionaryItem := dictionaryManager.GetDictionary(columnItem.Dictionary)
-		items := dictionaryItem["items"]
-		if items != nil {
-			itemsLi := items.([]map[string]interface{})
-			columnValue := fmt.Sprint((*loopItem)[columnItem.Name])
-			for _, codeNameItem := range itemsLi {
-				code := fmt.Sprint(codeNameItem["code"])
-				if code == columnValue {
-					(*loopItem)[columnItem.Name+"_DICTIONARY_NAME"] = codeNameItem["name"]
-					break
-				}
-			}
-		}
-	}
-}
+//func (o TemplateManager) ApplyDictionaryColumnData(loopItem *map[string]interface{}, columnItem Column) {
+//	dictionaryManager := dictionary.GetInstance()
+//	if columnItem.XMLName.Local == "dictionary-column" {
+//		dictionaryItem := dictionaryManager.GetDictionary(columnItem.Dictionary)
+//		items := dictionaryItem["items"]
+//		if items != nil {
+//			itemsLi := items.([]map[string]interface{})
+//			columnValue := fmt.Sprint((*loopItem)[columnItem.Name])
+//			for _, codeNameItem := range itemsLi {
+//				code := fmt.Sprint(codeNameItem["code"])
+//				if code == columnValue {
+//					(*loopItem)[columnItem.Name+"_DICTIONARY_NAME"] = codeNameItem["name"]
+//					break
+//				}
+//			}
+//		}
+//	}
+//}
 
 func (o TemplateManager) ApplyScriptColumnData(loopItem *map[string]interface{}, record map[string]interface{}, columnItem Column) {
 	if columnItem.XMLName.Local == "script-column" {
@@ -838,10 +1046,12 @@ func (o TemplateManager) GetToolbarBo(toolbar Toolbar) []interface{} {
 func (o TemplateManager) GetBoForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	queryResult := o.QueryDataForListTemplate(listTemplate, paramMap, pageNo, pageSize)
 	items := queryResult["items"].([]interface{})
-	bo := o.GetColumnModelDataForListTemplate(*listTemplate, items)
+	itemsDict := o.GetColumnModelDataForListTemplate(*listTemplate, items)
+	bo := itemsDict["items"].([]interface{})
 	return map[string]interface{}{
 		"totalResults": queryResult["totalResults"],
 		"items":        bo,
+		"relationBo":	itemsDict["relationBo"],
 	}
 }
 
@@ -861,7 +1071,7 @@ func (o TemplateManager) GetColumns(listTemplate *ListTemplate) []string {
 func (o TemplateManager) GetShowParameterLiForListTemplate(listTemplate *ListTemplate) []QueryParameter {
 	queryParameterLi := []QueryParameter{}
 	for _, item := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		if item.Editor != "hidden" {
+		if item.Editor != "hiddenfield" {
 			queryParameterLi = append(queryParameterLi, item)
 		}
 	}
@@ -871,46 +1081,46 @@ func (o TemplateManager) GetShowParameterLiForListTemplate(listTemplate *ListTem
 func (o TemplateManager) GetHiddenParameterLiForListTemplate(listTemplate *ListTemplate) []QueryParameter {
 	queryParameterLi := []QueryParameter{}
 	for _, item := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		if item.Editor == "hidden" {
+		if item.Editor == "hiddenfield" {
 			queryParameterLi = append(queryParameterLi, item)
 		}
 	}
 	return queryParameterLi
 }
 
-func (o TemplateManager) ApplyDictionaryForQueryParameter(listTemplate *ListTemplate) {
-	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
-	defer session.Close()
+//func (o TemplateManager) ApplyDictionaryForQueryParameter(listTemplate *ListTemplate) {
+//	mongoDBFactory := mongo.GetInstance()
+//	session, db := mongoDBFactory.GetConnection()
+//	defer session.Close()
+//
+//	dictionaryManager := dictionary.GetInstance()
+//	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
+//		item := &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
+//		for _, parameterAttribute := range item.ParameterAttributeLi {
+//			if parameterAttribute.Name == "dictionary" {
+//				item.Dictionary = dictionaryManager.GetDictionaryBySession(db, parameterAttribute.Value)
+//				break
+//			}
+//		}
+//	}
+//}
 
-	dictionaryManager := dictionary.GetInstance()
-	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		item := &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
-		for _, parameterAttribute := range item.ParameterAttributeLi {
-			if parameterAttribute.Name == "dictionary" {
-				item.Dictionary = dictionaryManager.GetDictionaryBySession(db, parameterAttribute.Value)
-				break
-			}
-		}
-	}
-}
-
-func (o TemplateManager) ApplyTreeForQueryParameter(listTemplate *ListTemplate) {
-	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
-	defer session.Close()
-
-	treeManager := tree.GetInstance()
-	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
-		item := &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
-		for _, parameterAttribute := range item.ParameterAttributeLi {
-			if parameterAttribute.Name == "tree" {
-				item.Tree = treeManager.GetTreeBySession(db, parameterAttribute.Value)
-				break
-			}
-		}
-	}
-}
+//func (o TemplateManager) ApplyTreeForQueryParameter(listTemplate *ListTemplate) {
+//	mongoDBFactory := mongo.GetInstance()
+//	session, db := mongoDBFactory.GetConnection()
+//	defer session.Close()
+//
+//	treeManager := tree.GetInstance()
+//	for i, _ := range listTemplate.QueryParameterGroup.QueryParameterLi {
+//		item := &(listTemplate.QueryParameterGroup.QueryParameterLi[i])
+//		for _, parameterAttribute := range item.ParameterAttributeLi {
+//			if parameterAttribute.Name == "tree" {
+//				item.Tree = treeManager.GetTreeBySession(db, parameterAttribute.Value)
+//				break
+//			}
+//		}
+//	}
+//}
 
 func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTemplate) map[string]interface{} {
 	_, db := global.GetConnection(sId)
@@ -934,6 +1144,32 @@ func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTempl
 			}
 		}
 	}
+
+	return result
+}
+
+// TODO
+func (o TemplateManager) GetLayerForListTemplate(sId int, listTemplate ListTemplate) map[string]interface{} {
+	_, db := global.GetConnection(sId)
+
+	result := map[string]interface{}{}
+	layerManager := layer.GetInstance()
+
+	listTemplateIterator := ListTemplateIterator{}
+	var iterateResult interface{} = ""
+	listTemplateIterator.IterateTemplateColumn(listTemplate, &iterateResult, func(column Column, iterateResult *interface{}) {
+		if column.Dictionary != "" {
+			layerMap := layerManager.GetLayerBySession(db, column.Dictionary)
+			if layerMap != nil {
+				items := layerMap["items"]
+				if items != nil {
+					result[column.Dictionary] = items
+				} else {
+					result[column.Dictionary] = []interface{}{}
+				}
+			}
+		}
+	})
 
 	return result
 }
@@ -969,7 +1205,8 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 		interceptorManager := InterceptorManager{}
 		items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 		if len(items) > 0 {
-			items = o.GetColumnModelDataForListTemplate(listTemplate, items)
+			itemsDict := o.GetColumnModelDataForListTemplate(listTemplate, items)
+			items = itemsDict["items"].([]interface{})
 			element = items[0].(map[string]interface{})
 		} else {
 			continue
@@ -999,3 +1236,33 @@ func (o TemplateManager) GetViewUrl(listTemplate ListTemplate) string {
 	}
 	return ""
 }
+
+func (o TemplateManager) GetQueryDefaultValue(listTemplate ListTemplate) map[string]string {
+	defaultDict := map[string]string{}
+	listTemplateIterator := ListTemplateIterator{}
+	var result interface{} = ""
+	listTemplateIterator.IterateTemplateQueryParameter(listTemplate, &result, func(queryParameter QueryParameter, result *interface{}){
+		mode := queryParameter.CDefaultValueExpr.Mode
+		content := queryParameter.CDefaultValueExpr.Content
+		value := o.parseQueryParameterExpression(mode, content)
+		if value != "" {
+			defaultDict[queryParameter.Name] = value
+		}
+	})
+	return defaultDict
+}
+
+func (o TemplateManager) parseQueryParameterExpression(mode string, content string) string {
+	expressionParser := ExpressionParser{}
+	if mode == "" || mode == "text" {
+		return content
+	} else if mode == "python" {
+		return expressionParser.ParseString("{}", content)
+	} else if mode == "golang" {
+		bo := map[string]interface{}{}
+		data := map[string]interface{}{}
+		return expressionParser.ParseGolang(bo, data, content)
+	}
+	return ""
+}
+

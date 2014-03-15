@@ -39,9 +39,10 @@
 				<fixHide>true</fixHide>
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
-					<relationItem>
+					<relationItem name="BillType">
 						<id>BillTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>BillType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

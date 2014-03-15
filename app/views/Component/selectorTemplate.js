@@ -114,8 +114,8 @@ function getDsUrl(listTemplate) {
 }
 
 function selectorMain() {
-	if (typeof(main) !== "undefined") {
-		main();
+	if (typeof(listMain) !== "undefined") {
+		listMain();
 	}
 //	YUI().use("node", "event", function(Y) {
 //		Y.on("domready", function(e) {
@@ -164,10 +164,10 @@ function selectorMain() {
 				});
 				// 取得父函数的queryFunc,并设置到页面上的hidden field里面,最后调用refresh,应用这些参数查询数据
 				if (parent && parent.s_queryFunc) {
-					var queryDict = parent.s_queryFunc()
+					var queryDict = parent.s_queryFunc();
 					for (var key in queryDict) {
-						if (document.getElementById(key)) {
-							document.getElementById(key).value = queryDict[key];
+						if (g_masterFormFieldDict[key]) {
+							g_masterFormFieldDict[key].set("value", queryDict[key]);
 						}
 					}
 				}

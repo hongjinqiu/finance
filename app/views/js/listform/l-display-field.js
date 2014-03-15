@@ -1,0 +1,1 @@
+Y.LDisplayField = Y.Base.create('l-display-field', Y.RDisplayField, [Y.WidgetChild]);

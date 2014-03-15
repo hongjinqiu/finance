@@ -25,7 +25,7 @@
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression>1 == 1</expression>
 		</checkbox-column>
-		<id-column name="id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="false" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -47,10 +47,12 @@
 	</column-model>
 
 	<query-parameters dataSetId="A">
-		<query-parameter name="code" auto="true" text=""></query-parameter>
+		<query-parameter name="code" auto="true" text="">
+		</query-parameter>
 		<query-parameter name="name" auto="true" text=""></query-parameter>
 		<query-parameter name="currencyTypeSign" auto="true" text=""></query-parameter>
-		<query-parameter name="roundingWay" auto="true" text=""></query-parameter>
+		<query-parameter name="roundingWay" auto="true" text="">
+		</query-parameter>
 		<query-parameter name="amtDecimals" auto="true" text=""></query-parameter>
 		<query-parameter name="upDecimals" auto="true" text=""></query-parameter>
 	</query-parameters>

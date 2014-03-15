@@ -122,8 +122,8 @@ func (c Component) ListTemplate() revel.Result {
 
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
-	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
-	templateManager.ApplyTreeForQueryParameter(&listTemplate)
+//	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
+//	templateManager.ApplyTreeForQueryParameter(&listTemplate)
 	toolbarBo := templateManager.GetToolbarForListTemplate(listTemplate)
 	paramMap := map[string]string{}
 	for k, v := range c.Params.Form {
@@ -416,7 +416,8 @@ func (c Component) GetColumnModelDataForListTemplate() revel.Result {
 	}
 
 	columnResult := templateManager.GetColumnModelDataForListTemplate(listTemplate, items[:1])
-	jsonByte, err := json.MarshalIndent(columnResult, "", "\t")
+	resultItems := columnResult["items"].([]interface{})
+	jsonByte, err := json.MarshalIndent(resultItems, "", "\t")
 	if err != nil {
 		panic(err)
 	}

@@ -179,18 +179,26 @@ type RelationDS struct {
 }
 
 type RelationItem struct {
-	XMLName           xml.Name     `xml:"relationItem"`
-	Id                string       `xml:"id"`
-	RelationExpr      RelationExpr `xml:"relationExpr"`
-	RelationModelId   string       `xml:"relationModelId"`
-	RelationDataSetId string       `xml:"relationDataSetId"`
-	DisplayField      string       `xml:"displayField"`
-	ValueField        string       `xml:"valueField"`
-	Parent            interface{}  `xml:"-"`
+	XMLName           xml.Name       `xml:"relationItem"`
+	Name              string         `xml:"name,attr,omitempty"`
+	Id                string         `xml:"id"`
+	RelationExpr      RelationExpr   `xml:"relationExpr"`
+	JsRelationExpr    JsRelationExpr `xml:"jsRelationExpr"`
+	RelationModelId   string         `xml:"relationModelId"`
+	RelationDataSetId string         `xml:"relationDataSetId"`
+	DisplayField      string         `xml:"displayField"`
+	ValueField        string         `xml:"valueField"`
+	Parent            interface{}    `xml:"-"`
 }
 
 type RelationExpr struct {
 	XMLName xml.Name `xml:"relationExpr"`
+	Mode    string   `xml:"mode,attr"`
+	Content string   `xml:",chardata"`
+}
+
+type JsRelationExpr struct {
+	XMLName xml.Name `xml:"jsRelationExpr"`
 	Mode    string   `xml:"mode,attr"`
 	Content string   `xml:",chardata"`
 }

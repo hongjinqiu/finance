@@ -1,0 +1,1 @@
+Y.LRadioField = Y.Base.create('l-radio-field', Y.RRadioField, [Y.WidgetChild]);

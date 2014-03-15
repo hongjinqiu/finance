@@ -46,9 +46,10 @@
 				<displayName>客户类别</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
-					<relationItem>
+					<relationItem name="CustomerType">
 						<id>CustomerTypeSelector</id>
 						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>CustomerType</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

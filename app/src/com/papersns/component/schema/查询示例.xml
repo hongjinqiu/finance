@@ -37,18 +37,18 @@
 	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
 	<column-model rownumber="true" bsonOrderBy="">
 		<checkbox-column hideable="true">
-			<expression>"31" == str(record.get("AUDIT_STATUS"))</expression><!-- python language -->
+			<expression>"31" == str(data.get("AUDIT_STATUS"))</expression><!-- python language -->
 		</checkbox-column>
 		<id-column name="EMPEGRESS_ID" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
 				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
-					<expression>"3" != str(record.get("AUDIT_STATUS"))</expression>
+					<expression>"3" != str(data.get("AUDIT_STATUS"))</expression>
 					<button-attribute name="code" value="U" />
 				</button>
 				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={EMPEGRESS_ID}" >
-					<expression>"13" != str(record.get("AUDIT_STATUS"))</expression>
+					<expression>"13" != str(data.get("AUDIT_STATUS"))</expression>
 				</button>
 			</buttons>
 		</virtual-column>
@@ -84,12 +84,12 @@
 		</query-parameter>
 
 		<query-parameter name="START_TIME" text="申请日期从" restriction="ge" editor="datefield">
-			<parameter-attribute name="inFormat" value="yyyyMM"/>
- 	 		<parameter-attribute name="queryFormat" value="yyyyMM"/>
+			<parameter-attribute name="displayPattern" value="yyyyMM"/>
+ 	 		<parameter-attribute name="dbPattern" value="yyyyMM"/>
 		</query-parameter>
 
 		<query-parameter name="END_TIME" text="申请日期到" restriction="le" editor="datefield">
-			<parameter-attribute name="queryFormat" value="yyyyMMddHHmmss" />
+			<parameter-attribute name="dbPattern" value="yyyyMMddHHmmss" />
 		</query-parameter>
 		<query-parameter name="AUDIT_STATUS" text="审核状态"  restriction="eq" editor="combo">
 			<parameter-attribute name="dictionary" value="D_AUDIT_STATUS" />

@@ -70,7 +70,8 @@ func (c Console) Summary() revel.Result {
 				dataBo[item.ColumnModel.Name] = []interface{}{}
 			}
 			items := dataBo[item.ColumnModel.Name].([]interface{})
-			items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+			itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+			items = itemsDict["items"].([]interface{})
 			dataBo[item.ColumnModel.Name] = items
 		} else if item.XMLName.Local == "toolbar" {
 			toolbarBo[item.Toolbar.Name] = templateManager.GetToolbarBo(item.Toolbar)
@@ -317,10 +318,13 @@ func (c Console) setDisplayField(listTemplate *ListTemplate) {
 }
 
 func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) map[string]interface{} {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
-	templateManager.ApplyDictionaryForQueryParameter(listTemplate)
-	templateManager.ApplyTreeForQueryParameter(listTemplate)
+	//templateManager.ApplyDictionaryForQueryParameter(listTemplate)
+	//templateManager.ApplyTreeForQueryParameter(listTemplate)
 	toolbarBo := templateManager.GetToolbarForListTemplate(*listTemplate)
 	paramMap := map[string]string{}
 	//	c.Request.URL
@@ -328,6 +332,16 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		value := strings.Join(v, ",")
 		if value != "" { // && !strings.Contains(k, "@")
 			paramMap[k] = value
+		}
+	}
+	defaultBo := templateManager.GetQueryDefaultValue(*listTemplate)
+	defaultBoByte, err := json.Marshal(&defaultBo)
+	if err != nil {
+		panic(err)
+	}
+	if len(paramMap) == 0 {
+		for key,value := range defaultBo {
+			paramMap[key] = value
 		}
 	}
 	pageNo := 1
@@ -355,12 +369,23 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		"totalResults": 0,
 		"items":        []interface{}{},
 	}
+	relationBo := map[string]interface{}{}
 	//if c.Params.Get("@entrance") != "true" {
 	if isGetBo {
 		dataBo = templateManager.GetBoForListTemplate(listTemplate, paramMap, pageNo, pageSize)
+		relationBo = dataBo["relationBo"].(map[string]interface{})
+		delete(dataBo, "relationBo")
 	}
+	
+	selectorInfo := templateManager.GetSelectorInfoForListTemplate(*listTemplate)
+	c.mergeSelectorInfo(&relationBo, selectorInfo)
 
 	dataBoByte, err := json.Marshal(&dataBo)
+	if err != nil {
+		panic(err)
+	}
+	
+	relationBoByte, err := json.Marshal(&relationBo)
 	if err != nil {
 		panic(err)
 	}
@@ -375,6 +400,16 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	//showParameterLi := templateManager.GetShowParameterLiForListTemplate(listTemplate)
 	showParameterLi := []QueryParameter{}
 	hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(listTemplate)
+	
+	layerBo := templateManager.GetLayerForListTemplate(sessionId, *listTemplate)
+	layerBoByte, err := json.Marshal(&layerBo)
+	if err != nil {
+		panic(err)
+	}
+	commonUtil := CommonUtil{}
+	layerBoJson := string(layerBoByte)
+	layerBoJson = commonUtil.FilterJsonEmptyAttr(layerBoJson)
+	
 	result := map[string]interface{}{
 		"pageSize":          pageSize,
 		"listTemplate":      listTemplate,
@@ -386,10 +421,28 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		//		"columns":       columns,
 		"dataBoText":       string(dataBoByte),
 		"dataBoJson":       template.JS(string(dataBoByte)),
+		"relationBoJson":       template.JS(string(relationBoByte)),
 		"listTemplateJson": template.JS(string(listTemplateByte)),
+		"layerBoJson": template.JS(layerBoJson),
+		"defaultBoJson": template.JS(string(defaultBoByte)),
 		//		"columnsJson":   string(columnsByte),
 	}
 	return result
+}
+
+func (c Console) mergeSelectorInfo(relationBo *map[string]interface{}, selectorInfo map[string]interface{}) {
+	for selectorId, info := range selectorInfo {
+		if (*relationBo)[selectorId] == nil {
+			(*relationBo)[selectorId] = info
+		} else {
+			infoDict := info.(map[string]interface{})
+			relationItemDict := (*relationBo)[selectorId].(map[string]interface{})
+			for key, value := range infoDict {
+				relationItemDict[key] = value
+			}
+			(*relationBo)[selectorId] = relationItemDict
+		}
+	}
 }
 
 // TODO,by test
@@ -626,7 +679,7 @@ func (c Console) getQueryParameterRenderLi(listTemplate ListTemplate) [][]map[st
 	listTemplateIterator := ListTemplateIterator{}
 	var result interface{} = ""
 	listTemplateIterator.IterateTemplateQueryParameter(listTemplate, &result, func(queryParameter QueryParameter, result *interface{}){
-		if queryParameter.Editor != "hidden" {
+		if queryParameter.Editor != "hiddenfield" {
 			columnColSpan := 2
 			containerItem = append(containerItem, map[string]interface{}{
 				"label":       queryParameter.Text,
@@ -687,7 +740,8 @@ func (c Console) Refretor() revel.Result {
 		items := getSummaryListTemplateInfoLi(listTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Component" {
-				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				items = itemsDict["items"].([]interface{})
 				break
 			}
 		}
@@ -704,7 +758,8 @@ func (c Console) Refretor() revel.Result {
 		items := getSummarySelectorTemplateInfoLi(selectorTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Selector" {
-				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				items = itemsDict["items"].([]interface{})
 				break
 			}
 		}
@@ -720,7 +775,8 @@ func (c Console) Refretor() revel.Result {
 		items := getSummaryFormTemplateInfoLi(formTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Form" {
-				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				items = itemsDict["items"].([]interface{})
 				break
 			}
 		}
@@ -737,7 +793,8 @@ func (c Console) Refretor() revel.Result {
 		items := getSummaryDataSourceInfoLi(dataSourceTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "DataSource" {
-				items = templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				items = itemsDict["items"].([]interface{})
 				break
 			}
 		}
@@ -855,3 +912,4 @@ func (c Console) RawXml() revel.Result {
 		"message": "可能传入了错误的refretorType:" + refretorType,
 	})
 }
+

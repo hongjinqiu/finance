@@ -1,0 +1,1 @@
+Y.LTextareaField = Y.Base.create('l-textarea-field', Y.RTextareaField, [Y.WidgetChild]);
