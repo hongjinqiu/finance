@@ -1126,6 +1126,7 @@ func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTempl
 	_, db := global.GetConnection(sId)
 
 	result := map[string]interface{}{}
+	resultLi := map[string]interface{}{}
 	layerManager := layer.GetInstance()
 	for _, item := range formTemplate.FormElemLi {
 		if item.XMLName.Local == "column-model" {
@@ -1135,9 +1136,15 @@ func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTempl
 					if layerMap != nil {
 						items := layerMap["items"]
 						if items != nil {
-							result[column.Dictionary] = items
+							dictMap := map[string]interface{}{}
+							for _, item := range items.([]map[string]interface{}) {
+								dictMap[fmt.Sprint(item["code"])] = item
+							}
+							result[column.Dictionary] = dictMap
+							resultLi[column.Dictionary] = items
 						} else {
-							result[column.Dictionary] = []interface{}{}
+							result[column.Dictionary] = map[string]interface{}{}
+							resultLi[column.Dictionary] = []interface{}{}
 						}
 					}
 				}
@@ -1145,7 +1152,10 @@ func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTempl
 		}
 	}
 
-	return result
+	return map[string]interface{}{
+		"layerBo": result,
+		"layerBoLi": resultLi,
+	}
 }
 
 // TODO
@@ -1153,6 +1163,7 @@ func (o TemplateManager) GetLayerForListTemplate(sId int, listTemplate ListTempl
 	_, db := global.GetConnection(sId)
 
 	result := map[string]interface{}{}
+	resultLi := map[string]interface{}{}
 	layerManager := layer.GetInstance()
 
 	listTemplateIterator := ListTemplateIterator{}
@@ -1163,15 +1174,24 @@ func (o TemplateManager) GetLayerForListTemplate(sId int, listTemplate ListTempl
 			if layerMap != nil {
 				items := layerMap["items"]
 				if items != nil {
-					result[column.Dictionary] = items
+					dictMap := map[string]interface{}{}
+					for _, item := range items.([]map[string]interface{}) {
+						dictMap[fmt.Sprint(item["code"])] = item
+					}
+					result[column.Dictionary] = dictMap
+					resultLi[column.Dictionary] = items
 				} else {
-					result[column.Dictionary] = []interface{}{}
+					result[column.Dictionary] = map[string]interface{}{}
+					resultLi[column.Dictionary] = []interface{}{}
 				}
 			}
 		}
 	})
 
-	return result
+	return map[string]interface{}{
+		"layerBo": result,
+		"layerBoLi": resultLi,
+	}
 }
 
 func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interface{}) map[string]interface{} {

@@ -1,14 +1,123 @@
 function FormManager() {
 }
 
+FormManager.prototype.validateReadonly = function(formObj, val, Y) {
+	var self = formObj;
+	if (!Y.Lang.isBoolean(val)) {
+		return false;
+	}
+	var templateIterator = new TemplateIterator();
+	var result = "";
+	var dataSetId = self.get("dataSetId");
+	var validateResult = true;
+	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function(column, result){
+		if (column.Name == self.get("name")) {
+			if (column.FixReadOnly == "true" && !val) {
+				validateResult = false;
+			}
+			return true;
+		}
+		return false;
+	});
+	return validateResult;
+}
+
+FormManager.prototype.initializeAttr = function(formObj, Y) {
+	var self = formObj;
+	if (g_dataSourceJson) {
+    	var modelIterator = new ModelIterator();
+    	var result = "";
+    	modelIterator.iterateAllField(g_dataSourceJson, result, function(fieldGroup, result){
+    		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+    			if (fieldGroup.AllowEmpty != "true") {
+    				self.set("required", true);
+    			}
+    		}
+    	});
+    	
+    	var templateIterator = new TemplateIterator();
+    	var result = "";
+    	var dataSetId = self.get("dataSetId");
+    	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function(column, result){
+    		if (column.Name == self.get("name")) {
+    			if (column.FixReadOnly == "true") {
+    				self.set("readonly", true);
+    			} else if (column.ReadOnly == "true") {
+    				self.set("readonly", true);
+    			}
+    			return true;
+    		}
+    		return false;
+    	});
+    	
+    	var formManager = new FormManager();
+    	self.set("validator", formManager.dsFormFieldValidator);
+    }
+}
+
+FormManager.prototype.applyEventBehavior = function(formObj, Y) {
+	var self = formObj;
+	
+	// 应用上js相关的操作,
+    var modelIterator = new ModelIterator();
+	var result = "";
+	modelIterator.iterateAllField(g_dataSourceJson, result, function(fieldGroup, result){
+		if (fieldGroup.Id == self.get("name") && fieldGroup.getDataSetId() == self.get("dataSetId")) {
+			if (fieldGroup.jsConfig && fieldGroup.jsConfig.listeners) {
+				for (var key in fieldGroup.jsConfig.listeners) {
+					if (key == "valueChange") {
+						self.after("valueChange", function(key) {
+							return function(e) {
+								fieldGroup.jsConfig.listeners[key](e, self);
+							}
+						}(key));
+					} else {
+						self._fieldNode.on(key, function(key) {
+							return function(e) {
+								fieldGroup.jsConfig.listeners[key](e, self);
+							}
+						}(key));
+					}
+				}
+			}
+		}
+	});
+}
+
+FormManager.prototype.setChoices = function(formObj) {
+	var self = formObj;
+	var choices = [];
+	if (g_layerBoLi) {
+		var templateIterator = new TemplateIterator();
+    	var result = "";
+    	var dataSetId = self.get("dataSetId");
+    	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function(column, result){
+    		if (column.Name == self.get("name")) {
+    			if (g_layerBoLi[column.Dictionary]) {
+					for (var k = 0; k < g_layerBoLi[column.Dictionary].length; k++) {
+						var dictionaryItem = g_layerBoLi[column.Dictionary][k];
+						choices.push({
+							value: dictionaryItem["code"],
+							label: dictionaryItem["name"]
+						});
+					}
+				}
+    			return true;
+    		}
+    		return false;
+    	});
+	}
+	self.set("choices", choices);
+}
+
 FormManager.prototype.getBo = function() {
 	var modelIterator = new ModelIterator();
-	var dataSource = dataSourceJson;
+	var dataSource = g_dataSourceJson;
 	var bo = {};
 	var result = "";
 	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
 		if (fieldGroup.isMasterField()) {
-			var formFieldObj = masterFormFieldDict[fieldGroup.Id];
+			var formFieldObj = g_masterFormFieldDict[fieldGroup.Id];
 			if (formFieldObj) {
 				if (!bo[fieldGroup.getDataSetId()]) {
 					bo[fieldGroup.getDataSetId()] = {};
@@ -38,7 +147,7 @@ FormManager.prototype.getBo = function() {
 
 FormManager.prototype.getDataSetNewData = function(dataSetId) {
 	var self = this;
-	var dataSource = dataSourceJson;
+	var dataSource = g_dataSourceJson;
 	var modelTemplateFactory = new ModelTemplateFactory();
 	var bo = self.getBo();
 	var data = {};
@@ -60,7 +169,7 @@ FormManager.prototype.getDataSetNewData = function(dataSetId) {
 
 FormManager.prototype.getDataSetCopyData = function(dataSetId, srcData) {
 	var self = this;
-	var dataSource = dataSourceJson;
+	var dataSource = g_dataSourceJson;
 	var modelTemplateFactory = new ModelTemplateFactory();
 	var bo = self.getBo();
 	var destData = {};
@@ -158,27 +267,29 @@ FormManager.prototype.dsFieldGroupValidator = function(value, dateSeperator, fie
 				return messageLi;
 			}
 		}
-	} else if (isDataTypeNumber && !isUnLimit) {
+	} else if (isDataTypeNumber) {
 		if (!/^-?\d*(\.\d*)?$/.test(value)) {
 			messageLi.push("必须由数字小数点组成");
 			return messageLi;
 		}
-		var fieldValueFloat = parseFloat(value);
-		if (fieldGroup.LimitOption == "limitMax") {
-			var maxValue = parseFloat(fieldGroup.LimitMax);
-			if (maxValue < fieldValueFloat) {
-				messageLi.push("超出最大值" + fieldGroup.LimitMax);
-			}
-		} else if (fieldGroup.LimitOption == "limitMin") {
-			var minValue = parseFloat(fieldGroup.LimitMin);
-			if (fieldValueFloat < minValue) {
-				messageLi.push("小于最小值" + fieldGroup.LimitMin);
-			}
-		} else if (fieldGroup.LimitOption == "limitRange") {
-			var minValue = parseFloat(fieldGroup.LimitMin);
-			var maxValue = parseFloat(fieldGroup.LimitMax);
-			if (fieldValueFloat < minValue || maxValue < fieldValueFloat) {
-				messageLi.push("超出范围("+fieldGroup.LimitMin+"~"+fieldGroup.LimitMax+")");
+		if (!isUnLimit) {
+			var fieldValueFloat = parseFloat(value);
+			if (fieldGroup.LimitOption == "limitMax") {
+				var maxValue = parseFloat(fieldGroup.LimitMax);
+				if (maxValue < fieldValueFloat) {
+					messageLi.push("超出最大值" + fieldGroup.LimitMax);
+				}
+			} else if (fieldGroup.LimitOption == "limitMin") {
+				var minValue = parseFloat(fieldGroup.LimitMin);
+				if (fieldValueFloat < minValue) {
+					messageLi.push("小于最小值" + fieldGroup.LimitMin);
+				}
+			} else if (fieldGroup.LimitOption == "limitRange") {
+				var minValue = parseFloat(fieldGroup.LimitMin);
+				var maxValue = parseFloat(fieldGroup.LimitMax);
+				if (fieldValueFloat < minValue || maxValue < fieldValueFloat) {
+					messageLi.push("超出范围("+fieldGroup.LimitMin+"~"+fieldGroup.LimitMax+")");
+				}
 			}
 		}
 	} else {
@@ -205,7 +316,7 @@ FormManager.prototype.dsFormFieldValidator = function(value, formFieldObj) {
 	var messageLi = [];
 	var result = "";
 	var formManager = new FormManager();
-	modelIterator.iterateAllField(dataSourceJson, result, function(fieldGroup, result){
+	modelIterator.iterateAllField(g_dataSourceJson, result, function(fieldGroup, result){
 		if (fieldGroup.Id == formFieldObj.get("name") && fieldGroup.getDataSetId() == formFieldObj.get("dataSetId")) {
 			var dateSeperator = formManager._getDateSeperator(fieldGroup.getDataSetId(), fieldGroup.Id);
 			messageLi = formManager.dsFieldGroupValidator(value, dateSeperator, fieldGroup);
@@ -247,7 +358,7 @@ FormManager.prototype.dsFormValidator = function(dataSource, bo) {
 	var formManager = new FormManager();
 	modelIterator.iterateAllFieldBo(dataSource, bo, result, function(fieldGroup, data, rowIndex, result){
 		if (fieldGroup.isMasterField()) {
-			var formFieldObj = masterFormFieldDict[fieldGroup.Id];
+			var formFieldObj = g_masterFormFieldDict[fieldGroup.Id];
 			var value = data[fieldGroup.Id];
 			if (value !== undefined && formFieldObj) {
 				if(!formManager.dsFormFieldValidator(value, formFieldObj)) {
@@ -286,15 +397,15 @@ FormManager.prototype.setFormStatus = function(status) {
 }
 
 FormManager.prototype._setMasterFormFieldStatus = function(status) {
-	for (var key in masterFormFieldDict) {
-		masterFormFieldDict[key].set("readonly", status == "view");
+	for (var key in g_masterFormFieldDict) {
+		g_masterFormFieldDict[key].set("readonly", status == "view");
 	}
 }
 
 FormManager.prototype._setDetailGridStatus = function(status) {
 	var modelIterator = new ModelIterator();
 	var result = "";
-	var dataSource = dataSourceJson;
+	var dataSource = g_dataSourceJson;
 	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
 		if (dataSet.Id != "A") {
 			var tbar = document.getElementById(dataSet.Id + "_tbar");
@@ -339,11 +450,11 @@ FormManager.prototype.loadData2Form = function(dataSource, bo) {
 	var result = "";
 	modelIterator.iterateAllFieldBo(dataSource, bo, result, function(fieldGroup, data, rowIndex, result){
 		if (fieldGroup.isMasterField()) {
-			if (masterFormFieldDict[fieldGroup.Id]) {
+			if (g_masterFormFieldDict[fieldGroup.Id]) {
 				if (data[fieldGroup.Id] !== undefined) {
-					masterFormFieldDict[fieldGroup.Id].set("value", data[fieldGroup.Id]);
+					g_masterFormFieldDict[fieldGroup.Id].set("value", data[fieldGroup.Id]);
 				} else {
-					masterFormFieldDict[fieldGroup.Id].set("value", "");
+					g_masterFormFieldDict[fieldGroup.Id].set("value", "");
 				}
 			}
 		}

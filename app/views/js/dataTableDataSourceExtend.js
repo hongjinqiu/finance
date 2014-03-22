@@ -98,7 +98,7 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 					columnModelName : self.param.columnModelName + "_addrow",// 用于virtualColumn的btn,onclick,回找grid的,暂时没用,
 					render : "#" + self.param.columnModelName + "_addrow",// 用panel里面的东东,
 					url : "",
-					totalResults : dataBo.totalResults || 50,
+					totalResults : g_dataBo.totalResults || 50,
 					pageSize : 10000,
 					paginatorContainer : null,
 					paginatorTemplate : null,

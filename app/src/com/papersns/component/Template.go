@@ -189,6 +189,8 @@ type ColumnAttributeGroup struct {
 	ColumnWidth      string `xml:"columnWidth,attr,omitempty"`
 	LabelWidth       string `xml:"labelWidth,attr,omitempty"`
 	DsFieldMap       string `xml:"dsFieldMap,attr,omitempty"`
+	FixReadOnly      string `xml:"fixReadOnly,attr,omitempty"`
+	ReadOnly         string `xml:"readOnly,attr,omitempty"`
 	DataSetId        string `xml:"-"`
 }
 
@@ -358,6 +360,7 @@ type QueryParamAttributeGroup struct {
 	Having      string `xml:"having,attr,omitempty"`
 	Required    string `xml:"required,attr,omitempty"`
 	UseIn       string `xml:"use-in,attr,omitempty"`
+	ReadOnly    string `xml:"readOnly,attr,omitempty"`
 }
 
 type ButtonGroup struct {

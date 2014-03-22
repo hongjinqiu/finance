@@ -240,6 +240,9 @@ func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 	if column.Hideable == "" {
 		column.Hideable = fieldGroup.FixHide
 	}
+	if column.FixReadOnly == "" {
+		column.FixReadOnly = fieldGroup.FixReadOnly
+	}
 	if column.XMLName.Local == "auto-column" {
 		o.applyAutoColumnXMLName(fieldGroup, column)
 	}

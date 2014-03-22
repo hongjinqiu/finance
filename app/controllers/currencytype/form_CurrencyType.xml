@@ -22,7 +22,11 @@
 		<id-column name="id" text="编号" hideable="true" />
 		
 		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
-		<auto-column name="name" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="name" colSpan="2" labelWidth="15%" columnWidth="35%">
+			<column-attribute name="editor" value="textfield"/>
+		</auto-column>
+		<!-- 
+		 -->
 	</column-model>
 
 	<html>
@@ -33,8 +37,19 @@
 	
 	<column-model dataSetId="A" colSpan="4">
 		<auto-column name="currencyTypeSign" colSpan="2" labelWidth="15%" columnWidth="35%" />
-		<auto-column name="roundingWay" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="roundingWay" colSpan="2" labelWidth="15%" columnWidth="35%">
+			<!-- <column-attribute name="editor" value="checkboxfield"/> -->
+		</auto-column>
 		<auto-column name="amtDecimals" colSpan="2" />
-		<auto-column name="upDecimals" colSpan="2" />
+		<auto-column name="upDecimals" colSpan="2">
+		</auto-column>
+		<!-- 
+		 -->
+		
+		<!-- by test -->
+		<auto-column name="age" colSpan="2" />
+		<auto-column name="dateTest" colSpan="2" />
 	</column-model>
+	<!-- 
+	 -->
 </form-template>

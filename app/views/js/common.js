@@ -10,6 +10,36 @@ CommonUtil.prototype.getFuncOrString = function(text) {
 	return text;
 }
 
+CommonUtil.prototype.getCRelationItem = function(cRelationDS, bo, formData) {
+	for (var i = 0; i < cRelationDS.CRelationItemLi.length; i++) {
+		var relationItem = cRelationDS.CRelationItemLi[i];
+		var mode = relationItem.CJsRelationExpr.Mode;
+		var content = relationItem.CJsRelationExpr.Content;
+		if (mode == "" || mode == "text") {
+			if (content == "true") {
+				return relationItem;
+			}
+		} else if (mode == "js") {
+			var data = formData;
+			if (eval(content) === true) {
+				return relationItem;
+			}
+		} else if (mode == "function") {
+			var data = formData;
+			eval("var f=" + content);
+			if (f(data) === true) {
+				return relationItem;
+			}
+		} else if (mode == "functionName") {
+			var data = formData;
+			if (eval(content + "(data)") === true) {
+				return relationItem;
+			}
+		}
+	}
+	return null;
+}
+
 var panelZIndex = 6;
 
 /**
@@ -319,7 +349,7 @@ function ajaxRequest(option){
 
 function g_setMasterFormFieldStatus(status) {
 	if (status == "view") {
-		for (var key in masterFormFieldDict) {
+		for (var key in g_masterFormFieldDict) {
 			
 		}
 	}

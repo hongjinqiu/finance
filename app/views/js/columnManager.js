@@ -331,17 +331,60 @@ ColumnManager.prototype.createDictionaryColumn = function(columnConfig) {
 		key: columnConfig.Name,
 		label: columnConfig.Text,
 		formatter: function(o) {
-			var dictionaryValue = o.data[columnConfig.Name + "_DICTIONARY_NAME"];
-			if (dictionaryValue !== undefined && dictionaryValue !== null) {
-				return dictionaryValue;
+			if (g_layerBo[columnConfig.Dictionary] && g_layerBo[columnConfig.Dictionary][o.value]) {
+				return g_layerBo[columnConfig.Dictionary][o.value].name;
 			}
 			if (!g_errorLog[columnConfig.Name + "_DICTIONARY_NAME"]) {
 				g_errorLog[columnConfig.Name + "_DICTIONARY_NAME"] = columnConfig.Name;
 				console.log(o);
 				console.log(o.data);
 				console.log(columnConfig);
-				console.log(columnConfig.Name + "_DICTIONARY_NAME");
-				console.log("字典字段没找到_DICTIONARY_NAME,code:" + o.value);
+				console.log(columnConfig.Name);
+				console.log("字典字段没找到,columnName:" + columnConfig.Name + ", dictionaryName:" + columnConfig.Dictionary + ",code:" + o.value);
+			}
+			return o.value;
+		}
+	};
+}
+
+ColumnManager.prototype.createSelectColumn = function(columnConfig) {
+	var self = this;
+	return {
+		key: columnConfig.Name,
+		label: columnConfig.Text,
+		allowHTML:  true,
+		formatter: function(o) {
+			var commonUtil = new CommonUtil();
+			var bo = {"A": o.data};
+			var relationItem = commonUtil.getCRelationItem(columnConfig.CRelationDS, bo, o.data);
+			var selectorName = relationItem.CRelationConfig.SelectorName;
+			var displayField = relationItem.CRelationConfig.DisplayField;
+			var selectorData = g_relationManager.getRelationBo(selectorName, o.value);
+			if (selectorData) {
+				var valueLi = [];
+				var keyLi = displayField.split(',');
+        		for (var j = 0; j < keyLi.length; j++) {
+        			if (selectorData[keyLi[j]]) {
+        				valueLi.push(selectorData[keyLi[j]]);
+        			}
+        		}
+        		var html = [];
+        		html.push("<span class='floatLeft'>" + valueLi.join(",") + "</span>");
+        		var selectorTitle = g_relationBo[selectorName].Description;
+        		var url = g_relationBo[selectorName].url || "";
+        		url = self.yInst.Lang.sub(url, selectorData);
+        		var jsAction = "showModalDialog({'title': '" + selectorTitle + "','url': '" + url + "'})";
+        		html.push('<a class="trigger_view selectIndent" href="javascript:void(0);" title="查看" onclick="' + jsAction + '"></a>');
+        		return html.join("");
+			} else {
+				if (!g_errorLog[columnConfig.Name]) {
+					g_errorLog[columnConfig.Name] = columnConfig.Name;
+					console.log(o);
+					console.log(o.data);
+					console.log(columnConfig);
+					console.log(columnConfig.Name);
+					console.log("关联object未找到,columnName:" + columnConfig.Name + ", selectorName:" + selectorName + ",id:" + o.value);
+				}
 			}
 			return o.value;
 		}
@@ -386,6 +429,8 @@ ColumnManager.prototype.createColumn = function(columnConfig) {
 			return self.createBooleanColumn(columnConfig);
 		} else if (columnConfig.XMLName.Local == "dictionary-column") {
 			return self.createDictionaryColumn(columnConfig);
+		} else if (columnConfig.XMLName.Local == "select-column") {
+			return self.createSelectColumn(columnConfig);
 		}
 		return {
 			key: columnConfig.Name,

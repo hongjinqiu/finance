@@ -1,8 +1,29 @@
-/**
- * @class TextField
- * @extends FormField
- * @param config {Object} Configuration object
- * @constructor
- * @description A text field node
- */
-Y.PTextField = Y.Base.create('p-text-field', Y.PFormField, [Y.WidgetChild]);
+Y.PTextField = Y.Base.create('p-text-field', Y.RTextField, [Y.WidgetChild], {
+    bindUI: function() {
+    	Y.PTextField.superclass.bindUI.apply(this, arguments);
+    	
+    	var self = this;
+    	new FormManager().applyEventBehavior(self, Y);
+    },
+
+    _validateReadonly: function(val) {
+    	var self = this;
+    	return new FormManager().validateReadonly(self, val, Y);
+    },
+    
+    initializer: function() {
+    	Y.PTextField.superclass.initializer.apply(this, arguments);
+    	var self = this;
+    	
+    	new FormManager().initializeAttr(self, Y);
+    }
+},
+{
+
+    ATTRS: {
+    	dataSetId: {
+            validator: Y.Lang.isString,
+            writeOnce: true
+        }
+    }
+});

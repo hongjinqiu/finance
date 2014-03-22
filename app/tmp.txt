@@ -1,0 +1,90 @@
+{BILL_TYPE_CODE=sandingtanti, 
+MODIFY_TIME=20140317164243, 
+CREATE_TIME=20140317164154, 
+MODIFY_BY_NAME=系统管理员, 
+END_DATE=null, 
+CREATE_BY=1, 
+REMARK=null, 
+BILL_STATUS=1, 
+IS_SYS=null, 
+CREATE_UNIT=1, 
+IS_INITBILL=null, 
+MODIFY_BY=1, 
+MODIFY_UNIT=1, 
+CREATE_DEPT=37, 
+HANDLE_AUDIT_STATUS=0, 
+AUDIT_TIME=null, 
+IS_AUDIT_SIGN=0, 
+AUDIT_STATUS=2, 
+IS_USED=0, 
+BUDGET_ACCOUNTING_ITEMS_SYSTEM_ID=3, 
+AUDIT_BY=null, 
+CANCEL_VERIFICATION_WAY=null, 
+VOUCHER=null, 
+TRANSFER_PROPERTY=null, 
+BILL_TYPE_NAME=三定摊提方案, 
+START_DATE=null, 
+AUDIT_BY_CODE=null, 
+IS_BILL_USED=false, 
+CREATE_BY_NAME=系统管理员, 
+BILL_KIND_ID=33, 
+BILL_TYPE_ID=100, 
+AUDIT_BY_NAME=null, 
+ATTACH_COUNT=0, 
+CREATE_BY_CODE=JTBB03352, 
+MODIFY_BY_CODE=JTBB03352}
+
+
+p-form-field.js,与r-form-field,有哪些异同,byTest,finish,
+p-text-field.js,finish,
+p-textarea-field.js,finish,
+p-display-field.js,finish,
+p-hidden-field.js,finish,
+p-number-field.js,finish,
+p-date-field.js,finish,
+p-checkbox-field.js,finish,
+p-radio-field.js,finish,
+p-choice-field.js,finish,
+p-select-field.js,finish,
+p-trigger-field.js,running,-----------------------,
+	_getTempValueCommon,
+	_getSelectorId,
+	_getSelectionAction,
+	如果按 l-trigger-field.js 里面的内容来折腾,那么,细化一番,
+	initializer:
+		selectFunc
+		unSelectFunc
+		queryFunc
+		self._setDefaultSelectAction
+		self._relationFuncTemplate
+	bindUI:
+		after valueChange,
+		根据copyField,
+	
+	先只考虑主数据集,再考虑分录里面的东东,分录要用到qpe的东东,
+p-form-quickedit.js
+
+
+p-form-field与r-form-field的异同,
+1._validateReadonly:
+	fieldGroup.FixReadOnly,其是遍历dataSource来完成,需要改成从column的配置中读取信息,
+2.initializer,方法,
+	required,要区分 ds 中有,和 column-item中有的字段,区分对待,
+	readonly,从column中读取,先fixReadonly,再readonly,
+	validator,根据ds进行判断,finish,
+3.bindUI方法,
+	应用上listeners,
+4.attrs,
+	dataSetId,
+	
+	
+	
+
+
+
+
+
+
+
+
+

@@ -21,7 +21,7 @@ threadLocal = threading.local()
 MONGODB_HOST = 'localhost'
 MONGODB_PORT = 27017
 MONGODB_ADDRESS = 'localhost:27017'
-MONGODB_DATABASE_NAME = 'aftermarket'
+MONGODB_DATABASE_NAME = 'aftermarket2'
 MONGODB_USER = None
 MONGODB_PASSWORD = None
 

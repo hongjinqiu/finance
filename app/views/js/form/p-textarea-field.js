@@ -1,12 +1,29 @@
-/**
- * @class PTextareaField
- * @extends PFormField
- * @param config {Object} Configuration object
- * @constructor
- * @description A hidden field node
- */
-Y.PTextareaField = Y.Base.create('p-textarea-field', Y.PFormField, [Y.WidgetChild], {
+Y.PTextareaField = Y.Base.create('p-textarea-field', Y.RTextareaField, [Y.WidgetChild], {
+    bindUI: function() {
+    	Y.PTextareaField.superclass.bindUI.apply(this, arguments);
+    	
+    	var self = this;
+    	new FormManager().applyEventBehavior(self, Y);
+    },
 
-    FIELD_TEMPLATE : '<textarea></textarea>'
+    _validateReadonly: function(val) {
+    	var self = this;
+    	return new FormManager().validateReadonly(self, val, Y);
+    },
+    
+    initializer: function() {
+    	Y.PTextareaField.superclass.initializer.apply(this, arguments);
+    	var self = this;
+    	
+    	new FormManager().initializeAttr(self, Y);
+    }
+},
+{
 
+    ATTRS: {
+    	dataSetId: {
+            validator: Y.Lang.isString,
+            writeOnce: true
+        }
+    }
 });

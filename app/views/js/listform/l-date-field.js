@@ -22,6 +22,12 @@ Y.LDateField = Y.Base.create('l-date-field', Y.RDateField, [Y.WidgetChild], {
 		});
 		this.set("dbPattern", dbPattern);
 		this.set("displayPattern", displayPattern);
+    },
+    bindUI: function() {
+    	Y.LDateField.superclass.bindUI.apply(this, arguments);
+    	var self = this;
+    	
+    	new LFormManager().applyEventBehavior(self);
     }
 },
 {

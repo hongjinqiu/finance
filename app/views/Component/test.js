@@ -1,4 +1,4 @@
-var layerBo = {
+var g_layerBo = {
 	"D_DECIMALS_TYPE" : [ {
 		"code" : 1,
 		"name" : "整数",

@@ -380,3 +380,12 @@ table {
 .alignLeft {
 	text-align: left;
 }
+
+.floatLeft {
+	float: left;
+}
+
+.selectIndent {
+	margin-left: 5px;
+}
+

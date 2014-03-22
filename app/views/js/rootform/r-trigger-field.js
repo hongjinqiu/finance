@@ -154,7 +154,7 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
     				var selectorName = this._getStringOrFunctionResult(this.get("selectorName"));
     				var relationManager = new RelationManager();
     				var relationItem = relationManager.getRelationBo(selectorName, value);
-    				var url = relationBo[selectorName]["url"] || "";
+    				var url = g_relationBo[selectorName]["url"] || "";
     				url = Y.Lang.sub(url, relationItem);
     				if (url) {
     					var selectorTitle = this._getStringOrFunctionResult(this.get("selectorTitle"));
@@ -271,8 +271,8 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
                 var relationManager = new RelationManager();
                 var li = val.split(",");
                 for (var i = 0; i < li.length; i++) {
-                	var relationBo = relationManager.getRelationBo(selectorName, li[i]);
-                	if (!relationBo) {
+                	var g_relationBo = relationManager.getRelationBo(selectorName, li[i]);
+                	if (!g_relationBo) {
                 		return false;
                 	}
                 }

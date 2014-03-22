@@ -9,7 +9,7 @@ ChoiceFieldManager.prototype.getChoices = function(name) {
 			for (var i = 0; i < queryParameter.ParameterAttributeLi.length; i++) {
 				if (queryParameter.ParameterAttributeLi[i].Name == "dictionary") {
 					var dictionaryCode = queryParameter.ParameterAttributeLi[i].Value;
-					var dictValueLi = layerBo[dictionaryCode];
+					var dictValueLi = g_layerBoLi[dictionaryCode];
 					for (var j = 0; j < dictValueLi.length; j++) {
 						choices.push({
 							"label": dictValueLi[j].name,
@@ -57,3 +57,4 @@ LFormManager.prototype.applyEventBehavior = function(formObj) {
 		return false;
 	});
 }
+

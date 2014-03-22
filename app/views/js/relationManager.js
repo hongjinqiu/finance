@@ -2,15 +2,15 @@ function RelationManager() {
 }
 
 /**
- * 开窗选回后,加入到relationBo中
+ * 开窗选回后,加入到g_relationBo中
  */
 RelationManager.prototype.addRelationBo = function(selectorId, url, obj) {
-	if (!relationBo[selectorId]) {
-		relationBo[selectorId] = {};
+	if (!g_relationBo[selectorId]) {
+		g_relationBo[selectorId] = {};
 	}
-	relationBo[selectorId][obj["id"]] = obj;
+	g_relationBo[selectorId][obj["id"]] = obj;
 	if (url) {
-		relationBo[selectorId]["url"] = url;
+		g_relationBo[selectorId]["url"] = url;
 	}
 }
 
@@ -21,8 +21,8 @@ RelationManager.prototype.getRelationBo = function(selectorId, id) {
 	if (!id || id === "" || id === 0 || id === "0") {
 		return null;
 	}
-	if (relationBo[selectorId] && relationBo[selectorId][id]) {
-		return relationBo[selectorId][id];
+	if (g_relationBo[selectorId] && g_relationBo[selectorId][id]) {
+		return g_relationBo[selectorId][id];
 	}
 	var self = this;
 	var result = null;

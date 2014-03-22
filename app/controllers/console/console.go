@@ -402,13 +402,21 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(listTemplate)
 	
 	layerBo := templateManager.GetLayerForListTemplate(sessionId, *listTemplate)
-	layerBoByte, err := json.Marshal(&layerBo)
+	iLayerBo := layerBo["layerBo"]
+	layerBoByte, err := json.Marshal(&iLayerBo)
+	if err != nil {
+		panic(err)
+	}
+	iLayerBoLi := layerBo["layerBoLi"]
+	layerBoLiByte, err := json.Marshal(&iLayerBoLi)
 	if err != nil {
 		panic(err)
 	}
 	commonUtil := CommonUtil{}
 	layerBoJson := string(layerBoByte)
 	layerBoJson = commonUtil.FilterJsonEmptyAttr(layerBoJson)
+	layerBoLiJson := string(layerBoLiByte)
+	layerBoLiJson = commonUtil.FilterJsonEmptyAttr(layerBoLiJson)
 	
 	result := map[string]interface{}{
 		"pageSize":          pageSize,
@@ -424,6 +432,7 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		"relationBoJson":       template.JS(string(relationBoByte)),
 		"listTemplateJson": template.JS(string(listTemplateByte)),
 		"layerBoJson": template.JS(layerBoJson),
+		"layerBoLiJson": template.JS(layerBoLiJson),
 		"defaultBoJson": template.JS(string(defaultBoByte)),
 		//		"columnsJson":   string(columnsByte),
 	}
@@ -550,7 +559,13 @@ func (c Console) FormSchema() revel.Result {
 	}
 
 	layerBo := templateManager.GetLayerForFormTemplate(sessionId, formTemplate)
-	layerBoByte, err := json.Marshal(&layerBo)
+	iLayerBo := layerBo["layerBo"]
+	layerBoByte, err := json.Marshal(&iLayerBo)
+	if err != nil {
+		panic(err)
+	}
+	iLayerBoLi := layerBo["layerBoLi"]
+	layerBoLiByte, err := json.Marshal(&iLayerBoLi)
 	if err != nil {
 		panic(err)
 	}
@@ -565,6 +580,9 @@ func (c Console) FormSchema() revel.Result {
 	layerBoJson := string(layerBoByte)
 	layerBoJson = commonUtil.FilterJsonEmptyAttr(layerBoJson)
 	result["layerBoJson"] = template.JS(layerBoJson)
+	layerBoLiJson := string(layerBoLiByte)
+	layerBoLiJson = commonUtil.FilterJsonEmptyAttr(layerBoLiJson)
+	result["layerBoLiJson"] = template.JS(layerBoLiJson)
 	relationBoJson := string(relationBoByte)
 	relationBoJson = commonUtil.FilterJsonEmptyAttr(relationBoJson)
 	result["relationBoJson"] = template.JS(relationBoJson)

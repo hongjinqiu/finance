@@ -5,6 +5,13 @@ Y.LChoiceField = Y.Base.create('l-choice-field', Y.RChoiceField, [Y.WidgetChild]
 		
 		var choiceFieldManager = new ChoiceFieldManager();
 		this.set("choices", choiceFieldManager.getChoices(self.get("name")));
+    },
+    
+    bindUI: function() {
+    	Y.LChoiceField.superclass.bindUI.apply(this, arguments);
+    	var self = this;
+    	
+    	new LFormManager().applyEventBehavior(self);
     }
 },
 {

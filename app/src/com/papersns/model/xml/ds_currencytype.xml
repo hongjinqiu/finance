@@ -65,6 +65,23 @@
 				<dictionary>D_DECIMALS_TYPE</dictionary>
 				<defaultValueExpr>3</defaultValueExpr>
 			</field>
+			
+			
+			<!-- by test, -->
+			<field id="age" extends="INT_FIELD">
+				<displayName>年龄</displayName>
+				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>2</defaultValueExpr>
+				<!-- 
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>100</limitMax>
+				 -->
+			</field>
+			<field id="dateTest" extends="DATE_FIELD">
+				<displayName>日期测试</displayName>
+				<allowEmpty>false</allowEmpty>
+			</field>
 		</bizField>
 	</masterData>
 </datasource>

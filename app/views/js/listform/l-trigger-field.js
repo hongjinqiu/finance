@@ -71,7 +71,7 @@ Y.LTriggerField = Y.Base.create('l-trigger-field', Y.RTriggerField, [Y.WidgetChi
 					var formData = queryParameterManager.getQueryFormData();
 					var name = selectorName();
 					if (name) {
-						return relationBo[name].Description;
+						return g_relationBo[name].Description;
 					}
 					return "";
 				}
@@ -126,34 +126,10 @@ Y.LTriggerField = Y.Base.create('l-trigger-field', Y.RTriggerField, [Y.WidgetChi
     },
     
     _relationFuncTemplate: function(queryParameter, formData) {
-		for (var i = 0; i < queryParameter.CRelationDS.CRelationItemLi.length; i++) {
-			var relationItem = queryParameter.CRelationDS.CRelationItemLi[i];
-			var mode = relationItem.CJsRelationExpr.Mode;
-			var content = relationItem.CJsRelationExpr.Content;
-			if (mode == "" || mode == "text") {
-				if (content == "true") {
-					return relationItem;
-				}
-			} else if (mode == "js") {
-				var data = formData;
-				if (eval(content) === true) {
-					return relationItem;
-				}
-			} else if (mode == "function") {
-				var data = formData;
-				eval("var f=" + content);
-				if (f(data) === true) {
-					return relationItem;
-				}
-			} else if (mode == "functionName") {
-				var data = formData;
-				if (eval(content + "(data)") === true) {
-					return relationItem;
-				}
-			}
-		}
-		return null;
-    }, 
+    	var commonUtil = new CommonUtil();
+    	var bo = {"A": formData};
+    	return commonUtil.getCRelationItem(queryParameter.CRelationDS, bo, formData);
+    },
     
     bindUI: function() {
     	Y.LTriggerField.superclass.bindUI.apply(this, arguments);

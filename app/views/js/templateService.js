@@ -1,8 +1,8 @@
 function TemplateIterator() {}
 
 TemplateIterator.prototype._iterateTemplateColumn = function(dataSetId, result, isContinue, iterateFunc) {
-	for (var j = 0; j < formTemplateJsonData.FormElemLi.length; j++) {
-		var formElem = formTemplateJsonData.FormElemLi[j];
+	for (var j = 0; j < g_formTemplateJsonData.FormElemLi.length; j++) {
+		var formElem = g_formTemplateJsonData.FormElemLi[j];
 		if (formElem.XMLName.Local == "column-model") {
 			if (formElem.ColumnModel.DataSetId == dataSetId) {
 				if (formElem.ColumnModel.ColumnLi) {
@@ -38,8 +38,8 @@ TemplateIterator.prototype.iterateAnyTemplateColumn = function(dataSetId, result
 }
 
 TemplateIterator.prototype._iterateTemplateColumnModel = function(result, isContinue, iterateFunc) {
-	for (var j = 0; j < formTemplateJsonData.FormElemLi.length; j++) {
-		var formElem = formTemplateJsonData.FormElemLi[j];
+	for (var j = 0; j < g_formTemplateJsonData.FormElemLi.length; j++) {
+		var formElem = g_formTemplateJsonData.FormElemLi[j];
 		if (formElem.XMLName.Local == "column-model") {
 			var iterateResult = iterateFunc(formElem.ColumnModel);
 			if (!isContinue && iterateResult) {

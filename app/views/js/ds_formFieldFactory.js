@@ -5,8 +5,8 @@ FormFieldFactory.prototype.getFormField = function(Y, name, dataSetId) {
 	var self = this;
 	var field = null;
 	// 从column-attribute里面读取
-	for (var i = 0; i < formTemplateJsonData.FormElemLi.length; i++) {
-		var formElem = formTemplateJsonData.FormElemLi[i];
+	for (var i = 0; i < g_formTemplateJsonData.FormElemLi.length; i++) {
+		var formElem = g_formTemplateJsonData.FormElemLi[i];
 		if (formElem.XMLName.Local == "column-model") {
 			if (formElem.ColumnModel.DataSetId == dataSetId) {
 				var flag = false;

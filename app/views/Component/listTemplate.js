@@ -23,6 +23,13 @@ function getSelectRecordLi() {
 //}
 
 function getQueryString(Y) {
+	var result = {};
+	for (var key in g_masterFormFieldDict) {
+		result[key] = g_masterFormFieldDict[key].get("value");
+	}
+	return Y.QueryString.stringify(result);
+	
+/*	
 	var form = Y.one('#queryForm'), query;
   
 	query = Y.QueryString.stringify(Y.Array.reduce(Y.one(form).all('input[name],select[name],textarea[name]')._nodes, {}, function (init, el, index, array) {
@@ -42,6 +49,7 @@ function getQueryString(Y) {
 	}));
  
 	return query;
+*/
 }
 
 function applyDateLocale(Y) {
@@ -90,12 +98,12 @@ function listMain() {
 			var renderName = "#columnModel_1";
 			var columnModelName = renderName.replace("#", "");
 			var param = {
-					data:dataBo.items,
+					data:g_dataBo.items,
 					columnModel:listTemplate.ColumnModel,
 					columnModelName:columnModelName,
 					render:renderName,
 					url:getDsUrl(listTemplate),
-					totalResults: dataBo.totalResults || 1,
+					totalResults: g_dataBo.totalResults || 1,
 					pageSize: DATA_PROVIDER_SIZE,
 					paginatorContainer : '#pagContC',
 					paginatorTemplate : '#tmpl-bar'
@@ -103,8 +111,8 @@ function listMain() {
 			dtInst = dataTableManager.createDataGrid(yInst, param);
 			gridPanelDict[columnModelName] = dtInst;
 			var queryParameterManager = new QueryParameterManager();
-			queryParameterManager.applyQueryParameter();
 			queryParameterManager.applyQueryDefaultValue();
+			queryParameterManager.applyObserveEventBehavior();
 			applyQueryBtnBehavior();
 	});
 }
@@ -158,6 +166,10 @@ $("#btn_more").click(function(){
 			myAnim.run();
 			Y.one("#btnMore").setStyle("display", "");
 			Y.one("#btnUp").setStyle("display", "none");
+		});
+		Y.one("#queryReset").on("click", function(e){
+			var queryParameterManager = new QueryParameterManager();
+			queryParameterManager.applyQueryDefaultValue();
 		});
 	});
 }
