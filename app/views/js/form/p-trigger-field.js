@@ -1,18 +1,30 @@
 Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChild], {
+	_getFieldDict: function() {
+		var self = this;
+		var dataSetId = self.get("dataSetId");
+		var fieldDict = null;
+		if (dataSetId == "A") {
+			fieldDict = g_masterFormFieldDict;
+		} else {
+			if (g_gridPanelDict[dataSetId + "_addrow"]) {
+				var record = g_gridPanelDict[dataSetId + "_addrow"].dt.getRecord(self._fieldNode);
+				fieldDict = record.formFieldDict;
+			}
+		}
+		return fieldDict;
+	},
+	
     bindUI: function() {
     	Y.PTriggerField.superclass.bindUI.apply(this, arguments);
     	var self = this;
     	
-    	// apply value change copy field value,// TODO,
     	this.after('valueChange', Y.bind(function(e) {
-			var listTemplateIterator = new ListTemplateIterator();
-			var result = "";
-			listTemplateIterator.iterateAnyTemplateQueryParameter(result, function(queryParameter, result){
-				if (queryParameter.Name == self.get("name")) {
-					var queryParameterManager = new QueryParameterManager();
-					var formData = queryParameterManager.getQueryFormData();
-					
-					var relationItem = self._relationFuncTemplate(queryParameter, formData);
+    		var templateIterator = new TemplateIterator();
+    		var result = "";
+    		var dataSetId = self.get("dataSetId");
+        	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function IterateFunc(column, result) {
+        		if (column.Name == self.get("name")) {
+        			var relationItem = self._relationFuncTemplate(dataSetId, column);
 					if (relationItem) {
 						if (relationItem.CCopyConfigLi) {
 							var selectorName = self.get("selectorName")();
@@ -22,7 +34,8 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChi
 									for (var i = 0; i < relationItem.CCopyConfigLi.length; i++) {
 										var copyColumnName = relationItem.CCopyConfigLi[i].CopyColumnName;
 										var copyValueField = relationItem.CCopyConfigLi[i].CopyValueField;
-										if (g_masterFormFieldDict[copyColumnName]) {
+										var fieldDict = self._getFieldDict();
+										if (fieldDict && fieldDict[copyColumnName]) {
 											var valueFieldLi = copyValueField.split(",");
 											var valueLi = [];
 											for (var j = 0; j < valueFieldLi.length; j++) {
@@ -30,27 +43,30 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChi
 													valueLi.push(selectorDict[valueFieldLi[j]]);
 												}
 											}
-											g_masterFormFieldDict[copyColumnName].set("value", valueLi.join(","));
+											fieldDict[copyColumnName].set("value", valueLi.join(","));
 										}
+										
 									}
 								}
 							} else {
 								for (var i = 0; i < relationItem.CCopyConfigLi.length; i++) {
 									var copyColumnName = relationItem.CCopyConfigLi[i].CopyColumnName;
-									if (g_masterFormFieldDict[copyColumnName]) {
-										g_masterFormFieldDict[copyColumnName].set("value", "");
+									var fieldDict = self._getFieldDict();
+									if (fieldDict && fieldDict[copyColumnName]) {
+										fieldDict[copyColumnName].set("value", "");
 									}
 								}
 							}
 						}
 					}
-					
-					return true;
-				}
-				return false;
-			});
+        			
+        			return true;
+        		}
+        		return false;
+        	});
     	},
         this));
+    	
     	new FormManager().applyEventBehavior(self, Y);
     },
 
@@ -181,16 +197,26 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChi
     },
     
     _relationFuncTemplate: function(dataSetId, column) {
+    	var self = this;
+    	var formManager = new FormManager();
+    	var bo = formManager.getBo();
     	if (dataSetId == "A") {
-    		var formManager = new FormManager();
-    		var bo = formManager.getBo();
     		var data = bo["A"];
     		
     		var commonUtil = new CommonUtil();
     		return commonUtil.getCRelationItem(column.CRelationDS, bo, data);
     	} else {
-    		// TODO 分录的东东,
-    		return null;
+    		var fieldDict = self._getFieldDict();
+    		
+    		var data = {};
+    		if (fieldDict) {
+    			for (var key in fieldDict) {
+    				data[key] = fieldDict[key].get("value");
+    			}
+    		}
+    		
+    		var commonUtil = new CommonUtil();
+    		return commonUtil.getCRelationItem(column.CRelationDS, bo, data);
     	}
     }
 },

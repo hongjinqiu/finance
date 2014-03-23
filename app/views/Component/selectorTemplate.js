@@ -175,7 +175,7 @@ function selectorMain() {
 				syncCallbackSelection();
 				
 				//if (parent || location.href.indexOf("@entrance=true") > -1) {
-				gridPanelDict["columnModel_1"].dt.refreshPaginator();
+				g_gridPanelDict["columnModel_1"].dt.refreshPaginator();
 				//}
 			});
 //		});

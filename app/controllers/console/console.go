@@ -237,6 +237,7 @@ func (c Console) SelectorSchema() revel.Result {
 
 	selectionBo := map[string]interface{}{
 		"url": templateManager.GetViewUrl(listTemplate),
+		"Description": listTemplate.Description,
 	}
 	ids := c.Params.Get("@id")
 	if ids != "" {
@@ -528,6 +529,8 @@ func (c Console) FormSchema() revel.Result {
 			relationLi := modelTemplateFactory.GetRelationLi(sessionId, dataSource, dataBo)
 			relationBo = templateManager.GetRelationBo(sessionId, relationLi)
 		}
+		// 从formTemplate中
+		templateManager.MergeSelectorInfo2RelationBo(formTemplate, &relationBo)
 	}
 	result["relationBo"] = relationBo
 	relationBoByte, err := json.Marshal(&relationBo)

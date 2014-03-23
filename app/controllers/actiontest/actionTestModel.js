@@ -108,7 +108,7 @@ var modelExtraInfo = {
  * 选择按钮,弹窗选择
  */
 function actionTestBSelect(dataSetId) {
-//	gridPanelDict[dataSetId].createAddRowGrid();
+//	g_gridPanelDict[dataSetId].createAddRowGrid();
 //	console.log("g_popupSelect");
 
 //	var modelIterator = new ModelIterator();
@@ -123,7 +123,7 @@ function actionTestBSelect(dataSetId) {
 				"name": data.name
 			});
 		}
-		gridPanelDict["B"].dt.addRows(li);
+		g_gridPanelDict["B"].dt.addRows(li);
 	};
 	/*
 	window.s_queryFunc = function() {

@@ -15,7 +15,7 @@ CommonUtil.prototype.getCRelationItem = function(cRelationDS, bo, formData) {
 		var relationItem = cRelationDS.CRelationItemLi[i];
 		var mode = relationItem.CJsRelationExpr.Mode;
 		var content = relationItem.CJsRelationExpr.Content;
-		if (mode == "" || mode == "text") {
+		if (mode == undefined || mode == "" || mode == "text") {
 			if (content == "true") {
 				return relationItem;
 			}

@@ -276,7 +276,7 @@ ModelTemplateFactory.prototype.applyDataSetCopyValue = function(dataSource, data
 	var result = "";
 	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
 		if (fieldGroup.getDataSetId() == dataSetId) {
-			if (fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true") {
+			if (fieldGroup.AllowCopy == undefined || fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true") {
 				if (srcData[fieldGroup.Id]) {
 					destData[fieldGroup.Id] = srcData[fieldGroup.Id];
 				}
@@ -296,7 +296,7 @@ ModelTemplateFactory.prototype.applyFieldGroupValueByString = function(fieldGrou
 	var intArray = ["SMALLINT", "INT", "LONGINT"];
 	for (var i = 0; i < intArray.length; i++) {
 		if (intArray[i] == fieldGroup.FieldDataType) {
-			if (content == "") {
+			if (content == undefined || content == "") {
 				data[fieldGroup.Id] = 0;
 			} else {
 				if (isNumber(content)) {
@@ -311,7 +311,7 @@ ModelTemplateFactory.prototype.applyFieldGroupValueByString = function(fieldGrou
 	var floatArray = ["FLOAT", "MONEY", "DECIMAL"];
 	for (var i = 0; i < floatArray.length; i++) {
 		if (floatArray[i] == fieldGroup.FieldDataType) {
-			if (content == "") {
+			if (content == undefined || content == "") {
 				data[fieldGroup.Id] = 0;
 			} else {
 				if (isNumber(content)) {
@@ -326,7 +326,7 @@ ModelTemplateFactory.prototype.applyFieldGroupValueByString = function(fieldGrou
 	var boolArray = ["BOOLEAN"];
 	for (var i = 0; i < boolArray.length; i++) {
 		if (boolArray[i] == fieldGroup.FieldDataType) {
-			if (content == "") {
+			if (content == undefined || content == "") {
 				data[fieldGroup.Id] = false
 			} else {
 				if (content == "true") {

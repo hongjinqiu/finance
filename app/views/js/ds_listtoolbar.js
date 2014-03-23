@@ -8,7 +8,7 @@ function g_deleteRecord(o) {
 		},
 		callback: function(o) {
 //			showSuccess("删除数据成功");
-			gridPanelDict["columnModel_1"].dt.refreshPaginator();
+			g_gridPanelDict["columnModel_1"].dt.refreshPaginator();
 		}
 	});
 }

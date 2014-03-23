@@ -15,7 +15,7 @@ function doRefretorDataSource() {
 }
 
 function doRefretor(name) {
-	var dtManager = gridPanelDict[name];
+	var dtManager = g_gridPanelDict[name];
 	var uri = "/console/refretor?type=" + name;
 	YUI(g_financeModule).use("finance-module", function(Y){
 		Y.on('io:complete', function(id, o, args) {

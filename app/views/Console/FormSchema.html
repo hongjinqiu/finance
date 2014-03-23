@@ -68,7 +68,7 @@
 	
 	var g_masterFormFieldLi = [];
 	var g_masterFormFieldDict = {};
-	var gridPanelDict = {};
+	var g_gridPanelDict = {};
 	var g_formStatus = "{{.result.formStatus}}";// 表单状态,view或""
 	var g_id = "{{.result.id}}";// 表单状态,view或""
 	//var masterRenderLiJson = {{.result.masterRenderLiJson}};
@@ -269,7 +269,7 @@
 									param["dataSourceJson"] = g_dataSourceJson;
 								}
 								dataTableManager.createDataGrid(Y, param);
-								gridPanelDict[columnModelName] = dataTableManager;
+								g_gridPanelDict[columnModelName] = dataTableManager;
 							} else {
 								// renderForm,不实现,放到主数据集中处理
 								console.log("detailDataSet which dataSetId is:" + columnModelName + " can't render to form,");

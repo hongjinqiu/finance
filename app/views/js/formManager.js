@@ -129,7 +129,7 @@ FormManager.prototype.getBo = function() {
 	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
 		var dataSetId = dataSet.Id;
 		if (dataSetId != "A") {
-			var gridObj = gridPanelDict[dataSetId];
+			var gridObj = g_gridPanelDict[dataSetId];
 			if (gridObj) {
 				bo[dataSetId] = gridObj.dt.get("data").toJSON();
 			}
@@ -212,7 +212,7 @@ FormManager.prototype.dsFieldGroupValidator = function(value, dateSeperator, fie
 	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "LONGINT";
 	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "MONEY";
 	isDataTypeNumber = isDataTypeNumber || fieldGroup.FieldDataType == "SMALLINT";
-	var isUnLimit = fieldGroup.LimitOption == "" || fieldGroup.LimitOption == "unLimit";
+	var isUnLimit = fieldGroup.LimitOption == undefined || fieldGroup.LimitOption == "" || fieldGroup.LimitOption == "unLimit";
 	var dateEnumLi = ["YEAR","YEARMONTH","DATE","TIME","DATETIME"];
 	var isDate = false;
 	for (var i = 0; i < dateEnumLi.length; i++) {
@@ -416,23 +416,23 @@ FormManager.prototype._setDetailGridStatus = function(status) {
 					tbar.style.display = "";
 				}
 			}
-			var detailGrid = gridPanelDict[dataSet.Id];
+			var detailGrid = g_gridPanelDict[dataSet.Id];
 			if (detailGrid) {
 				var templateIterator = new TemplateIterator();
 				templateIterator.iterateAnyTemplateColumn(dataSet.Id, result, function(column, result){
 					if (column.XMLName.Local == "virtual-column") {
 						if (status == "view") {
-							var virtualColumn = gridPanelDict[dataSet.Id].dt.getColumn(column.Name);
+							var virtualColumn = g_gridPanelDict[dataSet.Id].dt.getColumn(column.Name);
 							if (virtualColumn) {
-								gridPanelDict[dataSet.Id].virtualColumn = virtualColumn;
-								gridPanelDict[dataSet.Id].dt.removeColumn(column.Name);
+								g_gridPanelDict[dataSet.Id].virtualColumn = virtualColumn;
+								g_gridPanelDict[dataSet.Id].dt.removeColumn(column.Name);
 							}
 						} else {
-							var virtualColumn = gridPanelDict[dataSet.Id].dt.getColumn(column.Name);
+							var virtualColumn = g_gridPanelDict[dataSet.Id].dt.getColumn(column.Name);
 							if (!virtualColumn) {
-								virtualColumn = gridPanelDict[dataSet.Id].virtualColumn;
+								virtualColumn = g_gridPanelDict[dataSet.Id].virtualColumn;
 								if (virtualColumn) {
-									gridPanelDict[dataSet.Id].dt.addColumn(virtualColumn, 1);
+									g_gridPanelDict[dataSet.Id].dt.addColumn(virtualColumn, 1);
 								}
 							}
 						}
@@ -461,11 +461,11 @@ FormManager.prototype.loadData2Form = function(dataSource, bo) {
 	});
 	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
 		if (dataSet.Id != "A") {
-			if (gridPanelDict[dataSet.Id]) {
+			if (g_gridPanelDict[dataSet.Id]) {
 				if (bo[dataSet.Id] !== undefined) {
-					gridPanelDict[dataSet.Id].dt.set("data", bo[dataSet.Id]);
+					g_gridPanelDict[dataSet.Id].dt.set("data", bo[dataSet.Id]);
 				} else {
-					gridPanelDict[dataSet.Id].dt.set("data", []);
+					g_gridPanelDict[dataSet.Id].dt.set("data", []);
 				}
 			}
 		}

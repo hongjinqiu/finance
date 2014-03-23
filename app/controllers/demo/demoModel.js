@@ -29,5 +29,5 @@ var demoModel = {
 };
 
 function addRow(dataSetId) {
-	gridPanelDict[dataSetId].createAddRowGrid();
+	g_gridPanelDict[dataSetId].createAddRowGrid();
 }

@@ -18,7 +18,7 @@ function getSelectRecordLi() {
 
 // 用 dataTableExtend 里面的函数
 //function doVirtualColumnBtnAction(gridPanelId, elem, fn){
-//	var inst = gridPanelDict[gridPanelId];
+//	var inst = g_gridPanelDict[gridPanelId];
 //	return inst.doVirtualColumnBtnAction(elem, fn);
 //}
 
@@ -109,7 +109,7 @@ function listMain() {
 					paginatorTemplate : '#tmpl-bar'
 			};
 			dtInst = dataTableManager.createDataGrid(yInst, param);
-			gridPanelDict[columnModelName] = dtInst;
+			g_gridPanelDict[columnModelName] = dtInst;
 			var queryParameterManager = new QueryParameterManager();
 			queryParameterManager.applyQueryDefaultValue();
 			queryParameterManager.applyObserveEventBehavior();

@@ -355,7 +355,7 @@ DataTableManager.prototype.getSelectRecordLi = function() {
 }
 
 function doVirtualColumnBtnAction(columnModelName, elem, fn){
-	var self = gridPanelDict[columnModelName];
+	var self = g_gridPanelDict[columnModelName];
 	var dt = self.dt;
 	var yInst = self.yInst;
 	var o = dt.getRecord(yInst.one(elem));
@@ -363,7 +363,7 @@ function doVirtualColumnBtnAction(columnModelName, elem, fn){
 }
 
 //DataTableManager.prototype.doVirtualColumnBtnAction = function(columnModelName, elem, fn){
-//	var self = gridPanelDict[columnModelName];
+//	var self = g_gridPanelDict[columnModelName];
 //	var dt = self.dt;
 //	var dt = self.dt;
 //	var yInst = self.yInst;
