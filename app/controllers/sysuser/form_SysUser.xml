@@ -14,7 +14,6 @@
 	</html>
 	<toolbar>
 		<button text="列表页" mode="fn" handler="doSave" iconCls="test">
-			<expression>test_expression</expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>

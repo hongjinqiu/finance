@@ -53,6 +53,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 			data := diffDataRowLi[i].DestData
 			usedCheck.Insert(sessionId, fieldGroupLi, bo, data)
 		}
+		o.deleteExtraField(dataSource, bo)
 		txnManager := TxnManager{db}
 		txnId := global.GetTxnId(sessionId)
 		collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -102,6 +103,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 		srcData := diffDataRowLi[i].SrcData
 		usedCheck.Update(sessionId, fieldGroupLi, bo, destData, srcData)
 	}
+	o.deleteExtraField(dataSource, bo)
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
 	//	txnManager.Update(txnId int, collection string, doc map[string]interface{}) (map[string]interface{}, bool) {
@@ -109,6 +111,34 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 		panic("更新失败")
 	}
 	return &diffDataRowLi
+}
+
+func (o FinanceService) deleteExtraField(dataSource DataSource, bo *map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	var notInKeyDict = map[string]interface{}{};
+	modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
+		if notInKeyDict[fieldGroupLi[0].GetDataSetId()] == nil {
+			notInKeyLi := []string{};
+			for key, _ := range *data {
+				isIn := false
+				for _, fieldGroup := range fieldGroupLi {
+					if fieldGroup.Id == key {
+						isIn = true
+						break
+					}
+				}
+				if !isIn && key != "_id" {
+					notInKeyLi = append(notInKeyLi, key)
+				}
+			}
+			notInKeyDict[fieldGroupLi[0].GetDataSetId()] = notInKeyLi;
+		}
+		notInKeyLi := notInKeyDict[fieldGroupLi[0].GetDataSetId()].([]string)
+		for _, key := range notInKeyLi {
+			delete((*data), key)
+		}
+	})
 }
 
 func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, fieldGroup *FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) {

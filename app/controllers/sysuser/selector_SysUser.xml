@@ -11,7 +11,6 @@
 
 	<toolbar export="true">
 		<button text="新增" mode="fn" handler="doSave" iconCls="test">
-			<expression>test_expression</expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -71,20 +70,20 @@
 	</column-model>
 
 	<query-parameters dataSetId="A">
-		<query-parameter name="name" auto="true" text="" editor="hidden"></query-parameter>
+		<query-parameter name="name" auto="true" text="" editor="hiddenfield"></query-parameter>
 		<query-parameter name="code" auto="true" text=""></query-parameter>
 		<query-parameter name="nick" auto="true" text=""></query-parameter>
-		<query-parameter name="dept_id" auto="true" text=""></query-parameter>
-		<query-parameter name="type" auto="true" text=""></query-parameter>
+		<query-parameter name="dept_id" auto="true" text="" editor="textfield"></query-parameter>
+		<query-parameter name="type" auto="true" text="" editor="textfield"></query-parameter>
 		<query-parameter name="createTimeBegin" columnName="createTime" text="" restriction="ge" auto="true" />
 		<query-parameter name="createTimeEnd" columnName="createTime" text="" restriction="le" auto="true" />
-		<query-parameter name="dictTest" auto="true" text=""></query-parameter>
-		<query-parameter name="treeTest" auto="true" text=""></query-parameter>
-		<query-parameter name="treeUrlTest" auto="true" text=""></query-parameter>
-		<query-parameter name="checkboxTest" auto="true" text=""></query-parameter>
-		<query-parameter name="radioTest" auto="true" text=""></query-parameter>
+		<query-parameter name="dictTest" auto="true" text="" editor="textfield"></query-parameter>
+		<query-parameter name="treeTest" auto="true" text="" editor="textfield"></query-parameter>
+		<query-parameter name="treeUrlTest" auto="true" text="" editor="textfield"></query-parameter>
+		<query-parameter name="checkboxTest" auto="true" text="" editor="textfield"></query-parameter>
+		<query-parameter name="radioTest" auto="true" text="" editor="textfield"></query-parameter>
 		<query-parameter name="id" auto="true" text=""></query-parameter>
-		<query-parameter name="nestTest" text="">
+		<query-parameter name="nestTest" text="" editor="textfield">
 			<parameter-attribute name="config" value="{}" />
 			<parameter-attribute name="listeners" value="{}" />
 		</query-parameter>

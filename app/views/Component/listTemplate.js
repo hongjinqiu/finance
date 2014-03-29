@@ -82,39 +82,40 @@ function applyDateLocale(Y) {
 	}
 }
 
-function getDsUrl(listTemplate) {
-	return "/console/listschema?@name=" + listTemplate.Id + "&format=json";
+function createGridWithUrl(url) {
+	YUI(g_financeModule).use("finance-module", function(Y){
+		//applyDateLocale(Y);
+		yInst = Y;
+		var dataTableManager = new DataTableManager();
+		/*
+//paginatorContainer : '#pagContC',
+//paginatorTemplate : '#tmpl-bar',
+		 */
+		var renderName = "#columnModel_1";
+		var columnModelName = renderName.replace("#", "");
+		var param = {
+				data:g_dataBo.items,
+				columnModel:listTemplate.ColumnModel,
+				columnModelName:columnModelName,
+				render:renderName,
+				url:url,
+				totalResults: g_dataBo.totalResults || 1,
+				pageSize: DATA_PROVIDER_SIZE,
+				paginatorContainer : '#pagContC',
+				paginatorTemplate : '#tmpl-bar'
+		};
+		dtInst = dataTableManager.createDataGrid(yInst, param);
+		g_gridPanelDict[columnModelName] = dtInst;
+		var queryParameterManager = new QueryParameterManager();
+		queryParameterManager.applyQueryDefaultValue();
+		queryParameterManager.applyObserveEventBehavior();
+		applyQueryBtnBehavior();
+	});
 }
 
 function listMain() {
-	YUI(g_financeModule).use("finance-module", function(Y){
-			//applyDateLocale(Y);
-			yInst = Y;
-			var dataTableManager = new DataTableManager();
-			/*
-//	paginatorContainer : '#pagContC',
-//	paginatorTemplate : '#tmpl-bar',
-			 */
-			var renderName = "#columnModel_1";
-			var columnModelName = renderName.replace("#", "");
-			var param = {
-					data:g_dataBo.items,
-					columnModel:listTemplate.ColumnModel,
-					columnModelName:columnModelName,
-					render:renderName,
-					url:getDsUrl(listTemplate),
-					totalResults: g_dataBo.totalResults || 1,
-					pageSize: DATA_PROVIDER_SIZE,
-					paginatorContainer : '#pagContC',
-					paginatorTemplate : '#tmpl-bar'
-			};
-			dtInst = dataTableManager.createDataGrid(yInst, param);
-			g_gridPanelDict[columnModelName] = dtInst;
-			var queryParameterManager = new QueryParameterManager();
-			queryParameterManager.applyQueryDefaultValue();
-			queryParameterManager.applyObserveEventBehavior();
-			applyQueryBtnBehavior();
-	});
+	var url = "/console/listschema?@name=" + listTemplate.Id + "&format=json";
+	createGridWithUrl(url);
 }
 
 function applyQueryBtnBehavior() {

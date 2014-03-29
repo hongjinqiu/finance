@@ -18,37 +18,38 @@ type PayPact struct {
 
 func (c PayPact) SaveData() revel.Result {
 	c.actionSupport = PayPactSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c PayPact) DeleteData() revel.Result {
 	c.actionSupport = PayPactSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c PayPact) EditData() revel.Result {
 	c.actionSupport = PayPactSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c PayPact) NewData() revel.Result {
 	c.actionSupport = PayPactSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c PayPact) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = PayPactSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c PayPact) GetData() revel.Result {
  */
 func (c PayPact) CopyData() revel.Result {
 	c.actionSupport = PayPactSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c PayPact) CopyData() revel.Result {
  */
 func (c PayPact) GiveUpData() revel.Result {
 	c.actionSupport = PayPactSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c PayPact) GiveUpData() revel.Result {
  */
 func (c PayPact) RefreshData() revel.Result {
 	c.actionSupport = PayPactSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c PayPact) LogList() revel.Result {

@@ -82,7 +82,14 @@ p-form-field与r-form-field的异同,
 
 
 
-
+^^^^^^^A is:
+^^^^preColumnLi is null, name is:code
+[map[id:3 code:zhao mnemonicNo:招商 createTime:20140325155607 modifyTime:20140326163522 bankAddress: attachCount:0 name:招商银行 bankId:3 bankAccount:eeeee link
+By: dutyBy:12 createBy:15 modifyBy:15 bankPhone:ddddd cyberBankUrl: accountProperty:1 createUnit:0 modifyUnit:0 remark:]]
+^^^^preColumnLi is null, name is:name
+^^^^preColumnLi is null, name is:mnemonicNo
+^^^^^^^get data from columnModel
+^^^^preColumnLi is null, name is:bankId[map[:true id:3 _id:3 code:<nil> name:<nil> mnemonicNo:<nil>]]
 
 
 

@@ -9,10 +9,12 @@ function main() {
 				url: "/" + g_dataSourceJson.Id + "/GetData?format=json"
 				,params: {
 					"dataSourceModelId": g_dataSourceJson.Id,
+					"formTemplateId": g_formTemplateJsonData.Id,
 					"id": g_id
 				},
 				callback: function(o) {
 					var formManager = new FormManager();
+					g_relationBo = o.relationBo;
 					formManager.loadData2Form(g_dataSourceJson, o.bo);
 					formManager.setFormStatus(g_formStatus);
 				}
@@ -21,10 +23,12 @@ function main() {
 			ajaxRequest({
 				url: "/" + g_dataSourceJson.Id + "/NewData?format=json"
 				,params: {
-					"dataSourceModelId": g_dataSourceJson.Id
+					"dataSourceModelId": g_dataSourceJson.Id,
+					"formTemplateId": g_formTemplateJsonData.Id
 				},
 				callback: function(o) {
 					var formManager = new FormManager();
+					g_relationBo = o.relationBo;
 					formManager.loadData2Form(g_dataSourceJson, o.bo);
 					formManager.setFormStatus(g_formStatus);
 				}

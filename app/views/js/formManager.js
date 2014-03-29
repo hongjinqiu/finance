@@ -113,19 +113,14 @@ FormManager.prototype.setChoices = function(formObj) {
 FormManager.prototype.getBo = function() {
 	var modelIterator = new ModelIterator();
 	var dataSource = g_dataSourceJson;
-	var bo = {};
+	var bo = {"A": {}};
 	var result = "";
-	modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
-		if (fieldGroup.isMasterField()) {
-			var formFieldObj = g_masterFormFieldDict[fieldGroup.Id];
-			if (formFieldObj) {
-				if (!bo[fieldGroup.getDataSetId()]) {
-					bo[fieldGroup.getDataSetId()] = {};
-				}
-				bo[fieldGroup.getDataSetId()][fieldGroup.Id] = formFieldObj.get("value");
-			}
+	for (var key in g_masterFormFieldDict) {
+		var formFieldObj = g_masterFormFieldDict[key];
+		if (formFieldObj) {
+			bo["A"][key] = formFieldObj.get("value");
 		}
-	});
+	}
 	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
 		var dataSetId = dataSet.Id;
 		if (dataSetId != "A") {
@@ -268,7 +263,7 @@ FormManager.prototype.dsFieldGroupValidator = function(value, dateSeperator, fie
 			}
 		}
 	} else if (isDataTypeNumber) {
-		if (!/^-?\d*(\.\d*)?$/.test(value)) {
+		if (fieldGroup.Id != "id" && !/^-?\d*(\.\d*)?$/.test(value)) {
 			messageLi.push("必须由数字小数点组成");
 			return messageLi;
 		}
@@ -448,17 +443,13 @@ FormManager.prototype._setDetailGridStatus = function(status) {
 FormManager.prototype.loadData2Form = function(dataSource, bo) {
 	var modelIterator = new ModelIterator();
 	var result = "";
-	modelIterator.iterateAllFieldBo(dataSource, bo, result, function(fieldGroup, data, rowIndex, result){
-		if (fieldGroup.isMasterField()) {
-			if (g_masterFormFieldDict[fieldGroup.Id]) {
-				if (data[fieldGroup.Id] !== undefined) {
-					g_masterFormFieldDict[fieldGroup.Id].set("value", data[fieldGroup.Id]);
-				} else {
-					g_masterFormFieldDict[fieldGroup.Id].set("value", "");
-				}
+	if (bo["A"]) {
+		for (var key in bo["A"]) {
+			if (g_masterFormFieldDict[key]) {
+				g_masterFormFieldDict[key].set("value", bo["A"][key]);
 			}
 		}
-	});
+	}
 	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
 		if (dataSet.Id != "A") {
 			if (g_gridPanelDict[dataSet.Id]) {

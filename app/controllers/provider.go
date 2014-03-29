@@ -18,37 +18,38 @@ type Provider struct {
 
 func (c Provider) SaveData() revel.Result {
 	c.actionSupport = ProviderSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c Provider) DeleteData() revel.Result {
 	c.actionSupport = ProviderSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c Provider) EditData() revel.Result {
 	c.actionSupport = ProviderSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c Provider) NewData() revel.Result {
 	c.actionSupport = ProviderSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c Provider) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = ProviderSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c Provider) GetData() revel.Result {
  */
 func (c Provider) CopyData() revel.Result {
 	c.actionSupport = ProviderSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c Provider) CopyData() revel.Result {
  */
 func (c Provider) GiveUpData() revel.Result {
 	c.actionSupport = ProviderSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c Provider) GiveUpData() revel.Result {
  */
 func (c Provider) RefreshData() revel.Result {
 	c.actionSupport = ProviderSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c Provider) LogList() revel.Result {

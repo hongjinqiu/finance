@@ -21,6 +21,8 @@ func init() {
 type IActionSupport interface {
 	beforeNewData(sessionId int, dataSource DataSource)
 	afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{})
+	beforeGetData(sessionId int, dataSource DataSource)
+	afterGetData(sessionId int, dataSource DataSource, bo *map[string]interface{})
 	beforeCopyData(sessionId int, dataSource DataSource, srcBo map[string]interface{})
 	afterCopyData(sessionId int, dataSource DataSource, bo *map[string]interface{})
 	editValidate(sessionId int, dataSource DataSource, bo map[string]interface{}) (string, bool)
@@ -44,6 +46,8 @@ type ActionSupport struct{}
 
 func (o ActionSupport) beforeNewData(sessionId int, dataSource DataSource)                                          {}
 func (o ActionSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{})               {}
+func (o ActionSupport) beforeGetData(sessionId int, dataSource DataSource)               {}
+func (o ActionSupport) afterGetData(sessionId int, dataSource DataSource, bo *map[string]interface{})               {}
 func (o ActionSupport) beforeCopyData(sessionId int, dataSource DataSource, srcBo map[string]interface{})           {}
 func (o ActionSupport) afterCopyData(sessionId int, dataSource DataSource, bo *map[string]interface{})              {}
 func (o ActionSupport) editValidate(sessionId int, dataSource DataSource, bo map[string]interface{}) (string, bool) {
@@ -170,7 +174,7 @@ func (c BaseDataAction) commitTxn(sessionId int) {
 	}
 }
 
-func (c BaseDataAction) renderCommon(bo map[string]interface{}, dataSource DataSource) revel.Result {
+func (c BaseDataAction) renderCommon(bo map[string]interface{}, relationBo map[string]interface{}, dataSource DataSource) revel.Result {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
@@ -183,7 +187,8 @@ func (c BaseDataAction) renderCommon(bo map[string]interface{}, dataSource DataS
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(map[string]interface{}{
 			"bo":         bo,
-			"dataSource": dataSource,
+			"relationBo": relationBo,
+			//"dataSource": dataSource,
 		})
 	}
 	return c.Render()
@@ -202,37 +207,50 @@ func (c BaseDataAction) renderCommon(bo map[string]interface{}, dataSource DataS
 func (c BaseDataAction) NewData() revel.Result {
 	c.actionSupport = ActionSupport{}
 	
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) newDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) newDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 	
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	c.actionSupport.beforeNewData(sessionId, dataSource)
 	bo := modelTemplateFactory.GetInstanceByDS(dataSource)
 	c.actionSupport.afterNewData(sessionId, dataSource, &bo)
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 
 	c.commitTxn(sessionId)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 func (c BaseDataAction) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = ActionSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) getDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) getDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -246,15 +264,24 @@ func (c BaseDataAction) getDataCommon() (map[string]interface{}, DataSource) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-	bo, found := querySupport.FindByMap(collectionName, queryMap)
+	c.actionSupport.beforeGetData(sessionId, dataSource)
+	session, _ := global.GetConnection(sessionId)
+	bo, found := querySupport.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
 		panic("GetData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
+	c.actionSupport.afterGetData(sessionId, dataSource, &bo)
+
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
 	
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -262,17 +289,18 @@ func (c BaseDataAction) getDataCommon() (map[string]interface{}, DataSource) {
  */
 func (c BaseDataAction) CopyData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) copyDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) copyDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -295,10 +323,16 @@ func (c BaseDataAction) copyDataCommon() (map[string]interface{}, DataSource) {
 	c.actionSupport.beforeCopyData(sessionId, dataSource, srcBo)
 	dataSource, bo := modelTemplateFactory.GetCopyInstance(dataSourceModelId, srcBo)
 	c.actionSupport.afterCopyData(sessionId, dataSource, &bo)
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -307,17 +341,18 @@ func (c BaseDataAction) copyDataCommon() (map[string]interface{}, DataSource) {
 func (c BaseDataAction) EditData() revel.Result {
 	c.actionSupport = ActionSupport{}
 	
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) editDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) editDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -344,9 +379,16 @@ func (c BaseDataAction) editDataCommon() (map[string]interface{}, DataSource) {
 
 	c.actionSupport.beforeEditData(sessionId, dataSource, &bo)
 	c.actionSupport.afterEditData(sessionId, dataSource, &bo)
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
+	
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -354,17 +396,18 @@ func (c BaseDataAction) editDataCommon() (map[string]interface{}, DataSource) {
  */
 func (c BaseDataAction) SaveData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) saveCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Form.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	jsonBo := c.Params.Form.Get("jsonData")
 
 	bo := map[string]interface{}{}
@@ -403,7 +446,14 @@ func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
 	}
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
-	return bo, dataSource
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
+	
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -411,17 +461,18 @@ func (c BaseDataAction) saveCommon() (map[string]interface{}, DataSource) {
  */
 func (c BaseDataAction) GiveUpData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) giveUpDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) giveUpDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -443,10 +494,16 @@ func (c BaseDataAction) giveUpDataCommon() (map[string]interface{}, DataSource) 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.actionSupport.beforeGiveUpData(sessionId, dataSource, &bo)
 	c.actionSupport.afterGiveUpData(sessionId, dataSource, &bo)
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -455,17 +512,18 @@ func (c BaseDataAction) giveUpDataCommon() (map[string]interface{}, DataSource) 
 func (c BaseDataAction) DeleteData() revel.Result {
 	c.actionSupport = ActionSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -508,10 +566,16 @@ func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, DataSource) 
 	}
 	
 	c.actionSupport.afterDeleteData(sessionId, dataSource, &bo)
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -519,17 +583,18 @@ func (c BaseDataAction) deleteDataCommon() (map[string]interface{}, DataSource) 
  */
 func (c BaseDataAction) RefreshData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BaseDataAction) refreshDataCommon() (map[string]interface{}, DataSource) {
+func (c BaseDataAction) refreshDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -551,10 +616,16 @@ func (c BaseDataAction) refreshDataCommon() (map[string]interface{}, DataSource)
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.actionSupport.beforeRefreshData(sessionId, dataSource, &bo)
 	c.actionSupport.afterRefreshData(sessionId, dataSource, &bo)
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
-	return bo, dataSource
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -573,6 +644,7 @@ func (c BaseDataAction) LogList() revel.Result {
 
 func (c BaseDataAction) logListCommon() map[string]interface{} {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	//formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {

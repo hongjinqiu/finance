@@ -18,37 +18,38 @@ type CurrencyType struct {
 
 func (c CurrencyType) SaveData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CurrencyType) DeleteData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	
-	bo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+
+	bo, relationBo, dataSource := c.deleteDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CurrencyType) EditData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	bo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+	bo, relationBo, dataSource := c.editDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CurrencyType) NewData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	bo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+	bo, relationBo, dataSource := c.newDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CurrencyType) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+	c.actionSupport = CurrencyTypeSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c CurrencyType) GetData() revel.Result {
  */
 func (c CurrencyType) CopyData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	bo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+	bo, relationBo, dataSource := c.copyDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c CurrencyType) CopyData() revel.Result {
  */
 func (c CurrencyType) GiveUpData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	bo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+	bo, relationBo, dataSource := c.giveUpDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c CurrencyType) GiveUpData() revel.Result {
  */
 func (c CurrencyType) RefreshData() revel.Result {
 	c.actionSupport = CurrencyTypeSupport{}
-	bo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, dataSource)
+	bo, relationBo, dataSource := c.refreshDataCommon()
+
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CurrencyType) LogList() revel.Result {
@@ -91,4 +92,3 @@ func (c CurrencyType) LogList() revel.Result {
 	}
 	return c.Render()
 }
-

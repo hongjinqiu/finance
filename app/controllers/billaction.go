@@ -19,37 +19,38 @@ type BillAction struct {
 
 func (c BillAction) SaveData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c BillAction) DeleteData() revel.Result {
 	c.actionSupport = ActionSupport{}
 
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c BillAction) EditData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c BillAction) NewData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c BillAction) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = ActionSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -57,9 +58,9 @@ func (c BillAction) GetData() revel.Result {
  */
 func (c BillAction) CopyData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -67,9 +68,9 @@ func (c BillAction) CopyData() revel.Result {
  */
 func (c BillAction) GiveUpData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -77,9 +78,9 @@ func (c BillAction) GiveUpData() revel.Result {
  */
 func (c BillAction) RefreshData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c BillAction) LogList() revel.Result {
@@ -98,17 +99,18 @@ func (c BillAction) LogList() revel.Result {
  */
 func (c BillAction) CancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.cancelDataCommon()
+	bo, relationBo, dataSource := c.cancelDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BillAction) cancelDataCommon() (map[string]interface{}, DataSource) {
+func (c BillAction) cancelDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -146,7 +148,14 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, DataSource) {
 	c.commitTxn(sessionId)
 	
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
-	return bo, dataSource
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
+	
+	return bo, relationBo, dataSource
 }
 
 /**
@@ -154,17 +163,18 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, DataSource) {
  */
 func (c BillAction) UnCancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.unCancelDataCommon()
+	bo, relationBo, dataSource := c.unCancelDataCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
-func (c BillAction) unCancelDataCommon() (map[string]interface{}, DataSource) {
+func (c BillAction) unCancelDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
+	formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -202,5 +212,12 @@ func (c BillAction) unCancelDataCommon() (map[string]interface{}, DataSource) {
 	c.commitTxn(sessionId)
 	
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
-	return bo, dataSource
+	
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	bo = columnModelData["bo"].(map[string]interface{})
+	relationBo := columnModelData["relationBo"].(map[string]interface{})
+	
+	return bo, relationBo, dataSource
 }

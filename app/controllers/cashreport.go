@@ -18,37 +18,38 @@ type CashReport struct {
 
 func (c CashReport) SaveData() revel.Result {
 	c.actionSupport = CashReportSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CashReport) DeleteData() revel.Result {
 	c.actionSupport = CashReportSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CashReport) EditData() revel.Result {
 	c.actionSupport = CashReportSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CashReport) NewData() revel.Result {
 	c.actionSupport = CashReportSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CashReport) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = CashReportSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c CashReport) GetData() revel.Result {
  */
 func (c CashReport) CopyData() revel.Result {
 	c.actionSupport = CashReportSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c CashReport) CopyData() revel.Result {
  */
 func (c CashReport) GiveUpData() revel.Result {
 	c.actionSupport = CashReportSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c CashReport) GiveUpData() revel.Result {
  */
 func (c CashReport) RefreshData() revel.Result {
 	c.actionSupport = CashReportSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c CashReport) LogList() revel.Result {

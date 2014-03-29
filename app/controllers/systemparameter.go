@@ -18,37 +18,38 @@ type SystemParameter struct {
 
 func (c SystemParameter) SaveData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c SystemParameter) DeleteData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c SystemParameter) EditData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c SystemParameter) NewData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c SystemParameter) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = SystemParameterSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c SystemParameter) GetData() revel.Result {
  */
 func (c SystemParameter) CopyData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c SystemParameter) CopyData() revel.Result {
  */
 func (c SystemParameter) GiveUpData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c SystemParameter) GiveUpData() revel.Result {
  */
 func (c SystemParameter) RefreshData() revel.Result {
 	c.actionSupport = SystemParameterSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c SystemParameter) LogList() revel.Result {

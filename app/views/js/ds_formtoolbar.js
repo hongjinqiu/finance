@@ -5,9 +5,11 @@ function editData() {//修改
 		url: "/" + g_dataSourceJson.Id + "/EditData?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
 		}
@@ -25,11 +27,13 @@ function saveData() {//保存
 			url: "/" + g_dataSourceJson.Id + "/SaveData?format=json"
 			,params: {
 				"dataSourceModelId": g_dataSourceJson.Id,
+				"formTemplateId": g_formTemplateJsonData.Id,
 				"jsonData": bo
 			},
 			callback: function(o) {
 				showSuccess("保存数据成功");
 				formManager.setFormStatus("view");
+				g_relationBo = o.relationBo;
 				formManager.loadData2Form(g_dataSourceJson, o.bo);
 			}
 		});
@@ -42,9 +46,11 @@ function newData() {
 	ajaxRequest({
 		url: "/" + g_dataSourceJson.Id + "/NewData?format=json"
 		,params: {
-			"dataSourceModelId": g_dataSourceJson.Id
+			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id
 		},
 		callback: function(o) {
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
 		}
@@ -58,9 +64,11 @@ function copyData() {
 		url: "/" + g_dataSourceJson.Id + "/CopyData?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
 		}
@@ -74,9 +82,11 @@ function giveUpData() {
 		url: "/" + g_dataSourceJson.Id + "/GiveUpData?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
@@ -91,6 +101,7 @@ function deleteData() {
 			url: "/" + g_dataSourceJson.Id + "/DeleteData?format=json"
 			,params: {
 				"dataSourceModelId": g_dataSourceJson.Id,
+				"formTemplateId": g_formTemplateJsonData.Id,
 				"id": bo["id"]
 			},
 			callback: function(o) {
@@ -107,9 +118,11 @@ function refreshData() {
 		url: "/" + g_dataSourceJson.Id + "/RefreshData?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
@@ -123,6 +136,7 @@ function logList() {
 		url: "/" + g_dataSourceJson.Id + "/LogList?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
@@ -140,10 +154,12 @@ function cancelData() {
 		url: "/" + g_dataSourceJson.Id + "/CancelData?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
 			showSuccess("作废数据成功");
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
@@ -157,16 +173,19 @@ function unCancelData() {
 		url: "/" + g_dataSourceJson.Id + "/UnCancelData?format=json"
 		,params: {
 			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
 			"id": bo["id"]
 		},
 		callback: function(o) {
 			showSuccess("反作废数据成功");
+			g_relationBo = o.relationBo;
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
 	});
 }
 
+/*
 function getData() {
 	ajaxRequest({
 		url: "/ActionTest/GetData?format=json"
@@ -180,7 +199,7 @@ function getData() {
 		}
 	});
 }
-
+*/
 function test() {
 	var relationManager = new RelationManager();
 	relationManager.getRelationBo("SysUserSelector", 16);

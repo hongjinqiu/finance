@@ -625,6 +625,81 @@ func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemp
 	return o.GetColumnModelDataForColumnModel(listTemplate.ColumnModel, items)
 }
 
+func (o TemplateManager) GetColumnModelDataForFormTemplate(formTemplate FormTemplate, bo map[string]interface{}) map[string]interface{} {
+	relationBo := map[string]interface{}{}
+	formTemplateIterator := FormTemplateIterator{}
+	var result interface{} = ""
+	formTemplateIterator.IterateAllTemplateColumnModel(formTemplate, &result, func(columnModel ColumnModel, result * interface{}){
+		if bo[columnModel.DataSetId] != nil {
+			if columnModel.DataSetId == "A" {
+				items := []interface{}{
+					map[string]interface{}{
+						"A": bo["A"],
+					},
+				}
+				columnModelData := o.GetColumnModelDataForColumnModel(columnModel, items)
+				columnModelItems := columnModelData["items"].([]interface{})
+				if len(columnModelItems) > 0 {
+					// 主数据集有多个,因此,需要累加
+					if bo["A"] == nil {
+						bo["A"] = map[string]interface{}{}
+					}
+					aDict := bo["A"].(map[string]interface{})
+					item0 := columnModelItems[0].(map[string]interface{})
+					for key, value := range item0 {
+						aDict[key] = value
+					}
+					bo["A"] = aDict
+					columnModelRelationBo := columnModelData["relationBo"].(map[string]interface{})
+					o.mergeRelationBo(&relationBo, columnModelRelationBo)
+				}
+			} else {
+				items := bo[columnModel.DataSetId].([]interface{})
+				dataSetItems := []interface{}{}
+				for _, item := range items {
+					dataSetItems = append(dataSetItems, map[string]interface{}{
+						columnModel.DataSetId: item,
+					})
+				}
+				columnModelData := o.GetColumnModelDataForColumnModel(columnModel, dataSetItems)
+				
+				items = columnModelData["items"].([]interface{})
+				
+				bo[columnModel.DataSetId] = items
+				columnModelRelationBo := columnModelData["relationBo"].(map[string]interface{})
+				o.mergeRelationBo(&relationBo, columnModelRelationBo)
+			}
+		}
+	})
+	o.mergeSelectorInfo2RelationBo(formTemplate, &relationBo)
+	return map[string]interface{}{
+		"bo": bo,
+		"relationBo": relationBo,
+	}
+}
+
+func (o TemplateManager) mergeRelationBo(relationBo *map[string]interface{}, columnModelRelationBo map[string]interface{}) {
+	for key, item := range columnModelRelationBo {
+		if (*relationBo)[key] == nil {
+			(*relationBo)[key] = item
+		} else {
+			relationBoItem := map[string]interface{}{}
+			if (*relationBo)[key] != nil {
+				relationBoItem = (*relationBo)[key].(map[string]interface{})
+			}
+			columnModelRelationBoItem := item.(map[string]interface{})
+			for subKey, subItem := range columnModelRelationBoItem {
+				if relationBoItem[subKey] == nil {
+					relationBoItem[subKey] = subItem
+				}
+			}
+			
+			(*relationBo)[key] = relationBoItem
+		}
+	}
+}
+
+
 //func (o TemplateManager) applyAdapterColumnName(listTemplate ListTemplate) {
 //	if listTemplate.Adapter.Name != "" {
 //		//ApplyColumnName(listTemplate *ListTemplate, column *Column) {
@@ -672,6 +747,20 @@ func (o TemplateManager) GetSelectorInfoForListTemplate(listTemplate ListTemplat
 				listTemplate := o.GetSelectorTemplate(selectorName)
 				selectorInfo := map[string]interface{}{
 					"Description": listTemplate.Description,
+					"url": o.GetViewUrl(listTemplate),
+				}
+				result[selectorName] = selectorInfo
+			}
+		}
+	})
+	listTemplateIterator.IterateTemplateQueryParameter(listTemplate, &iterateResult, func(queryParameter QueryParameter, iterateResult *interface{}){
+		if queryParameter.CRelationDS.CRelationItemLi != nil {
+			for _, relationItem := range queryParameter.CRelationDS.CRelationItemLi {
+				selectorName := relationItem.CRelationConfig.SelectorName
+				listTemplate := o.GetSelectorTemplate(selectorName)
+				selectorInfo := map[string]interface{}{
+					"Description": listTemplate.Description,
+					"url": o.GetViewUrl(listTemplate),
 				}
 				result[selectorName] = selectorInfo
 			}
@@ -705,12 +794,14 @@ func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnMode
 		loopItem := map[string]interface{}{}
 		loopItem[columnModel.CheckboxColumn.Name] = expressionParser.Parse(recordJson, columnModel.CheckboxColumn.Expression)
 		idColumnName := columnModel.IdColumn.Name
-		if columnModel.IdColumn.DataSetId != "" {
-			idColumnName = columnModel.IdColumn.DataSetId + "." + idColumnName
+		if idColumnName != "" {
+			if columnModel.IdColumn.DataSetId != "" {
+				idColumnName = columnModel.IdColumn.DataSetId + "." + idColumnName
+			}
+			loopItem[columnModel.IdColumn.Name] = o.getValueBySpot(record, idColumnName)
+			loopItem["id"] = o.getValueBySpot(record, idColumnName)
+			loopItem["_id"] = o.getValueBySpot(record, idColumnName)
 		}
-		loopItem[columnModel.IdColumn.Name] = o.getValueBySpot(record, idColumnName)
-		loopItem["id"] = o.getValueBySpot(record, idColumnName)
-		loopItem["_id"] = o.getValueBySpot(record, idColumnName)
 		for _, columnNode := range columnNodeDict {
 			o.GetColumnModelDataForColumnItem(sessionId, columnNodeDict, columnNode, record, &relationBo, &loopItem)
 		}
@@ -725,6 +816,10 @@ func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnMode
 }
 
 func (o TemplateManager) recursionSetDefaultDataSetId(dataSetId string, columnModel *ColumnModel) {
+	idColumn := &columnModel.IdColumn
+	if idColumn.DataSetId == "" {
+		idColumn.DataSetId = dataSetId
+	}
 	if columnModel.ColumnLi != nil {
 		for i, _ := range columnModel.ColumnLi {
 			columnItem := &columnModel.ColumnLi[i]
@@ -864,6 +959,7 @@ func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNo
 		for _, name := range columnNode.preColumnLi {
 			o.GetColumnModelDataForColumnItem(sessionId, columnNodeDict, columnNodeDict[name], record, relationBo, loopItem)
 		}
+		//println("^^^^preColumnLi is not null, name is:" + columnItem.Name)
 		// 算完前驱,算自身,
 		for _, name := range columnNode.preColumnLi {
 			preColumnNode := columnNodeDict[name]
@@ -885,11 +981,17 @@ func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNo
 			}
 		}
 	} else {
+		//println("^^^^preColumnLi is null, name is:" + columnItem.Name)
 		if columnItem.XMLName.Local != "virtual-column" {
 			columnItemName := columnItem.Name
 			if columnItem.DataSetId != "" {
 				columnItemName = columnItem.DataSetId + "." + columnItemName
 			}
+//			println("get value from record")
+//			fmt.Println("record is:")
+//			fmt.Println(record)
+//			println("columnItemName is:")
+//			fmt.Println(columnItemName)
 			(*loopItem)[columnItem.Name] = o.getValueBySpot(record, columnItemName)
 			//o.ApplyDictionaryColumnData(loopItem, columnItem)
 			o.ApplyScriptColumnData(loopItem, record, columnItem)
@@ -1048,10 +1150,15 @@ func (o TemplateManager) GetBoForListTemplate(listTemplate *ListTemplate, paramM
 	items := queryResult["items"].([]interface{})
 	itemsDict := o.GetColumnModelDataForListTemplate(*listTemplate, items)
 	bo := itemsDict["items"].([]interface{})
+	relationBo := itemsDict["relationBo"].(map[string]interface{})
+	
+	selectorInfo := o.GetSelectorInfoForListTemplate(*listTemplate)
+	o.mergeRelationBo(&relationBo, selectorInfo)
+	
 	return map[string]interface{}{
 		"totalResults": queryResult["totalResults"],
 		"items":        bo,
-		"relationBo":	itemsDict["relationBo"],
+		"relationBo":	relationBo,
 	}
 }
 
@@ -1247,7 +1354,7 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 	return result
 }
 
-func (o TemplateManager) MergeSelectorInfo2RelationBo(formTemplate FormTemplate, relationBo *map[string]interface{}) {
+func (o TemplateManager) mergeSelectorInfo2RelationBo(formTemplate FormTemplate, relationBo *map[string]interface{}) {
 	formTemplateIterator := FormTemplateIterator{}
 	var result interface{} = ""
 	formTemplateIterator.IterateTemplateColumn(formTemplate, &result, func(column Column, result *interface{}){

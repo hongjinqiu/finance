@@ -82,8 +82,6 @@ func (o ModelIterator) IterateDiffBo(dataSource DataSource, destBo *map[string]i
 func (o ModelIterator) iterateDiffMasterDataBo(dataSource DataSource, destBo *map[string]interface{}, srcBo map[string]interface{}, result *interface{}, iterateFunc IterateDiffFunc) {
 	masterFieldGroupLi := o.getDataSetFieldGroupLi(&dataSource.MasterData.FixField, &dataSource.MasterData.BizField)
 
-	fmt.Println("srcData is")
-	fmt.Println(srcBo)
 	destData := (*destBo)["A"].(map[string]interface{})
 	srcData := srcBo["A"].(map[string]interface{})
 	

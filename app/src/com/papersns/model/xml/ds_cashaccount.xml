@@ -106,19 +106,6 @@
 				<dictionary>D_FIN_LIMITS_CONTROL</dictionary>
 				<defaultValueExpr>1</defaultValueExpr>
 			</field>
-			<!-- 
-				currencyTypeCode,currencyTypeName
-			 -->
-			<field id="currencyTypeCode" extends="STRING_FIELD">
-				<displayName>币别code</displayName>
-				<allowEmpty>true</allowEmpty>
-				<fieldLength>40</fieldLength>
-			</field>
-			<field id="currencyTypeName" extends="STRING_FIELD">
-				<displayName>币别name</displayName>
-				<allowEmpty>true</allowEmpty>
-				<fieldLength>40</fieldLength>
-			</field>
 		</bizField>
 	</masterData>
 </datasource>

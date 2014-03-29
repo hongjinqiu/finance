@@ -18,37 +18,38 @@ type AccountingPeriod struct {
 
 func (c AccountingPeriod) SaveData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c AccountingPeriod) DeleteData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c AccountingPeriod) EditData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c AccountingPeriod) NewData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c AccountingPeriod) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = AccountingPeriodSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c AccountingPeriod) GetData() revel.Result {
  */
 func (c AccountingPeriod) CopyData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c AccountingPeriod) CopyData() revel.Result {
  */
 func (c AccountingPeriod) GiveUpData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c AccountingPeriod) GiveUpData() revel.Result {
  */
 func (c AccountingPeriod) RefreshData() revel.Result {
 	c.actionSupport = AccountingPeriodSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c AccountingPeriod) LogList() revel.Result {

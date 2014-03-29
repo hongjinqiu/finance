@@ -18,37 +18,38 @@ type TaxType struct {
 
 func (c TaxType) SaveData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c TaxType) DeleteData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c TaxType) EditData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c TaxType) NewData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c TaxType) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = TaxTypeSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -56,9 +57,9 @@ func (c TaxType) GetData() revel.Result {
  */
 func (c TaxType) CopyData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -66,9 +67,9 @@ func (c TaxType) CopyData() revel.Result {
  */
 func (c TaxType) GiveUpData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -76,9 +77,9 @@ func (c TaxType) GiveUpData() revel.Result {
  */
 func (c TaxType) RefreshData() revel.Result {
 	c.actionSupport = TaxTypeSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c TaxType) LogList() revel.Result {

@@ -378,9 +378,6 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		delete(dataBo, "relationBo")
 	}
 	
-	selectorInfo := templateManager.GetSelectorInfoForListTemplate(*listTemplate)
-	c.mergeSelectorInfo(&relationBo, selectorInfo)
-
 	dataBoByte, err := json.Marshal(&dataBo)
 	if err != nil {
 		panic(err)
@@ -440,21 +437,6 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	return result
 }
 
-func (c Console) mergeSelectorInfo(relationBo *map[string]interface{}, selectorInfo map[string]interface{}) {
-	for selectorId, info := range selectorInfo {
-		if (*relationBo)[selectorId] == nil {
-			(*relationBo)[selectorId] = info
-		} else {
-			infoDict := info.(map[string]interface{})
-			relationItemDict := (*relationBo)[selectorId].(map[string]interface{})
-			for key, value := range infoDict {
-				relationItemDict[key] = value
-			}
-			(*relationBo)[selectorId] = relationItemDict
-		}
-	}
-}
-
 // TODO,by test
 func (c Console) FormSchema() revel.Result {
 	sessionId := global.GetSessionId()
@@ -500,39 +482,10 @@ func (c Console) FormSchema() revel.Result {
 	}
 	result["toolbarBo"] = toolbarBo
 	dataBo := map[string]interface{}{}
-	if strId != "" && formTemplate.DataSourceModelId != "" {
-		dataSourceModelId := formTemplate.DataSourceModelId
-		id, err := strconv.Atoi(strId)
-		if err != nil {
-			panic(err)
-		}
-		querySupport := QuerySupport{}
-		queryMap := map[string]interface{}{
-			"_id": id,
-		}
-		modelTemplateFactory := ModelTemplateFactory{}
-		dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
-		collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-		bo, found := querySupport.FindByMap(collectionName, queryMap)
-		if !found {
-			panic("FormSchema, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
-		}
-		dataBo = bo
-	}
-	result["dataBo"] = dataBo
-
 	relationBo := map[string]interface{}{}
-	if formTemplate.DataSourceModelId != "" {
-		if strId != "" && formTemplate.DataSourceModelId != "" {
-			modelTemplateFactory := ModelTemplateFactory{}
-			dataSource := modelTemplateFactory.GetDataSource(formTemplate.DataSourceModelId)
-			relationLi := modelTemplateFactory.GetRelationLi(sessionId, dataSource, dataBo)
-			relationBo = templateManager.GetRelationBo(sessionId, relationLi)
-		}
-		// 从formTemplate中
-		templateManager.MergeSelectorInfo2RelationBo(formTemplate, &relationBo)
-	}
+	result["dataBo"] = dataBo
 	result["relationBo"] = relationBo
+
 	relationBoByte, err := json.Marshal(&relationBo)
 	if err != nil {
 		panic(err)
@@ -540,16 +493,6 @@ func (c Console) FormSchema() revel.Result {
 
 	// 主数据集的后台渲染
 	result["masterRenderLi"] = c.getMasterRenderLi(formTemplate)
-	//	{
-	//		dataBoByte, err := json.Marshal(result["masterRenderLi"])
-	//		if err != nil {
-	//			panic(err)
-	//		}
-	//		commonUtil := CommonUtil{}
-	//		masterRenderLiJson := string(dataBoByte)
-	//		masterRenderLiJson = commonUtil.FilterJsonEmptyAttr(masterRenderLiJson)
-	//		result["masterRenderLiJson"] = template.JS(masterRenderLiJson)
-	//	}
 
 	formTemplateJsonDataArray, err := json.Marshal(&formTemplate)
 	if err != nil {
@@ -655,8 +598,10 @@ func (c Console) getMasterRenderLi(formTemplate FormTemplate) map[string]interfa
 						lineColSpanSum = lineColSpanSum - lineColSpan
 					}
 				} else {
+					isModelField := false
 					modelIterator.IterateAllField(&dataSource, &message, func(fieldGroup *FieldGroup, result *interface{}) {
 						if fieldGroup.IsMasterField() && fieldGroup.Id == column.Name {
+							isModelField = true
 							if column.Hideable != "true" {
 								columnColSpan, err := strconv.Atoi(column.ColSpan)
 								if err != nil {
@@ -680,6 +625,29 @@ func (c Console) getMasterRenderLi(formTemplate FormTemplate) map[string]interfa
 							}
 						}
 					})
+					if !isModelField {
+						if column.Hideable != "true" {
+							columnColSpan, err := strconv.Atoi(column.ColSpan)
+							if err != nil {
+								columnColSpan = 1
+							}
+							containerItem = append(containerItem, map[string]interface{}{
+								"isHtml":      "false",
+								"required":    false,
+								"label":       column.Text,
+								"name":        column.Name,
+								"columnWidth": column.ColumnWidth,
+								"columnSpan":  columnColSpan - 1,
+								"labelWidth":  column.LabelWidth,
+							})
+							lineColSpanSum += columnColSpan
+							if lineColSpanSum >= lineColSpan {
+								container = append(container, containerItem)
+								containerItem = []map[string]interface{}{}
+								lineColSpanSum = lineColSpanSum - lineColSpan
+							}
+						}
+					}
 				}
 			}
 			if 0 < lineColSpanSum && lineColSpanSum < lineColSpan {

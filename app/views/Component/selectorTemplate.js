@@ -92,31 +92,26 @@ function syncCheckboxWhenChangeSelection(Y, dataGrid) {
 }
 
 /**
- * form页面传id进来,后端将其放置到selectionBo中,选择器要回显这些内容放到选择区域内,并同步到选择框中
+ * form页面传id进来,后端将其放置到g_selectionBo中,选择器要回显这些内容放到选择区域内,并同步到选择框中
  */
 function syncCallbackSelection() {
-	if (selectionBo) {
-		for (var key in selectionBo) {
-			if (key != "url") {
-				syncSelection(dtInst.yInst, selectionBo[key]);
+	if (g_selectionBo) {
+		for (var key in g_selectionBo) {
+			if (/^\d+$/g.test(key)) {
+				syncSelection(dtInst.yInst, g_selectionBo[key]);
 			}
 		}
 		syncCheckboxWhenChangeSelection(dtInst.yInst, dtInst.dt);
 	}
 }
 
-function getDsUrl(listTemplate) {
+function selectorMain() {
 	var id = listTemplate.SelectorId;
 	if (!id) {
 		id = listTemplate.Id;
 	}
-	return "/console/selectorschema?@name=" + id + "&format=json";
-}
-
-function selectorMain() {
-	if (typeof(listMain) !== "undefined") {
-		listMain();
-	}
+	var url = "/console/selectorschema?@name=" + id + "&format=json";
+	createGridWithUrl(url);
 //	YUI().use("node", "event", function(Y) {
 //		Y.on("domready", function(e) {
 			YUI(g_financeModule).use("finance-module", function(Y){
@@ -147,8 +142,8 @@ function selectorMain() {
 							parent.s_selectFunc([]);
 						} else {
 							for (var i = 0; i < selectValueLi.length; i++) {
-								if (selectionBo[selectValueLi[i]]) {
-									parent.g_relationManager.addRelationBo(selectorId, selectionBo["url"], selectionBo[selectValueLi[i]]);
+								if (g_selectionBo[selectValueLi[i]]) {
+									parent.g_relationManager.addRelationBo(selectorId, g_selectionBo["url"], g_selectionBo[selectValueLi[i]]);
 								}
 							}
 							parent.s_selectFunc(selectValueLi);
@@ -171,7 +166,7 @@ function selectorMain() {
 						}
 					}
 				}
-				// 同步selectionBo到选择区域,
+				// 同步g_selectionBo到选择区域,
 				syncCallbackSelection();
 				
 				//if (parent || location.href.indexOf("@entrance=true") > -1) {

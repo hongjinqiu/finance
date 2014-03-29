@@ -22,3 +22,13 @@ func (o FormTemplateIterator) IterateTemplateColumn(formTemplate FormTemplate, r
 		}
 	}
 }
+
+type IterateTemplateColumnModelFunc func(columnModel ColumnModel, result * interface{})
+
+func (o FormTemplateIterator) IterateAllTemplateColumnModel(formTemplate FormTemplate, result *interface{}, iterateFunc IterateTemplateColumnModelFunc) {
+	for _, item := range formTemplate.FormElemLi {
+		if (item.XMLName.Local == "column-model") {
+			iterateFunc(item.ColumnModel, result);
+		}
+	}
+}

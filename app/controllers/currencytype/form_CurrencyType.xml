@@ -43,13 +43,5 @@
 		<auto-column name="amtDecimals" colSpan="2" />
 		<auto-column name="upDecimals" colSpan="2">
 		</auto-column>
-		<!-- 
-		 -->
-		
-		<!-- by test -->
-		<auto-column name="age" colSpan="2" />
-		<auto-column name="dateTest" colSpan="2" />
 	</column-model>
-	<!-- 
-	 -->
 </form-template>

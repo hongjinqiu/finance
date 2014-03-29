@@ -35,9 +35,9 @@
 		thousandsSeparator: ","
 	};
 	{{if .result.selectionBoJson}}
-	var selectionBo = {{.result.selectionBoJson}};
+	var g_selectionBo = {{.result.selectionBoJson}};
 	{{else}}
-	var selectionBo = null;
+	var g_selectionBo = null;
 	{{end}}
 	{{if .result.layerBoJson}}
 	var g_layerBo = {{.result.layerBoJson}};

@@ -29,37 +29,38 @@ type ActionTest struct {
 
 func (c ActionTest) SaveData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.saveCommon()
+	bo, relationBo, dataSource := c.saveCommon()
 
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c ActionTest) DeleteData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
 	
-	bo, dataSource := c.deleteDataCommon()
+	bo, relationBo, dataSource := c.deleteDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c ActionTest) EditData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.editDataCommon()
+	bo, relationBo, dataSource := c.editDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c ActionTest) NewData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.newDataCommon()
+	bo, relationBo, dataSource := c.newDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c ActionTest) GetData() revel.Result {
-	bo, dataSource := c.getDataCommon()
+	c.actionSupport = ActionTestSupport{}
+	bo, relationBo, dataSource := c.getDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -67,9 +68,9 @@ func (c ActionTest) GetData() revel.Result {
  */
 func (c ActionTest) CopyData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.copyDataCommon()
+	bo, relationBo, dataSource := c.copyDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -77,9 +78,9 @@ func (c ActionTest) CopyData() revel.Result {
  */
 func (c ActionTest) GiveUpData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.giveUpDataCommon()
+	bo, relationBo, dataSource := c.giveUpDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 /**
@@ -87,9 +88,9 @@ func (c ActionTest) GiveUpData() revel.Result {
  */
 func (c ActionTest) RefreshData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.refreshDataCommon()
+	bo, relationBo, dataSource := c.refreshDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c ActionTest) LogList() revel.Result {
@@ -105,14 +106,14 @@ func (c ActionTest) LogList() revel.Result {
 
 func (c ActionTest) CancelData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	bo, dataSource := c.cancelDataCommon()
+	bo, relationBo, dataSource := c.cancelDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }
 
 func (c ActionTest) UnCancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, dataSource := c.unCancelDataCommon()
+	bo, relationBo, dataSource := c.unCancelDataCommon()
 	
-	return c.renderCommon(bo, dataSource)
+	return c.renderCommon(bo, relationBo, dataSource)
 }

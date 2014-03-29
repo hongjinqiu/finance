@@ -102,7 +102,7 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 					pageSize : 10000,
 					paginatorContainer : null,
 					paginatorTemplate : null,
-					//columnManager : new ColumnDataSourceManager(self),
+					columnManager : new ColumnDataSourceManager(),
 					plugin : Y.Plugin.DataTablePFormQuickEdit
 				};
 

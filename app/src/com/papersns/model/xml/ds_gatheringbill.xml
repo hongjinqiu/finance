@@ -320,8 +320,8 @@
 				<relationDS>
 					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("accountType")) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "2"</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -329,8 +329,8 @@
 					</relationItem>
 					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("accountType")) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "1"</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>

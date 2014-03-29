@@ -38,7 +38,7 @@
 	
 	<column-model dataSetId="A" colSpan="6">
 		<auto-column name="accountId" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<select-column name="receiveBankId" text="开户银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<select-column name="receiveBankId" text="开户银行" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<string-column name="receiveBankAccount" text="银行帐号" colSpan="2" labelWidth="13%" />
 		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="accountProperty" text="账户属性" colSpan="2" />
 		<auto-column name="balanceDate" colSpan="2" />
@@ -98,8 +98,15 @@
 			</buttons>
 		</virtual-column>
 		<auto-column name="accountType" />
-		<auto-column name="accountId" />
-		<select-column name="bankId" text="费用银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single" />
+		<auto-column name="accountId">
+			<relationDS>
+				<relationItem name="BankAccount">
+					<copyConfig copyColumnName="bankId" copyValueField="bankId" />
+					<copyConfig copyColumnName="bankAccount" copyValueField="bankAccount" />
+				</relationItem>
+			</relationDS>
+		</auto-column>
+		<auto-column name="bankId" text="费用银行" dsFieldMap="BankAccount.A.bankId" />
 		<string-column name="bankAccount" text="费用银行帐号" />
 		<auto-column name="incomeItemId" />
 		<auto-column name="amtFee" />
