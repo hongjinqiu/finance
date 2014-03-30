@@ -58,6 +58,8 @@ FormManager.prototype.initializeAttr = function(formObj, Y) {
 FormManager.prototype.applyEventBehavior = function(formObj, Y) {
 	var self = formObj;
 	
+	var dataSetId = self.get("dataSetId");
+	var name = self.get("name");
 	// 应用上js相关的操作,
     var modelIterator = new ModelIterator();
 	var result = "";
@@ -81,6 +83,44 @@ FormManager.prototype.applyEventBehavior = function(formObj, Y) {
 				}
 			}
 		}
+	});
+	// observe的添加,主要用于清值,如果是用tree需要联动呢?到时再添加呗
+	var templateIterator = new TemplateIterator();
+	var result = "";
+	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function(column, result){
+		if (column.Name == name) {
+			if (column.ColumnAttributeLi) {
+				for (var i = 0; i < column.ColumnAttributeLi.length; i++) {
+					if (column.ColumnAttributeLi[i].Name == "observe") {
+						var observeFields = column.ColumnAttributeLi[i].Value.split(",");
+						if (dataSetId == "A") {
+							self.after("valueChange", function() {
+								for (var j = 0; j < observeFields.length; j++) {
+									var targetObj = g_masterFormFieldDict[observeFields[j]];
+									if (targetObj) {
+										targetObj.set("value", "");
+									}
+								}
+							});
+						} else {
+							self.after("valueChange", function() {
+								if (g_gridPanelDict[dataSetId + "_addrow"]) {
+									var formFieldDict = g_gridPanelDict[dataSetId + "_addrow"].dt.getRecord(self._fieldNode).formFieldDict;
+									for (var j = 0; j < observeFields.length; j++) {
+										var targetObj = formFieldDict[observeFields[j]];
+										if (targetObj) {
+											targetObj.set("value", "");
+										}
+									}
+								}
+							});
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
 	});
 }
 
@@ -382,6 +422,45 @@ FormManager.prototype.dsFormValidator = function(dataSource, bo) {
 	};
 }
 
+FormManager.prototype.dsDetailValidator = function(dataSource, dataSetId, detailDataLi) {
+	var bo = {};
+	bo[dataSetId] = detailDataLi;
+	var modelIterator = new ModelIterator();
+	var result = "";
+	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
+		if (dataSet == "A") {
+			bo["A"] = {};
+		} else if (!bo[dataSet]) {
+			bo[dataSet] = [];
+		}
+	});
+	
+	var messageLi = [];
+	var formManager = new FormManager();
+	modelIterator.iterateAllFieldBo(dataSource, bo, result, function(fieldGroup, data, rowIndex, result){
+		if (!fieldGroup.isMasterField() && fieldGroup.getDataSetId() == dataSetId) {
+			var formFieldDict = g_gridPanelDict[dataSetId + "_addrow"].dt.getRecord(rowIndex).formFieldDict;
+			var formFieldObj = formFieldDict[fieldGroup.Id];
+			var value = data[fieldGroup.Id];
+			if (value !== undefined && formFieldObj) {
+				if(!formManager.dsFormFieldValidator(value, formFieldObj)) {
+					//messageLi.push(fieldGroup.DisplayName + formFieldObj.get("error"));
+					messageLi.push("序号为" + (rowIndex + 1) + "的分录，" + fieldGroup.DisplayName + formFieldObj.get("error"));
+				}
+			}
+		}
+	});
+	if (messageLi.length > 0) {
+		return {
+			"result": false,
+			"message": messageLi.join("<br />")
+		};
+	}
+	return {
+		"result": true
+	};
+}
+
 FormManager.prototype.setFormStatus = function(status) {
 	var self = this;
 	g_formStatus = status;
@@ -446,7 +525,7 @@ FormManager.prototype.loadData2Form = function(dataSource, bo) {
 	if (bo["A"]) {
 		for (var key in bo["A"]) {
 			if (g_masterFormFieldDict[key]) {
-				g_masterFormFieldDict[key].set("value", bo["A"][key]);
+				g_masterFormFieldDict[key].set("value", bo["A"][key] || "");
 			}
 		}
 	}

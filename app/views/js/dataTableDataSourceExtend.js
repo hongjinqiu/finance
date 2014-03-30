@@ -70,13 +70,23 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 
 				dialog.onOK = function(e) {
 					e.preventDefault();
-					this.hide();
-					// code that executes the user confirmed action goes here
-					if (this.callback) {
-						this.callback();
+					
+					// 数据较验
+					var formManager = new FormManager();
+					var detailDataLi = pluginDataTableManager.dt.pqe.getRecords();
+					var dataSetId = self.param.columnModelName;
+					var validateResult = formManager.dsDetailValidator(g_dataSourceJson, dataSetId, detailDataLi);
+					if (!validateResult.result) {
+						showError(validateResult.message);
+					} else {
+						this.hide();
+						// code that executes the user confirmed action goes here
+						if (this.callback) {
+							this.callback();
+						}
+						// callback reference removed, so it won't persist
+						this.callback = false;
 					}
-					// callback reference removed, so it won't persist
-					this.callback = false;
 				}
 
 				dialog.hide = function() {

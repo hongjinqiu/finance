@@ -161,18 +161,25 @@ func (o CommonMethod) getCRelationDS(cRelationDS CRelationDS, relationDS Relatio
 	} else if cRelationDS.CRelationItemLi != nil && relationDS.RelationItemLi != nil {
 //		templateManager := TemplateManager{}
 		cRelationItemLi := []CRelationItem{}
-		for i, item := range relationDS.RelationItemLi {
+		for _, item := range relationDS.RelationItemLi {
 			cRelationItem := CRelationItem{}
 			
 			isInherit := false
 			columnRelationItem := CRelationItem{}
-			if len(cRelationDS.CRelationItemLi) > i {
-				for _, subItem := range cRelationDS.CRelationItemLi {
-					if subItem.Name == item.Name {
-						isInherit = true
-						columnRelationItem = subItem
-						break
-					}
+//			if len(cRelationDS.CRelationItemLi) > i {
+//				for _, subItem := range cRelationDS.CRelationItemLi {
+//					if subItem.Name == item.Name {
+//						isInherit = true
+//						columnRelationItem = subItem
+//						break
+//					}
+//				}
+//			}
+			for _, subItem := range cRelationDS.CRelationItemLi {
+				if subItem.Name == item.Name {
+					isInherit = true
+					columnRelationItem = subItem
+					break
 				}
 			}
 			if isInherit {

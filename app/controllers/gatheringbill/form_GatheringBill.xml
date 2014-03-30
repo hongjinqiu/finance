@@ -35,11 +35,11 @@
 			<div>收款账户信息</div>
 		]]>
 	</html>
-	
+
 	<column-model dataSetId="A" colSpan="6">
 		<auto-column name="accountId" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<select-column name="receiveBankId" text="开户银行" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<string-column name="receiveBankAccount" text="银行帐号" colSpan="2" labelWidth="13%" />
+		<select-column name="receiveBankId" auto="true" dsFieldMap="BankAccount.A.bankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<string-column name="receiveBankAccount" auto="true" dsFieldMap="BankAccount.A.bankAccount" colSpan="2" labelWidth="13%" />
 		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="accountProperty" text="账户属性" colSpan="2" />
 		<auto-column name="balanceDate" colSpan="2" />
 		<auto-column name="balanceTypeId" colSpan="2" />
@@ -80,7 +80,7 @@
 		<auto-column name="linkman" colSpan="2" />
 		<auto-column name="linkPhone" colSpan="2" />
 	</column-model>
-	
+
 	<column-model dataSetId="B">
 		<toolbar>
 			<button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button>
@@ -97,7 +97,9 @@
 				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
 			</buttons>
 		</virtual-column>
-		<auto-column name="accountType" />
+		<auto-column name="accountType">
+			<column-attribute name="observe" value="accountId,bankId,bankAccount"/>
+		</auto-column>
 		<auto-column name="accountId">
 			<relationDS>
 				<relationItem name="BankAccount">
@@ -106,8 +108,8 @@
 				</relationItem>
 			</relationDS>
 		</auto-column>
-		<auto-column name="bankId" text="费用银行" dsFieldMap="BankAccount.A.bankId" />
-		<string-column name="bankAccount" text="费用银行帐号" />
+		<auto-column name="bankId" text="费用银行" dsFieldMap="BankAccount.A.bankId" fixReadOnly="true" />
+		<string-column name="bankAccount" text="费用银行帐号" fixReadOnly="true" />
 		<auto-column name="incomeItemId" />
 		<auto-column name="amtFee" />
 	</column-model>
