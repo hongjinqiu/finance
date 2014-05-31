@@ -27,7 +27,7 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
@@ -36,7 +36,7 @@
 				<displayName>单据类型</displayName>
 				<allowEmpty>false</allowEmpty>
 				<defaultValueExpr>1</defaultValueExpr>
-				<fixHide>true</fixHide>
+				<!-- <fixHide>true</fixHide> -->
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
 					<relationItem name="BillType">

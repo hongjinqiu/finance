@@ -115,7 +115,8 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	
     	this._fieldNode.on('change', Y.bind(function(e) {
     		var value = this._fieldNode.get('value');
-    		value = value.replace(/[-\/]/gi, "");
+    		value = value.replace(/[-\/\s:]/gi, "");
+    		value = this.getValueFromShowValue(value);
             this.set('value', value, {
                 src: 'ui'
             });
@@ -124,7 +125,8 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	
     	this._fieldNode.on('blur', Y.bind(function(e) {
     		var value = this._fieldNode.get('value');
-    		value = value.replace(/[-\/]/gi, "");
+    		value = value.replace(/[-\/\s:]/gi, "");
+    		value = this.getValueFromShowValue(value);
             this.set('value', value, {
                 src: 'ui'
             });
@@ -158,7 +160,8 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     			displayValue = displayValue.replace("mm", mm);
     			displayValue = displayValue.replace("ss", ss);
     			displayValue = displayValue.replace(/[a-z]/gi, "");
-    			displayValue = displayValue.replace(/^[-\/]*|[-\/]*$/gi, "");
+    			displayValue = displayValue.replace(/^[-\/\s:]*|[-\/\s:]*$/gi, "");
+    			displayValue = this.getShowValue(displayValue);
                 this._fieldNode.set('value', displayValue);
             }
         },

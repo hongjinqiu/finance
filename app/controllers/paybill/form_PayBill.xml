@@ -28,17 +28,22 @@
 		<auto-column name="billTypeId" colSpan="2" labelWidth="13%" />
 		<auto-column name="property" colSpan="2" />
 	</column-model>
-
-	<html>
-		<![CDATA[
-			<div>基本信息</div>
-			<div>付款账户信息</div>
-		]]>
-	</html>
+	
+	<html><![CDATA[
+			<div id="tabContent" style="visibility: hidden;">
+				<ul>
+					<li><a href="#baseInfoDiv">基本信息</a></li>
+					<li><a href="#manageInfoDiv">管理信息</a></li>
+					<li><a href="#remarkDiv">备注</a></li>
+				</ul>
+				<div>
+					<div id="baseInfoDiv">
+					<div>付款账户信息</div>
+	]]></html>
 	
 	<column-model dataSetId="A" colSpan="6">
 		<auto-column name="accountId" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<select-column name="receiveBankId" text="开户银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<select-column name="receiveBankId" text="开户银行" auto="true" dsFieldMap="BankAccount.A.bankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<string-column name="receiveBankAccount" text="银行帐号" colSpan="2" labelWidth="13%" />
 		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="accountProperty" text="账户属性" colSpan="2" />
 		<auto-column name="balanceDate" colSpan="2" />
@@ -99,9 +104,45 @@
 		</virtual-column>
 		<auto-column name="accountType" />
 		<auto-column name="accountId" />
-		<select-column name="bankId" text="费用银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single" />
+		<select-column name="bankId" text="费用银行" auto="true" dsFieldMap="BankAccount.A.bankId"/>
 		<string-column name="bankAccount" text="费用银行帐号" />
 		<auto-column name="incomeItemId" />
 		<auto-column name="amtFee" />
 	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="manageInfoDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="createBy" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="createTime" colSpan="2" labelWidth="15%" />
+		<auto-column name="modifyBy" colSpan="2" />
+		<auto-column name="modifyTime" colSpan="2" />
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="remarkDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="2">
+		<auto-column name="remark" colSpan="2" labelWidth="15%">
+			<column-attribute name="editor" value="textareafield"/>
+		</auto-column>
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+			YUI(g_financeModule).use("finance-module", function(Y) {
+				var tabview = new Y.TabView({srcNode:'#tabContent'});
+				tabview.render();
+				Y.one("#tabContent").setStyle("visibility", "visible");
+			});
+			</script>
+	]]></html>
 </form-template>

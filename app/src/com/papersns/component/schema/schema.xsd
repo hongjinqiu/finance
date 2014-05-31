@@ -182,65 +182,85 @@
 	<element name="toolbar">
 		<complexType>
 			<choice minOccurs="0" maxOccurs="unbounded">
-				<element name="button-group">
-					<complexType>
-						<choice maxOccurs="unbounded">
-							<element ref="tns:button" />
-							<element ref="tns:split-button" />
-						</choice>
-						<attribute name="title" />
-						<attribute name="columns" type="int" use="required" />
-						<attribute name="iconAlign" default="left">
-							<simpleType>
-								<restriction base="string">
-									<enumeration value="top" />
-									<enumeration value="right" />
-									<enumeration value="bottom" />
-									<enumeration value="left" />
-								</restriction>
-							</simpleType>
-						</attribute>
-						<attribute name="scale" default="small">
-							<simpleType>
-								<restriction base="string">
-									<enumeration value="small" />
-									<enumeration value="medium" />
-									<enumeration value="large" />
-								</restriction>
-							</simpleType>
-						</attribute>
-					</complexType>
-				</element>
+				<element ref="tns:button-group" />
 				<element ref="tns:button" maxOccurs="unbounded" />
 				<element ref="tns:split-button" />
 			</choice>
-			<attribute name="name"></attribute>
-			<attribute name="export" default="true" type="boolean"></attribute>
-			<attribute name="exporter"></attribute>
-			<attribute name="exportParam" default="false" type="boolean"></attribute>
-			<attribute name="freezedHeader" default="true" type="boolean"></attribute>
-			<attribute name="exportChart" default="true" type="boolean"></attribute>
-			<attribute name="excelChart"></attribute>
-			<attribute name="excelChartType">
+			<attributeGroup ref="tns:toolbar-attribute" />
+		</complexType>
+	</element>
+	
+	<element name="editor-toolbar">
+		<complexType>
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<element ref="tns:button-group" />
+				<element ref="tns:button" maxOccurs="unbounded" />
+				<element ref="tns:split-button" />
+			</choice>
+			<attributeGroup ref="tns:toolbar-attribute" />
+		</complexType>
+	</element>
+	
+	<element name="button-group">
+		<complexType>
+			<choice maxOccurs="unbounded">
+				<element ref="tns:button" />
+				<element ref="tns:split-button" />
+			</choice>
+			<attribute name="title" />
+			<attribute name="columns" type="int" use="required" />
+			<attribute name="iconAlign" default="left">
 				<simpleType>
 					<restriction base="string">
-						<enumeration value="xlColumnClustered" />
-						<enumeration value="xlLineMarkers" />
-						<enumeration value="xlColumnStacked" />
+						<enumeration value="top" />
+						<enumeration value="right" />
+						<enumeration value="bottom" />
+						<enumeration value="left" />
 					</restriction>
 				</simpleType>
 			</attribute>
-			<attribute name="exportTitle"></attribute>
-			<attribute name="exportSuffix" default="xlsx">
+			<attribute name="scale" default="small">
 				<simpleType>
 					<restriction base="string">
-						<enumeration value="xlsx" />
-						<enumeration value="xls" />
+						<enumeration value="small" />
+						<enumeration value="medium" />
+						<enumeration value="large" />
 					</restriction>
 				</simpleType>
 			</attribute>
 		</complexType>
 	</element>
+	
+	<attributeGroup name="toolbar-attribute">
+		<annotation>
+			<documentation>列模型属性</documentation>
+		</annotation>
+		<attribute name="name"></attribute>
+		<attribute name="export" default="true" type="boolean"></attribute>
+		<attribute name="exporter"></attribute>
+		<attribute name="exportParam" default="false" type="boolean"></attribute>
+		<attribute name="freezedHeader" default="true" type="boolean"></attribute>
+		<attribute name="exportChart" default="true" type="boolean"></attribute>
+		<attribute name="excelChart"></attribute>
+		<attribute name="excelChartType">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="xlColumnClustered" />
+					<enumeration value="xlLineMarkers" />
+					<enumeration value="xlColumnStacked" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="exportTitle"></attribute>
+		<attribute name="exportSuffix" default="xlsx">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="xlsx" />
+					<enumeration value="xls" />
+				</restriction>
+			</simpleType>
+		</attribute>
+	</attributeGroup>
 
 	<element name="button">
 		<complexType>
@@ -396,6 +416,7 @@
 		<complexType>
 			<sequence>
 				<element ref="tns:toolbar" minOccurs="0" />
+				<element ref="tns:editor-toolbar" minOccurs="0" />
 				<element ref="tns:checkbox-column" minOccurs="0" />
 				<element ref="tns:id-column" minOccurs="0" />
 				<choice minOccurs="1" maxOccurs="unbounded">
@@ -560,7 +581,7 @@
 								<element name="expression" minOccurs="0"></element>
 							</choice>
 							<attributeGroup ref="tns:column-attributes" />
-							<!-- <attribute name="flowId" type="long"></attribute> -->
+							<attribute name="forEditor" type="boolean"></attribute>
 						</complexType>
 					</element>
 					<element name="select-column">
@@ -704,6 +725,9 @@
 		</attribute>
 		<attribute name="colSpan" type="int" default="1"></attribute>
 		<attribute name="width" />
+		<attribute name="fieldWidth" />
+		<attribute name="fieldHeight" />
+		<attribute name="fieldCls" />
 		<attribute name="columnWidth" />
 		<attribute name="labelWidth" />
 		<attribute name="excelWidth" />
@@ -752,6 +776,16 @@
 		<attribute name="fixReadOnly" type="boolean" default="false">
 			<annotation>
 				<documentation>是否固定只读</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="zeroShowEmpty" type="boolean" default="false">
+			<annotation>
+				<documentation>是否0显示为空</documentation>
+			</annotation>
+		</attribute>
+		<attribute name="zeroShowEmpty" type="boolean" default="false">
+			<annotation>
+				<documentation>是否0显示为空</documentation>
 			</annotation>
 		</attribute>
 	</attributeGroup>

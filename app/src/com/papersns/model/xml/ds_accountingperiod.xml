@@ -27,7 +27,7 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
@@ -39,6 +39,8 @@
 				<limitMin>1970</limitMin>
 				<limitMax>2099</limitMax>
 				<allowCopy>false</allowCopy>
+				<zeroShowEmpty>true</zeroShowEmpty>
+				<allowDuplicate>false</allowDuplicate>
 			</field>
 			<field id="numAccountingPeriod" extends="INT_FIELD">
 				<displayName>会计期总数</displayName>
@@ -47,15 +49,15 @@
 				<limitMin>1</limitMin>
 				<limitMax>20</limitMax>
 				<defaultValueExpr>12</defaultValueExpr>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 		</bizField>
 	</masterData>
 	<detailData>
 		<id>B</id>
 		<displayName>会计期明细列表</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
+		<allowEmpty>false</allowEmpty>
 		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
@@ -64,6 +66,7 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>

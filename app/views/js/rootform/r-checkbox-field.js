@@ -37,6 +37,10 @@ Y.RCheckboxField = Y.Base.create('r-checkbox-field', Y.RFormField, [Y.WidgetChil
         this._fieldNode.after('change', Y.bind(function (e) {
             this.set('checked', e.currentTarget.get('checked'), {src : 'ui'});
         }, this));
+    },
+    
+    getShowValue: function(value) {
+    	return value;
     }
 }, {
     ATTRS : {

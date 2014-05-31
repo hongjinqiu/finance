@@ -12,7 +12,7 @@
 	<toolbar export="true">
 		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
 
-		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+		<button text="删除" mode="fn" handler="g_deleteRecords">
 			<button-attribute name="code" value="D" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -36,7 +36,7 @@
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
-	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选ActionTest" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选ActionTest" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<toolbar>
 			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
 		</toolbar>
@@ -51,7 +51,7 @@
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
 					<expression>1 == 1</expression>
 					<button-attribute name="code" value="D" />
 				</button>

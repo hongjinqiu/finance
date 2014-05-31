@@ -160,10 +160,11 @@ DataTableManager.prototype.hideLoadingImg = function() {
 	loadingNode.setStyle("display", "none");
 }
 
-DataTableManager.prototype.doAfterResponse = function() {
+/*
+DataTableManager.prototype.doAfterResponse = function(e) {
 	
 }
-
+*/
 DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	var self = this;
 	this.param = param;
@@ -196,7 +197,9 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 			},
 			response : function(e) {
 				self.hideLoadingImg();
-				self.doAfterResponse();
+				if (self.doAfterResponse) {
+					self.doAfterResponse(e);
+				}
 			}
 		}
 	});

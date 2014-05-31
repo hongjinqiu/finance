@@ -14,6 +14,7 @@ func init() {
 	defer rwlock.Unlock()
 	interceptorDict[reflect.TypeOf(SysUserInterceptor{}).Name()] = reflect.TypeOf(SysUserInterceptor{})
 	interceptorDict[reflect.TypeOf(ModelListTemplateInterceptor{}).Name()] = reflect.TypeOf(ModelListTemplateInterceptor{})
+	interceptorDict[reflect.TypeOf(PubReferenceLogInterceptor{}).Name()] = reflect.TypeOf(PubReferenceLogInterceptor{})
 }
 
 func GetInterceptorDict() map[string]reflect.Type {

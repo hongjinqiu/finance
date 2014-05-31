@@ -12,7 +12,7 @@ var scriptDict map[string]reflect.Type = map[string]reflect.Type{}
 func init() {
 	rwlock.Lock()
 	defer rwlock.Unlock()
-	scriptDict[reflect.TypeOf(SysUser{}).Name()] = reflect.TypeOf(SysUser{})
+	//scriptDict[reflect.TypeOf(SysUser{}).Name()] = reflect.TypeOf(SysUser{})
 }
 
 func GetScriptDict() map[string]reflect.Type {

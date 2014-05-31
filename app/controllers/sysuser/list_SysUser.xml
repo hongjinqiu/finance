@@ -5,135 +5,57 @@
 	<data-source-model-id>SysUser</data-source-model-id>
 
 	<adapter name="ModelListTemplateAdapter" />
-	<description>用户列表</description>
-	<scripts></scripts>
+	<description>系统用户列表</description>
+	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<button text="新增" mode="fn" handler="doSave" iconCls="test">
-			<expression></expression>
-			<button-attribute name="code" value="C" />
-			<button-attribute name="functionId" value="50010" />
-		</button>
+		<!-- 
+		<button text="新增" mode="url" handler="/console/formschema?@name=SysUser" iconCls="test" />
 
-		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
-			<button-attribute name="code" value="D" />
-			<button-attribute name="functionId" value="50010" />
+		<button text="删除" mode="fn" handler="g_deleteRecords">
 		</button>
-
-		<button text="导出" mode="url" handler="doExport">
-			<button-attribute name="code" value="U" />
-			<button-attribute name="functionId" value="10018" />
-		</button>
-
-		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
-		</button>
+		 -->
 	</toolbar>
-
-	<security functionId="10018"></security>
-
-	<!-- <before-build-query>SysUser.beforeBuildQuery</before-build-query> <after-build-query>SysUser.afterBuildQuery</after-build-query> -->
-	<after-query-data></after-query-data>
 
 	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
-		<fix-bson-query>{"_id": {"$gte": 15}}</fix-bson-query><!-- mongoDB fix query, json format -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
-	<!-- <column-model selectionMode="checkbox" rownumber="true" sqlOrderBy="create_time desc"> -->
-	<column-model selectionMode="radio" rownumber="true" bsonOrderBy="_id" dataSetId="A">
-		<toolbar>
-			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
-		</toolbar>
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选系统用户" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<!-- <expression>"31" == str(data.get("AUDIT_STATUS"))</expression> -->
 			<expression>1 == 1</expression>
-			<!-- python language -->
 		</checkbox-column>
-		<!-- <id-column name="EMPEGRESS_ID" text="编号" hideable="true" /> -->
 		<id-column name="id" text="编号" hideable="false" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
-					<expression>1 == 1</expression>
-					<button-attribute name="code" value="U" />
+				<!-- 
+				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=SysUser&amp;id={id}">
 				</button>
-				<button text="查看" iconCls="ck_btn" mode="url^" handler="/component/schema.go?@name=DEMO_VIEW&amp;EMPEGRESS_ID={id}">
-					<expression>1 == 1</expression>
+				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				</button>
+				 -->
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=SysUser&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>
 
 		<auto-column name="code" />
 		<auto-column name="name" />
-		<string-column name="stringColumn" auto="true" />
-		<auto-column name="moneyNumberColumn" />
-		<auto-column name="priceNumberColumn" />
-		<auto-column name="unitCostNumberColumn" />
-		<auto-column name="percentNumberColumn" />
-		<auto-column name="quantityNumberColumn" />
-		
-		<auto-column name="dateTest" />
-		<auto-column name="timeTest" />
-		<auto-column name="dateTimeTest" />
-		<auto-column name="yearTest" />
-		<auto-column name="yearMonthTest" />
-		
-		<auto-column name="dictionaryTest" />
-		
-		<auto-column name="startDate" />
-		<auto-column name="endDate" />
-		<auto-column name="selectTest" />
-		
-		<string-column name="nick" auto="true" />
-		<number-column name="numTest" auto="true"></number-column>
-		<date-column name="dateTest" auto="true" />
-		<boolean-column name="boolTest" auto="true" />
-		<dictionary-column name="dictTest" auto="true" dictionary="" />
-		<string-column name="nestTest" text="嵌套测试">
-			<column-model dataSetId="A">
-				<script-column name="nest1" text="嵌套1" script="data.get('nick').encode('utf8')"></script-column>
-				<auto-column name="dateTest" />
-				<auto-column name="startDate" />
-				<auto-column name="selectTest" />
-				<auto-column name="dictionaryTest" />
-				<!-- <dictionary-column name="nestDictTest1" dictionary="D_DICTTEST"></dictionary-column> -->
-			</column-model>
-		</string-column>
-		<!-- 
-		<select-column name="" displayField="" valueField="" selectorName="" selectionMode="single" queryFunc="">
-			<listeners change="" selection="" unSelection="" />
-		</select-column>
-		 -->
+		<auto-column name="type" />
+		<auto-column name="status" />
+		<auto-column name="nick" />
 	</column-model>
 
 	<query-parameters dataSetId="A">
+		<query-parameter name="code" auto="true" text="">
+		</query-parameter>
+		<query-parameter name="name" auto="true" text=""></query-parameter>
+		<query-parameter name="type" auto="true" text=""></query-parameter>
+		<query-parameter name="status" auto="true" text="">
+		</query-parameter>
 		<query-parameter name="nick" auto="true" text=""></query-parameter>
-		<!-- <query-parameter name="moneyNumberColumn" auto="true" text=""></query-parameter>
-		
-		<query-parameter name="dateTestBegin" columnName="dateTest" auto="true" text="日期从" restriction="ge"></query-parameter>
-		<query-parameter name="dateTestEnd" columnName="dateTest" auto="true" text="日期至" restriction="le"></query-parameter>
-		
-		<query-parameter name="dateTest" auto="true" text=""></query-parameter>
-		<query-parameter name="timeTest" auto="true" text=""></query-parameter>
-		<query-parameter name="dateTimeTest" auto="true" text=""></query-parameter>
-		<query-parameter name="yearTest" auto="true" text=""></query-parameter>
-		<query-parameter name="yearMonthTest" auto="true" text=""></query-parameter>
-		
-		<query-parameter name="dictionaryTest" auto="true" text=""></query-parameter>
-		
-		<query-parameter name="selectTest" auto="true" text=""></query-parameter>
-	
-		<query-parameter name="dictTest" auto="true" text=""></query-parameter>
-		<query-parameter name="treeTest" auto="true" text=""></query-parameter>
-		<query-parameter name="treeUrlTest" auto="true" text=""></query-parameter>
-		<query-parameter name="checkboxTest" auto="true" text=""></query-parameter>
-		<query-parameter name="radioTest" auto="true" text=""></query-parameter>
-		<query-parameter name="id" auto="true" text=""></query-parameter>
-		<query-parameter name="nestTest" text="">
-			<parameter-attribute name="config" value="{}" />
-			<parameter-attribute name="listeners" value="{}" />
-		</query-parameter> -->
 	</query-parameters>
 </list-template>

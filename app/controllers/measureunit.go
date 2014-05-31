@@ -18,38 +18,33 @@ type MeasureUnit struct {
 
 func (c MeasureUnit) SaveData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c MeasureUnit) DeleteData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c MeasureUnit) EditData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c MeasureUnit) NewData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c MeasureUnit) GetData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +52,8 @@ func (c MeasureUnit) GetData() revel.Result {
  */
 func (c MeasureUnit) CopyData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +61,8 @@ func (c MeasureUnit) CopyData() revel.Result {
  */
 func (c MeasureUnit) GiveUpData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +70,8 @@ func (c MeasureUnit) GiveUpData() revel.Result {
  */
 func (c MeasureUnit) RefreshData() revel.Result {
 	c.actionSupport = MeasureUnitSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c MeasureUnit) LogList() revel.Result {

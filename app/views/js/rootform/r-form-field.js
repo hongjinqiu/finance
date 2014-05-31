@@ -158,6 +158,7 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
      *     markup placeholders.
      */
     _renderNode : function (nodeTemplate, nodeClass, nodeBefore) {
+    	var self = this;
         if (!nodeTemplate) {
             return null;
         }
@@ -165,7 +166,17 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             node = Y.Node.create(nodeTemplate),
             placeHolder = contentBox.one('.' + nodeClass);
 
-        node.addClass(nodeClass);
+        if (self.get("fieldCls")) {
+        	node.addClass(nodeClass + " " + self.get("fieldCls"));
+        } else {
+        	node.addClass(nodeClass);
+        }
+        if (self.get("fieldWidth")) {
+        	node.setStyle("width", self.get("fieldWidth"));
+        }
+        if (self.get("fieldHeight")) {
+        	node.setStyle("height", self.get("fieldHeight"));
+        }
 
         if (placeHolder) {
             placeHolder.replace(node);
@@ -268,11 +279,12 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             return;
         }
 
+        var showValue = this.getShowValue(this.get('value'));
         this._fieldNode.setAttrs({
             name: this.get('name'),
             type: nodeType,
             id: this.get('id') + Y.RFormField.FIELD_ID_SUFFIX,
-            value: this.get('value')
+            value: showValue
         });
 
         this._fieldNode.setAttribute('tabindex', Y.RFormField.tabIndex);
@@ -446,7 +458,8 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
 
     resetFieldNode: function() {
         this.set('value', this._initialValue);
-        this._fieldNode.set('value', this._initialValue);
+        var showValue = this.getShowValue(this._initialValue);
+        this._fieldNode.set('value', showValue);
         this.fire('nodeReset');
     },
 
@@ -483,7 +496,8 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
 
     bindUI: function() {
         this._fieldNode.on('change', Y.bind(function(e) {
-            this.set('value', this._fieldNode.get('value'), {
+        	var value = this.getValueFromShowValue(this._fieldNode.get('value'));
+            this.set('value', value, {
                 src: 'ui'
             });
         },
@@ -491,7 +505,8 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
 
         this.on('valueChange', Y.bind(function(e) {
             if (e.src != 'ui') {
-                this._fieldNode.set('value', e.newVal);
+            	var showValue = this.getShowValue(e.newVal);
+                this._fieldNode.set('value', showValue);
             }
         },
         this));
@@ -502,7 +517,8 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         this));
 
         this._fieldNode.on('blur', Y.bind(function(e) {
-            this.set('value', this._fieldNode.get('value'), {
+        	var value = this.getValueFromShowValue(this._fieldNode.get('value'));
+            this.set('value', value, {
                 src: 'ui'
             });
         },
@@ -560,8 +576,30 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
         if (this.get('validateInline') === true) {
             this._enableInlineValidation();
         }
-    }
+    },
     
+    getShowValue: function(value) {
+    	var self = this;
+    	if (this.get("zeroShowEmpty")) {
+    		if (value == "0") {
+    			return "";
+    		}
+    	}
+    	return value;
+    },
+    
+    getValueFromShowValue: function(showValue) {
+    	var self = this;
+    	if (this.get("zeroShowEmpty")) {
+    		if (showValue == "0" || showValue == "") {
+    			var value = self.get("value");
+    			if (value == "0") {
+    				return value;
+    			}
+    		}
+    	}
+    	return showValue;
+    }
 },
 {
     /**
@@ -707,6 +745,26 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
             validator : function(val) {
                 return this._validateReadonly(val);
             }
+        },
+        
+        zeroShowEmpty : {
+        	value: false,
+        	validator: Y.Lang.isBoolean
+        },
+        
+        fieldWidth : {
+            value : '',
+            validator : Y.Lang.isString
+        },
+        
+        fieldHeight : {
+            value : '',
+            validator : Y.Lang.isString
+        },
+        
+        fieldCls : {
+            value : '',
+            validator : Y.Lang.isString
         }
     },
 

@@ -310,9 +310,97 @@ func (o ModelTemplateFactory) extendFieldPoolField(fieldGroup *FieldGroup, field
 					}
 
 				}
+				// 结构体等的处理
+				outFieldGroup.DefaultValueExpr = o.getDefaultValueExpr(outFieldGroup.DefaultValueExpr, innerFieldGroup.DefaultValueExpr)
+				outFieldGroup.CalcValueExpr = o.getCalcValueExpr(outFieldGroup.CalcValueExpr, innerFieldGroup.CalcValueExpr)
+				outFieldGroup.RelationDS = o.getRelationDS(outFieldGroup.RelationDS, innerFieldGroup.RelationDS)
 			}
 		}
 	}
+}
+
+func (o ModelTemplateFactory) getDefaultValueExpr(leftDefaultValueExpr DefaultValueExpr, defaultValueExpr DefaultValueExpr) DefaultValueExpr {
+	if leftDefaultValueExpr.Mode == "" && defaultValueExpr.Mode != "" {
+		leftDefaultValueExpr.Mode = defaultValueExpr.Mode
+	}
+	if leftDefaultValueExpr.Content == "" && defaultValueExpr.Content != "" {
+		leftDefaultValueExpr.Content = defaultValueExpr.Content
+	}
+	
+	return leftDefaultValueExpr
+}
+
+func (o ModelTemplateFactory) getCalcValueExpr(leftCalcValueExpr CalcValueExpr, defaultValueExpr CalcValueExpr) CalcValueExpr {
+	if leftCalcValueExpr.Mode == "" && defaultValueExpr.Mode != "" {
+		leftCalcValueExpr.Mode = defaultValueExpr.Mode
+	}
+	if leftCalcValueExpr.Content == "" && defaultValueExpr.Content != "" {
+		leftCalcValueExpr.Content = defaultValueExpr.Content
+	}
+	
+	return leftCalcValueExpr
+}
+
+func (o ModelTemplateFactory) getRelationDS(leftRelationDS RelationDS, relationDS RelationDS) RelationDS {
+	resultRelationDS := RelationDS{}
+	if leftRelationDS.RelationItemLi == nil && relationDS.RelationItemLi != nil {
+		cRelationItemLi := []RelationItem{}
+		for _, item := range relationDS.RelationItemLi {
+			cRelationItemLi = append(cRelationItemLi, item)
+		}
+		resultRelationDS.RelationItemLi = cRelationItemLi
+	} else if leftRelationDS.RelationItemLi != nil && relationDS.RelationItemLi != nil {
+		cRelationItemLi := []RelationItem{}
+		for _, item := range relationDS.RelationItemLi {
+			cRelationItem := RelationItem{}
+			
+			isInherit := false
+			columnRelationItem := RelationItem{}
+			for _, subItem := range leftRelationDS.RelationItemLi {
+				if subItem.Name == item.Name {
+					isInherit = true
+					columnRelationItem = subItem
+					break
+				}
+			}
+			if isInherit {
+				cRelationItem.Name = columnRelationItem.Name
+				cRelationItem.Id = columnRelationItem.Id
+				if columnRelationItem.RelationExpr.Mode != "" {
+					cRelationItem.RelationExpr.Mode = columnRelationItem.RelationExpr.Mode
+				} else {
+					cRelationItem.RelationExpr.Mode = item.RelationExpr.Mode
+				}
+				if columnRelationItem.RelationExpr.Content != "" {
+					cRelationItem.RelationExpr.Content = columnRelationItem.RelationExpr.Content
+				} else {
+					cRelationItem.RelationExpr.Content = item.RelationExpr.Content
+				}
+				if columnRelationItem.JsRelationExpr.Mode != "" {
+					cRelationItem.JsRelationExpr.Mode = columnRelationItem.JsRelationExpr.Mode
+				} else {
+					cRelationItem.JsRelationExpr.Mode = item.JsRelationExpr.Mode
+				}
+				if columnRelationItem.JsRelationExpr.Content != "" {
+					cRelationItem.JsRelationExpr.Content = columnRelationItem.JsRelationExpr.Content
+				} else {
+					cRelationItem.JsRelationExpr.Content = item.JsRelationExpr.Content
+				}
+				cRelationItem.RelationModelId = columnRelationItem.RelationModelId
+				cRelationItem.RelationDataSetId = columnRelationItem.RelationDataSetId
+				cRelationItem.DisplayField = columnRelationItem.DisplayField
+				cRelationItem.ValueField = columnRelationItem.ValueField
+			} else {
+				cRelationItem = item
+			}
+			
+			cRelationItemLi = append(cRelationItemLi, cRelationItem)
+		}
+		resultRelationDS.RelationItemLi = cRelationItemLi
+	} else if leftRelationDS.RelationItemLi != nil && relationDS.RelationItemLi == nil {
+		resultRelationDS.RelationItemLi = leftRelationDS.RelationItemLi
+	}
+	return resultRelationDS
 }
 
 func (o ModelTemplateFactory) getPoolFields() Fields {
@@ -337,20 +425,6 @@ func (o ModelTemplateFactory) getPoolFields() Fields {
 	}
 	for i, _ := range fields.FieldLi {
 		o.extendFieldPoolField(&fields.FieldLi[i].FieldGroup, fieldGroupLi)
-	}
-
-	for i, _ := range fields.FieldLi {
-		outFieldRelationDS := &fields.FieldLi[i].FieldGroup.RelationDS
-		if outFieldRelationDS.RelationItemLi == nil {
-			for j, _ := range fields.FieldLi {
-				if fields.FieldLi[i].FieldGroup.Extends == fields.FieldLi[j].FieldGroup.Id {
-					innerFieldRelationDS := &fields.FieldLi[j].FieldGroup.RelationDS
-					if innerFieldRelationDS.RelationItemLi != nil {
-						outFieldRelationDS.RelationItemLi = innerFieldRelationDS.RelationItemLi
-					}
-				}
-			}
-		}
 	}
 	return fields
 }
@@ -418,6 +492,38 @@ func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource DataSource, bo *m
 	})
 }
 
+func (o ModelTemplateFactory) applyDataSetDefaultValue(dataSource DataSource, dataSetId string, bo map[string]interface{}, data *map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	expressionParser := ExpressionParser{}
+	boJsonData, err := json.Marshal(&bo)
+	if err != nil {
+		panic(err)
+	}
+	boJson := string(boJsonData)
+	modelIterator.IterateAllField(&dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}) {
+		if fieldGroup.GetDataSetId() == dataSetId {
+			var content string = ""
+			if fieldGroup.DefaultValueExpr.Content != "" {
+				if fieldGroup.DefaultValueExpr.Mode == "" || fieldGroup.DefaultValueExpr.Mode == "text" {
+					content = fieldGroup.DefaultValueExpr.Content
+				} else if fieldGroup.DefaultValueExpr.Mode == "python" {
+					dataJsonData, err := json.Marshal(data)
+					if err != nil {
+						panic(err)
+					}
+					dataJson := string(dataJsonData)
+					content = expressionParser.ParseModel(boJson, dataJson, fieldGroup.DefaultValueExpr.Content)
+				} else if fieldGroup.DefaultValueExpr.Mode == "golang" {
+					exprContent := fieldGroup.DefaultValueExpr.Content
+					content = expressionParser.ParseGolang(bo, *data, exprContent)
+				}
+			}
+			o.applyFieldGroupValueByString(*fieldGroup, data, content)
+		}
+	})
+}
+
 func (o ModelTemplateFactory) applyCalcValueExpr(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
@@ -444,6 +550,38 @@ func (o ModelTemplateFactory) applyCalcValueExpr(dataSource DataSource, bo *map[
 				content = expressionParser.ParseGolang(*bo, *data, exprContent)
 			}
 			o.applyFieldGroupValueByString(fieldGroup, data, content)
+		}
+	})
+}
+
+func (o ModelTemplateFactory) applyDataSetCalcValue(dataSource DataSource, dataSetId string, bo map[string]interface{}, data *map[string]interface{}) {
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	expressionParser := ExpressionParser{}
+	boJsonData, err := json.Marshal(&bo)
+	if err != nil {
+		panic(err)
+	}
+	boJson := string(boJsonData)
+	modelIterator.IterateAllField(&dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}) {
+		if fieldGroup.GetDataSetId() == dataSetId {
+			var content string = ""
+			if fieldGroup.CalcValueExpr.Content != "" {
+				if fieldGroup.CalcValueExpr.Mode == "" || fieldGroup.CalcValueExpr.Mode == "text" {
+					content = fieldGroup.CalcValueExpr.Content
+				} else if fieldGroup.CalcValueExpr.Mode == "python" {
+					dataJsonData, err := json.Marshal(data)
+					if err != nil {
+						panic(err)
+					}
+					dataJson := string(dataJsonData)
+					content = expressionParser.ParseModel(boJson, dataJson, fieldGroup.CalcValueExpr.Content)
+				} else if fieldGroup.CalcValueExpr.Mode == "golang" {
+					exprContent := fieldGroup.CalcValueExpr.Content
+					content = expressionParser.ParseGolang(bo, *data, exprContent)
+				}
+				o.applyFieldGroupValueByString(*fieldGroup, data, content)
+			}
 		}
 	})
 }
@@ -589,9 +727,30 @@ func (o ModelTemplateFactory) applyCopy(dataSource DataSource, destBo *map[strin
 	o.applyDefaultValueExpr(dataSource, destBo)
 	result = ""
 	modelIterator.IterateAllFieldTwoBo(&dataSource, destBo, srcBo, &result, func(fieldGroup *FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {
-		if fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true" {
+		dataSetAllowCopy := true
+		if fieldGroup.IsMasterField() {
+			masterData, _ := fieldGroup.GetMasterData()
+			if masterData.AllowCopy == "false" {
+				dataSetAllowCopy = false
+			}
+		} else {
+			detailData, _ := fieldGroup.GetDetailData()
+			if detailData.AllowCopy == "false" {
+				dataSetAllowCopy = false
+			}
+		}
+		if dataSetAllowCopy && (fieldGroup.AllowCopy == "" || fieldGroup.AllowCopy == "true") {
 			if srcData[fieldGroup.Id] != nil {
 				(*destData)[fieldGroup.Id] = srcData[fieldGroup.Id]
+			}
+		}
+	})
+	// dataSet.allowCopy
+	modelIterator.IterateDataBo(dataSource, destBo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
+		if !fieldGroupLi[0].IsMasterField() {
+			detailData, _ := fieldGroupLi[0].GetDetailData()
+			if detailData.AllowCopy == "false" {
+				(*destBo)[fieldGroupLi[0].GetDataSetId()] = []interface{}{}
 			}
 		}
 	})
@@ -758,4 +917,11 @@ func (o ModelTemplateFactory) GetCollectionName(dataSource DataSource) string {
 		return dataSource.CollectionName
 	}
 	return dataSource.Id
+}
+
+func (o ModelTemplateFactory) GetDataSetNewData(dataSource DataSource, dataSetId string, bo map[string]interface{}) map[string]interface{} {
+	data := map[string]interface{}{}
+	o.applyDataSetDefaultValue(dataSource, dataSetId, bo, &data)
+	o.applyDataSetCalcValue(dataSource, dataSetId, bo, &data)
+	return data
 }

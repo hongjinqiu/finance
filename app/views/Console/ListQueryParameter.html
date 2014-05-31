@@ -1,4 +1,5 @@
-		<div id="queryParameters" class="queryDiv">
+		{{$queryParameterRenderLen := len .result.queryParameterRenderLi}}
+		<div id="queryParameters" class="queryDiv" {{if eq $queryParameterRenderLen 0}}style="display: none;"{{end}}>
 			<div class="queryTitle">查询参数</div>
 			<form action="/component/listtemplate" method="post" name="queryForm" id="queryForm">
 				{{range $index, $item := .result.hiddenParameterLi}}

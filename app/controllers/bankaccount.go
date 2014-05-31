@@ -3,6 +3,10 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	"strings"
+	. "com/papersns/model"
+	. "com/papersns/component"
+	. "com/papersns/error"
+	"com/papersns/global"
 )
 
 func init() {
@@ -12,44 +16,62 @@ type BankAccountSupport struct {
 	ActionSupport
 }
 
+func (o BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSetId := "B"
+	data := modelTemplateFactory.GetDataSetNewData(dataSource, dataSetId, *bo)
+	
+	// 设置默认的币别
+	qb := QuerySupport{}
+	session, _ := global.GetConnection(sessionId)
+	collection := "CurrencyType"
+	query := map[string]interface{}{
+		"A.code": "RMB",
+	}
+	currencyType, found := qb.FindByMapWithSession(session, collection, query)
+	if !found {
+		panic(BusinessError{"没有找到币别人民币，请先配置默认币别"})
+	}
+	data["currencyTypeId"] = currencyType["id"]
+	
+	(*bo)["B"] = []interface{}{
+		data,
+	}
+}
+
 type BankAccount struct {
 	BaseDataAction
 }
 
 func (c BankAccount) SaveData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BankAccount) DeleteData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BankAccount) EditData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BankAccount) NewData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BankAccount) GetData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +79,8 @@ func (c BankAccount) GetData() revel.Result {
  */
 func (c BankAccount) CopyData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +88,8 @@ func (c BankAccount) CopyData() revel.Result {
  */
 func (c BankAccount) GiveUpData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +97,8 @@ func (c BankAccount) GiveUpData() revel.Result {
  */
 func (c BankAccount) RefreshData() revel.Result {
 	c.actionSupport = BankAccountSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BankAccount) LogList() revel.Result {

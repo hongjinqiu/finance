@@ -22,31 +22,60 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 			var columns = host.get("columns");
 			Y.each(columns, function(rec, i) {
 				if (self._isVirtualColumn(host.dataSetId, rec.key)) {
+					// 查询出 forEditor的 column,换掉
+					var templateIterator = new TemplateIterator();
+					var result = "";
+					var virtualColumnForEditor = null;
+					templateIterator.iterateAnyTemplateColumn(host.dataSetId, result, function IterateFunc(column, result) {
+						if (column.XMLName.Local == "virtual-column" && column.ForEditor == "true") {
+							virtualColumnForEditor = column;
+							return true;
+						}
+						return false;
+					});
 					rec.allowHTML = true;
-					rec.formatter = function(o) {
-						var bodyHtmlLi = [];
-						var btnTemplate = "<input type='button' value='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
-						bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
-							value: "复制",
-							handler: "g_pluginCopyRow",
-							"class": "test",
-							columnModelName: host.dataSetId
-						}));
-						bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
-							value: "删除",
-							handler: "g_pluginRemoveSingleRow",
-							"class": "test",
-							columnModelName: host.dataSetId
-						}));
-//						console.log(Y.Lang.sub(btnTemplate, {
-//							value: "删除",
-//							handler: "g_pluginRemoveSingleRow",
-//							"class": "test",
-//							columnModelName: host.dataSetId
-//						}));
-//						bodyHtmlLi.push("<input type='button' value='复制' class='' onclick='showAlert(\"复制test\")'/>");
-//						bodyHtmlLi.push("<input type='button' value='删除' class='' onclick='showAlert(\"删除test\")'/>");
-						return bodyHtmlLi.join("");
+					if (virtualColumnForEditor != null) {
+						rec.formatter = function(o) {
+							var bodyHtmlLi = [];
+							for (var j = 0; j < virtualColumnForEditor.Buttons.ButtonLi.length; j++) {
+								var btnTemplate = null;
+								if (virtualColumnForEditor.Buttons.ButtonLi[j].Mode == "fn") {
+									btnTemplate = "<input type='button' value='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
+								} else if (virtualColumnForEditor.Buttons.ButtonLi[j].Mode == "url") {
+									btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
+								} else {
+									btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
+								}
+								var handler = virtualColumnForEditor.Buttons.ButtonLi[j].Handler;
+								handler = Y.Lang.sub(handler, o.data);
+								bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
+									value: virtualColumnForEditor.Buttons.ButtonLi[j].Text,
+									handler: handler,
+									"class": virtualColumnForEditor.Buttons.ButtonLi[j].IconCls,
+									href: handler,
+									columnModelName: host.dataSetId
+								}));
+							}
+							return bodyHtmlLi.join("");
+						}
+					} else {
+						rec.formatter = function(o) {
+							var bodyHtmlLi = [];
+							var btnTemplate = "<input type='button' value='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
+							bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
+								value: "复制",
+								handler: "g_pluginCopyRow",
+								"class": "test",
+								columnModelName: host.dataSetId
+							}));
+							bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
+								value: "删除",
+								handler: "g_pluginRemoveSingleRow",
+								"class": "test",
+								columnModelName: host.dataSetId
+							}));
+							return bodyHtmlLi.join("");
+						}
 					}
 				} else if (!self._isSkip(host.dataSetId, rec.key)) {
 					rec.allowHTML = true;
@@ -59,6 +88,21 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 			host.set("columns", columns);
 			var h = this.afterHostEvent('render', function() {
 				self._addFormFieldPlugin(host);
+				
+				// apply model.js beforeEdit 函数
+				var modelIterator = new ModelIterator();
+				var result = "";
+				modelIterator.iterateAllDataSet(g_dataSourceJson, result, function(dataSet, result){
+					if (dataSet.Id == host.dataSetId) {
+						if (dataSet.jsConfig && dataSet.jsConfig.beforeEdit) {
+							// 迭代每一行 record,调用beforeEdit,
+							var recordLi = host.get('data');
+							recordLi.each(function(rec, recordIndex) {
+								dataSet.jsConfig.beforeEdit(recordLi, rec, recordIndex);
+							});
+						}
+					}
+				});
 			});
 			
 			self._resetHostAddRow(host);
@@ -89,7 +133,6 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 			var self = this;
 			host.oldHostAddRowsFunc = host.addRows;
 			host.addRows = function() {
-				console.log("addRows");
 				var data = null;
 				if (arguments && arguments.length > 0) {
 					data = arguments[0];
@@ -114,6 +157,32 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 			var rows = host._tbodyNode.get('children');
 			var templateIterator = new TemplateIterator();
 			var formFieldFactory = new FormFieldFactory();
+			
+			var columnResult = "";
+			var columnLi = [];
+			templateIterator.iterateAllTemplateColumn(dataSetId, columnResult, function IterateFunc(column, result) {
+				columnLi.push(column);
+			});
+			var columnSequenceService = new ColumnSequenceService();
+			var sequenceColumnLi = columnSequenceService.buildSequenceColumnLi(columnLi);
+			// 给其加上是否在当前数据集的属性
+			var modelIterator = new ModelIterator();
+			var modelResult = "";
+			var modelFieldLi = [];
+			modelIterator.iterateAllField(g_dataSourceJson, modelResult, function(fieldGroup, result){
+				if (fieldGroup.getDataSetId() == dataSetId) {
+					modelFieldLi.push(fieldGroup);
+				}
+			});
+			for (var i = 0; i < sequenceColumnLi.length; i++) {
+				for (var j = 0; j < modelFieldLi.length; j++) {
+					if (sequenceColumnLi[i].Name == modelFieldLi[j].Id) {
+						sequenceColumnLi[i].isDsField = true;
+						break;
+					}
+				}
+			}
+			
 			host.get('data').each(function(rec, recordIndex) {
 				if (!host.getRecord(recordIndex).formFieldLi) {
 					host.getRecord(recordIndex).formFieldLi = [];
@@ -133,32 +202,39 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 						}
 						return false;
 					});
-					//HiddenColumn,
+					// 生成field,再进行赋值,此时,copyConfig才能起作用
+					// 生成HiddenColumn,
 					var iterateResult = "";
 					templateIterator.iterateAllTemplateColumn(dataSetId, iterateResult, function IterateFunc(column, result) {
 						if (column.Hideable == "true") {
 							var field = formFieldFactory.getFormField(Y, column.Name, dataSetId);
-							field.set("value", rec.get(column.Name));
 							host.getRecord(recordIndex).formFieldLi.push(field);
 							host.getRecord(recordIndex).formFieldDict[column.Name] = field;
 						}
 					});
 					
+					// 生成非HiddenColumn
 					var list = rows.item(recordIndex).all('.pformquickedit-container');
 					var field_count = list.size();
 					for ( var j = 0; j < field_count; j++) {
 						var fieldName = self._getColumnKey(list.item(j));
 						
 						var field = formFieldFactory.getFormField(Y, fieldName, dataSetId);
-						
 						field.render("#" + list.item(j).get("id"));
-						if (rec.get(fieldName)) {
-							field.set("value", rec.get(fieldName) + "");
-						} else {
-							field.set("value", "");
-						}
 						host.getRecord(recordIndex).formFieldLi.push(field);
 						host.getRecord(recordIndex).formFieldDict[fieldName] = field;
+					}
+					
+					for (var i = 0; i < sequenceColumnLi.length; i++) {
+						if (sequenceColumnLi[i].isDsField) {// 对于非数据源模型中的字段,当前只有复制出来的字段,这种字段不管其,select-column set value会自动带出
+							var columnName = sequenceColumnLi[i].Name;
+							var field = host.getRecord(recordIndex).formFieldDict[columnName];
+							if (rec.get(columnName)) {
+								field.set("value", rec.get(columnName));
+							} else {
+								field.set("value", "");
+							}
+						}
 					}
 				}
 			});

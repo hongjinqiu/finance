@@ -27,20 +27,14 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
 			<field id="code" extends="CODE_FIELD">
-				<displayName>代码</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>20</fieldLength>
 			</field>
 			<field id="name" extends="NAME_FIELD">
-				<displayName>名称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
 			</field>
 			<field id="taxRate" extends="FLOAT_FIELD">
 				<displayName>税率(%)</displayName>
@@ -48,18 +42,22 @@
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>100</limitMax>
+				<defaultValueExpr>17</defaultValueExpr>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 			<field id="isDeductTax" extends="INT_FIELD">
 				<displayName>按扣除税率计税</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_YESNO</dictionary>
 				<defaultValueExpr>1</defaultValueExpr>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 			<field id="isDeduct" extends="INT_FIELD">
 				<displayName>可抵扣</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_YESNO</dictionary>
 				<defaultValueExpr>2</defaultValueExpr>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 		</bizField>
 	</masterData>

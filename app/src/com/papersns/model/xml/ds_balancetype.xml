@@ -27,25 +27,20 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
 			<field id="code" extends="CODE_FIELD">
-				<displayName>代码</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>20</fieldLength>
 			</field>
 			<field id="name" extends="NAME_FIELD">
-				<displayName>名称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
 			</field>
 			<field id="balanceAttr" extends="INT_FIELD">
 				<displayName>属性</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_FIN_BALANCE_ATTR</dictionary>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 		</bizField>
 	</masterData>

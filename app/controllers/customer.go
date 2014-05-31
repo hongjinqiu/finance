@@ -18,38 +18,33 @@ type Customer struct {
 
 func (c Customer) SaveData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c Customer) DeleteData() revel.Result {
 	c.actionSupport = CustomerSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c Customer) EditData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c Customer) NewData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c Customer) GetData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +52,8 @@ func (c Customer) GetData() revel.Result {
  */
 func (c Customer) CopyData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +61,8 @@ func (c Customer) CopyData() revel.Result {
  */
 func (c Customer) GiveUpData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +70,8 @@ func (c Customer) GiveUpData() revel.Result {
  */
 func (c Customer) RefreshData() revel.Result {
 	c.actionSupport = CustomerSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c Customer) LogList() revel.Result {

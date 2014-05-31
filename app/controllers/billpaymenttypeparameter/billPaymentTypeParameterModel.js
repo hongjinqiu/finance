@@ -14,7 +14,7 @@ function main() {
 				},
 				callback: function(o) {
 					var formManager = new FormManager();
-					g_relationBo = o.relationBo;
+					formManager.applyGlobalParamFromAjaxData(o);
 					formManager.loadData2Form(g_dataSourceJson, o.bo);
 					formManager.setFormStatus(g_formStatus);
 				}
@@ -28,7 +28,7 @@ function main() {
 				},
 				callback: function(o) {
 					var formManager = new FormManager();
-					g_relationBo = o.relationBo;
+					formManager.applyGlobalParamFromAjaxData(o);
 					formManager.loadData2Form(g_dataSourceJson, o.bo);
 					formManager.setFormStatus(g_formStatus);
 				}

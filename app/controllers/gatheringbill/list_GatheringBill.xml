@@ -12,7 +12,7 @@
 	<toolbar export="true">
 		<button text="新增" mode="url" handler="/console/formschema?@name=GatheringBill" iconCls="test" />
 
-		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+		<button text="删除" mode="fn" handler="g_deleteRecords">
 		</button>
 	</toolbar>
 
@@ -21,7 +21,7 @@
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
 	</data-provider>
 
-	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选收款单" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选收款单" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression>1 == 1</expression>
 		</checkbox-column>
@@ -31,7 +31,7 @@
 			<buttons>
 				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=GatheringBill&amp;id={id}">
 				</button>
-				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
 				</button>
 				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=GatheringBill&amp;id={id}&amp;formStatus=view">
 				</button>

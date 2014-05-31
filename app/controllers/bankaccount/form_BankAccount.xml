@@ -26,18 +26,23 @@
 		<auto-column name="mnemonicNo" colSpan="2" labelWidth="13%" />
 	</column-model>
 
-	<html>
-		<![CDATA[
-			<div>基本信息</div>
-		]]>
-	</html>
+	<html><![CDATA[
+			<div id="tabContent" style="visibility: hidden;">
+				<ul>
+					<li><a href="#baseInfoDiv">基本信息</a></li>
+					<li><a href="#manageInfoDiv">管理信息</a></li>
+					<li><a href="#remarkDiv">备注</a></li>
+				</ul>
+				<div>
+					<div id="baseInfoDiv">
+	]]></html>
 	
 	<column-model dataSetId="A" colSpan="6">
 		<auto-column name="bankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<auto-column name="bankAccount" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<auto-column name="linkBy" colSpan="2" labelWidth="13%" />
-		<auto-column name="bankAddress" colSpan="4" />
-		<auto-column name="bankPhone" colSpan="2" />
+		<!-- <auto-column name="bankAccount" colSpan="2" labelWidth="13%" columnWidth="20%" /> -->
+		<auto-column name="linkBy" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<auto-column name="bankPhone" colSpan="2" labelWidth="13%" />
+		<auto-column name="bankAddress" colSpan="4" fieldWidth="75%" />
 		<auto-column name="cyberBankUrl" colSpan="2" />
 		<auto-column name="dutyBy" colSpan="2" />
 		<auto-column name="accountProperty" colSpan="2" />
@@ -45,18 +50,28 @@
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button>
+			<!-- <button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button> -->
 			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
 			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
 			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
 		</toolbar>
+		<editor-toolbar>
+			<button text="新增" mode="fn" handler="g_pluginAddRow" iconCls="yui3-button btn-show"></button>
+			<button text="删除" mode="fn" handler="g_pluginRemoveRow" iconCls="test"></button>
+		</editor-toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false" />
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作">
 			<buttons>
-				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
-				<button text="复制" mode="fn" handler="g_copyRow" iconCls="test"></button>
-				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
+				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="yui3-button btn-show"></button>
+				<!-- <button text="复制" mode="fn" handler="g_copyRow" iconCls="test"></button> -->
+				<button name="btn_delete" text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
+			</buttons>
+		</virtual-column>
+		<virtual-column name="FUN_EDITOR" text="操作" forEditor="true">
+			<buttons>
+				<button text="复制" mode="fn" handler="g_pluginCopyRow" iconCls="test"></button>
+				<button text="删除d" mode="fn" handler="g_pluginRemoveSingleRow" iconCls="test"></button>
 			</buttons>
 		</virtual-column>
 		<auto-column name="currencyTypeId" />
@@ -66,5 +81,40 @@
 		<auto-column name="limitsControl" />
 	</column-model>
 	
+	<html><![CDATA[
+					</div>
+					<div id="manageInfoDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="createBy" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="createTime" colSpan="2" labelWidth="15%" />
+		<auto-column name="modifyBy" colSpan="2" />
+		<auto-column name="modifyTime" colSpan="2" />
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="remarkDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="2">
+		<auto-column name="remark" colSpan="2" labelWidth="15%">
+			<column-attribute name="editor" value="textareafield"/>
+		</auto-column>
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+			YUI(g_financeModule).use("finance-module", function(Y) {
+				var tabview = new Y.TabView({srcNode:'#tabContent'});
+				tabview.render();
+				Y.one("#tabContent").setStyle("visibility", "visible");
+			});
+			</script>
+	]]></html>
 	
 </form-template>

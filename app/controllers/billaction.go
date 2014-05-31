@@ -5,6 +5,7 @@ import (
 	. "com/papersns/component"
 	"com/papersns/global"
 	. "com/papersns/model"
+	. "com/papersns/model/handler"
 	. "com/papersns/mongo"
 	"strconv"
 	"strings"
@@ -19,38 +20,33 @@ type BillAction struct {
 
 func (c BillAction) SaveData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BillAction) DeleteData() revel.Result {
 	c.actionSupport = ActionSupport{}
 
-	bo, relationBo, dataSource := c.deleteDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BillAction) EditData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BillAction) NewData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BillAction) GetData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -58,9 +54,8 @@ func (c BillAction) GetData() revel.Result {
  */
 func (c BillAction) CopyData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -68,9 +63,8 @@ func (c BillAction) CopyData() revel.Result {
  */
 func (c BillAction) GiveUpData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -78,9 +72,8 @@ func (c BillAction) GiveUpData() revel.Result {
  */
 func (c BillAction) RefreshData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c BillAction) LogList() revel.Result {
@@ -99,12 +92,11 @@ func (c BillAction) LogList() revel.Result {
  */
 func (c BillAction) CancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.cancelDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.cancelDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
-func (c BillAction) cancelDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
+func (c BillAction) cancelDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
@@ -144,18 +136,25 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, map[string]inter
 
 	c.actionSupport.afterCancelData(sessionId, dataSource, &bo)
 
-	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
-	
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
-	
+
+	usedCheck := UsedCheck{}
+	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
+
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
 	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
-	
-	return bo, relationBo, dataSource
+
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return ModelRenderVO{
+		Bo:          bo,
+		RelationBo:  relationBo,
+		UsedCheckBo: usedCheckBo,
+		DataSource:  dataSource,
+	}
 }
 
 /**
@@ -163,12 +162,11 @@ func (c BillAction) cancelDataCommon() (map[string]interface{}, map[string]inter
  */
 func (c BillAction) UnCancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.unCancelDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.unCancelDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
-func (c BillAction) unCancelDataCommon() (map[string]interface{}, map[string]interface{}, DataSource) {
+func (c BillAction) unCancelDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
@@ -208,16 +206,23 @@ func (c BillAction) unCancelDataCommon() (map[string]interface{}, map[string]int
 
 	c.actionSupport.afterUnCancelData(sessionId, dataSource, &bo)
 
-	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
-	
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
-	
+
+	usedCheck := UsedCheck{}
+	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
+
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
 	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
-	
-	return bo, relationBo, dataSource
+
+	modelTemplateFactory.ClearReverseRelation(&dataSource)
+	c.commitTxn(sessionId)
+	return ModelRenderVO{
+		Bo:          bo,
+		RelationBo:  relationBo,
+		UsedCheckBo: usedCheckBo,
+		DataSource:  dataSource,
+	}
 }

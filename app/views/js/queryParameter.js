@@ -1,5 +1,8 @@
 function QueryParameterManager() {}
 
+/**
+ * 设置传入的默认值
+ */
 QueryParameterManager.prototype.applyQueryDefaultValue = function() {
 	YUI(g_financeModule).use("finance-module", function(Y){
 		if (g_defaultBo) {
@@ -13,6 +16,25 @@ QueryParameterManager.prototype.applyQueryDefaultValue = function() {
 		} else {
 			for (var key in g_masterFormFieldDict) {
 				g_masterFormFieldDict[key].set("value", "");
+			}
+		}
+	});
+}
+
+/**
+ * 设置url传入的参数值
+ */
+QueryParameterManager.prototype.applyFormData = function() {
+	YUI(g_financeModule).use("finance-module", function(Y){
+		if (g_formDataJson) {
+			for (var key in g_formDataJson) {
+				if (g_masterFormFieldDict[key]) {
+					if (g_formDataJson[key]) {
+						g_masterFormFieldDict[key].set("value", g_formDataJson[key]);
+					} else {
+						g_masterFormFieldDict[key].set("value", "");
+					}
+				}
 			}
 		}
 	});

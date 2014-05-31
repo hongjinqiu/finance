@@ -3,98 +3,81 @@
 	<id>SysUser</id>
 	<data-source-model-id>SysUser</data-source-model-id>
 	<adapter name="ModelFormTemplateAdapter" />
-	<description>用户表单</description>
-	<scripts>console/summary.js</scripts>
+	<description>系统用户表单</description>
+	<scripts>sysuser/sysUserModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
-	<html>
-		<![CDATA[
-			<script type="text/javascript">console.log("hello world")</script>
-			<div>before toolbar</div>
-		]]>
-	</html>
 	<toolbar>
-		<button text="列表页" mode="fn" handler="doSave" iconCls="test">
-			<button-attribute name="code" value="C" />
-			<button-attribute name="functionId" value="50010" />
-		</button>
-		<button text="新增" mode="fn" handler="test" iconCls="">
-			<button-attribute name="code" value="D" />
-			<button-attribute name="functionId" value="50010" />
-		</button>
-
-		<button text="复制" mode="url" handler="doExport">
-			<button-attribute name="code" value="U" />
-			<button-attribute name="functionId" value="10018" />
-		</button>
-
-		<button text="修改" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="保存" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="放弃" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="删除" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="作废" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="反作废" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="刷新" mode="fn" handler="test" iconCls="">
-		</button>
-		<button text="修改日志" mode="fn" handler="test" iconCls="">
-		</button>
+		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=SysUser" iconCls="test"></button>
+		<!-- <button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button> -->
+		<!-- <button name="copyBtn" text="复制" mode="fn" handler="copyData"></button> -->
+		<!-- <button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button> -->
+		<!-- <button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button> -->
+		<!-- <button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button> -->
+		<!-- <button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button> -->
+		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
 	</toolbar>
-	<html>
-		<![CDATA[
-			<div>after toolbar</div>
-		]]>
-	</html>
-
-	<html>
-		<![CDATA[
-			<div>before column-model</div>
-		]]>
-	</html>
-	<column-model name="A">
-		<auto-column name="code" />
-		<auto-column name="name" />
-		<html>in column pos0</html>
-		<auto-column name="startDate" colSpan="3" />
-		<auto-column name="endDate" colSpan="3">
-			<editor>
-				<editor_attribute name="aaa" value="bb" />
-				<editor_attribute name="aaa" value="cccc" />
-			</editor>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<id-column name="id" text="编号" hideable="true" />
+		
+		<auto-column name="code" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="name" colSpan="2" labelWidth="15%" columnWidth="35%">
 		</auto-column>
-		<html>
-			hello html
-			<editor>
-				<editor_attribute name="aaa" value="bb" />
-				<editor_attribute name="aaa" value="cccc" />
-			</editor>
-		</html>
-		<select-column auto="true" name="" displayField="" valueField="" selectorName="" selectionMode="single" queryFunc="">
-			<listeners change="" selection="" unSelection="" />
-		</select-column>
 	</column-model>
 
-
-	<column-model name="B" selectionMode="radio" rownumber="true" bsonOrderBy="_id">
-		<auto-column name="ttt" />
-		<virtual-column name="">
-			
-		</virtual-column>
-		<auto-column name="eee dddd">
-			<editor>
-				<editor_attribute name="" value=""></editor_attribute>
-				<editor_attribute name="" value=""></editor_attribute>
-				<editor_attribute name="" value=""></editor_attribute>
-			</editor>
+	<html><![CDATA[
+			<div id="tabContent" style="visibility: hidden;">
+				<ul>
+					<li><a href="#baseInfoDiv">基本信息</a></li>
+					<li><a href="#manageInfoDiv">管理信息</a></li>
+					<li><a href="#remarkDiv">备注</a></li>
+				</ul>
+				<div>
+					<div id="baseInfoDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="type" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="status" colSpan="2" labelWidth="15%" columnWidth="35%">
 		</auto-column>
-		<auto-column name="" colSpan="3" />
+		<auto-column name="nick" colSpan="2" />
 	</column-model>
 
-	<!-- <html> <![CDATA[ <div>pos0</div> ]]> </html> <column-model name="datailDataSetName" selectionMode="radio" rownumber="true" bsonOrderBy="_id"> <auto-column name="" /> </column-model> 
-		<html> <![CDATA[ <div>pos0</div> ]]> </html> <html> <![CDATA[ <div>pos0</div> ]]> </html> <column-model name="datailDataSetName" selectionMode="radio" rownumber="true" bsonOrderBy="_id"> 
-		<auto-column name="" /> </column-model> <html> <![CDATA[ <div>pos0</div> ]]> </html> -->
+	<html><![CDATA[
+					</div>
+					<div id="manageInfoDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="createBy" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="createTime" colSpan="2" labelWidth="15%" />
+		<auto-column name="modifyBy" colSpan="2" />
+		<auto-column name="modifyTime" colSpan="2" />
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="remarkDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="2">
+		<auto-column name="remark" colSpan="2" labelWidth="15%">
+			<column-attribute name="editor" value="textareafield"/>
+		</auto-column>
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+			YUI(g_financeModule).use("finance-module", function(Y) {
+				var tabview = new Y.TabView({srcNode:'#tabContent'});
+				tabview.render();
+				Y.one("#tabContent").setStyle("visibility", "visible");
+			});
+			</script>
+	]]></html>
+	
 </form-template>

@@ -266,6 +266,7 @@ function showConfirm(msg, callback, width, height){
  * 	method: GET | POST,
  * 	params: post data,
  * 	callback: success callback function,
+ *  failCallback: fail callback function,
  * }
  */
 function ajaxRequest(option){
@@ -298,13 +299,32 @@ function ajaxRequest(option){
 //								console.log("complete");
 				},
 				success: function(id, o, args){
-					if (option.callback) {
+					if (option.callback || option.failCallback) {
 						try {
+							var jsonRsp = {};
 							if (o.responseText) {
-								option.callback(Y.JSON.parse(o.responseText));
+								jsonRsp = Y.JSON.parse(o.responseText);
+							}
+							if (jsonRsp.success === false) {
+								if (option.failCallback) {
+									option.failCallback(jsonRsp);
+								} else {
+									showError(jsonRsp.message);
+								}
+							} else {
+								if (option.callback) {
+									option.callback(jsonRsp);
+								}
+							}
+							
+							/*
+							if (o.responseText) {
+								var jsonRsp = Y.JSON.parse(o.responseText);
+								option.callback(jsonRsp);
 							} else {
 								option.callback({});
 							}
+							*/
 						} catch (e) {
 							console.error(option["url"]);
 							console.error(e);

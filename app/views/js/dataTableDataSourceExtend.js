@@ -31,8 +31,41 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 				};
 				var bodyHtmlLi = [];
 				bodyHtmlLi.push("<div class='alignLeft'>");
-				bodyHtmlLi.push("<input type='button' value='新增' class='' onclick='g_pluginAddRow(\"" + self.param.columnModelName + "\")'/>");
-				bodyHtmlLi.push("<input type='button' value='删除' class='' onclick='g_pluginRemoveRow(\"" + self.param.columnModelName + "\")'/>");
+				
+				if (self.param.columnModel.EditorToolbar && self.param.columnModel.EditorToolbar.ButtonLi) {
+					for (var i = 0; i < self.param.columnModel.EditorToolbar.ButtonLi.length; i++) {
+						var btnTemplate = null;
+						var replObj = {};
+						var button = self.param.columnModel.EditorToolbar.ButtonLi[i];
+						if (button.Mode == "fn") {
+							btnTemplate = "<input type='button' value='{value}' class='{class}' onclick='{fnName}(\"{columnModelName}\")'/>";
+							replObj = {
+								value: button.Text,
+								"class": button.IconCls,
+								fnName: button.Handler,
+								columnModelName: self.param.columnModelName
+							};
+						} else if (button.Mode == "url") {
+							btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
+							replObj = {
+								value: button.Text,
+								href: button.Handler,
+								"class": button.IconCls
+							};
+						} else {
+							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
+							replObj = {
+								value: button.Text,
+								href: button.Handler,
+								"class": button.IconCls
+							};
+						}
+						if (btnTemplate) {
+							btnTemplate = Y.Lang.sub(btnTemplate, replObj);
+							bodyHtmlLi.push(btnTemplate);
+						}
+					}
+				}
 				bodyHtmlLi.push("</div>");
 				bodyHtmlLi.push('<div style="overflow: auto" id="' + self.param.columnModelName + "_addrow" + '"></div>');
 
@@ -76,6 +109,7 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 					var detailDataLi = pluginDataTableManager.dt.pqe.getRecords();
 					var dataSetId = self.param.columnModelName;
 					var validateResult = formManager.dsDetailValidator(g_dataSourceJson, dataSetId, detailDataLi);
+					
 					if (!validateResult.result) {
 						showError(validateResult.message);
 					} else {
@@ -199,8 +233,17 @@ function g_removeRow(dataSetId) {
 	if (selectRecordLi.length == 0) {
 		showAlert("请先选择");
 	} else {
+		var hasUsed = false;
 		for (var i = 0; i < selectRecordLi.length; i++) {
-			g_gridPanelDict[dataSetId].dt.removeRow(selectRecordLi[i]);
+			var isUsed = g_usedCheck && g_usedCheck[dataSetId] && g_usedCheck[dataSetId][selectRecordLi[i].get("id")];
+			if (isUsed) {
+				hasUsed = true;
+			} else {
+				g_gridPanelDict[dataSetId].dt.removeRow(selectRecordLi[i]);
+			}
+		}
+		if (hasUsed) {
+			showAlert("部门数据已被用，不可删除！");
 		}
 	}
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>PubReferenceLog</id>
+	<selector-id>PubReferenceLogSelector</selector-id>
+	<data-source-model-id>PubReferenceLog</data-source-model-id>
+
+	<adapter name="ModelListTemplateAdapter" />
+	<description>被用信息列表</description>
+	<scripts>js/ds_listtoolbar.js&amp;pubreferencelog/pubReferenceLogListTemplate.js</scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<toolbar export="true">
+	</toolbar>
+
+	<before-build-query>PubReferenceLogInterceptor.BeforeBuildQuery</before-build-query>
+	<after-build-query>PubReferenceLogInterceptor.AfterBuildQuery</after-build-query>
+	<after-query-data>PubReferenceLogInterceptor.AfterQueryData</after-query-data>
+
+	<data-provider size="10">
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+	
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选被用信息" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
+		<checkbox-column name="checkboxSelect" hideable="false">
+		</checkbox-column>
+		<id-column name="id" text="编号" hideable="true" />
+
+		<auto-column name="referenceDataSourceModelId" hideable="true" />
+		<auto-column name="referenceDataSourceModelDisplayName" dsFieldMap="PubReferenceLog.A.referenceDataSourceModelId"></auto-column>
+		<auto-column name="referenceId" />
+	</column-model>
+
+	<query-parameters>
+		<query-parameter name="beReferenceDataSourceModelId" text="被引用方数据源模型ID" restriction="eq" editor="hiddenfield" use-in="none"></query-parameter>
+		<query-parameter name="beReferenceId" text="被引用方ID" restriction="eq" editor="hiddenfield" use-in="none"></query-parameter>
+		<query-parameter name="beReference" text="被引用方" restriction="eq" editor="hiddenfield"></query-parameter>
+	</query-parameters>
+</list-template>

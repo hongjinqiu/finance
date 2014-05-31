@@ -148,7 +148,7 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
     	if (!multi) {
     		this._viewNode.on("click", Y.bind(function(e) {
     			var value = this.get("value");
-    			if (!value) {
+    			if (!value || value == "0") {
     				showAlert("没有数据，无法查看详情");
     			} else {
     				var selectorName = this._getStringOrFunctionResult(this.get("selectorName"));
@@ -271,9 +271,11 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
                 var relationManager = new RelationManager();
                 var li = val.split(",");
                 for (var i = 0; i < li.length; i++) {
-                	var g_relationBo = relationManager.getRelationBo(selectorName, li[i]);
-                	if (!g_relationBo) {
-                		return false;
+                	if (li[i] != "0") {
+                		var g_relationBo = relationManager.getRelationBo(selectorName, li[i]);
+                		if (!g_relationBo) {
+                			return false;
+                		}
                 	}
                 }
                 return true;

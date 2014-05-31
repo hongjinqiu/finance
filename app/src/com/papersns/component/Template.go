@@ -66,6 +66,15 @@ type Html struct {
 
 type Toolbar struct {
 	XMLName     xml.Name    `xml:"toolbar"`
+	ToolbarCommon
+}
+
+type EditorToolbar struct {
+	XMLName     xml.Name    `xml:"editor-toolbar"`
+	ToolbarCommon
+}
+
+type ToolbarCommon struct {
 	ButtonGroup ButtonGroup `xml:"button-group"`
 	ButtonLi    []Button    `xml:",any"`
 
@@ -106,6 +115,7 @@ type ColumnModel struct {
 	CheckboxColumn CheckboxColumn `xml:"checkbox-column"`
 	IdColumn       IdColumn       `xml:"id-column"`
 	Toolbar        Toolbar        `xml:"toolbar"`
+	EditorToolbar        EditorToolbar        `xml:"editor-toolbar"`
 	ColumnLi       []Column       `xml:",any"`
 
 	ColumnModelAttributeGroup
@@ -178,6 +188,9 @@ type ColumnAttributeGroup struct {
 	Locked           string `xml:"locked,attr,omitempty"`
 	Auto             string `xml:"auto,attr,omitempty"`
 	Width            string `xml:"width,attr,omitempty"`
+	FieldWidth       string `xml:"fieldWidth,attr,omitempty"`
+	FieldHeight      string `xml:"fieldHeight,attr,omitempty"`
+	FieldCls         string `xml:"fieldCls,attr,omitempty"`
 	ExcelWidth       string `xml:"excelWidth,attr,omitempty"`
 	Renderer         string `xml:"renderer,attr,omitempty"`
 	RendererTemplate string `xml:"rendererTemplate,attr,omitempty"`
@@ -191,6 +204,7 @@ type ColumnAttributeGroup struct {
 	DsFieldMap       string `xml:"dsFieldMap,attr,omitempty"`
 	FixReadOnly      string `xml:"fixReadOnly,attr,omitempty"`
 	ReadOnly         string `xml:"readOnly,attr,omitempty"`
+	ZeroShowEmpty    string `xml:"zeroShowEmpty,attr,omitempty"`
 	DataSetId        string `xml:"-"`
 }
 
@@ -229,6 +243,7 @@ type Column struct {
 	IsQuantity    string `xml:"isQuantity,attr,omitempty"`    // 是否数量
 
 	Script string `xml:"script,attr,omitempty"`
+	ForEditor string `xml:"forEditor,attr,omitempty"`
 
 	// select-column的内容
 	//	DisplayField  string `xml:"displayField,attr,omitempty"`

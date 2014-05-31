@@ -3,6 +3,11 @@ function ListTemplateIterator() {}
 function IterateFunc(column, result) {
 }
 
+ListTemplateIterator.prototype.recursionGetColumnItem = function(columnModel, columnLi) {
+	var self = this;
+	self._recursionGetColumnItem(columnModel, columnLi);
+}
+
 ListTemplateIterator.prototype._recursionGetColumnItem = function(columnModel, columnLi) {
 	var self = this;
 	for (var i = 0; i < columnModel.ColumnLi.length; i++) {

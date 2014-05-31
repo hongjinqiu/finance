@@ -25,20 +25,26 @@
 		<auto-column name="numAccountingPeriod" colSpan="2" labelWidth="15%" columnWidth="35%" />
 	</column-model>
 
-	<html>
-		<![CDATA[
-			<div>基本信息</div>
-		]]>
-	</html>
+	<html><![CDATA[
+			<div id="tabContent" style="visibility: hidden;">
+				<ul>
+					<li><a href="#baseInfoDiv">基本信息</a></li>
+					<li><a href="#manageInfoDiv">管理信息</a></li>
+					<li><a href="#remarkDiv">备注</a></li>
+				</ul>
+				<div>
+					<div id="baseInfoDiv">
+	]]></html>
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
-			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
-			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
+			<!-- <button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button> -->
+			<button text="编辑" mode="fn" handler="editAccountingDetail" iconCls="test"></button>
+			<!-- <button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button> -->
 		</toolbar>
-		<checkbox-column name="checkboxSelect" hideable="false" />
+		<checkbox-column name="checkboxSelect" hideable="true" />
 		<id-column name="id" text="编号" hideable="true" />
+		<!-- 
 		<virtual-column name="FUN_C" text="操作">
 			<buttons>
 				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
@@ -46,8 +52,47 @@
 				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
 			</buttons>
 		</virtual-column>
-		<auto-column name="sequenceNo" />
+		 -->
+		<auto-column name="sequenceNo">
+			<column-attribute name="editor" value="displayfield"/>
+		</auto-column>
 		<auto-column name="startDate" />
 		<auto-column name="endDate" />
 	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="manageInfoDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="createBy" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="createTime" colSpan="2" labelWidth="15%" />
+		<auto-column name="modifyBy" colSpan="2" />
+		<auto-column name="modifyTime" colSpan="2" />
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="remarkDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="2">
+		<auto-column name="remark" colSpan="2" labelWidth="15%">
+			<column-attribute name="editor" value="textareafield"/>
+		</auto-column>
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+			YUI(g_financeModule).use("finance-module", function(Y) {
+				var tabview = new Y.TabView({srcNode:'#tabContent'});
+				tabview.render();
+				Y.one("#tabContent").setStyle("visibility", "visible");
+			});
+			</script>
+	]]></html>
 </form-template>

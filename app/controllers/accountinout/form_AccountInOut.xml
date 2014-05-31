@@ -26,8 +26,8 @@
 							validateInline: true
 						});
 						field.render("#A_billDateBegin_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['billDateBegin'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['billDateBegin'] = field;
 					});
 					</script>
 					～
@@ -40,8 +40,8 @@
 							validateInline: true
 						});
 						field.render("#A_billDateEnd_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['billDateEnd'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['billDateEnd'] = field;
 					});
 					</script>
 				</td>
@@ -62,8 +62,8 @@
 							validateInline: true
 						});
 						field.render("#A_cashAccount_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['cashAccount'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['cashAccount'] = field;
 					});
 					</script>
 				</td>
@@ -86,8 +86,8 @@
 							validateInline: true
 						});
 						field.render("#A_accountingYearStart_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['accountingYearStart'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['accountingYearStart'] = field;
 					});
 					</script>
 					年
@@ -100,8 +100,8 @@
 							validateInline: true
 						});
 						field.render("#A_accountingPeriodStart_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['accountingPeriodStart'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['accountingPeriodStart'] = field;
 					});
 					</script>
 					期
@@ -115,8 +115,8 @@
 							validateInline: true
 						});
 						field.render("#A_accountingYearEnd_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['accountingYearEnd'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['accountingYearEnd'] = field;
 					});
 					</script>
 					年
@@ -129,8 +129,8 @@
 							validateInline: true
 						});
 						field.render("#A_accountingPeriodEnd_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['accountingPeriodEnd'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['accountingPeriodEnd'] = field;
 					});
 					</script>
 					期
@@ -153,8 +153,8 @@
 							validateInline: true
 						});
 						field.render("#A_accountProperty_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['accountProperty'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['accountProperty'] = field;
 					});
 					</script>
 				</td>
@@ -174,8 +174,8 @@
 							multi: true
 						});
 						field.render("#A_displayMode_render");
-						masterFormFieldLi.push(field);
-						masterFormFieldDict['displayMode'] = field;
+						g_masterFormFieldLi.push(field);
+						g_masterFormFieldDict['displayMode'] = field;
 					});
 					</script>
 				</td>
@@ -189,23 +189,24 @@
 		<button name="copyBtn" text="导出Excel" mode="fn" handler="copyData"></button>
 	</toolbar>
 	
-	<column-model dataSetId="A">
+	<column-model dataSetId="B">
 		<id-column name="id" text="编号" hideable="true" />
 		
-		<auto-column name="accountType" />
-		<select-column name="accountId" text="账户代码" auto="true" displayField="code"></select-column>
+		<auto-column name="accountType" dsFieldMap="AccountInOut.A.accountType"/>
+		<select-column name="accountId" text="账户代码" auto="true" dsFieldMap="AccountInOut.A.accountId">
+		</select-column>
 		<string-column name="accountName" text="账户名称"></string-column>
-		<auto-column name="currencyTypeId" />
+		<auto-column name="currencyTypeId" dsFieldMap="AccountInOut.A.currencyTypeId"/>
 		<number-column name="origBalance" text="上期结余"></number-column>
-		<auto-column name="amtIncrease" />
-		<auto-column name="amtReduce" />
+		<auto-column name="amtIncrease" dsFieldMap="AccountInOut.A.amtIncrease"/>
+		<auto-column name="amtReduce" dsFieldMap="AccountInOut.A.amtReduce"/>
 		<number-column name="finalBalance" text="期末结余"></number-column>
 		<number-column name="increaseCount" text="增加笔数"></number-column>
 		<number-column name="reduceCount" text="减少笔数"></number-column>
 		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="ACCOUNT_PROPERTY" text="账户属性"></dictionary-column>
-		<select-column name="bankId" text="开户银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single"></select-column>
-		<string-column name="bankAccount" text="银行账号"></string-column>
-		<select-column name="dutyBy" text="责任人" displayField="code,name" valueField="id" selectorName="SysUserSelector" selectionMode="single"></select-column>
+		<select-column name="bankId" auto="true" dsFieldMap="BankAccount.A.bankId"></select-column>
+		<string-column name="bankAccount" auto="true" dsFieldMap="BankAccount.A.bankId"></string-column>
+		<select-column name="dutyBy" text="责任人" auto="true" dsFieldMap="BankAccount.A.dutyBy"></select-column>
 		<number-column name="amtSecureBalance" text="安全余额"></number-column>
 		<number-column name="amtLimits" text="限额"></number-column>
 	</column-model>

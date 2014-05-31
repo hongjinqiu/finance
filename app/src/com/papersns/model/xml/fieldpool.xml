@@ -53,8 +53,17 @@
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
 		<allowCopy>false</allowCopy>
-		<defaultValueExpr mode="text"></defaultValueExpr>
+		<zeroShowEmpty>false</zeroShowEmpty>
 		<relationDS>
+			<relationItem name="SysUser">
+				<id>SysUserSelector</id>
+				<relationExpr>true</relationExpr>
+				<jsRelationExpr>true</jsRelationExpr>
+				<relationModelId>SysUser</relationModelId>
+				<relationDataSetId>A</relationDataSetId>
+				<displayField>code,name</displayField>
+				<valueField>id</valueField>
+			</relationItem>
 		</relationDS>
 	</field>
 
@@ -65,6 +74,7 @@
 		<fieldNumberType>DATETIME</fieldNumberType>
 		<fixReadOnly>true</fixReadOnly>
 		<allowCopy>false</allowCopy>
+		<zeroShowEmpty>true</zeroShowEmpty>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 	</field>
 
@@ -75,6 +85,7 @@
 		<fieldLength>20</fieldLength>
 		<fixReadOnly>true</fixReadOnly>
 		<allowCopy>false</allowCopy>
+		<zeroShowEmpty>true</zeroShowEmpty>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
@@ -87,6 +98,7 @@
 		<fieldNumberType>UNDEFINE</fieldNumberType>
 		<fieldLength>20</fieldLength>
 		<fixReadOnly>true</fixReadOnly>
+		<zeroShowEmpty>true</zeroShowEmpty>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
@@ -97,8 +109,18 @@
 		<displayName>最后修改人</displayName>
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
-		<allowCopy>false</allowCopy>	
+		<allowCopy>false</allowCopy>
+		<zeroShowEmpty>true</zeroShowEmpty>
 		<relationDS>
+			<relationItem name="SysUser">
+				<id>SysUserSelector</id>
+				<relationExpr>true</relationExpr>
+				<jsRelationExpr>true</jsRelationExpr>
+				<relationModelId>SysUser</relationModelId>
+				<relationDataSetId>A</relationDataSetId>
+				<displayField>code,name</displayField>
+				<valueField>id</valueField>
+			</relationItem>
 		</relationDS>
 	</field>
 
@@ -108,6 +130,7 @@
 		<fieldDataType>INT</fieldDataType>
 		<fixReadOnly>true</fixReadOnly>
 		<allowCopy>false</allowCopy>
+		<zeroShowEmpty>true</zeroShowEmpty>
 		<defaultValueExpr mode="text"></defaultValueExpr>
 		<relationDS>
 		</relationDS>
@@ -119,6 +142,8 @@
 		<fieldDataType>LONGINT</fieldDataType>
 		<fieldNumberType>DATETIME</fieldNumberType>
 		<fixReadOnly>true</fixReadOnly>
+		<allowCopy>false</allowCopy>
+		<zeroShowEmpty>true</zeroShowEmpty>
 	</field>
 
 	<field id="AUDIT_STATUS" extends="ROOT_FIELD">
@@ -140,7 +165,17 @@
 		<!-- <fieldName>auditBy</fieldName> -->
 		<displayName>审核人</displayName>
 		<fieldDataType>INT</fieldDataType>
+		<zeroShowEmpty>true</zeroShowEmpty>
 		<relationDS>
+			<relationItem name="SysUser">
+				<id>SysUserSelector</id>
+				<relationExpr>true</relationExpr>
+				<jsRelationExpr>true</jsRelationExpr>
+				<relationModelId>SysUser</relationModelId>
+				<relationDataSetId>A</relationDataSetId>
+				<displayField>code,name</displayField>
+				<valueField>id</valueField>
+			</relationItem>
 		</relationDS>
 	</field>
 
@@ -149,6 +184,7 @@
 		<displayName>审核时间</displayName>
 		<fieldDataType>LONGINT</fieldDataType>
 		<fieldNumberType>TIME</fieldNumberType>
+		<zeroShowEmpty>true</zeroShowEmpty>
 	</field>
 
 	<field id="BILL_STATUS" extends="ROOT_FIELD">
@@ -284,14 +320,18 @@
 		<displayName>代码</displayName>
 		<fieldDataType>STRING</fieldDataType>
 		<fieldLength>20</fieldLength>
+		<allowEmpty>false</allowEmpty>
 		<allowCopy>false</allowCopy>
+		<allowDuplicate>false</allowDuplicate>
+		<denyEditInUsed>true</denyEditInUsed>
 	</field>	
 	
 	<field id="NAME_FIELD" extends="ROOT_FIELD">
 		<!-- <fieldName>nameField</fieldName> -->
+		<allowEmpty>false</allowEmpty>
 		<displayName>名称</displayName>
 		<fieldDataType>STRING</fieldDataType>
-		<fieldLength>20</fieldLength>
+		<fieldLength>40</fieldLength>
 	</field>	
 	
 	<field id="DATE_FIELD" extends="ROOT_FIELD">

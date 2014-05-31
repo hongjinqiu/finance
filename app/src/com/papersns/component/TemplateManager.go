@@ -226,6 +226,10 @@ func (o TemplateManager) GetSelectorTemplateInfo(id string) SelectorTemplateInfo
 				if selectorTemplateInfo.ListTemplate.Id == id {
 					return selectorTemplateInfo
 				}
+			} else {
+				if selectorTemplateInfo.ListTemplate.SelectorId == id {
+					return selectorTemplateInfo
+				}
 			}
 		}
 		o.clearSelectorTemplate()
@@ -350,6 +354,7 @@ func (o TemplateManager) loadSingleSelectorTemplate(path string) (SelectorTempla
 		} else {
 			gSelectorTemplateDict[listTemplate.Id] = selectorTemplateInfo
 		}
+		return selectorTemplateInfo, nil
 	}
 	return SelectorTemplateInfo{}, nil
 }
@@ -959,7 +964,6 @@ func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNo
 		for _, name := range columnNode.preColumnLi {
 			o.GetColumnModelDataForColumnItem(sessionId, columnNodeDict, columnNodeDict[name], record, relationBo, loopItem)
 		}
-		//println("^^^^preColumnLi is not null, name is:" + columnItem.Name)
 		// 算完前驱,算自身,
 		for _, name := range columnNode.preColumnLi {
 			preColumnNode := columnNodeDict[name]
@@ -981,17 +985,11 @@ func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNo
 			}
 		}
 	} else {
-		//println("^^^^preColumnLi is null, name is:" + columnItem.Name)
 		if columnItem.XMLName.Local != "virtual-column" {
 			columnItemName := columnItem.Name
 			if columnItem.DataSetId != "" {
 				columnItemName = columnItem.DataSetId + "." + columnItemName
 			}
-//			println("get value from record")
-//			fmt.Println("record is:")
-//			fmt.Println(record)
-//			println("columnItemName is:")
-//			fmt.Println(columnItemName)
 			(*loopItem)[columnItem.Name] = o.getValueBySpot(record, columnItemName)
 			//o.ApplyDictionaryColumnData(loopItem, columnItem)
 			o.ApplyScriptColumnData(loopItem, record, columnItem)

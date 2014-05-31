@@ -35,10 +35,10 @@ var sysUserModel = {
 		},
 		afterNewData: function(dataSource, bo){},// defaultValueExprForJs->calcValueExprForJs->afterNewData->calcValueExprForJs
 		listeners: {},
-		beforeedit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),editor里面有record,
-		validateedit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),editor里面有record,
-		edit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e)
-		canceledit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e)
+		beforeEdit: function(recordLi, record, recordIndex){},//数据集函数,表格控件函数,表格刚渲染完成时触发,参数:(recordLi, record, recordIndex),record.formFieldDict,可以取得到别的控件,recordLi.size(),可取长度
+		validateEdit: function(jsonDataLi){},//数据集函数,表格控件函数,表格弹出框点击确定时触发,参数:(jsonDataLi),editor里面有record,点击确定时触发,
+		edit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),未实现
+		canceledit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),未实现
 		celldblclick: function() {},// 暂不实现
 		validate: function(bo, data) {}// 整条记录的validate
 	}

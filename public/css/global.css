@@ -389,3 +389,12 @@ table {
 	margin-left: 5px;
 }
 
+.formToolbar {
+	height: 20px;
+}
+
+.table-layout-textarea {
+	width: 500px;
+	height: 120px;
+}
+

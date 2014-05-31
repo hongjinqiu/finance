@@ -2,14 +2,17 @@ package controllers
 
 //import "github.com/robfig/revel"
 import (
+	. "com/papersns/error"
 	"com/papersns/global"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
 	. "com/papersns/mongo"
 	. "com/papersns/script"
+	"encoding/json"
 	"fmt"
 	"labix.org/v2/mgo"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -18,20 +21,22 @@ type FinanceService struct{}
 
 func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) *[]DiffDataRow {
 	modelTemplateFactory := ModelTemplateFactory{}
-	
+
 	strId := modelTemplateFactory.GetStrId(*bo)
-	
+
 	modelTemplateFactory.ConvertDataType(dataSource, bo)
 	// 主数据集和分录数据校验
-	message := o.validateBO((dataSource), (*bo))
+	message := o.validateBO(sessionId, dataSource, (*bo))
 	if message != "" {
-		panic(message)
+		panic(BusinessError{message})
 	}
 	_, db := global.GetConnection(sessionId)
+
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+
 	if strId == "" || strId == "0" {
 		// 主数据集和分录id赋值,
-		modelIterator := ModelIterator{}
-		var result interface{} = ""
 		modelIterator.IterateAllFieldBo(dataSource, bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 			o.setDataId(db, dataSource, &fieldGroup, bo, data)
 		})
@@ -65,9 +70,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 	if err != nil {
 		panic(err)
 	}
-	modelIterator := ModelIterator{}
 	srcBo := map[string]interface{}{}
-	var result interface{} = ""
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 	err = db.C(collectionName).Find(map[string]interface{}{"_id": id}).One(&srcBo)
 	if err != nil {
@@ -116,10 +119,10 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 func (o FinanceService) deleteExtraField(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
-	var notInKeyDict = map[string]interface{}{};
+	var notInKeyDict = map[string]interface{}{}
 	modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		if notInKeyDict[fieldGroupLi[0].GetDataSetId()] == nil {
-			notInKeyLi := []string{};
+			notInKeyLi := []string{}
 			for key, _ := range *data {
 				isIn := false
 				for _, fieldGroup := range fieldGroupLi {
@@ -132,7 +135,7 @@ func (o FinanceService) deleteExtraField(dataSource DataSource, bo *map[string]i
 					notInKeyLi = append(notInKeyLi, key)
 				}
 			}
-			notInKeyDict[fieldGroupLi[0].GetDataSetId()] = notInKeyLi;
+			notInKeyDict[fieldGroupLi[0].GetDataSetId()] = notInKeyLi
 		}
 		notInKeyLi := notInKeyDict[fieldGroupLi[0].GetDataSetId()].([]string)
 		for _, key := range notInKeyLi {
@@ -146,7 +149,7 @@ func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, field
 		if fieldGroup.IsMasterField() {
 			masterSeqName := GetMasterSequenceName((dataSource))
 			masterSeqId := mongo.GetSequenceNo(db, masterSeqName)
-//			(*data)["_id"] = masterSeqId
+			//			(*data)["_id"] = masterSeqId
 			(*data)["id"] = masterSeqId
 			(*bo)["_id"] = masterSeqId
 			(*bo)["id"] = masterSeqId
@@ -155,35 +158,156 @@ func (o FinanceService) setDataId(db *mgo.Database, dataSource DataSource, field
 			if found {
 				detailSeqName := GetDetailSequenceName((dataSource), detailData)
 				detailSeqId := mongo.GetSequenceNo(db, detailSeqName)
-//				(*data)["_id"] = detailSeqId
+				//				(*data)["_id"] = detailSeqId
 				(*data)["id"] = detailSeqId
 			}
 		}
 	}
 }
 
-func (o FinanceService) validateBO(dataSource DataSource, bo map[string]interface{}) string {
+func (o FinanceService) validateBO(sessionId int, dataSource DataSource, bo map[string]interface{}) string {
 	messageLi := []string{}
 	modelIterator := ModelIterator{}
-	detailIndex := map[string]int{}
-	for _, item := range dataSource.DetailDataLi {
-		detailIndex[item.Id] = 0
-	}
+	//	detailIndex := map[string]int{}
+	//	for _, item := range dataSource.DetailDataLi {
+	//		detailIndex[item.Id] = 0
+	//	}
 	var result interface{} = messageLi
-	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, messageLi *interface{}) {
-		stringLi := (*messageLi).([]string)
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		fieldMessageLi := o.validateFieldGroup(fieldGroup, *data)
 		if fieldGroup.IsMasterField() {
 			for _, item := range fieldMessageLi {
-				stringLi = append(stringLi, item)
+				messageLi = append(messageLi, item)
 			}
 		} else {
 			detailData, _ := fieldGroup.GetDetailData()
-			detailIndex[detailData.Id]++
+			//			detailIndex[detailData.Id]++
 			for _, item := range fieldMessageLi {
-				stringLi = append(stringLi, "分录:"+detailData.DisplayName+"序号为"+strconv.Itoa(detailIndex[detailData.Id])+"的数据,"+item)
+				//				messageLi = append(messageLi, "分录:"+detailData.DisplayName+"序号为"+strconv.Itoa(detailIndex[detailData.Id])+"的数据,"+item)
+				messageLi = append(messageLi, "分录:"+detailData.DisplayName+"序号为"+strconv.Itoa(rowIndex+1)+"的数据,"+item)
 			}
 		}
+	})
+	// validate detailData.allowEmpty
+	if dataSource.DetailDataLi != nil {
+		for _, item := range dataSource.DetailDataLi {
+			if item.AllowEmpty == "false" {
+				isEmpty := false
+				if bo[item.Id] == nil {
+					isEmpty = true
+				} else {
+					lineData := bo[item.Id].([]interface{})
+					if len(lineData) == 0 {
+						isEmpty = true
+					}
+				}
+				if isEmpty {
+					messageLi = append(messageLi, "分录:"+item.DisplayName+"不允许为空")
+				}
+			}
+		}
+	}
+
+	duplicateMessage := o.validateBODuplicate(sessionId, dataSource, bo)
+	if duplicateMessage != "" {
+		messageLi = append(messageLi, duplicateMessage)
+	}
+
+	return strings.Join(messageLi, "<br />")
+}
+
+func (o FinanceService) validateBODuplicate(sessionId int, dataSource DataSource, bo map[string]interface{}) string {
+	result := ""
+	result += o.validateMasterDataDuplicate(sessionId, dataSource, bo)
+	if result != "" {
+		result += "<br />"
+	}
+	result += o.validateDetailDataDuplicate(sessionId, dataSource, bo)
+	return result
+}
+
+func (o FinanceService) validateMasterDataDuplicate(sessionId int, dataSource DataSource, bo map[string]interface{}) string {
+	message := ""
+	modelTemplateFactory := ModelTemplateFactory{}
+	strId := modelTemplateFactory.GetStrId(bo)
+	andQueryLi := []map[string]interface{}{}
+	andFieldNameLi := []string{}
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &result, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
+		if fieldGroup.IsMasterField() {
+			if fieldGroup.AllowDuplicate == "false" && fieldGroup.Id != "id" {
+				andQueryLi = append(andQueryLi, map[string]interface{}{
+					"A." + fieldGroup.Id: (*data)[fieldGroup.Id],
+				})
+				andFieldNameLi = append(andFieldNameLi, fieldGroup.DisplayName)
+			}
+		}
+	})
+	if len(andQueryLi) > 0 {
+		if !(strId == "" || strId == "0") {
+			andQueryLi = append(andQueryLi, map[string]interface{}{
+				"_id": map[string]interface{}{
+					"$ne": bo["id"],
+				},
+			})
+		}
+		duplicateQuery := map[string]interface{}{
+			"$and": andQueryLi,
+		}
+		collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+		_, db := global.GetConnection(sessionId)
+		duplicateQueryByte, err := json.MarshalIndent(duplicateQuery, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		log.Println("validateMasterDataDuplicate,collectionName:" + collectionName + ", query:" + string(duplicateQueryByte))
+		count, err := db.C(collectionName).Find(duplicateQuery).Limit(1).Count()
+		if err != nil {
+			panic(err)
+		}
+		if count > 0 {
+			message = strings.Join(andFieldNameLi, "+") + "不允许重复"
+		}
+	}
+
+	return message
+}
+
+func (o FinanceService) validateDetailDataDuplicate(sessionId int, dataSource DataSource, bo map[string]interface{}) string {
+	messageLi := []string{}
+	modelIterator := ModelIterator{}
+	var result interface{} = ""
+	duplicateFieldIdLi := []string{}
+	duplicateFieldNameLi := []string{}
+	modelIterator.IterateAllField(&dataSource, &result, func(fieldGroup *FieldGroup, result *interface{}) {
+		if !fieldGroup.IsMasterField() {
+			if fieldGroup.AllowDuplicate == "false" && fieldGroup.Id != "id" {
+				duplicateFieldIdLi = append(duplicateFieldIdLi, fieldGroup.Id)
+				duplicateFieldNameLi = append(duplicateFieldNameLi, fieldGroup.DisplayName)
+			}
+		}
+	})
+	duplicateFieldNameJoin := strings.Join(duplicateFieldNameLi, "+") + "不允许重复"
+	modelIterator.IterateDataBo(dataSource, &bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
+		modelIterator.IterateDataBo(dataSource, &bo, result, func(innerFieldGroupLi []FieldGroup, innerData *map[string]interface{}, innerRowIndex int, innerResult *interface{}) {
+			if innerRowIndex > rowIndex {
+				isDuplicate := true
+				if len(duplicateFieldIdLi) == 0 {
+					isDuplicate = false
+				}
+				for _, item := range duplicateFieldIdLi {
+					if (*innerData)[item] != (*data)[item] {
+						isDuplicate = false
+						break
+					}
+				}
+				if isDuplicate {
+					detailData, _ := fieldGroupLi[0].GetDetailData()
+					messageLi = append(messageLi, "分录:"+detailData.DisplayName+"序号为"+strconv.Itoa(rowIndex+1)+","+strconv.Itoa(innerRowIndex+1)+"的数据，"+duplicateFieldNameJoin)
+				}
+			}
+		})
 	})
 	return strings.Join(messageLi, "<br />")
 }
@@ -196,11 +320,11 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 		if value != nil {
 			strValue := fmt.Sprint(value)
 			if strValue == "" {
-				messageLi = append(messageLi, fieldGroup.DisplayName+"不允许空值")
+				messageLi = append(messageLi, fieldGroup.Id+","+fieldGroup.DisplayName+"不允许空值")
 				return messageLi
 			}
 		} else {
-			messageLi = append(messageLi, fieldGroup.DisplayName+"不允许空值")
+			messageLi = append(messageLi, fieldGroup.Id+","+fieldGroup.DisplayName+"不允许空值")
 			return messageLi
 		}
 	}

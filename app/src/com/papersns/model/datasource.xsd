@@ -214,9 +214,10 @@
 				</element>
 				<element name="displayName" type="string" default="分录数据集" />
 				<!-- <element name="parentId" type="string" default="A" /> -->
-				<element name="allowEmptyRow" type="boolean" default="false" />
+				<element name="allowEmpty" type="boolean" default="true" minOccurs="0" maxOccurs="1" />
+				<!-- <element name="allowEmptyRow" type="boolean" default="false" /> -->
 				<element name="allowCopy" type="boolean" default="true" />
-				<element name="readonly" type="boolean" default="false" />
+				<!-- <element name="readonly" type="boolean" default="false" /> -->
 				<!-- 主键字段 -->
 				<!-- <element name="primaryKey">
 					<simpleType>
@@ -308,6 +309,13 @@
 									<group ref="tns:field-group"></group>
 									<attribute name="id" default="id" />
 									<attribute name="extends" default="MODIFY_TIME" />
+								</complexType>
+							</element>
+							<element name="billStatus" minOccurs="0" maxOccurs="1">
+								<complexType>
+									<group ref="tns:field-group"></group>
+									<attribute name="id" default="id" />
+									<attribute name="extends" default="BILL_STATUS" />
 								</complexType>
 							</element>
 							<element name="attachCount" minOccurs="1" maxOccurs="1">

@@ -1,13 +1,16 @@
 function TemplateIterator() {}
 
 TemplateIterator.prototype._iterateTemplateColumn = function(dataSetId, result, isContinue, iterateFunc) {
+	var listTemplateIterator = new ListTemplateIterator();
 	for (var j = 0; j < g_formTemplateJsonData.FormElemLi.length; j++) {
 		var formElem = g_formTemplateJsonData.FormElemLi[j];
 		if (formElem.XMLName.Local == "column-model") {
 			if (formElem.ColumnModel.DataSetId == dataSetId) {
 				if (formElem.ColumnModel.ColumnLi) {
-					for (var k = 0; k < formElem.ColumnModel.ColumnLi.length; k++) {
-						var column = formElem.ColumnModel.ColumnLi[k];
+					var columnLi = [];
+					listTemplateIterator.recursionGetColumnItem(formElem.ColumnModel, columnLi);
+					for (var k = 0; k < columnLi.length; k++) {
+						var column = columnLi[k];
 						var iterateResult = iterateFunc(column);
 						if (!isContinue && iterateResult) {
 							return;

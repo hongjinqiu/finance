@@ -18,38 +18,33 @@ type GatheringBill struct {
 
 func (c GatheringBill) SaveData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) DeleteData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) EditData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) NewData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) GetData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +52,8 @@ func (c GatheringBill) GetData() revel.Result {
  */
 func (c GatheringBill) CopyData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +61,8 @@ func (c GatheringBill) CopyData() revel.Result {
  */
 func (c GatheringBill) GiveUpData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +70,8 @@ func (c GatheringBill) GiveUpData() revel.Result {
  */
 func (c GatheringBill) RefreshData() revel.Result {
 	c.actionSupport = GatheringBillSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) LogList() revel.Result {
@@ -98,9 +90,8 @@ func (c GatheringBill) LogList() revel.Result {
  */
 func (c GatheringBill) CancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.cancelDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.cancelDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -108,8 +99,7 @@ func (c GatheringBill) CancelData() revel.Result {
  */
 func (c GatheringBill) UnCancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.unCancelDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.unCancelDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 

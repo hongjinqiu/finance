@@ -152,7 +152,23 @@
 			<!-- 数据字典表达式 -->
 			<element name="dictionaryWhere" type="string" default="" minOccurs="0" maxOccurs="1" />
 			<!-- 联动计算表达式 -->
-			<element name="calcValueExpr" type="string" default="" minOccurs="0" maxOccurs="1" />
+			<element name="calcValueExpr" minOccurs="0" maxOccurs="1">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute name="mode" default="text">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="text" />
+										<enumeration value="python" />
+										<enumeration value="golang" />
+									</restriction>
+								</simpleType>
+							</attribute>
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
 			<!-- 是否虚拟字段 -->
 			<element name="virtual" type="boolean" default="false" minOccurs="0" maxOccurs="1" />
 			<!-- 零值显示空白 -->
@@ -166,8 +182,61 @@
 			<!-- 格式化来源是字段 -->
 			<element name="formatExpr" type="string" default="" minOccurs="0" maxOccurs="1" />
 			<!-- 关联模型集合 -->
-			<element name="relationDS" type="string" default="" minOccurs="0" maxOccurs="1" />
+			<element name="relationDS" minOccurs="0" maxOccurs="1">
+				<complexType>
+					<sequence>
+						<element name="relationItem" minOccurs="0" maxOccurs="unbounded">
+							<complexType>
+								<sequence>
+									<element name="id" type="string" default="R" />
+									<element name="relationExpr" default="1">
+										<complexType>
+											<simpleContent>
+												<extension base="string">
+													<attribute name="mode" default="text">
+														<simpleType>
+															<restriction base="string">
+																<enumeration value="text" />
+																<enumeration value="python" />
+																<enumeration value="golang" />
+															</restriction>
+														</simpleType>
+													</attribute>
+												</extension>
+											</simpleContent>
+										</complexType>
+									</element>
+									<element name="jsRelationExpr" default="1">
+										<complexType>
+											<simpleContent>
+												<extension base="string">
+													<attribute name="mode" default="text">
+														<simpleType>
+															<restriction base="string">
+																<enumeration value="text" />
+																<enumeration value="js" />
+																<enumeration value="function" />
+																<enumeration value="functionName" />
+															</restriction>
+														</simpleType>
+													</attribute>
+												</extension>
+											</simpleContent>
+										</complexType>
+									</element>
+									<element name="relationModelId" type="string" default="" />
+									<element name="relationDataSetId" type="string" default="" />
+									<element name="displayField" type="string" default="" />
+									<element name="valueField" type="string" default="" />
+								</sequence>
+								<attribute name="name" use="required"></attribute>
+							</complexType>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
 			<!-- 
+			<element name="relationDS" type="string" default="" minOccurs="0" maxOccurs="1" />
 			<element name="relationDS" minOccurs="0" maxOccurs="1">
 				<complexType>
 					<sequence>

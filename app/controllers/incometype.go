@@ -18,38 +18,33 @@ type IncomeType struct {
 
 func (c IncomeType) SaveData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c IncomeType) DeleteData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c IncomeType) EditData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c IncomeType) NewData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c IncomeType) GetData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +52,8 @@ func (c IncomeType) GetData() revel.Result {
  */
 func (c IncomeType) CopyData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +61,8 @@ func (c IncomeType) CopyData() revel.Result {
  */
 func (c IncomeType) GiveUpData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +70,8 @@ func (c IncomeType) GiveUpData() revel.Result {
  */
 func (c IncomeType) RefreshData() revel.Result {
 	c.actionSupport = IncomeTypeSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c IncomeType) LogList() revel.Result {

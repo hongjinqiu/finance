@@ -5,9 +5,9 @@ import (
 	"strconv"
 )
 
-type SysUser struct{}
+type ScriptTest struct{}
 
-func (o SysUser) GetIntTest(bo map[string]interface{}, data map[string]interface{}) string {
+func (o ScriptTest) GetIntTest(bo map[string]interface{}, data map[string]interface{}) string {
 	masterData := bo["A"].(map[string]interface{})
 	attachCount, err := strconv.Atoi(fmt.Sprint(masterData["attachCount"]))
 	if err != nil {

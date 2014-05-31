@@ -6,6 +6,7 @@ import (
 	. "com/papersns/component"
 	"com/papersns/global"
 	. "com/papersns/model"
+	. "com/papersns/model/handler"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -328,23 +329,31 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	//templateManager.ApplyTreeForQueryParameter(listTemplate)
 	toolbarBo := templateManager.GetToolbarForListTemplate(*listTemplate)
 	paramMap := map[string]string{}
-	//	c.Request.URL
-	for k, v := range c.Params.Form {
-		value := strings.Join(v, ",")
-		if value != "" { // && !strings.Contains(k, "@")
-			paramMap[k] = value
-		}
-	}
+	
 	defaultBo := templateManager.GetQueryDefaultValue(*listTemplate)
 	defaultBoByte, err := json.Marshal(&defaultBo)
 	if err != nil {
 		panic(err)
 	}
-	if len(paramMap) == 0 {
-		for key,value := range defaultBo {
-			paramMap[key] = value
-		}
+	for key,value := range defaultBo {
+		paramMap[key] = value
 	}
+	//	c.Request.URL
+	for k, v := range c.Params.Form {
+		value := strings.Join(v, ",")
+		paramMap[k] = value
+	}
+	for k, v := range c.Params.Query {
+		value := strings.Join(v, ",")
+		paramMap[k] = value
+	}
+	
+	formDataByte, err := json.Marshal(&paramMap)
+	if err != nil {
+		panic(err)
+	}
+	
+//	}
 	pageNo := 1
 	pageSize := 10
 	if listTemplate.DataProvider.Size != "" {
@@ -371,12 +380,24 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		"items":        []interface{}{},
 	}
 	relationBo := map[string]interface{}{}
+	usedCheckBo := map[string]interface{}{}
 	//if c.Params.Get("@entrance") != "true" {
 	if isGetBo {
 		dataBo = templateManager.GetBoForListTemplate(listTemplate, paramMap, pageNo, pageSize)
 		relationBo = dataBo["relationBo"].(map[string]interface{})
-		delete(dataBo, "relationBo")
+		//delete(dataBo, "relationBo")
+		
+		// usedCheck的修改,
+		if listTemplate.DataSourceModelId != "" {
+			modelTemplateFactory := ModelTemplateFactory{}
+			dataSource := modelTemplateFactory.GetDataSource(listTemplate.DataSourceModelId)
+			items := dataBo["items"].([]interface{})
+			usedCheck := UsedCheck{}
+			
+			usedCheckBo = usedCheck.GetListUsedCheck(sessionId, dataSource, items, listTemplate.ColumnModel.DataSetId)
+		}
 	}
+	dataBo["usedCheckBo"] = usedCheckBo
 	
 	dataBoByte, err := json.Marshal(&dataBo)
 	if err != nil {
@@ -389,6 +410,11 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	}
 
 	listTemplateByte, err := json.Marshal(listTemplate)
+	if err != nil {
+		panic(err)
+	}
+	
+	usedCheckByte, err := json.Marshal(&usedCheckBo)
 	if err != nil {
 		panic(err)
 	}
@@ -432,6 +458,8 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		"layerBoJson": template.JS(layerBoJson),
 		"layerBoLiJson": template.JS(layerBoLiJson),
 		"defaultBoJson": template.JS(string(defaultBoByte)),
+		"formDataJson": template.JS(string(formDataByte)),
+		"usedCheckJson": template.JS(string(usedCheckByte)),
 		//		"columnsJson":   string(columnsByte),
 	}
 	return result

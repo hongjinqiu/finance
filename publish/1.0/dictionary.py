@@ -172,6 +172,37 @@ def getDictionaryLi():
             {'code': 2,'name': '银行账户','order': 2},
         ],
     })
+    li.append({
+        'code': 'D_MEASUREUNIT_TYPE',
+        'name': '计量单位类别',
+        'items': [
+            {'code': 1,'name': '计数','order': 1},
+            {'code': 2,'name': '时间','order': 2},
+            {'code': 3,'name': '重量','order': 3},
+            {'code': 4,'name': '长度','order': 4},
+            {'code': 5,'name': '面积','order': 5},
+            {'code': 6,'name': '材积','order': 6},
+            {'code': 7,'name': '容积','order': 7},
+            {'code': 8,'name': '其他','order': 8},
+        ],
+    })
+    li.append({
+        'code': 'D_TAOBAO_TYPE',
+        'name': '用户类型',
+        'items': [
+            {'code': 1,'name': '系统管理员','order': 1},
+            {'code': 2,'name': '普通用户','order': 2},
+        ],
+    })
+    li.append({
+        'code': 'D_TAOBAO_STATUS',
+        'name': '用户状态',
+        'items': [
+            {'code': -1,'name': '删除','order': -1},
+            {'code': 1,'name': '正常','order': 1},
+            {'code': 2,'name': '冻结','order': 2},
+        ],
+    })
 
 
     return li

@@ -6,10 +6,30 @@ import (
 	. "com/papersns/mongo"
 	"fmt"
 	"labix.org/v2/mgo"
+	"log"
 	"strconv"
+	"encoding/json"
 )
 
 type UsedCheck struct{}
+
+func (o UsedCheck) CheckUsed(sessionId int, dataSource DataSource, bo map[string]interface{}) bool {
+	_, db := global.GetConnection(sessionId)
+	masterData := bo["A"].(map[string]interface{})
+	beReferenceQuery := []interface{}{
+		dataSource.Id,
+		"A",
+		"id",
+		masterData["id"],
+	}
+	count, err := db.C("PubReferenceLog").Find(map[string]interface{}{
+		"beReference": beReferenceQuery,
+	}).Limit(1).Count()
+	if err != nil {
+		panic(err)
+	}
+	return count > 0
+}
 
 func (o UsedCheck) Insert(sessionId int, fieldGroupLi []FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) {
 	_, db := global.GetConnection(sessionId)
@@ -37,8 +57,10 @@ func (o UsedCheck) Update(sessionId int, fieldGroupLi []FieldGroup, bo *map[stri
 	} else if destData == nil && srcData != nil {
 		o.Delete(sessionId, fieldGroupLi, srcData)
 	} else if destData != nil && srcData != nil {
-		// 分析字段,如果字段都相等,不过帐,
+		fmt.Println("^^^^^^^^^,dest data is not nil and srcData is not nil")
 		modelTemplateFactory := ModelTemplateFactory{}
+		fmt.Println(modelTemplateFactory.IsDataDifferent(fieldGroupLi, *destData, srcData))
+		// 分析字段,如果字段都相等,不过帐,
 		if modelTemplateFactory.IsDataDifferent(fieldGroupLi, *destData, srcData) {
 			o.Delete(sessionId, fieldGroupLi, srcData)
 			o.Insert(sessionId, fieldGroupLi, bo, destData)
@@ -46,28 +68,19 @@ func (o UsedCheck) Update(sessionId int, fieldGroupLi []FieldGroup, bo *map[stri
 	}
 }
 
+/**
+ * 不能直接用主数据集["ds", "A", "id", id]来直接删除,
+ * 因为会连同分录的一起被删,而分录差异行数据做了different的判断,未修改的分录不会再补上被用记录,就漏掉了
+*/
 func (o UsedCheck) Delete(sessionId int, fieldGroupLi []FieldGroup, data map[string]interface{}) {
-	dataSource := fieldGroupLi[0].GetDataSource()
-	id, err := strconv.Atoi(fmt.Sprint(data["id"]))
-	if err != nil {
-		panic(err)
-	}
-	if !fieldGroupLi[0].IsMasterField() {
-		referenceQuery := []interface{}{
-			dataSource.Id,
-			fieldGroupLi[0].GetDataSetId(),
-			"id",
-			id,
-		}
-		o.deleteReference(sessionId, referenceQuery)
-	} else {
-		for _, fieldGroup := range fieldGroupLi {
-			if fieldGroup.IsRelationField() {
-				srcDataSourceId := fieldGroup.GetDataSource().Id
-				srcDataSetId := fieldGroup.GetDataSetId()
-				//		dataSetData = (*bo)[srcDataSetId].(map[string]interface{})
-				srcFieldName := fieldGroup.Id
-				referenceQuery := []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, id}
+	for _, fieldGroup := range fieldGroupLi {
+		if fieldGroup.IsRelationField() {
+			srcDataSourceId := fieldGroup.GetDataSource().Id
+			srcDataSetId := fieldGroup.GetDataSetId()
+			srcFieldName := fieldGroup.Id
+			fieldValue := data[srcFieldName]
+			if fieldValue != nil {
+				referenceQuery := []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, fieldValue}
 				o.deleteReference(sessionId, referenceQuery)
 			}
 		}
@@ -93,16 +106,20 @@ func (o UsedCheck) deleteReference(sessionId int, referenceQuery []interface{}) 
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
-	count, err := db.C("PubReferenceLog").Find(map[string]interface{}{
+	deleteQuery := map[string]interface{}{
 		"reference": referenceQuery,
-	}).Limit(1).Count()
+	}
+	deleteByte, err := json.MarshalIndent(&deleteQuery, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	log.Println("deleteReference,collection:PubReferenceLog,query is:" + string(deleteByte))
+	count, err := db.C("PubReferenceLog").Find(deleteQuery).Limit(1).Count()
 	if err != nil {
 		panic(err)
 	}
 	if count > 0 {
-		_, result := txnManager.RemoveAll(txnId, "PubReferenceLog", map[string]interface{}{
-			"reference": referenceQuery,
-		})
+		_, result := txnManager.RemoveAll(txnId, "PubReferenceLog", deleteQuery)
 		if !result {
 			panic("删除失败")
 		}
@@ -116,7 +133,8 @@ func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup,
 	sourceLi := []interface{}{}
 
 	srcDataSourceId := fieldGroup.GetDataSource().Id
-	srcDataSetId := fieldGroup.GetDataSetId()
+	//srcDataSetId := fieldGroup.GetDataSetId()
+	srcDataSetId := "A"
 	srcFieldName := "id"
 	iId := fmt.Sprint(masterData["id"])
 	id, err := strconv.Atoi(iId)
@@ -129,7 +147,7 @@ func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup,
 		srcDataSourceId = fieldGroup.GetDataSource().Id
 		srcDataSetId = fieldGroup.GetDataSetId()
 		srcFieldName = fieldGroup.Id
-		iId := fmt.Sprint(masterData["id"])
+		iId := fmt.Sprint(masterData[srcFieldName])
 		id, err := strconv.Atoi(iId)
 		if err != nil {
 			panic(err)
@@ -155,7 +173,7 @@ func (o UsedCheck) GetSourceReferenceLi(db *mgo.Database, fieldGroup FieldGroup,
 		//		dataSetData = (*bo)[srcDataSetId].(map[string]interface{})
 		dataSetData = (*data)
 		srcFieldName = fieldGroup.Id
-		iId = fmt.Sprint(dataSetData["id"])
+		iId = fmt.Sprint(dataSetData[srcFieldName])
 		id, err = strconv.Atoi(iId)
 		if err != nil {
 			panic(err)
@@ -181,24 +199,122 @@ func (o UsedCheck) GetBeReferenceLi(db *mgo.Database, fieldGroup FieldGroup, rel
 	if relationItem.RelationDataSetId == "A" {
 		sourceLi = append(sourceLi, []interface{}{relationItem.RelationModelId, "A", "id", relationId})
 		return sourceLi
-	} else {
-		refData := map[string]interface{}{}
-		query := map[string]interface{}{
-			relationItem.RelationDataSetId + ".id": relationId,
-		}
-		//{"B.id": 2}
-		err := db.C(relationItem.RelationModelId).Find(query).One(&refData)
-		if err != nil {
-			panic(err)
-		}
-		masterData := refData["A"].(map[string]interface{})
-		masterDataId, err := strconv.Atoi(fmt.Sprint(masterData["id"]))
-		if err != nil {
-			panic(err)
-		}
-		sourceLi = append(sourceLi, []interface{}{relationItem.RelationModelId, "A", "id", masterDataId})
 	}
+	
+	refData := map[string]interface{}{}
+	query := map[string]interface{}{
+		relationItem.RelationDataSetId + ".id": relationId,
+	}
+	//{"B.id": 2}
+	err = db.C(relationItem.RelationModelId).Find(query).One(&refData)
+	if err != nil {
+		panic(err)
+	}
+	masterData := refData["A"].(map[string]interface{})
+	masterDataId, err := strconv.Atoi(fmt.Sprint(masterData["id"]))
+	if err != nil {
+		panic(err)
+	}
+	sourceLi = append(sourceLi, []interface{}{relationItem.RelationModelId, "A", "id", masterDataId})
 
 	sourceLi = append(sourceLi, []interface{}{relationItem.RelationModelId, relationItem.RelationDataSetId, "id", relationId})
 	return sourceLi
+}
+
+func (o UsedCheck) GetFormUsedCheck(sessionId int, dataSource DataSource, bo map[string]interface{}) map[string]interface{} {
+	result := map[string]interface{}{}
+	_, db := global.GetConnection(sessionId)
+	modelIterator := ModelIterator{}
+	var iteResult interface{} = ""
+	modelIterator.IterateAllFieldBo(dataSource, &bo, &iteResult, func(fieldGroup FieldGroup, data *map[string]interface{}, rowIndex int, iteResult *interface{}) {
+		if fieldGroup.Id == "id" {
+			dataSetId := fieldGroup.GetDataSetId()
+			referenceQuery := []interface{}{
+				dataSource.Id,
+				dataSetId,
+				fieldGroup.Id,
+				(*data)[fieldGroup.Id],
+			}
+			query := map[string]interface{}{
+				"beReference": referenceQuery,
+			}
+			queryByte, err := json.MarshalIndent(query, "", "\t")
+			if err != nil {
+				panic(err)
+			}
+			log.Println("GetFormUsedCheck,collection:PubReferenceLog,query is:" + string(queryByte))
+			count, err := db.C("PubReferenceLog").Find(query).Limit(1).Count()
+			if err != nil {
+				panic(err)
+			}
+			isUsed := count > 0
+			if result[dataSetId] == nil {
+				result[dataSetId] = map[string]interface{}{}
+			}
+			dataSetUsedMap := result[dataSetId].(map[string]interface{})
+			dataSetUsedMap[fmt.Sprint((*data)[fieldGroup.Id])] = isUsed
+			result[dataSetId] = dataSetUsedMap
+		}
+	})
+
+	return result
+}
+
+func (o UsedCheck) GetListUsedCheck(sessionId int, dataSource DataSource, items []interface{}, dataSetId string) map[string]interface{} {
+	result := map[string]interface{}{}
+	_, db := global.GetConnection(sessionId)
+	for _, item := range items {
+		itemMap := item.(map[string]interface{})
+		dataSetData := itemMap
+		referenceQuery := []interface{}{
+			dataSource.Id,
+			dataSetId,
+			"id",
+			dataSetData["id"],
+		}
+		queryMap := map[string]interface{}{
+			"beReference": referenceQuery,
+		}
+		queryByte, err := json.MarshalIndent(&queryMap, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		log.Println("GetListUsedCheck,collection:PubReferenceLog,query is:" + string(queryByte))
+		count, err := db.C("PubReferenceLog").Find(queryMap).Limit(1).Count()
+		if err != nil {
+			panic(err)
+		}
+		isUsed := count > 0
+		if result[dataSetId] == nil {
+			result[dataSetId] = map[string]interface{}{}
+		}
+		dataSetUsedMap := result[dataSetId].(map[string]interface{})
+		dataSetUsedMap[fmt.Sprint(dataSetData["id"])] = isUsed
+		result[dataSetId] = dataSetUsedMap
+		/*
+		if itemMap[dataSetId] != nil {
+			dataSetData := itemMap[dataSetId].(map[string]interface{})
+			referenceQuery := []interface{}{
+				dataSource.Id,
+				dataSetId,
+				"id",
+				dataSetData["id"],
+			}
+			count, err := db.C("PubReferenceLog").Find(map[string]interface{}{
+				"reference": referenceQuery,
+			}).Limit(1).Count()
+			if err != nil {
+				panic(err)
+			}
+			isUsed := count > 0
+			if result[dataSetId] == nil {
+				result[dataSetId] = map[string]interface{}{}
+			}
+			dataSetUsedMap := result[dataSetId].(map[string]interface{})
+			dataSetUsedMap[fmt.Sprint(dataSetData["id"])] = isUsed
+			result[dataSetId] = dataSetUsedMap
+		}
+		*/
+	}
+	return result
 }

@@ -32,307 +32,45 @@
 			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
-			<field id="code" extends="CODE_FIELD">
-				<displayName>代码</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>20</fieldLength>
-				<defaultValueExpr>code</defaultValueExpr>
+			<field id="code" extends="CODE_FIELD"><!-- subId -->
+				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="name" extends="NAME_FIELD">
-				<displayName>名称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
-				<defaultValueExpr>名称测试</defaultValueExpr>
+			<field id="name" extends="NAME_FIELD"><!-- fullName -->
+				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="nick" extends="NAME_FIELD">
-				<displayName>名称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
-				<defaultValueExpr>nick</defaultValueExpr>
+<!-- 
+type,类型,1:系统管理员,2:普通用户
+status,子账号当前状态 1正常 -1删除 2冻结,为避免出错,给其添加相应的0-9,忽忽忽忽,
+fullName:全称,例如:张小姐,映射到name,
+subId:映射到code,
+sellerId:卖家ID,
+sellerNick:卖家昵称,例如:五行色东辉专卖店
+nick:昵称,例如:五行色东辉专卖店:小张
+ -->
+			<field id="type" extends="INT_FIELD">
+				<displayName>类型</displayName>
+				<dictionary>D_TAOBAO_TYPE</dictionary>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="stringColumn" extends="STRING_FIELD">
-				<displayName>stringColumn测试</displayName>
-				<fixHide>false</fixHide>
-				<fieldLength>20</fieldLength>
+			<field id="status" extends="INT_FIELD">
+				<displayName>状态</displayName>
+				<dictionary>D_TAOBAO_STATUS</dictionary>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="moneyNumberColumn" extends="AMOUNT_FIELD">
-				<displayName>moneyNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
+			<field id="sellerId" extends="INT_FIELD">
+				<displayName>卖家ID</displayName>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="priceNumberColumn" extends="PRICE_FIELD">
-				<displayName>priceNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
+			<field id="sellerNick" extends="STRING_FIELD">
+				<displayName>卖家昵称</displayName>
+				<fieldLength>100</fieldLength>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="unitCostNumberColumn" extends="UNITCOST_FIELD">
-				<displayName>unitCostNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="percentNumberColumn" extends="PERCENT_FIELD">
-				<displayName>percentNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="quantityNumberColumn" extends="QUANTITY_FIELD">
-				<displayName>quantityNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="dateTest" extends="DATE_FIELD">
-				<displayName>dateTest日期测试</displayName>
-				<fieldNumberType>DATE</fieldNumberType>
-			</field>
-			<field id="timeTest" extends="DATE_FIELD">
-				<displayName>timeTest日期测试</displayName>
-				<fieldNumberType>TIME</fieldNumberType>
-			</field>
-			<field id="dateTimeTest" extends="DATE_FIELD">
-				<displayName>dateTimeTest日期测试</displayName>
-				<fieldNumberType>DATETIME</fieldNumberType>
-			</field>
-			<field id="yearTest" extends="DATE_FIELD">
-				<displayName>yearTest日期测试</displayName>
-				<fieldNumberType>YEAR</fieldNumberType>
-			</field>
-			<field id="yearMonthTest" extends="DATE_FIELD">
-				<displayName>yearMonthTest日期测试</displayName>
-				<fieldNumberType>YEARMONTH</fieldNumberType>
-			</field>
-			<field id="dictionaryTest" extends="INT_FIELD">
-				<displayName>dictionaryTest日期测试</displayName>
-				<dictionary>D_DICTTEST</dictionary>
-			</field>
-			<field id="selectTest" extends="INT_FIELD">
-				<displayName>select选择测试</displayName>
-				<relationDS>
-					<relationItem name="SysUser">
-						<id>SysUserSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
-						<relationModelId>SysUser</relationModelId>
-						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
-						<valueField>id</valueField>
-					</relationItem>
-				</relationDS>
+			<field id="nick" extends="STRING_FIELD">
+				<displayName>昵称</displayName>
+				<fieldLength>100</fieldLength>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
 		</bizField>
 	</masterData>
-	<detailData>
-		<id>B</id>
-		<displayName>分录数据集B</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
-		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
-		<fixField>
-			<primaryKey id="id" extends="PRIMARY_KEY" />
-			<createBy id="createBy" extends="CREATE_BY" />
-			<createTime id="createTime" extends="CREATE_TIME" />
-			<createUnit id="createUnit" extends="CREATE_UNIT" />
-			<modifyBy id="modifyBy" extends="MODIFY_BY" />
-			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
-			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<attachCount id="attachCount" extends="ATTACH_COUNT" />
-			<remark id="remark" extends="REMARK" />
-		</fixField>
-		<bizField>
-			<field id="code" extends="CODE_FIELD">
-				<displayName>detailB_代码</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>20</fieldLength>
-				<defaultValueExpr>code</defaultValueExpr>
-			</field>
-			<field id="nick" extends="NAME_FIELD">
-				<displayName>detailB_昵称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
-				<defaultValueExpr>nick</defaultValueExpr>
-			</field>
-			<field id="stringColumn" extends="STRING_FIELD">
-				<displayName>detailB_stringColumn测试</displayName>
-				<fixHide>false</fixHide>
-				<fieldLength>20</fieldLength>
-			</field>
-			<field id="moneyNumberColumn" extends="AMOUNT_FIELD">
-				<displayName>detailB_moneyNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="priceNumberColumn" extends="PRICE_FIELD">
-				<displayName>detailB_priceNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="unitCostNumberColumn" extends="UNITCOST_FIELD">
-				<displayName>detailB_unitCostNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="percentNumberColumn" extends="PERCENT_FIELD">
-				<displayName>detailB_percentNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="quantityNumberColumn" extends="QUANTITY_FIELD">
-				<displayName>detailB_quantityNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="dateTest" extends="DATE_FIELD">
-				<displayName>detailB_dateTest日期测试</displayName>
-				<fieldNumberType>DATE</fieldNumberType>
-			</field>
-			<field id="timeTest" extends="DATE_FIELD">
-				<displayName>detailB_timeTest日期测试</displayName>
-				<fieldNumberType>TIME</fieldNumberType>
-			</field>
-			<field id="dateTimeTest" extends="DATE_FIELD">
-				<displayName>detailB_dateTimeTest日期测试</displayName>
-				<fieldNumberType>DATETIME</fieldNumberType>
-			</field>
-			<field id="yearTest" extends="DATE_FIELD">
-				<displayName>detailB_yearTest日期测试</displayName>
-				<fieldNumberType>YEAR</fieldNumberType>
-			</field>
-			<field id="yearMonthTest" extends="DATE_FIELD">
-				<displayName>detailB_yearMonthTest日期测试</displayName>
-				<fieldNumberType>YEARMONTH</fieldNumberType>
-			</field>
-			<field id="dictionaryTest" extends="INT_FIELD">
-				<displayName>detailB_dictionaryTest日期测试</displayName>
-				<dictionary>D_DICTTEST</dictionary>
-			</field>
-			<field id="selectTest" extends="INT_FIELD">
-				<displayName>detailB_select选择测试</displayName>
-				<relationDS>
-					<relationItem name="SysUser">
-						<id>SysUserSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
-						<relationModelId>SysUser</relationModelId>
-						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
-						<valueField>id</valueField>
-					</relationItem>
-				</relationDS>
-			</field>
-		</bizField>
-	</detailData>
-	<detailData>
-		<id>C</id>
-		<displayName>分录数据集C</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
-		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
-		<fixField>
-			<primaryKey id="id" extends="PRIMARY_KEY" />
-			<createBy id="createBy" extends="CREATE_BY" />
-			<createTime id="createTime" extends="CREATE_TIME" />
-			<createUnit id="createUnit" extends="CREATE_UNIT" />
-			<modifyBy id="modifyBy" extends="MODIFY_BY" />
-			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
-			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<attachCount id="attachCount" extends="ATTACH_COUNT" />
-			<remark id="remark" extends="REMARK" />
-		</fixField>
-		<bizField>
-			<field id="code" extends="CODE_FIELD">
-				<displayName>detailC_代码</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>20</fieldLength>
-				<defaultValueExpr>code</defaultValueExpr>
-			</field>
-			<field id="nick" extends="NAME_FIELD">
-				<displayName>detailC_昵称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
-				<defaultValueExpr>nick</defaultValueExpr>
-			</field>
-			<field id="stringColumn" extends="STRING_FIELD">
-				<displayName>detailC_stringColumn测试</displayName>
-				<fixHide>false</fixHide>
-				<fieldLength>20</fieldLength>
-			</field>
-			<field id="moneyNumberColumn" extends="AMOUNT_FIELD">
-				<displayName>detailC_moneyNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="priceNumberColumn" extends="PRICE_FIELD">
-				<displayName>detailC_priceNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="unitCostNumberColumn" extends="UNITCOST_FIELD">
-				<displayName>detailC_unitCostNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="percentNumberColumn" extends="PERCENT_FIELD">
-				<displayName>detailC_percentNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="quantityNumberColumn" extends="QUANTITY_FIELD">
-				<displayName>detailC_quantityNumberColumn测试</displayName>
-				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
-				<limitMax>1000</limitMax>
-			</field>
-			<field id="dateTest" extends="DATE_FIELD">
-				<displayName>detailC_dateTest日期测试</displayName>
-				<fieldNumberType>DATE</fieldNumberType>
-			</field>
-			<field id="timeTest" extends="DATE_FIELD">
-				<displayName>detailC_timeTest日期测试</displayName>
-				<fieldNumberType>TIME</fieldNumberType>
-			</field>
-			<field id="dateTimeTest" extends="DATE_FIELD">
-				<displayName>detailC_dateTimeTest日期测试</displayName>
-				<fieldNumberType>DATETIME</fieldNumberType>
-			</field>
-			<field id="yearTest" extends="DATE_FIELD">
-				<displayName>detailC_yearTest日期测试</displayName>
-				<fieldNumberType>YEAR</fieldNumberType>
-			</field>
-			<field id="yearMonthTest" extends="DATE_FIELD">
-				<displayName>detailC_yearMonthTest日期测试</displayName>
-				<fieldNumberType>YEARMONTH</fieldNumberType>
-			</field>
-			<field id="dictionaryTest" extends="INT_FIELD">
-				<displayName>detailC_dictionaryTest日期测试</displayName>
-				<dictionary>D_DICTTEST</dictionary>
-			</field>
-			<field id="selectTest" extends="INT_FIELD">
-				<displayName>detailC_select选择测试</displayName>
-				<relationDS>
-					<relationItem name="SysUser">
-						<id>SysUserSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
-						<relationModelId>SysUser</relationModelId>
-						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
-						<valueField>id</valueField>
-					</relationItem>
-				</relationDS>
-			</field>
-		</bizField>
-	</detailData>
 </datasource>

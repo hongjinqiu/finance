@@ -5,13 +5,13 @@
 	<data-source-model-id></data-source-model-id>
 
 	<description>单据类型参数列表</description>
-	<scripts>js/ds_listtoolbar.js</scripts>
+	<scripts>js/ds_listtoolbar.js&amp;billpaymenttypeparameter/billTypeParameterListTemplate.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
+		<!-- <button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
 
-		<button text="删除" mode="url^" handler="/oa/selfapply/egress/getEgress.go?EMPEGRESS_ID={EMPEGRESS_ID}">
+		<button text="删除" mode="fn" handler="g_deleteRecords">
 			<button-attribute name="code" value="D" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -22,7 +22,7 @@
 		</button>
 
 		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
-		</button>
+		</button> -->
 	</toolbar>
 
 	<!-- <security functionId="10018"></security> -->
@@ -37,35 +37,55 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选单据类型参数" selectionTemplate="{code},{name}" bsonOrderBy="_id" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="id" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}">
-					<expression>1 == 1</expression>
+				<button text="编辑" iconCls="bj_btn" mode="fn" handler="editJump">
+					<expression></expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
-					<expression>1 == 1</expression>
+				<!-- 
+				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+					<expression></expression>
 					<button-attribute name="code" value="D" />
 				</button>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
-					<expression>1 == 1</expression>
+				 -->
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="fn" handler="viewJump">
+					<expression></expression>
 				</button>
 			</buttons>
 		</virtual-column>
 
-		<dictionary-column dictionary="D_BILL_TYPE_PARAMETER" name="type" text="类型" />
+		<!-- <dictionary-column dictionary="D_BILL_TYPE_PARAMETER" name="type" text="类型" /> -->
+		<select-column name="billTypeId" text="类型">
+			<relationDS>
+				<relationItem name="BillType">
+					<relationExpr>true</relationExpr>
+					<jsRelationExpr>true</jsRelationExpr>
+					<relationConfig selectorName="BillTypeSelector" displayField="code,name" valueField="id" selectionMode="single" />
+				</relationItem>
+			</relationDS>
+		</select-column>
 		<dictionary-column dictionary="D_FIN_BUSI_PROPERTY" name="property" text="预设业务属性" />
 	</column-model>
 
 	<query-parameters dataSetId="A">
-		<query-parameter name="type" text="类型" auto="true" editor="combo" restriction="eq">
+		<!-- <query-parameter name="type" text="类型" auto="true" editor="combofield" restriction="eq">
 			<parameter-attribute name="dictionary" value="D_BILL_TYPE_PARAMETER"/>
+		</query-parameter> -->
+		<query-parameter name="billTypeId" text="类型" editor="triggerfield" restriction="in">
+			<relationDS>
+				<relationItem name="BillType">
+					<relationExpr>true</relationExpr>
+					<jsRelationExpr>true</jsRelationExpr>
+					<relationConfig selectorName="BillTypeSelector" displayField="code,name" valueField="id" selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
 		</query-parameter>
-		<query-parameter name="property" text="预设业务属性" auto="true" editor="combo" restriction="eq">
+		<query-parameter name="property" text="预设业务属性" auto="true" editor="combofield" restriction="eq">
 			<parameter-attribute name="dictionary" value="D_FIN_BUSI_PROPERTY"/>
 		</query-parameter>
 	</query-parameters>

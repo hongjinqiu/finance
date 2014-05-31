@@ -26,11 +26,16 @@
 		<auto-column name="providerTypeId" colSpan="2" />
 	</column-model>
 
-	<html>
-		<![CDATA[
-			<div>基本信息</div>
-		]]>
-	</html>
+	<html><![CDATA[
+			<div id="tabContent" style="visibility: hidden;">
+				<ul>
+					<li><a href="#baseInfoDiv">基本信息</a></li>
+					<li><a href="#manageInfoDiv">管理信息</a></li>
+					<li><a href="#remarkDiv">备注</a></li>
+				</ul>
+				<div>
+					<div id="baseInfoDiv">
+	]]></html>
 	
 	<column-model dataSetId="A" colSpan="4">
 		<auto-column name="type" colSpan="2" labelWidth="15%" columnWidth="35%" />
@@ -46,4 +51,41 @@
 		<auto-column name="url" colSpan="2" />
 		<auto-column name="status" colSpan="2" />
 	</column-model>
+
+	<html><![CDATA[
+					</div>
+					<div id="manageInfoDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="4">
+		<auto-column name="createBy" colSpan="2" labelWidth="15%" columnWidth="35%" />
+		<auto-column name="createTime" colSpan="2" labelWidth="15%" />
+		<auto-column name="modifyBy" colSpan="2" />
+		<auto-column name="modifyTime" colSpan="2" />
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+					<div id="remarkDiv">
+	]]></html>
+	
+	<column-model dataSetId="A" colSpan="2">
+		<auto-column name="remark" colSpan="2" labelWidth="15%">
+			<column-attribute name="editor" value="textareafield"/>
+		</auto-column>
+	</column-model>
+	
+	<html><![CDATA[
+					</div>
+				</div>
+			</div>
+			<script type="text/javascript">
+			YUI(g_financeModule).use("finance-module", function(Y) {
+				var tabview = new Y.TabView({srcNode:'#tabContent'});
+				tabview.render();
+				Y.one("#tabContent").setStyle("visibility", "visible");
+			});
+			</script>
+	]]></html>
+	
 </form-template>

@@ -9,7 +9,7 @@ function editData() {//修改
 			"id": bo["id"]
 		},
 		callback: function(o) {
-			g_relationBo = o.relationBo;
+			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
 		}
@@ -20,6 +20,7 @@ function saveData() {//保存
 	var formManager = new FormManager();
 	var bo = formManager.getBo();
 	var validateResult = formManager.dsFormValidator(g_dataSourceJson, bo);
+	
 	if (!validateResult.result) {
 		showError(validateResult.message);
 	} else {
@@ -33,7 +34,7 @@ function saveData() {//保存
 			callback: function(o) {
 				showSuccess("保存数据成功");
 				formManager.setFormStatus("view");
-				g_relationBo = o.relationBo;
+				formManager.applyGlobalParamFromAjaxData(o);
 				formManager.loadData2Form(g_dataSourceJson, o.bo);
 			}
 		});
@@ -50,7 +51,7 @@ function newData() {
 			"formTemplateId": g_formTemplateJsonData.Id
 		},
 		callback: function(o) {
-			g_relationBo = o.relationBo;
+			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
 		}
@@ -68,7 +69,7 @@ function copyData() {
 			"id": bo["id"]
 		},
 		callback: function(o) {
-			g_relationBo = o.relationBo;
+			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
 		}
@@ -78,17 +79,23 @@ function copyData() {
 function giveUpData() {
 	var formManager = new FormManager();
 	var bo = formManager.getBo();
-	ajaxRequest({
-		url: "/" + g_dataSourceJson.Id + "/GiveUpData?format=json"
-		,params: {
-			"dataSourceModelId": g_dataSourceJson.Id,
-			"formTemplateId": g_formTemplateJsonData.Id,
-			"id": bo["id"]
-		},
-		callback: function(o) {
-			g_relationBo = o.relationBo;
-			formManager.loadData2Form(g_dataSourceJson, o.bo);
-			formManager.setFormStatus("view");
+	showWarning("您确定要放弃吗？", function(){
+		if (!bo["id"] || bo["id"] == "0") {
+			location.href = "/console/listschema?@name=" + g_dataSourceJson.Id;
+		} else {
+			ajaxRequest({
+				url: "/" + g_dataSourceJson.Id + "/GiveUpData?format=json"
+				,params: {
+					"dataSourceModelId": g_dataSourceJson.Id,
+					"formTemplateId": g_formTemplateJsonData.Id,
+					"id": bo["id"]
+				},
+				callback: function(o) {
+					formManager.applyGlobalParamFromAjaxData(o);
+					formManager.loadData2Form(g_dataSourceJson, o.bo);
+					formManager.setFormStatus("view");
+				}
+			});
 		}
 	});
 }
@@ -122,7 +129,7 @@ function refreshData() {
 			"id": bo["id"]
 		},
 		callback: function(o) {
-			g_relationBo = o.relationBo;
+			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
@@ -132,18 +139,9 @@ function refreshData() {
 function logList() {
 	var formManager = new FormManager();
 	var bo = formManager.getBo();
-	ajaxRequest({
-		url: "/" + g_dataSourceJson.Id + "/LogList?format=json"
-		,params: {
-			"dataSourceModelId": g_dataSourceJson.Id,
-			"formTemplateId": g_formTemplateJsonData.Id,
-			"id": bo["id"]
-		},
-		callback: function(o) {
-			YUI(g_financeModule).use("finance-module", function(Y) {
-				showAlert(Y.JSON.stringify(o));
-			});
-		}
+	var dialog = showModalDialog({
+		"title": "被用查询",
+		"url": "/console/listschema?@name=PubReferenceLog&beReferenceDataSourceModelId=" + g_dataSourceJson.Id + "&beReferenceId=" + bo["id"] + "&date=" + new Date()
 	});
 }
 
@@ -159,7 +157,7 @@ function cancelData() {
 		},
 		callback: function(o) {
 			showSuccess("作废数据成功");
-			g_relationBo = o.relationBo;
+			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
@@ -178,7 +176,7 @@ function unCancelData() {
 		},
 		callback: function(o) {
 			showSuccess("反作废数据成功");
-			g_relationBo = o.relationBo;
+			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("view");
 		}
@@ -218,8 +216,42 @@ function setBorderTmp(btn, status) {
 
 ToolbarManager.prototype.enableDisableToolbarBtn = function() {
 	if (g_formStatus == "view") {
-		var viewEnableBtnLi = ["listBtn","newBtn","copyBtn","editBtn","delBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
+		var viewEnableBtnLi = ["listBtn","newBtn","copyBtn","editBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
 		var viewDisableBtnLi = ["saveBtn","giveUpBtn"];
+		
+		// cancelBtn,
+		if (g_masterFormFieldDict["billStatus"]) {
+			if (g_masterFormFieldDict["billStatus"].get("value") == "0") {
+				viewEnableBtnLi.push("cancelBtn");
+			} else {
+				viewDisableBtnLi.push("cancelBtn");
+			}
+		}
+		// unCancelBtn,
+		if (g_masterFormFieldDict["billStatus"]) {
+			if (g_masterFormFieldDict["billStatus"].get("value") == "4") {
+				viewEnableBtnLi.push("unCancelBtn");
+			} else {
+				viewDisableBtnLi.push("unCancelBtn");
+			}
+		}
+		// delBtn,
+		var isUsed = false;
+		if (g_usedCheck) {
+			if (g_usedCheck["A"]) {
+				var id = g_masterFormFieldDict["id"].get("value");
+				if (g_usedCheck["A"][id]) {
+					isUsed = true;
+				}
+			}
+		}
+		if (isUsed) {
+			viewDisableBtnLi.push("delBtn");
+		} else {
+			viewEnableBtnLi.push("delBtn");
+		}
+		
+		
 		for (var i = 0; i < viewEnableBtnLi.length; i++) {
 			var btn = document.getElementById(viewEnableBtnLi[i]);
 			if (btn) {
@@ -227,6 +259,7 @@ ToolbarManager.prototype.enableDisableToolbarBtn = function() {
 				setBorderTmp(btn, "");
 			}
 		}
+		/*
 		var cancelBtn = document.getElementById("cancelBtn");
 		if (cancelBtn && g_masterFormFieldDict["billStatus"]) {
 			if (g_masterFormFieldDict["billStatus"].get("value") == "0") {
@@ -247,6 +280,7 @@ ToolbarManager.prototype.enableDisableToolbarBtn = function() {
 				setBorderTmp(unCancelBtn, "disabled");
 			}
 		}
+		*/
 		
 		for (var i = 0; i < viewDisableBtnLi.length; i++) {
 			var btn = document.getElementById(viewDisableBtnLi[i]);

@@ -4,6 +4,9 @@ function ColumnManager() {
 }
 
 ColumnManager.prototype.currencyFormatFunc = function(o) {
+	if (o.column.zeroShowEmpty == "true" && o.value == "0") {
+		return "";
+	}
 	var self = this;
 	var yInst = self.yInst;
 	var formatConfig = null;
@@ -160,6 +163,23 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
 						}
 						if (!buttonBoLi || buttonBoLi[j]["isShow"]) {
+							var id = columnModel.IdColumn.Name;
+							var isUsed = g_usedCheck && g_usedCheck[columnModel.DataSetId] && g_usedCheck[columnModel.DataSetId][o.data[id]];
+							if (!(isUsed && virtualColumn.Buttons.ButtonLi[j].Name == "btn_delete")) {
+								// handler进行值的预替换,
+								var Y = yInst;
+								var handler = virtualColumn.Buttons.ButtonLi[j].Handler;
+								handler = Y.Lang.sub(handler, o.data);
+								htmlLi.push(Y.Lang.sub(btnTemplate, {
+									value: virtualColumn.Buttons.ButtonLi[j].Text,
+									handler: handler,
+									"class": virtualColumn.Buttons.ButtonLi[j].IconCls,
+									href: handler,
+									columnModelName: columnModelName
+								}));
+							}
+							
+							/*
 							// handler进行值的预替换,
 							var Y = yInst;
 							var handler = virtualColumn.Buttons.ButtonLi[j].Handler;
@@ -171,6 +191,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 								href: handler,
 								columnModelName: columnModelName
 							}));
+							 */
 						}
 					}
 					return htmlLi.join("");
@@ -188,16 +209,26 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 	if (columnConfig.DecimalPlaces) {
 		decimalPlaces = parseInt(columnConfig.DecimalPlaces);
 	}
-	var isFormatter = columnConfig.Prefix != "";
-	isFormatter = isFormatter || columnConfig.DecimalPlaces != "";
-	isFormatter = isFormatter || columnConfig.DecimalSeparator != "";
-	isFormatter = isFormatter || columnConfig.ThousandsSeparator != "";
-	isFormatter = isFormatter || columnConfig.Suffix != "";
+	var isFormatter = (columnConfig.Prefix || "") != "";
+	isFormatter = isFormatter || (columnConfig.DecimalPlaces || "") != "";
+	isFormatter = isFormatter || (columnConfig.DecimalSeparator || "") != "";
+	isFormatter = isFormatter || (columnConfig.ThousandsSeparator || "") != "";
+	isFormatter = isFormatter || (columnConfig.Suffix || "") != "";
 	
 	// 财务相关字段的判断,以决定是否用 formatter 函数,
-	isFormatter = isFormatter || columnConfig.CurrencyField != "";
-	isFormatter = isFormatter || columnConfig.IsPercent != "";
+	isFormatter = isFormatter || (columnConfig.CurrencyField || "") != "";
+	isFormatter = isFormatter || (columnConfig.IsPercent || "") != "";
+
+	var zeroShowEmpty = columnConfig.ZeroShowEmpty == "true";
 	
+	/*
+	if (columnConfig.Name == "sequenceNo") {
+		console.log("sequence no");
+		console.log(isFormatter);
+		console.log(columnConfig.Prefix);
+		console.log(columnConfig.Prefix != "");
+	}
+	*/
 	if (isFormatter) {
 		return {
 			key: columnConfig.Name,
@@ -214,7 +245,20 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 			isPercent: columnConfig.IsPercent,
 			isMoney: columnConfig.IsMoney,
 			isUnitPrice: columnConfig.IsUnitPrice,
-			isCost: columnConfig.IsCost
+			isCost: columnConfig.IsCost,
+			zeroShowEmpty: columnConfig.ZeroShowEmpty
+		};
+	}
+	if (zeroShowEmpty) {
+		return {
+			key: columnConfig.Name,
+			label: columnConfig.Text,
+			formatter: function(o) {
+				if (o.value == "0") {
+					return "";
+				}
+				return o.value;
+			}
 		};
 	}
 	return {
@@ -224,7 +268,7 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 }
 
 ColumnManager.prototype.convertDate2DisplayPattern = function(displayPattern) {
-	displayPattern = displayPattern.replace("yyyy", "%G");
+	displayPattern = displayPattern.replace("yyyy", "%Y");
 	displayPattern = displayPattern.replace("MM", "%m");
 	displayPattern = displayPattern.replace("dd", "%d");
 	displayPattern = displayPattern.replace("HH", "%H");
@@ -248,7 +292,11 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 			label: columnConfig.Text,
 			dbPattern: dbPattern,
 			displayPattern: displayPattern,
+			zeroShowEmpty: columnConfig.ZeroShowEmpty,
 			formatter: function(o) {
+				if (o.column.zeroShowEmpty == "true" && o.value == "0") {
+					return "";
+				}
 				if (o.value !== undefined && o.value !== null) {
 					var date = new Date();
 					var value = o.value + "";
@@ -305,6 +353,19 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 			console.log("日期字段未同时配置dbPattern和displayPattern");
 		}
 	}
+	var zeroShowEmpty = columnConfig.ZeroShowEmpty == "true";
+	if (zeroShowEmpty) {
+		return {
+			key: columnConfig.Name,
+			label: columnConfig.Text,
+			formatter: function(o) {
+				if (o.value == "0") {
+					return "";
+				}
+				return o.value;
+			}
+		};
+	}
 	return {
 		key: columnConfig.Name,
 		label: columnConfig.Text
@@ -353,7 +414,11 @@ ColumnManager.prototype.createSelectColumn = function(columnConfig) {
 		key: columnConfig.Name,
 		label: columnConfig.Text,
 		allowHTML:  true,
+		zeroShowEmpty: columnConfig.ZeroShowEmpty,
 		formatter: function(o) {
+			if (o.column.zeroShowEmpty == "true" && o.value == "0") {
+				return "";
+			}
 			var commonUtil = new CommonUtil();
 			var bo = {"A": o.data};
 			var relationItem = commonUtil.getCRelationItem(columnConfig.CRelationDS, bo, o.data);
@@ -462,9 +527,11 @@ ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
 		if (column) {
 			columns.push(column);
 		} else {
-			var virtualColumn = self.createVirtualColumn(columnModelName, columnModel, i);
-			if (virtualColumn) {
-				columns.push(virtualColumn);
+			if (columnModel.ColumnLi[i].ForEditor != "true") {
+				var virtualColumn = self.createVirtualColumn(columnModelName, columnModel, i);
+				if (virtualColumn) {
+					columns.push(virtualColumn);
+				}
 			}
 		}
 //		if (i == 2) {

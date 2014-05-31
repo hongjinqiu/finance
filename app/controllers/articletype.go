@@ -18,38 +18,33 @@ type ArticleType struct {
 
 func (c ArticleType) SaveData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c ArticleType) DeleteData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c ArticleType) EditData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c ArticleType) NewData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c ArticleType) GetData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +52,8 @@ func (c ArticleType) GetData() revel.Result {
  */
 func (c ArticleType) CopyData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +61,8 @@ func (c ArticleType) CopyData() revel.Result {
  */
 func (c ArticleType) GiveUpData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +70,8 @@ func (c ArticleType) GiveUpData() revel.Result {
  */
 func (c ArticleType) RefreshData() revel.Result {
 	c.actionSupport = ArticleTypeSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c ArticleType) LogList() revel.Result {

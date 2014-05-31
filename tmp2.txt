@@ -1,44 +1,69 @@
-master
-createBy
-master
-createTime
-master
-modifyBy
-master
-modifyTime
-master
-billStatus
-master
-attachCount
-master
-remark
-master
-code
-master
-nick
-master
-startDate
-master
-endDate
-master
-createBy
-master
-createTime
-master
-modifyBy
-master
-modifyTime
-master
-billStatus
-master
-attachCount
-master
-remark
-master
-code
-master
-nick
-master
-startDate
-master
-endDate
+PayPact	付款条款,没用到,---------------------to delete----------------------,
+
+默认值,被用不可改,不可复制,列表页的多选选择,
+
+基础资料,挨个开发,
+ArticleType	项目类别,用到,finish,被用关联添加,
+Article	项目		被收款单用到,finish,被用关联添加,
+ProviderType	供应商类别,finish,被用关联添加,
+Provider	供应商,用到,finish,pass,被用关联添加,
+CurrencyType	币别,用到,finish,pass,被用关联添加,
+Bank	银行资料,用到,pass,finish,被用关联添加,
+MeasureUnit	计量单位,用到,finish,被用关联添加,
+CashAccount	现金账户,用到,pass,finish,被用关联添加,
+CustomerType	客户类别,用到,pass,被用关联添加,
+Customer	客户,用到,pass,被用关联添加,
+SysUser	系统用户,用到,pass,被用关联添加,
+TaxType	税率类别,用到,pass,finish,被用关联添加,
+BalanceType	结算方式,用到,pass,finish,被用关联添加,
+IncomeType	收入费用类别,用到,pass,finish,
+IncomeItem	收入费用项目,用到,pass,finish,
+BankAccount	银行账户,用到,pass,比较难搞,finish,
+AccountingPeriod	会计期,finish,被用关联添加,
+
+找一个东东进行选择器的开发,	
+
+单据类型:
+BillType	单据类型,用到,finish,
+
+单据类型参数:
+BillReceiveTypeParameter	收款单类型参数,finish,被用关联添加,
+BillPaymentTypeParameter	付款单类型参数,finish,被用关联添加,
+
+系统参数:
+SystemParameter	系统参数,用到,pass,
+
+
+初始化:
+AccountInit	账户初始化,用到,pass,需要完成button的选回的配置实现,running,--------------
+现户账户初始化,running,--------------------------------,
+增,
+删,
+改,
+查,
+
+
+选择器的算法,跟这个地方有点小区别,
+因此,还是用算法,算出一个数据,然后循环一遍即可
+需要在button里面添加 <relationDS>的相关属性,
+1.button添加relationDS属性,running,--------------------------------,
+2.迭代模型添加 对 button 的迭代,
+3.JS实现对选回数据的复制,
+
+银行账户初始化,
+
+单据:
+GatheringBill	收款单,用到,pass,
+PayBill	付款单,用到,pass,
+
+
+报表:
+AccountInOut	月档,used,pass,
+AccountInOutItem	日记账明细,pass,
+
+
+最后,所有的查询,都要带上createUnit字段,
+
+
+
+

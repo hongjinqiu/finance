@@ -1,9 +1,14 @@
-DataTableManager.prototype.doAfterResponse = function() {
+DataTableManager.prototype.doAfterResponse = function(e) {
 	// this is a total HACK, should figure a better way than Y.later ...
 	YUI(g_financeModule).use("finance-module", function(Y) {
 		Y.later( 25, self, function(){
 			syncCheckboxWhenChangeSelection(Y, dtInst.dt);
 		} );
+		
+		var data = Y.JSON.parse(e.data.responseText);
+		if (data.relationBo) {
+			g_relationManager.mergeRelationBo(data.relationBo);
+		}
 	});
 }
 

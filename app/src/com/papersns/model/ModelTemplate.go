@@ -41,13 +41,14 @@ type MasterData struct {
 }
 
 type DetailData struct {
-	XMLName       xml.Name    `xml:"detailData"`
-	Id            string      `xml:"id"`
-	DisplayName   string      `xml:"displayName"`
-	ParentId      string      `xml:"parentId"`
-	AllowEmptyRow string      `xml:"allowEmptyRow"`
+	XMLName     xml.Name `xml:"detailData"`
+	Id          string   `xml:"id"`
+	DisplayName string   `xml:"displayName"`
+	//	ParentId      string      `xml:"parentId"`
+	AllowEmpty    string      `xml:"allowEmpty"`
+	//AllowEmptyRow string      `xml:"allowEmptyRow"`
 	AllowCopy     string      `xml:"allowCopy"`
-	Readonly      string      `xml:"readonly"`
+	//Readonly      string      `xml:"readonly"`
 	PrimaryKey    string      `xml:"primaryKey"`
 	FixField      FixField    `xml:"fixField"`
 	BizField      BizField    `xml:"bizField"`

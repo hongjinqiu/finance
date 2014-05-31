@@ -1,6 +1,21 @@
 function RelationManager() {
 }
 
+RelationManager.prototype.mergeRelationBo = function(relationBo) {
+	for (var key in relationBo) {
+		if (!g_relationBo[key]) {
+			g_relationBo[key] = relationBo[key];
+		} else {
+			var relationBoItem = g_relationBo[key];
+			for (var subKey in relationBo[key]) {
+				if (!relationBoItem[subKey]) {
+					relationBoItem[subKey] = relationBo[key][subKey];
+				}
+			}
+		}
+	}
+}
+
 /**
  * 开窗选回后,加入到g_relationBo中
  */

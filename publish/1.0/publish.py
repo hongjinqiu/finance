@@ -224,9 +224,16 @@ def initSysUser():
         item['A'] = {
             '_id': item['_id'],
             'id': item['id'],
-            'code': 'code' + str(random.randint(0,100)),
-            'name': 'name' + str(random.randint(0,100)),
+            'code': 'code' + str(item['_id']) + '_' + str(random.randint(0,100)),
+            'name': 'name' + str(item['_id']) + '_' + str(random.randint(0,100)),
+            'type': 2,
+            'status': 1,
+            'sellerId': random.randint(0,10000),
+            'sellerNick': 'sellerNick' + str(item['_id']) + '_' + str(random.randint(0,100)),
+            'nick': 'nick' + str(item['_id']) + '_' + str(random.randint(0,100)),
         }
+        if item["_id"] == 15:
+            item["A"]["type"] = 1
         mongoDB.SysUser.save(item)
 
 if __name__ == '__main__':

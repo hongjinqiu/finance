@@ -239,7 +239,6 @@ func (o CommonMethod) getCRelationDS(cRelationDS CRelationDS, relationDS Relatio
 	return resultCRelationDS
 }
 
-// TODO, bytest
 func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 	if column.Text == "" {
 		column.Text = fieldGroup.DisplayName
@@ -249,6 +248,9 @@ func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 	}
 	if column.FixReadOnly == "" {
 		column.FixReadOnly = fieldGroup.FixReadOnly
+	}
+	if column.ZeroShowEmpty == "" {
+		column.ZeroShowEmpty = fieldGroup.ZeroShowEmpty
 	}
 	if column.XMLName.Local == "auto-column" {
 		o.applyAutoColumnXMLName(fieldGroup, column)

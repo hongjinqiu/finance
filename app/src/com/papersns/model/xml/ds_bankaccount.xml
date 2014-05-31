@@ -27,20 +27,14 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<!-- <billStatus id="billStatus" extends="BILL_STATUS" /> -->
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
 		<bizField>
 			<field id="code" extends="CODE_FIELD">
-				<displayName>代码</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>20</fieldLength>
 			</field>
 			<field id="name" extends="NAME_FIELD">
-				<displayName>名称</displayName>
-				<allowEmpty>false</allowEmpty>
-				<fieldLength>40</fieldLength>
 			</field>
 			<field id="mnemonicNo" extends="STRING_FIELD">
 				<displayName>助记码</displayName>
@@ -62,11 +56,13 @@
 					</relationItem>
 				</relationDS>
 			</field>
+			<!-- 
 			<field id="bankAccount" extends="STRING_FIELD">
 				<displayName>银行帐号</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>30</fieldLength>
 			</field>
+			 -->
 			<field id="linkBy" extends="STRING_FIELD">
 				<displayName>开户银行联系人</displayName>
 				<allowEmpty>true</allowEmpty>
@@ -90,6 +86,7 @@
 			<field id="dutyBy" extends="INT_FIELD">
 				<displayName>账户责任人</displayName>
 				<allowEmpty>true</allowEmpty>
+				<zeroShowEmpty>true</zeroShowEmpty>
 				<relationDS>
 					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
@@ -113,9 +110,8 @@
 	<detailData>
 		<id>B</id>
 		<displayName>账户币别</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
+		<allowEmpty>false</allowEmpty>
 		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
@@ -124,6 +120,7 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
@@ -132,6 +129,8 @@
 				<displayName>币别代码</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>true</allowCopy>
+				<allowDuplicate>false</allowDuplicate>
+				<zeroShowEmpty>true</zeroShowEmpty>
 				<relationDS>
 					<relationItem name="CurrencyType">
 						<id>CurrencyTypeSelector</id>
@@ -150,13 +149,16 @@
 				<allowCopy>true</allowCopy>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="amtOriginalCurrencyBalance" extends="FLOAT_FIELD">
 				<displayName>当前余额</displayName>
 				<allowEmpty>true</allowEmpty>
-				<allowCopy>true</allowCopy>
+				<allowCopy>false</allowCopy>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
+				<fixReadOnly>true</fixReadOnly>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="amtLimits" extends="FLOAT_FIELD">
 				<displayName>限额</displayName>
@@ -164,6 +166,7 @@
 				<allowCopy>true</allowCopy>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="limitsControl" extends="INT_FIELD">
 				<displayName>赤字控制</displayName>

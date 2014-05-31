@@ -18,38 +18,33 @@ type PayBill struct {
 
 func (c PayBill) SaveData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.saveCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.saveCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c PayBill) DeleteData() revel.Result {
 	c.actionSupport = PayBillSupport{}
 	
-	bo, relationBo, dataSource := c.deleteDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.deleteDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c PayBill) EditData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.editDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.editDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c PayBill) NewData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.newDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.newDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c PayBill) GetData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.getDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.getDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -57,9 +52,8 @@ func (c PayBill) GetData() revel.Result {
  */
 func (c PayBill) CopyData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.copyDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.copyDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -67,9 +61,8 @@ func (c PayBill) CopyData() revel.Result {
  */
 func (c PayBill) GiveUpData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.giveUpDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.giveUpDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -77,9 +70,8 @@ func (c PayBill) GiveUpData() revel.Result {
  */
 func (c PayBill) RefreshData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	bo, relationBo, dataSource := c.refreshDataCommon()
-	
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.refreshDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c PayBill) LogList() revel.Result {
@@ -98,9 +90,8 @@ func (c PayBill) LogList() revel.Result {
  */
 func (c PayBill) CancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.cancelDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.cancelDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -108,8 +99,7 @@ func (c PayBill) CancelData() revel.Result {
  */
 func (c PayBill) UnCancelData() revel.Result {
 	c.actionSupport = ActionSupport{}
-	bo, relationBo, dataSource := c.unCancelDataCommon()
-
-	return c.renderCommon(bo, relationBo, dataSource)
+	modelRenderVO := c.unCancelDataCommon()
+	return c.renderCommon(modelRenderVO)
 }
 
