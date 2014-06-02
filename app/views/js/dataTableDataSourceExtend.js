@@ -214,6 +214,96 @@ function g_pluginCopyRow(o, dataSetId) {
 	g_gridPanelDict[dataSetId + "_addrow"].dt.addRow(data);
 }
 
+function _recurionApplyCopyField(data, columnLi, columnName, columnValue) {
+	var bo = new FormManager().getBo();
+	data[columnName] = columnValue;
+	var commonUtil = new CommonUtil();
+	for (var i = 0; i < columnLi.length; i++) {
+		if (columnLi[i].Name == columnName) {
+			if (columnLi[i].XMLName.Local == "seelct-column") {
+				if (columnLi[i].CRelationDS) {
+					var relationItem = commonUtil.getCRelationItem(columnLi[i].CRelationDS, bo, data);
+					if (relationItem.CCopyConfigLi) {
+						for (var j = 0; j < relationItem.CCopyConfigLi.length; j++) {
+							var copyValueField = relationItem.CCopyConfigLi[j].CopyValueField;
+							var selectorDict = g_relationManager.getRelationBo(relationItem.CRelationConfig.SelectorName, columnValue);
+							if (selectorDict) {
+								var copyColumnValue = selectorDict[copyValueField];
+								_recurionApplyCopyField(data, columnLi, relationItem.CCopyConfigLi[j].CopyColumnName, copyColumnValue);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+/*
+	"buttonConfig": {
+		"selectRowBtn": {
+			selectFunc: function(datas){},// 单多选回调
+			queryFunc: function(){}// 单多选回调
+		}
+	}
+ */
+/**
+ * 点击选择,选择回多行,需要从全局配置中读queryFunc,selectFunc是这里面应用上的
+ * @param dataSetId
+ */
+function g_selectRow(dataSetId, btnName) {
+//	var formManager = new FormManager();
+	var templateIterator = new TemplateIterator();
+	var result = "";
+	templateIterator.iterateAnyTemplateButton(result, function(toolbarOrColumnModel, button, result) {
+		if (toolbarOrColumnModel.DataSetId == dataSetId && button.Name == btnName) {
+			window.s_selectFunc = function(selectValueLi) {
+				if (button.jsConfig && button.jsConfig.selectFunc) {
+					button.jsConfig.selectFunc(selectValueLi);
+				} else {
+					selectRowBtnDefaultAction(dataSetId, toolbarOrColumnModel, button, selectValueLi);
+				}
+        	};
+        	window.s_queryFunc = function() {
+        		var queryFunc = null;
+        		if (button.jsConfig && button.jsConfig.queryFunc) {
+        			queryFunc = button.jsConfig.queryFunc;
+        		}
+        		if (queryFunc) {
+        			return queryFunc();
+        		}
+        		return {};
+        	};
+        	if (button.CRelationDS && button.CRelationDS.CRelationItemLi) {
+    			var relationItem = button.CRelationDS.CRelationItemLi[0];
+    			var url = "/console/selectorschema?@name={NAME_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}";
+    			var selectorName = relationItem.CRelationConfig.SelectorName;
+    			url = url.replace("{NAME_VALUE}", selectorName);
+    			var multi = relationItem.CRelationConfig.SelectionMode == "multi";
+    			url = url.replace("{MULTI_VALUE}", multi);
+    			var displayField = relationItem.CRelationConfig.DisplayField;
+    			url = url.replace("{DISPLAY_FIELD_VALUE}", displayField);
+    			var selectorTitle = g_relationBo[selectorName].Description;
+    			var dialog = showModalDialog({
+    				"title": selectorTitle,
+    				"url": url
+    			});
+    			window.s_closeDialog = function() {
+    				if (window.s_dialog) {
+    					window.s_dialog.hide();
+    				}
+    				window.s_dialog = null;
+    				window.s_selectFunc = null;
+    				window.s_queryFunc = null;
+    			}
+        	}
+        	
+			return true;
+		}
+		return false;
+	});
+}
+
 /**
  * 点击新增,新增一行
  */

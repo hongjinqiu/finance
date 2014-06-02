@@ -1352,33 +1352,40 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 	return result
 }
 
+func (o TemplateManager) mergeSelectorInfo2RelationBoFromCRelationDS(cRelationDS CRelationDS, relationBo *map[string]interface{}) {
+	if cRelationDS.CRelationItemLi != nil {
+		for _, item := range cRelationDS.CRelationItemLi {
+			selectorName := item.CRelationConfig.SelectorName
+			if (*relationBo)[selectorName] != nil {
+				selectorDict := (*relationBo)[selectorName].(map[string]interface{})
+				if selectorDict["Description"] == nil {
+					selectorTemplate := o.GetSelectorTemplate(selectorName)
+					selectorDict["Description"] = selectorTemplate.Description
+				}
+				if selectorDict["url"] == nil {
+					selectorTemplate := o.GetSelectorTemplate(selectorName)
+					selectorDict["url"] = o.GetViewUrl(selectorTemplate)
+				}
+				(*relationBo)[selectorName] = selectorDict
+			} else {
+				selectorDict := map[string]interface{}{}
+				selectorTemplate := o.GetSelectorTemplate(selectorName)
+				selectorDict["Description"] = selectorTemplate.Description
+				selectorDict["url"] = o.GetViewUrl(selectorTemplate)
+				(*relationBo)[selectorName] = selectorDict
+			}
+		}
+	}
+}
+
 func (o TemplateManager) mergeSelectorInfo2RelationBo(formTemplate FormTemplate, relationBo *map[string]interface{}) {
 	formTemplateIterator := FormTemplateIterator{}
 	var result interface{} = ""
 	formTemplateIterator.IterateTemplateColumn(formTemplate, &result, func(column Column, result *interface{}){
-		if column.CRelationDS.CRelationItemLi != nil {
-			for _, item := range column.CRelationDS.CRelationItemLi {
-				selectorName := item.CRelationConfig.SelectorName
-				if (*relationBo)[selectorName] != nil {
-					selectorDict := (*relationBo)[selectorName].(map[string]interface{})
-					if selectorDict["Description"] == nil {
-						selectorTemplate := o.GetSelectorTemplate(selectorName)
-						selectorDict["Description"] = selectorTemplate.Description
-					}
-					if selectorDict["url"] == nil {
-						selectorTemplate := o.GetSelectorTemplate(selectorName)
-						selectorDict["url"] = o.GetViewUrl(selectorTemplate)
-					}
-					(*relationBo)[selectorName] = selectorDict
-				} else {
-					selectorDict := map[string]interface{}{}
-					selectorTemplate := o.GetSelectorTemplate(selectorName)
-					selectorDict["Description"] = selectorTemplate.Description
-					selectorDict["url"] = o.GetViewUrl(selectorTemplate)
-					(*relationBo)[selectorName] = selectorDict
-				}
-			}
-		}
+		o.mergeSelectorInfo2RelationBoFromCRelationDS(column.CRelationDS, relationBo)
+	})
+	formTemplateIterator.IterateTemplateButton(formTemplate, &result, func(toolbar Toolbar, column ColumnModel, isToolbarBtn bool, button Button, result *interface{}){
+		o.mergeSelectorInfo2RelationBoFromCRelationDS(button.CRelationDS, relationBo)
 	})
 }
 

@@ -65,12 +65,12 @@ type Html struct {
 }
 
 type Toolbar struct {
-	XMLName     xml.Name    `xml:"toolbar"`
+	XMLName xml.Name `xml:"toolbar"`
 	ToolbarCommon
 }
 
 type EditorToolbar struct {
-	XMLName     xml.Name    `xml:"editor-toolbar"`
+	XMLName xml.Name `xml:"editor-toolbar"`
 	ToolbarCommon
 }
 
@@ -115,7 +115,7 @@ type ColumnModel struct {
 	CheckboxColumn CheckboxColumn `xml:"checkbox-column"`
 	IdColumn       IdColumn       `xml:"id-column"`
 	Toolbar        Toolbar        `xml:"toolbar"`
-	EditorToolbar        EditorToolbar        `xml:"editor-toolbar"`
+	EditorToolbar  EditorToolbar  `xml:"editor-toolbar"`
 	ColumnLi       []Column       `xml:",any"`
 
 	ColumnModelAttributeGroup
@@ -242,7 +242,7 @@ type Column struct {
 	IsPercent     string `xml:"isPercent,attr,omitempty"`     // 是否百分比
 	IsQuantity    string `xml:"isQuantity,attr,omitempty"`    // 是否数量
 
-	Script string `xml:"script,attr,omitempty"`
+	Script    string `xml:"script,attr,omitempty"`
 	ForEditor string `xml:"forEditor,attr,omitempty"`
 
 	// select-column的内容
@@ -393,6 +393,7 @@ type Button struct {
 	XMLName         xml.Name        `xml:""` // 有可能是button,也有可能是split-button
 	Expression      string          `xml:"expression"`
 	ButtonAttribute ButtonAttribute `xml:"button-attribute"`
+	CRelationDS     CRelationDS     `xml:"relationDS"`
 	ButtonAttributeGroup
 }
 

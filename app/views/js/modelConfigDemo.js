@@ -41,6 +41,12 @@ var sysUserModel = {
 		canceledit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),未实现
 		celldblclick: function() {},// 暂不实现
 		validate: function(bo, data) {}// 整条记录的validate
+	},
+	"buttonConfig": {
+		"selectRowBtn": {
+			selectFunc: function(datas){},// 单多选回调
+			queryFunc: function(){}// 单多选回调
+		}
 	}
 };
 

@@ -99,3 +99,16 @@ ModelIterator.prototype.iterateAllDataSet = function(dataSource, result, iterate
 	}
 }
 
+//function IterateFunc(btnName, btnValue, result){}
+//
+//ModelIterator.prototype.iterateAllButton = function(dataSource, result, iterateFunc) {
+//	var self = this;
+//	if (dataSource.buttonConfig) {
+//		for (var key in dataSource.buttonConfig) {
+//			iterateFunc(key, dataSource.buttonConfig[key], result);
+//		}
+//	}
+//}
+
+
+

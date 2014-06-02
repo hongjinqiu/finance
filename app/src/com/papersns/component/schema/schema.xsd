@@ -272,6 +272,7 @@
 						<attribute name="value"></attribute>
 					</complexType>
 				</element>
+				<element ref="tns:relationDS" minOccurs="0"></element>
 			</sequence>
 			<attributeGroup ref="tns:button-attribute" />
 		</complexType>
@@ -776,11 +777,6 @@
 		<attribute name="fixReadOnly" type="boolean" default="false">
 			<annotation>
 				<documentation>是否固定只读</documentation>
-			</annotation>
-		</attribute>
-		<attribute name="zeroShowEmpty" type="boolean" default="false">
-			<annotation>
-				<documentation>是否0显示为空</documentation>
 			</annotation>
 		</attribute>
 		<attribute name="zeroShowEmpty" type="boolean" default="false">
