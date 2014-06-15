@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>BankAccountCurrencyType</id>
+	<displayName>银行账户币别</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName></collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<billStatus id="billStatus" extends="BILL_STATUS" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="code" extends="CODE_FIELD">
+			</field>
+			<field id="name" extends="NAME_FIELD">
+			</field>
+			<field id="bankAccountId" extends="INT_FIELD">
+				<displayName>银行账户</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem name="BankAccount">
+						<id>BankAccountSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>BankAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="bankId" extends="INT_FIELD">
+				<displayName>开户银行</displayName>
+				<allowEmpty>false</allowEmpty>
+				<relationDS>
+					<relationItem name="Bank">
+						<id>BankSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>Bank</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="accountProperty" extends="INT_FIELD">
+				<displayName>账户属性</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_FIN_ACCOUNT_PROPERTY</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field>
+			<field id="currencyTypeId" extends="INT_FIELD">
+				<displayName>币别代码</displayName>
+				<allowEmpty>false</allowEmpty>
+				<allowCopy>true</allowCopy>
+				<zeroShowEmpty>true</zeroShowEmpty>
+				<relationDS>
+					<relationItem name="CurrencyType">
+						<id>CurrencyTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>CurrencyType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="bankAccountCurrencyTypeId" extends="INT_FIELD">
+				<displayName>银行账户币别分录ID</displayName>
+				<allowEmpty>false</allowEmpty>
+				<fixHide>true</fixHide>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

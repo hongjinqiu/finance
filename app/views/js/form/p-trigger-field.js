@@ -45,7 +45,6 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChi
 											}
 											fieldDict[copyColumnName].set("value", valueLi.join(","));
 										}
-										
 									}
 								}
 							} else {
@@ -176,7 +175,7 @@ Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChi
     			if (!fieldGroup.jsConfig.selectFunc) {
     				fieldGroup.jsConfig.selectFunc = function(selectValueLi, formObj) {
     					if (!selectValueLi || selectValueLi.length == 0) {
-    						self._getUnSelectionAction()(self);
+    						self.get("unSelectFunc")(self);
     					} else {
     						formObj.set("value", selectValueLi.join(","));
     					}

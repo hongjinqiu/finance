@@ -160,8 +160,8 @@ def getDictionaryLi():
         'code': 'D_FEE_ACCOUNT_TYPE',
         'name': '费用账户类型',
         'items': [
-            {'code': 1,'name': '银行存款','order': 1},
-            {'code': 2,'name': '现金','order': 2},
+            {'code': 1,'name': '现金','order': 1},
+            {'code': 2,'name': '银行存款','order': 2},
         ],
     })
     li.append({
@@ -201,6 +201,14 @@ def getDictionaryLi():
             {'code': -1,'name': '删除','order': -1},
             {'code': 1,'name': '正常','order': 1},
             {'code': 2,'name': '冻结','order': 2},
+        ],
+    })
+    li.append({
+        'code': 'D_BILL_STATUS',
+        'name': '单据状态',
+        'items': [
+            {'code': 1,'name': '正常','order': 1},
+            {'code': 4,'name': '作废','order': 2},
         ],
     })
 

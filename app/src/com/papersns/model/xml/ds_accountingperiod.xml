@@ -41,6 +41,7 @@
 				<allowCopy>false</allowCopy>
 				<zeroShowEmpty>true</zeroShowEmpty>
 				<allowDuplicate>false</allowDuplicate>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 			<field id="numAccountingPeriod" extends="INT_FIELD">
 				<displayName>会计期总数</displayName>
@@ -50,6 +51,7 @@
 				<limitMax>20</limitMax>
 				<defaultValueExpr>12</defaultValueExpr>
 				<zeroShowEmpty>true</zeroShowEmpty>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 		</bizField>
 	</masterData>
@@ -78,15 +80,18 @@
 				<limitOption>limitRange</limitOption>
 				<limitMin>1</limitMin>
 				<limitMax>20</limitMax>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 			<field id="startDate" extends="DATE_FIELD">
 				<displayName>开始日期</displayName>
 				<allowEmpty>false</allowEmpty>
+				<denyEditInUsed>true</denyEditInUsed>
 				<!-- <fixReadOnly>true</fixReadOnly> -->
 			</field>
 			<field id="endDate" extends="DATE_FIELD">
 				<displayName>结束日期</displayName>
 				<allowEmpty>false</allowEmpty>
+				<denyEditInUsed>true</denyEditInUsed>
 			</field>
 		</bizField>
 	</detailData>

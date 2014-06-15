@@ -465,8 +465,10 @@ func (o ModelTemplateFactory) getBo(dataSource DataSource) map[string]interface{
 func (o ModelTemplateFactory) applyDefaultValueExpr(dataSource DataSource, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
+	tmpBo := *bo
+	tmpBo["pendingTransactions"] = []interface{}{}
 	expressionParser := ExpressionParser{}
-	boJsonData, err := json.Marshal(bo)
+	boJsonData, err := json.Marshal(&tmpBo)
 	if err != nil {
 		panic(err)
 	}
@@ -496,7 +498,9 @@ func (o ModelTemplateFactory) applyDataSetDefaultValue(dataSource DataSource, da
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	expressionParser := ExpressionParser{}
-	boJsonData, err := json.Marshal(&bo)
+	tmpBo := bo
+	tmpBo["pendingTransactions"] = []interface{}{}
+	boJsonData, err := json.Marshal(&tmpBo)
 	if err != nil {
 		panic(err)
 	}
@@ -528,7 +532,9 @@ func (o ModelTemplateFactory) applyCalcValueExpr(dataSource DataSource, bo *map[
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	expressionParser := ExpressionParser{}
-	boJsonData, err := json.Marshal(bo)
+	tmpBo := *bo
+	tmpBo["pendingTransactions"] = []interface{}{}
+	boJsonData, err := json.Marshal(&tmpBo)
 	if err != nil {
 		panic(err)
 	}
@@ -558,7 +564,9 @@ func (o ModelTemplateFactory) applyDataSetCalcValue(dataSource DataSource, dataS
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	expressionParser := ExpressionParser{}
-	boJsonData, err := json.Marshal(&bo)
+	tmpBo := bo
+	tmpBo["pendingTransactions"] = []interface{}{}
+	boJsonData, err := json.Marshal(&tmpBo)
 	if err != nil {
 		panic(err)
 	}
@@ -678,7 +686,9 @@ func (o ModelTemplateFactory) applyRelationFieldValue(dataSource DataSource, bo 
 func (o ModelTemplateFactory) ParseRelationExpr(fieldGroup FieldGroup, bo map[string]interface{}, data map[string]interface{}) (RelationItem, bool) {
 	fieldValue := fmt.Sprint(data[fieldGroup.Id])
 	if fieldValue != "" {
-		boJsonByte, err := json.Marshal(bo)
+		tmpBo := bo
+		tmpBo["pendingTransactions"] = []interface{}{}
+		boJsonByte, err := json.Marshal(&tmpBo)
 		if err != nil {
 			panic(err)
 		}
@@ -837,14 +847,24 @@ func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup
 	for _, floatItem := range floatArray {
 		if floatItem == fieldGroup.FieldDataType {
 			if content == "" {
-				(*data)[fieldGroup.Id] = 0
+				(*data)[fieldGroup.Id] = "0"
 			} else {
-				value, err := strconv.ParseFloat(content, 32)
-				if err != nil {
-					panic(err)
+				if commonUtil.IsFloat(content) {
+					(*data)[fieldGroup.Id] = content
+				} else {
+					panic("id:" + fieldGroup.Id + ",DisplayName:" + fieldGroup.DisplayName + ",类型为float_field,赋值:" + content + ",非法,必须由-,数字,小数点组成")
 				}
-				(*data)[fieldGroup.Id] = float32(value)
 			}
+			// 由于mongoDB无法存储精确的值,因此,浮点型暂时用string来存储
+//			if content == "" {
+//				(*data)[fieldGroup.Id] = 0
+//			} else {
+//				value, err := strconv.ParseFloat(content, 32)
+//				if err != nil {
+//					panic(err)
+//				}
+//				(*data)[fieldGroup.Id] = float32(value)
+//			}
 			return
 		}
 	}

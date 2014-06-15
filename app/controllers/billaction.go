@@ -3,10 +3,12 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	. "com/papersns/component"
+	. "com/papersns/error"
 	"com/papersns/global"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	. "com/papersns/mongo"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -98,6 +100,7 @@ func (c BillAction) CancelData() revel.Result {
 
 func (c BillAction) cancelDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -120,10 +123,16 @@ func (c BillAction) cancelDataCommon() ModelRenderVO {
 		panic("CancelData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 
+	c.setRequestParameterToBo(&bo)
+
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeCancelData(sessionId, dataSource, &bo)
 	mainData := bo["A"].(map[string]interface{})
+	bo["A"] = mainData
+	if fmt.Sprint(mainData["billStatus"]) == "4" {
+		panic(BusinessError{Message: "单据已作废，不可再次作废"})
+	}
 	mainData["billStatus"] = 4
 
 	_, db := global.GetConnection(sessionId)
@@ -168,6 +177,7 @@ func (c BillAction) UnCancelData() revel.Result {
 
 func (c BillAction) unCancelDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -190,11 +200,16 @@ func (c BillAction) unCancelDataCommon() ModelRenderVO {
 		panic("UnCancelData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
 
+	c.setRequestParameterToBo(&bo)
+
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
 	c.actionSupport.beforeUnCancelData(sessionId, dataSource, &bo)
 	mainData := bo["A"].(map[string]interface{})
-	mainData["billStatus"] = 0
+	if fmt.Sprint(mainData["billStatus"]) == "1" {
+		panic(BusinessError{Message: "单据已经反作废，不可再次反作废"})
+	}
+	mainData["billStatus"] = 1
 
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}

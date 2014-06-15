@@ -50,7 +50,16 @@
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<!-- <button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button> -->
+			<button name="selectRowBtn" text="选择" mode="fn" handler="g_selectRow" iconCls="yui3-button btn-show">
+				<relationDS>
+					<relationItem name="CurrencyType">
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationConfig selectorName="CurrencyTypeSelector" displayField="code,name" valueField="id" selectionMode="multi" />
+						<copyConfig copyColumnName="currencyTypeId" copyValueField="id" />
+					</relationItem>
+				</relationDS>
+			</button>
 			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
 			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
 			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
@@ -71,7 +80,7 @@
 		<virtual-column name="FUN_EDITOR" text="操作" forEditor="true">
 			<buttons>
 				<button text="复制" mode="fn" handler="g_pluginCopyRow" iconCls="test"></button>
-				<button text="删除d" mode="fn" handler="g_pluginRemoveSingleRow" iconCls="test"></button>
+				<button text="删除" mode="fn" handler="g_pluginRemoveSingleRow" iconCls="test"></button>
 			</buttons>
 		</virtual-column>
 		<auto-column name="currencyTypeId" />

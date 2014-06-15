@@ -1,5 +1,5 @@
 function g_deleteRecord(o) {
-	showWarning("确认删除？", function(){
+	showConfirm("确认删除？", function(){
 		var url = "/" + listTemplate.DataSourceModelId + "/DeleteData?format=json";
 		ajaxRequest({
 			url: url
@@ -18,7 +18,7 @@ function g_deleteRecord(o) {
 function g_deleteRecords() {
 	var selectRecords = g_gridPanelDict["columnModel_1"].getSelectRecordLi();
 	if (selectRecords.length > 0) {
-		showWarning("确认删除？", function(){
+		showConfirm("确认删除？", function(){
 			var errorMsgLi = [];
 			
 			var url = "/" + listTemplate.DataSourceModelId + "/DeleteData?format=json";

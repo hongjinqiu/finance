@@ -27,7 +27,9 @@ func (o FieldGroup) IsRelationField() bool {
 
 func (o FieldGroup) GetRelationItem(bo map[string]interface{}, data map[string]interface{}) (RelationItem, bool) {
 	expressionParser := ExpressionParser{}
-	boJsonData, err := json.Marshal(bo)
+	tmpBo := bo
+	tmpBo["pendingTransactions"] = []interface{}{}
+	boJsonData, err := json.Marshal(&tmpBo)
 	if err != nil {
 		panic(err)
 	}

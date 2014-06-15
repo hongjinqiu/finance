@@ -191,7 +191,9 @@
 		<!-- <fieldName>billStatus</fieldName> -->
 		<displayName>单据状态</displayName>
 		<fieldDataType>SMALLINT</fieldDataType>
-		<defaultValueExpr mode="text"></defaultValueExpr>
+		<fieldNumberType>UNDEFINE</fieldNumberType>
+		<defaultValueExpr mode="text">1</defaultValueExpr>
+		<dictionary>D_BILL_STATUS</dictionary>
 	</field>
 	<field id="ATTACH_COUNT" extends="ROOT_FIELD">
 		<!-- <fieldName>attachCount</fieldName> -->

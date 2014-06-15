@@ -41,11 +41,11 @@
 		<auto-column name="billDate" />
 		<auto-column name="billNo" />
 		<auto-column name="property" />
+		<auto-column name="billStatus" />
 		<auto-column name="accountId">
 			<relationDS>
 				<relationItem name="BankAccount">
 					<copyConfig copyColumnName="receiveBankId" copyValueField="bankId"/>
-					<copyConfig copyColumnName="receiveBankAccount" copyValueField="bankAccount"/>
 				</relationItem>
 			</relationDS>
 		</auto-column>
@@ -54,7 +54,6 @@
 		<auto-column name="currencyTypeId" />
 		<auto-column name="amtGathering" />
 		<auto-column name="receiveBankId" dsFieldMap="BankAccount.A.bankId" />
-		<auto-column name="receiveBankAccount" dsFieldMap="BankAccount.A.bankAccount" />
 		<auto-column name="balanceDate" />
 	</column-model>
 
@@ -63,6 +62,7 @@
 		<query-parameter name="billDateEnd" columnName="billDate" auto="true" text="单据日期到" restriction="le" />
 		<query-parameter name="billNo" auto="true" text=""></query-parameter>
 		<query-parameter name="property" auto="true" text=""></query-parameter>
+		<query-parameter name="billStatus" auto="true" text=""></query-parameter>
 		<query-parameter name="accountId" auto="true" text="">
 		</query-parameter>
 		<query-parameter name="chamberlainType" auto="true" text=""></query-parameter>

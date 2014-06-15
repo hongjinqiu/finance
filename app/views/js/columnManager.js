@@ -207,7 +207,7 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 	var yInst = self.yInst;
 	var decimalPlaces = 2;
 	if (columnConfig.DecimalPlaces) {
-		decimalPlaces = parseInt(columnConfig.DecimalPlaces);
+		decimalPlaces = parseInt(columnConfig.DecimalPlaces, 10);
 	}
 	var isFormatter = (columnConfig.Prefix || "") != "";
 	isFormatter = isFormatter || (columnConfig.DecimalPlaces || "") != "";
@@ -304,25 +304,25 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 						var start = o.column.dbPattern.indexOf("yyyy");
 						var end = o.column.dbPattern.indexOf("yyyy") + "yyyy".length;
 						var yyyy = value.substring(start, end);
-						date.setYear(parseInt(yyyy));
+						date.setYear(parseInt(yyyy, 10));
 					}
 					if (o.column.dbPattern.indexOf("MM") > -1) {
 						var start = o.column.dbPattern.indexOf("MM");
 						var end = o.column.dbPattern.indexOf("MM") + "MM".length;
 						var mm = value.substring(start, end);
-						date.setMonth(parseInt(mm) - 1);
+						date.setMonth(parseInt(mm, 10) - 1);
 					}
 					if (o.column.dbPattern.indexOf("dd") > -1) {
 						var start = o.column.dbPattern.indexOf("dd");
 						var end = o.column.dbPattern.indexOf("dd") + "dd".length;
 						var dd = value.substring(start, end);
-						date.setDate(parseInt(dd));
+						date.setDate(parseInt(dd, 10));
 					}
 					if (o.column.dbPattern.indexOf("HH") > -1) {
 						var start = o.column.dbPattern.indexOf("HH");
 						var end = o.column.dbPattern.indexOf("HH") + "HH".length;
 						var hh = value.substring(start, end);
-						date.setHours(parseInt(hh));
+						date.setHours(parseInt(hh, 10));
 					}
 					if (o.column.dbPattern.indexOf("mm") > -1) {
 						var start = o.column.dbPattern.indexOf("mm");

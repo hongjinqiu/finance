@@ -89,7 +89,7 @@
 				<allowEmpty>true</allowEmpty>
 				<fixReadOnly>true</fixReadOnly>
 				<limitOption>limitMin</limitOption>
-				<limitMin>0</limitMin>
+				<limitMin>-1000000000</limitMin>
 				<zeroShowEmpty>true</zeroShowEmpty>
 				<allowCopy>false</allowCopy>
 			</field>

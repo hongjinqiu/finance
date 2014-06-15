@@ -221,6 +221,15 @@
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
+					<relationItem name="AccountInit">
+						<id>AccountInitSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "AccountInit"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "AccountInit"</jsRelationExpr>
+						<relationModelId>AccountInit</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
 				</relationDS>
 			</field>
 		</bizField>

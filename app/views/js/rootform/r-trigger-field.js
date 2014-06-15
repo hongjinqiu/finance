@@ -72,7 +72,7 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
     	this.on('valueChange', Y.bind(function(e) {
             if (e.src != 'ui') {
             	var newValue = e.newVal + "";
-            	if (!newValue || parseInt(newValue) <= 0) {
+            	if (!newValue || parseInt(newValue, 10) <= 0) {
             		this._fieldNode.set('value', "");
             		return;
             	}
@@ -84,6 +84,9 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
                 for (var i = 0; i < li.length; i++) {
                 	var value = "";
                 	var relationItem = relationManager.getRelationBo(selectorName, li[i]);
+                	if (!relationItem) {
+                		Y.log("selectorName:" + selectorName + ", id:" + li[i] + " can't found relationItem");
+                	}
                 	var displayField = this._getStringOrFunctionResult(this.get("displayField"));
                 	if (displayField.indexOf("{") > -1) {
                 		value = Y.Lang.sub(displayField, relationItem);
@@ -123,25 +126,29 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
         	
             var url = "/console/selectorschema?@name={NAME_VALUE}&@id={ID_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}";
             var selectorName = this._getStringOrFunctionResult(this.get("selectorName"));
-            url = url.replace("{NAME_VALUE}", selectorName);
-            url = url.replace("{ID_VALUE}", this.get('value'));
-            var multi = this._getBooleanOrFunctionResult(this.get("multi"));
-            url = url.replace("{MULTI_VALUE}", multi);
-            var displayField = this._getStringOrFunctionResult(this.get("displayField"));
-            url = url.replace("{DISPLAY_FIELD_VALUE}", displayField);
-            var selectorTitle = this._getStringOrFunctionResult(this.get("selectorTitle"));
-    		var dialog = showModalDialog({
-    			"title": selectorTitle,
-    			"url": url
-    		});
-    		window.s_closeDialog = function() {
-    			if (window.s_dialog) {
-    				window.s_dialog.hide();
-    			}
-    			window.s_dialog = null;
-    			window.s_selectFunc = null;
-    			window.s_queryFunc = null;
-    		}
+            if (!selectorName || selectorName == "NullSelector") {
+            	showAlert("无法打开选择器");
+            } else {
+            	url = url.replace("{NAME_VALUE}", selectorName);
+            	url = url.replace("{ID_VALUE}", this.get('value'));
+            	var multi = this._getBooleanOrFunctionResult(this.get("multi"));
+            	url = url.replace("{MULTI_VALUE}", multi);
+            	var displayField = this._getStringOrFunctionResult(this.get("displayField"));
+            	url = url.replace("{DISPLAY_FIELD_VALUE}", displayField);
+            	var selectorTitle = this._getStringOrFunctionResult(this.get("selectorTitle"));
+            	var dialog = showModalDialog({
+            		"title": selectorTitle,
+            		"url": url
+            	});
+            	window.s_closeDialog = function() {
+            		if (window.s_dialog) {
+            			window.s_dialog.hide();
+            		}
+            		window.s_dialog = null;
+            		window.s_selectFunc = null;
+            		window.s_queryFunc = null;
+            	}
+            }
     	}, this));
     	
     	var multi = this._getBooleanOrFunctionResult(this.get("multi"));

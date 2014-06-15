@@ -630,7 +630,7 @@ func (c Console) getMasterRenderLi(formTemplate FormTemplate) map[string]interfa
 					modelIterator.IterateAllField(&dataSource, &message, func(fieldGroup *FieldGroup, result *interface{}) {
 						if fieldGroup.IsMasterField() && fieldGroup.Id == column.Name {
 							isModelField = true
-							if column.Hideable != "true" {
+							if column.Hideable != "true" && column.ManualRender != "true" {
 								columnColSpan, err := strconv.Atoi(column.ColSpan)
 								if err != nil {
 									columnColSpan = 1
@@ -654,7 +654,7 @@ func (c Console) getMasterRenderLi(formTemplate FormTemplate) map[string]interfa
 						}
 					})
 					if !isModelField {
-						if column.Hideable != "true" {
+						if column.Hideable != "true" && column.ManualRender != "true" {
 							columnColSpan, err := strconv.Atoi(column.ColSpan)
 							if err != nil {
 								columnColSpan = 1

@@ -352,7 +352,7 @@
 				<displayName>费用金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
+				<limitMin>-1000000000</limitMin>
 				<limitMax>1000000000</limitMax>
 			</field>
 		</bizField>

@@ -62,7 +62,7 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	var x = xy[0];
     	var y = xy[1];
     	//var width = parseInt(node.getComputedStyle("width"));
-    	var height = parseInt(node.getComputedStyle("height"));
+    	var height = parseInt(node.getComputedStyle("height"), 10);
     	this._overlay.setAttrs({
     		x: x,
     		y: y + height + 4

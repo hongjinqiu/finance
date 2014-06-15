@@ -19,10 +19,13 @@ FormManager.prototype.getDataIsUsedForFormObj = function(formObj) {
 			if (g_usedCheck[dataSetId]) {
 				if (g_gridPanelDict[dataSetId + "_addrow"]) {
 					var record = g_gridPanelDict[dataSetId + "_addrow"].dt.getRecord(self._fieldNode);
-					var fieldDict = record.formFieldDict;
-					var idValue = fieldDict["id"].get("value");
-					if (g_usedCheck[dataSetId][idValue]) {
-						isUsed = true;
+					// 由于在createDataGrid之前,已经在全局的g_gridPanelDict中放置 b_addrow,因此,需要判断空,
+					if (record && record.formFieldDict) {
+						var fieldDict = record.formFieldDict;
+						var idValue = fieldDict["id"].get("value");
+						if (g_usedCheck[dataSetId][idValue]) {
+							isUsed = true;
+						}
 					}
 				}
 			}
@@ -110,9 +113,11 @@ FormManager.prototype.initializeAttr = function(formObj, Y) {
     		}
     		return false;
     	});
-    	
+
     	var formManager = new FormManager();
-    	formManager.updateSingleFieldAttr4GlobalParam(formObj, Y);
+    	formObj.after("render", function(){
+    		formManager.updateSingleFieldAttr4GlobalParam(formObj, Y);
+    	});
     	self.set("validator", formManager.dsFormFieldValidator);
     }
 }
@@ -563,6 +568,10 @@ FormManager.prototype.dsFormValidator = function(dataSource, bo) {
 		}
 	});
 	
+	if (dataSource.jsConfig && dataSource.jsConfig.validate) {
+		dataSource.jsConfig.validate(bo, masterMessageLi, detailMessageDict);
+	}
+	
 	// 合计数据集错误信息到messageLi中
 	modelIterator.iterateAllDataSet(dataSource, result, function(dataSet, result){
 		if (dataSet.Id == "A") {
@@ -710,13 +719,35 @@ FormManager.prototype.applyGlobalParamFromAjaxData = function(o) {
 	g_usedCheck = o.usedCheckBo;
 }
 
+/**
+ * 需要按dataSource的顺序来加载字段值,否则计算表格式时会出错
+ */
 FormManager.prototype.loadData2Form = function(dataSource, bo) {
 	var modelIterator = new ModelIterator();
 	var result = "";
 	if (bo["A"]) {
+		var keyInMaster = [];
+		// 遍历主数据集字段,按顺序加载值
+		modelIterator.iterateAllField(dataSource, result, function(fieldGroup, result){
+			if (fieldGroup.getDataSetId() == "A") {
+				if (g_masterFormFieldDict[fieldGroup.Id]) {
+					g_masterFormFieldDict[fieldGroup.Id].set("value", bo["A"][fieldGroup.Id] || "");
+				}
+				keyInMaster.push(fieldGroup.Id);
+			}
+		});
 		for (var key in bo["A"]) {
-			if (g_masterFormFieldDict[key]) {
-				g_masterFormFieldDict[key].set("value", bo["A"][key] || "");
+			var isIn = false;
+			for (var i = 0; i < keyInMaster.length; i++) {
+				if (keyInMaster[i] == key) {
+					isIn = true;
+					break;
+				}
+			}
+			if (!isIn) {
+				if (g_masterFormFieldDict[key]) {
+					g_masterFormFieldDict[key].set("value", bo["A"][key] || "");
+				}
 			}
 		}
 	}
@@ -733,3 +764,30 @@ FormManager.prototype.loadData2Form = function(dataSource, bo) {
 	});
 }
 
+FormManager.prototype.getFieldDict = function(formObj) {
+	var self = formObj;
+	var dataSetId = self.get("dataSetId");
+	var fieldDict = null;
+	if (dataSetId == "A") {
+		fieldDict = g_masterFormFieldDict;
+	} else {
+		if (g_gridPanelDict[dataSetId + "_addrow"]) {
+			var record = g_gridPanelDict[dataSetId + "_addrow"].dt.getRecord(self._fieldNode);
+			fieldDict = record.formFieldDict;
+		}
+	}
+	return fieldDict;
+}
+
+FormManager.prototype.setDetailIncId = function(dataSource, bo) {
+	var modelTemplateFactory = new ModelTemplateFactory();
+	var modelIterator = new ModelIterator();
+	var result = "";
+	modelIterator.iterateDataBo(dataSource, bo, result, function(fieldGroupLi, data, rowIndex, result) {
+		if (!fieldGroupLi[0].isMasterField()) {
+			if (data["id"] == "0" || data["id"] == "") {
+				data["id"] = modelTemplateFactory.getSequenceNo();
+			}
+		}
+	});
+}

@@ -31,6 +31,29 @@ func (o UsedCheck) CheckUsed(sessionId int, dataSource DataSource, bo map[string
 	return count > 0
 }
 
+func (o UsedCheck) CheckDeleteDetailRecordUsed(sessionId int, dataSource DataSource, bo map[string]interface{}, diffDataRow DiffDataRow) bool {
+	_, db := global.GetConnection(sessionId)
+	fieldGroupLi := diffDataRow.FieldGroupLi
+	destData := diffDataRow.DestData
+	srcData := diffDataRow.SrcData
+	if destData == nil && srcData != nil {// 删除的分录
+		beReferenceQuery := []interface{}{
+			dataSource.Id,
+			fieldGroupLi[0].GetDataSetId(),
+			"id",
+			srcData["id"],
+		}
+		count, err := db.C("PubReferenceLog").Find(map[string]interface{}{
+			"beReference": beReferenceQuery,
+		}).Limit(1).Count()
+		if err != nil {
+			panic(err)
+		}
+		return count > 0
+	}
+	return false
+}
+
 func (o UsedCheck) Insert(sessionId int, fieldGroupLi []FieldGroup, bo *map[string]interface{}, data *map[string]interface{}) {
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
@@ -57,7 +80,6 @@ func (o UsedCheck) Update(sessionId int, fieldGroupLi []FieldGroup, bo *map[stri
 	} else if destData == nil && srcData != nil {
 		o.Delete(sessionId, fieldGroupLi, srcData)
 	} else if destData != nil && srcData != nil {
-		fmt.Println("^^^^^^^^^,dest data is not nil and srcData is not nil")
 		modelTemplateFactory := ModelTemplateFactory{}
 		fmt.Println(modelTemplateFactory.IsDataDifferent(fieldGroupLi, *destData, srcData))
 		// 分析字段,如果字段都相等,不过帐,
@@ -80,8 +102,11 @@ func (o UsedCheck) Delete(sessionId int, fieldGroupLi []FieldGroup, data map[str
 			srcFieldName := fieldGroup.Id
 			fieldValue := data[srcFieldName]
 			if fieldValue != nil {
-				referenceQuery := []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, fieldValue}
-				o.deleteReference(sessionId, referenceQuery)
+				referenceQueryLi := []interface{}{}
+				referenceQueryLi = append(referenceQueryLi, []interface{}{srcDataSourceId, srcDataSetId, "id", data["id"]})
+				referenceQueryLi = append(referenceQueryLi, []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, fieldValue})
+//				referenceQuery := []interface{}{srcDataSourceId, srcDataSetId, srcFieldName, fieldValue}
+				o.deleteReference(sessionId, referenceQueryLi)
 			}
 		}
 	}
@@ -99,16 +124,27 @@ func (o UsedCheck) DeleteAll(sessionId int, fieldGroupLi []FieldGroup, data map[
 		"id",
 		id,
 	}
-	o.deleteReference(sessionId, referenceQuery)
+	referenceQueryLi := []interface{}{referenceQuery}
+	o.deleteReference(sessionId, referenceQueryLi)
 }
 
-func (o UsedCheck) deleteReference(sessionId int, referenceQuery []interface{}) {
+func (o UsedCheck) deleteReference(sessionId int, referenceQueryLi []interface{}) {
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
+//	deleteQuery := map[string]interface{}{
+//		"reference": referenceQueryLi,
+//	}
 	deleteQuery := map[string]interface{}{
-		"reference": referenceQuery,
+		//"$and": referenceQueryLi,
 	}
+	andQuery := []interface{}{}
+	for _, item := range referenceQueryLi {
+		andQuery = append(andQuery, map[string]interface{}{
+			"reference": item,
+		})
+	}
+	deleteQuery["$and"] = andQuery
 	deleteByte, err := json.MarshalIndent(&deleteQuery, "", "\t")
 	if err != nil {
 		panic(err)

@@ -35,65 +35,26 @@ SystemParameter	系统参数,用到,pass,
 
 
 初始化:
-AccountInit	账户初始化,用到,pass,需要完成button的选回的配置实现,running,--------------
-现户账户初始化,running,--------------------------------,
-增,
-删,
-改,
-查,
-
-
-选择器的算法,跟这个地方有点小区别,
-因此,还是用算法,算出一个数据,然后循环一遍即可
-需要在button里面添加 <relationDS>的相关属性,
-1.button添加relationDS属性,finish,
-2.迭代模型添加 对 button 的迭代,finish,
-3.button的queryFunc的相关实现,
-3.1.dataSourceJsonData迭代,
-3.2.需要extend,按name来折腾,
-3.3.查看相关的开窗实现,p-trigger-field.js,g_selectRow里面,应用上,
-	开窗的准备:
-	想一想,开窗要做哪些东东?
-	明白了,主要是编写s_selectFunc函数,
-	3.3.1.window.s_selectFunc,用于选择完回调,
-		window.s_selectFunc = function(selectValueLi) {....
-	3.3.2.window.s_queryFunc,用于开窗后,父窗口回调,
-	
-	3.3.3.
-		var dialog = showModalDialog({
-    			"title": selectorTitle,
-    			"url": url
-    		});
-    		window.s_closeDialog = function() {
-    			if (window.s_dialog) {
-    				window.s_dialog.hide();
-    			}
-    			window.s_dialog = null;
-    			window.s_selectFunc = null;
-    			window.s_queryFunc = null;
-    		}
-    待测试了,
-    4.g_relationBo中,需要从按钮的CRelationDS的配置中来读取内容,running,-----------------------,
-    这个地方应该要写一个函数,
-    要修改 mergeSelectorInfo2RelationBo,修改这个方法,
-    
-    对选择器实现方法的测试,明天再折腾,
-3.JS实现对选回数据的复制,finish,
-
-银行账户初始化,
+AccountInit	账户初始化,用到,pass,需要完成button的选回的配置实现,finish,
+现户账户初始化,finish,
 
 单据:
-GatheringBill	收款单,用到,pass,
-PayBill	付款单,用到,pass,
-
-
+GatheringBill	收款单,用到,finish,
+PayBill	付款单,用到,running,---------------------------,
+	
 报表:
 AccountInOut	月档,used,pass,
 AccountInOutItem	日记账明细,pass,
 
 
 最后,所有的查询,都要带上createUnit字段,
+金额数字的格式化问题,
+需要找一个go的大数进行计算,
+程序中的长度是utf8 encode后的,因此,会有*3的效应,处理这个东东,
 
+当数据量大时,过账会有bug,因此,我需要一个新的小 pendingTransaction 来操作,只需要其底下的几个字段修改即可,
+先尝试在pendingTransaction里面存string,看一看会不会好一些,
+接下来,改成用 $pull,$set的方式,做差异化处理,减小大小,
 
 
 

@@ -2,6 +2,11 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/component"
+	. "com/papersns/error"
+	"com/papersns/global"
+	. "com/papersns/model"
+	"strconv"
 	"strings"
 )
 
@@ -10,6 +15,38 @@ func init() {
 
 type CashAccountSupport struct {
 	ActionSupport
+}
+
+/**
+* 为避免并发问题,重设amtOriginalCurrencyBalance为数据库中值
+ */
+func (o CashAccountSupport) beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+	session, _ := global.GetConnection(sessionId)
+	modelTemplateFactory := ModelTemplateFactory{}
+	strId := modelTemplateFactory.GetStrId(*bo)
+	if strId != "" && strId != "0" {
+		id, err := strconv.Atoi(strId)
+		if err != nil {
+			panic(err)
+		}
+		queryMap := map[string]interface{}{
+			"_id": id,
+		}
+		qb := QuerySupport{}
+		collectionName := "CashAccount"
+		boInDb, found := qb.FindByMapWithSession(session, collectionName, queryMap)
+		if !found {
+			panic(BusinessError{Message: "现金账户保存前，现金账户未找到"})
+		}
+
+		masterData := (*bo)["A"].(map[string]interface{})
+		(*bo)["A"] = masterData
+
+		masterDataInDb := boInDb["A"].(map[string]interface{})
+		boInDb["A"] = masterDataInDb
+
+		masterData["amtOriginalCurrencyBalance"] = masterDataInDb["amtOriginalCurrencyBalance"]
+	}
 }
 
 type CashAccount struct {
@@ -24,7 +61,7 @@ func (c CashAccount) SaveData() revel.Result {
 
 func (c CashAccount) DeleteData() revel.Result {
 	c.actionSupport = CashAccountSupport{}
-	
+
 	modelRenderVO := c.deleteDataCommon()
 	return c.renderCommon(modelRenderVO)
 }
@@ -84,4 +121,3 @@ func (c CashAccount) LogList() revel.Result {
 	}
 	return c.Render()
 }
-

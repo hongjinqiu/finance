@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 仅用于被用查询的关联选择用,没有其它的用途 -->
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>AccountInit</id>
+	<selector-id>AccountInitSelector</selector-id>
+	<data-source-model-id>AccountInit</data-source-model-id>
+
+	<adapter name="ModelListTemplateAdapter" />
+	<description>账户初始化列表</description>
+	<scripts>js/ds_listtoolbar.js</scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<toolbar export="true">
+		<!-- <button text="新增" mode="url" handler="/console/formschema?@name=AccountInit" iconCls="test" />
+
+		<button text="删除" mode="fn" handler="g_deleteRecords">
+		</button> -->
+	</toolbar>
+
+	<data-provider size="10">
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选账户初始化" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
+		<checkbox-column name="checkboxSelect" hideable="false">
+			<expression>1 == 1</expression>
+		</checkbox-column>
+		<id-column name="id" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=AccountInit&amp;id={id}">
+				</button>
+				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				</button>
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=AccountInit&amp;id={id}&amp;formStatus=view">
+				</button>
+			</buttons>
+		</virtual-column>
+
+		<auto-column name="accountType" hideable="true" />
+		<auto-column name="accountId">
+			<relationDS>
+				<relationItem name="CashAccount">
+					<copyConfig copyColumnName="name" copyValueField="name" />
+					<copyConfig copyColumnName="currencyTypeId" copyValueField="currencyTypeId" />
+				</relationItem>
+			</relationDS>
+		</auto-column>
+		<auto-column name="name" text="账户名称" dsFieldMap="CashAccount.A.name" fixReadOnly="true" />
+		<auto-column name="currencyTypeId" />
+		<auto-column name="exchangeRateShow" />
+		<auto-column name="exchangeRate" />
+		<auto-column name="amtEarly" />
+	</column-model>
+
+	<query-parameters dataSetId="A">
+		<query-parameter name="accountId" auto="true" text=""></query-parameter>
+		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
+	</query-parameters>
+</list-template>

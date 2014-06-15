@@ -110,7 +110,7 @@
 	<detailData>
 		<id>B</id>
 		<displayName>账户币别</displayName>
-		<allowEmpty>false</allowEmpty>
+		<allowEmpty>true</allowEmpty>
 		<allowCopy>true</allowCopy>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
@@ -156,7 +156,7 @@
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
 				<limitOption>limitMin</limitOption>
-				<limitMin>0</limitMin>
+				<limitMin>-1000000000</limitMin>
 				<fixReadOnly>true</fixReadOnly>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>

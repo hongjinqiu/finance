@@ -53,7 +53,7 @@
 	<detailData>
 		<id>B</id>
 		<displayName>现金帐户初始数据</displayName>
-		<allowEmpty>false</allowEmpty>
+		<allowEmpty>true</allowEmpty>
 		<allowCopy>true</allowCopy>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
@@ -80,6 +80,7 @@
 				<displayName>账户代码</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowDuplicate>false</allowDuplicate>
+				<allowCopy>true</allowCopy>
 				<relationDS>
 					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
@@ -129,8 +130,9 @@
 				<displayName>期初金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<limitOption>limitRange</limitOption>
-				<limitMin>0</limitMin>
+				<limitMin>-1000000000</limitMin>
 				<limitMax>1000000000</limitMax>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 		</bizField>
 	</detailData>

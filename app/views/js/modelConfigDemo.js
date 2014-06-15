@@ -40,8 +40,9 @@ var sysUserModel = {
 		edit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),未实现
 		canceledit: function(editor, e){},//数据集函数,表格控件函数,参数:(editor,e),未实现
 		celldblclick: function() {},// 暂不实现
-		validate: function(bo, data) {}// 整条记录的validate
+//		validate: function(bo, data) {}// 整条记录的validate,未实现,请使用validateEdit方法,
 	},
+	validate: function(bo, masterMessageLi, detailMessageDict) {},// bo:整条业务对象,masterMessageLi:[],主数据集错误信息,detailMessageDict:{"B":[],"C":[]},分录数据集错误信息
 	"buttonConfig": {
 		"selectRowBtn": {
 			selectFunc: function(datas){},// 单多选回调

@@ -14,12 +14,12 @@ var modelExtraInfo = {
 						var accountingYearValue = accountingYear.get("value");
 						var formManager = new FormManager();
 						var modelTemplateFactory = new ModelTemplateFactory();
-						var numAccountingPeriodIntValue = parseInt(g_masterFormFieldDict["numAccountingPeriod"].get("value"));
+						var numAccountingPeriodIntValue = parseInt(g_masterFormFieldDict["numAccountingPeriod"].get("value"), 10);
 						var datas = [];
 						YUI(g_financeModule).use("finance-module", function(Y){
 							var date = new Date();
 							for (var i = 0; i < numAccountingPeriodIntValue; i++) {
-								date.setYear(parseInt(accountingYearValue));
+								date.setYear(parseInt(accountingYearValue, 10));
 								date.setMonth(i + 1);
 								date.setDate(0);
 								
@@ -55,22 +55,22 @@ var modelExtraInfo = {
 		"endDate": {
 			listeners : {
 				valueChange: function(e, formObj) {
-					if (g_gridPanelDict["B_addrow"]) {// 初次设值时,也会触发 valueChange 事件,此时,还没有 g_gridPanelDict 这个方法
+					if (g_gridPanelDict["B_addrow"]) {// 初次设值时,也会触发 valueChange 事件,此时,record中还有没有formFieldDict,
 						var recordLi = g_gridPanelDict["B_addrow"].dt.get("data");
 						var currentIndex = 0;
 						recordLi.each(function(rec, recordIndex) {
-							if (rec.formFieldDict["endDate"] == formObj) {
+							if (rec.formFieldDict && rec.formFieldDict["endDate"] == formObj) {
 								currentIndex = recordIndex;
 							}
 						});
 						var startDateValue = formObj.get("value");
 						if (startDateValue.length >= 8 && /^\d*$/g.test(startDateValue)) {
 							recordLi.each(function(rec, recordIndex) {
-								if (recordIndex == (currentIndex + 1)) {
+								if (recordIndex == (currentIndex + 1) && rec.formFieldDict) {
 									var date = new Date();
-									date.setFullYear(parseInt(startDateValue.substring(0,4)));
-									date.setMonth(parseInt(startDateValue.substring(4,6)) - 1);
-									date.setDate(parseInt(startDateValue.substring(6,8)));
+									date.setFullYear(parseInt(startDateValue.substring(0,4), 10));
+									date.setMonth(parseInt(startDateValue.substring(4,6), 10) - 1);
+									date.setDate(parseInt(startDateValue.substring(6,8), 10));
 									YUI(g_financeModule).use("finance-module", function(Y) {
 										date = Y.DataType.Date.addDays(date, 1);
 										var dateValue = Y.DataType.Date.format(date, {

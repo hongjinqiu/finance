@@ -5,7 +5,7 @@ import "github.com/robfig/revel"
 import (
 	"reflect"
 	. "com/papersns/error"
-	"runtime"
+//	"runtime"
 )
 
 func SessionAdapter(c *revel.Controller, fc []revel.Filter) {
@@ -27,6 +27,7 @@ func BusinessPanicFilter(c *revel.Controller, fc []revel.Filter) {
 				err := x.(BusinessError)
 				c.Result = c.RenderJson(map[string]interface{}{
 					"success": false,
+					"code": err.Code,
 					"message": err.Error(),
 				})
 			} else {
@@ -38,7 +39,8 @@ func BusinessPanicFilter(c *revel.Controller, fc []revel.Filter) {
 }
 
 func init() {// 运行的顺序是从上往下
-	runtime.GOMAXPROCS(1)
+//	runtime.GOMAXPROCS(1)
+//	runtime.GOMAXPROCS(runtime.NumCPU())
 	// Filters is the default set of global filters.
 	revel.Filters = []revel.Filter{
 		revel.PanicFilter,             // Recover from panics and display an error page instead.

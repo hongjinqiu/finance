@@ -784,6 +784,11 @@
 				<documentation>是否0显示为空</documentation>
 			</annotation>
 		</attribute>
+		<attribute name="manualRender" type="boolean" default="false">
+			<annotation>
+				<documentation>是否手工渲染</documentation>
+			</annotation>
+		</attribute>
 	</attributeGroup>
 
 	<element name="editor">

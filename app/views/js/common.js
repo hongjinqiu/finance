@@ -55,8 +55,8 @@ function showModalDialog(config) {
 			var node = Y.one("window");
 	//		width = parseInt(node.getComputedStyle("width"));
 	//		height = parseInt(node.getComputedStyle("height"));
-			width = parseInt(node.get("winWidth"));
-			height = parseInt(node.get("winHeight"));
+			width = parseInt(node.get("winWidth"), 10);
+			height = parseInt(node.get("winHeight"), 10);
 		var frameWidth = width - 40;
 		if (frameWidth <= 0) {
 			frameWidth = 100;
@@ -379,7 +379,145 @@ function isNumber(value) {
 	return /^-?\d*(\.\d*)?$/.test(value);
 }
 
+/**
+ * @param continueAnyAll "true"|"false" 出现赤字是否继续
+ */
+function limitControlSaveData(continueAnyAll) {
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
+	if (continueAnyAll == "true" || continueAnyAll == "false") {
+		bo.continueAnyAll = continueAnyAll;
+	}
+	var validateResult = formManager.dsFormValidator(g_dataSourceJson, bo);
+	
+	if (!validateResult.result) {
+		showError(validateResult.message);
+	} else {
+		ajaxRequest({
+			url: "/" + g_dataSourceJson.Id + "/SaveData?format=json"
+			,params: {
+				"dataSourceModelId": g_dataSourceJson.Id,
+				"formTemplateId": g_formTemplateJsonData.Id,
+				"jsonData": bo
+			},
+			callback: function(o) {
+				showSuccess("保存数据成功");
+				formManager.setFormStatus("view");
+				formManager.applyGlobalParamFromAjaxData(o);
+				formManager.loadData2Form(g_dataSourceJson, o.bo);
+				// 为现金账户和银行账户添加的自定义函数
+				if (typeof(enableQueryParameters) != "undefined") {
+					enableQueryParameters();
+				}
+			},
+			failCallback: function(o) {
+				if (o.code == "3") {// 赤字警告
+					showConfirm(o.message + "<br />是否继续？", function(){
+						limitControlSaveData("true");
+					});
+				} else {
+					showError(o.message);
+				}
+			}
+		});
+	}
+}
 
+function limitControlDeleteDataExecute(continueAnyAll) {
+	if (continueAnyAll != "true" && continueAnyAll != "false") {
+		continueAnyAll = "false";
+	}
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
+	ajaxRequest({
+		url: "/" + g_dataSourceJson.Id + "/DeleteData?format=json"
+		,params: {
+			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
+			"id": bo["id"],
+			"continueAnyAll": continueAnyAll || ""
+		},
+		callback: function(o) {
+			location.href = "/console/listschema?@name=" + g_dataSourceJson.Id;
+		},
+		failCallback: function(o) {
+			if (o.code == "3") {// 赤字警告
+				showConfirm(o.message + "<br />是否继续？", function(){
+					limitControlDeleteDataExecute("true");
+				});
+			} else {
+				showError(o.message);
+			}
+		}
+	});
+}
 
+function limitControlDeleteData() {
+	showConfirm("您确定要删除吗？", function(){
+		limitControlDeleteDataExecute();
+	})
+}
 
+function limitControlCancelData(continueAnyAll) {
+	if (continueAnyAll != "true" && continueAnyAll != "false") {
+		continueAnyAll = "false";
+	}
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
+	ajaxRequest({
+		url: "/" + g_dataSourceJson.Id + "/CancelData?format=json"
+		,params: {
+			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
+			"id": bo["id"],
+			"continueAnyAll": continueAnyAll || ""
+		},
+		callback: function(o) {
+			showSuccess("作废数据成功");
+			formManager.applyGlobalParamFromAjaxData(o);
+			formManager.loadData2Form(g_dataSourceJson, o.bo);
+			formManager.setFormStatus("view");
+		},
+		failCallback: function(o) {
+			if (o.code == "3") {// 赤字警告
+				showConfirm(o.message + "<br />是否继续？", function(){
+					limitControlCancelData("true");
+				});
+			} else {
+				showError(o.message);
+			}
+		}
+	});
+}
 
+function limitControlUnCancelData(continueAnyAll) {
+	if (continueAnyAll != "true" && continueAnyAll != "false") {
+		continueAnyAll = "false";
+	}
+	var formManager = new FormManager();
+	var bo = formManager.getBo();
+	ajaxRequest({
+		url: "/" + g_dataSourceJson.Id + "/UnCancelData?format=json"
+		,params: {
+			"dataSourceModelId": g_dataSourceJson.Id,
+			"formTemplateId": g_formTemplateJsonData.Id,
+			"id": bo["id"],
+			"continueAnyAll": continueAnyAll || ""
+		},
+		callback: function(o) {
+			showSuccess("反作废数据成功");
+			formManager.applyGlobalParamFromAjaxData(o);
+			formManager.loadData2Form(g_dataSourceJson, o.bo);
+			formManager.setFormStatus("view");
+		},
+		failCallback: function(o) {
+			if (o.code == "3") {// 赤字警告
+				showConfirm(o.message + "<br />是否继续？", function(){
+					limitControlUnCancelData("true");
+				});
+			} else {
+				showError(o.message);
+			}
+		}
+	});
+}

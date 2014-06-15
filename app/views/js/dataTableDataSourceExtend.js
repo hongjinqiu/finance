@@ -150,8 +150,8 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 					plugin : Y.Plugin.DataTablePFormQuickEdit
 				};
 
+				g_gridPanelDict[self.param.columnModelName + "_addrow"] = pluginDataTableManager;// 这一行要放在createDataGrid之前,因为里面的selectField会触发valueChange,应用到copyField里,需要从全局的g_gridPanelDict里面查找formFieldDict,
 				pluginDataTableManager.createDataGrid(Y, param);
-				g_gridPanelDict[self.param.columnModelName + "_addrow"] = pluginDataTableManager;
 				dialog.show();
 			});
 }
@@ -212,31 +212,6 @@ function g_pluginCopyRow(o, dataSetId) {
 	var data = formManager.getDataSetCopyData(dataSetId, data);
 //	inputDataLi.push(data);
 	g_gridPanelDict[dataSetId + "_addrow"].dt.addRow(data);
-}
-
-function _recurionApplyCopyField(data, columnLi, columnName, columnValue) {
-	var bo = new FormManager().getBo();
-	data[columnName] = columnValue;
-	var commonUtil = new CommonUtil();
-	for (var i = 0; i < columnLi.length; i++) {
-		if (columnLi[i].Name == columnName) {
-			if (columnLi[i].XMLName.Local == "seelct-column") {
-				if (columnLi[i].CRelationDS) {
-					var relationItem = commonUtil.getCRelationItem(columnLi[i].CRelationDS, bo, data);
-					if (relationItem.CCopyConfigLi) {
-						for (var j = 0; j < relationItem.CCopyConfigLi.length; j++) {
-							var copyValueField = relationItem.CCopyConfigLi[j].CopyValueField;
-							var selectorDict = g_relationManager.getRelationBo(relationItem.CRelationConfig.SelectorName, columnValue);
-							if (selectorDict) {
-								var copyColumnValue = selectorDict[copyValueField];
-								_recurionApplyCopyField(data, columnLi, relationItem.CCopyConfigLi[j].CopyColumnName, copyColumnValue);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 /*

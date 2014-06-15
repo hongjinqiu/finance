@@ -205,6 +205,7 @@ type ColumnAttributeGroup struct {
 	FixReadOnly      string `xml:"fixReadOnly,attr,omitempty"`
 	ReadOnly         string `xml:"readOnly,attr,omitempty"`
 	ZeroShowEmpty    string `xml:"zeroShowEmpty,attr,omitempty"`
+	ManualRender     string `xml:"manualRender,attr,omitempty"`
 	DataSetId        string `xml:"-"`
 }
 

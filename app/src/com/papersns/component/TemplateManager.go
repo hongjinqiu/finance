@@ -790,6 +790,7 @@ func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnMode
 	expressionParser := ExpressionParser{}
 	for _, item := range items {
 		record := item.(map[string]interface{})
+		record["pendingTransactions"] = []interface{}{}
 		recordJsonByte, err := json.Marshal(record)
 		if err != nil {
 			panic(err)
@@ -894,6 +895,7 @@ func (o TemplateManager) buildColumnNode(columnDict map[string]Column) map[strin
 }
 
 func (o TemplateManager) parseModelExpression(bo map[string]interface{}, data map[string]interface{}, mode string, content string) string {
+	bo["pendingTransactions"] = []interface{}{}
 	expressionParser := ExpressionParser{}
 	if mode == "" || mode == "text" {
 		return content
@@ -952,10 +954,11 @@ func (o TemplateManager) applyCopyValueField(sessionId int, preColumnName string
 }
 
 func (o TemplateManager) getData4Expression(column Column, record map[string]interface{}) map[string]interface{} {
-	if column.DataSetId == "A" {
-		return record["A"].(map[string]interface{})
-	}
-	return record
+	return record[column.DataSetId].(map[string]interface{})
+//	if column.DataSetId == "A" {
+//		return record["A"].(map[string]interface{})
+//	}
+//	return record
 }
 
 func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNodeDict map[string]ColumnNode, columnNode ColumnNode, record map[string]interface{}, relationBo *map[string]interface{}, loopItem *map[string]interface{}) {
@@ -993,16 +996,18 @@ func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNo
 			(*loopItem)[columnItem.Name] = o.getValueBySpot(record, columnItemName)
 			//o.ApplyDictionaryColumnData(loopItem, columnItem)
 			o.ApplyScriptColumnData(loopItem, record, columnItem)
-			// 如果是select-column,取rs中的值出来,放到relationBo里面,
+			// 如果是select-column,取rs中的值出来,放到relationBo里面,多选,按逗号分隔
 			if columnItem.XMLName.Local == "select-column" {
 				if (*loopItem)[columnItem.Name] != nil {
 					valueStr := fmt.Sprint((*loopItem)[columnItem.Name])
 					if valueStr != "" {
-						value, err := strconv.Atoi(valueStr)
-						if err != nil {
-							panic(err)
+						for _, item := range strings.Split(valueStr, ",") {
+							value, err := strconv.Atoi(item)
+							if err != nil {
+								panic(err)
+							}
+							o.applyRelationBoBySelectField(sessionId, columnItem, value, record, relationBo)
 						}
-						o.applyRelationBoBySelectField(sessionId, columnItem, value, record, relationBo)
 					}
 				}
 			}
@@ -1013,7 +1018,8 @@ func (o TemplateManager) GetColumnModelDataForColumnItem(sessionId int, columnNo
 				virtualColumn["buttons"] = buttons
 				(*loopItem)[columnItem.Name] = virtualColumn
 			}
-
+			
+			record["pendingTransactions"] = []interface{}{}
 			recordJsonByte, err := json.Marshal(record)
 			if err != nil {
 				panic(err)

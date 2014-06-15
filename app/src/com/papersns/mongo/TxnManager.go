@@ -7,6 +7,8 @@ import (
 	"labix.org/v2/mgo/bson"
 	"strconv"
 	"time"
+	"log"
+	"encoding/json"
 )
 
 const (
@@ -240,7 +242,8 @@ func (o TxnManager) Insert(txnId int, collection string, doc map[string]interfac
 	o.pubTxnCollectionIfNotExist(txnId, collection)
 
 	seqName := GetCollectionSequenceName(collection)
-	if doc["_id"] == nil {
+	strId := fmt.Sprint(doc["_id"])
+	if doc["_id"] == nil || strId == "" || strId == "0" {
 		sequenceNo := GetSequenceNo(o.DB, seqName)
 		doc["_id"] = sequenceNo
 		doc["id"] = sequenceNo
@@ -618,6 +621,15 @@ func (o TxnManager) pubTxnCollectionIfNotExist(txnId int, collection string) {
 			"collections": collection,
 		},
 	}
+	updateByte, err := json.MarshalIndent(&update, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	queryByte, err := json.MarshalIndent(&query, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	log.Println("pubTxnCollectionIfNotExist,update Transactions update:" + string(updateByte) + ", query:" + string(queryByte))
 	if err := o.DB.C("Transactions").Update(query, update); err != nil {
 		if err != mgo.ErrNotFound {
 			panic(err)

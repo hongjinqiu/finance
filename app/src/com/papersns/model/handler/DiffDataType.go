@@ -13,7 +13,7 @@ const DELETE int = 4
 type DiffDataRow struct {
 	FieldGroupLi []FieldGroup
 	DestBo *map[string]interface{}
-	DestData *map[string]interface{}
+	DestData *map[string]interface{}// 页面上传入
 	SrcData map[string]interface{}
-	SrcBo map[string]interface{}
+	SrcBo map[string]interface{}// 数据库中
 }

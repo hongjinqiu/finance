@@ -220,6 +220,12 @@ ModelTemplateFactory.prototype.extendDataSource = function(dataSource, modelExtr
 			}
 		}
 	});
+	if (modelExtraInfo.validate) {
+		if (!dataSource.jsConfig) {
+			dataSource.jsConfig = {};
+		}
+		dataSource.jsConfig.validate = modelExtraInfo.validate;
+	}
 }
 
 /**
@@ -300,7 +306,7 @@ ModelTemplateFactory.prototype.applyFieldGroupValueByString = function(fieldGrou
 				data[fieldGroup.Id] = 0;
 			} else {
 				if (isNumber(content)) {
-					data[fieldGroup.Id] = parseInt(content);
+					data[fieldGroup.Id] = parseInt(content, 10);
 				} else {
 					console.log("赋值错误,fieldGroup.dataSetId=" + fieldGroup.getDataSetId() + ", fieldGroup.Id=" + fieldGroup.Id + ", expect type is:" + intArray.join(",") + ", but value=" + content);
 				}
@@ -312,10 +318,11 @@ ModelTemplateFactory.prototype.applyFieldGroupValueByString = function(fieldGrou
 	for (var i = 0; i < floatArray.length; i++) {
 		if (floatArray[i] == fieldGroup.FieldDataType) {
 			if (content == undefined || content == "") {
-				data[fieldGroup.Id] = 0;
+				data[fieldGroup.Id] = "0";
 			} else {
 				if (isNumber(content)) {
-					data[fieldGroup.Id] = parseFloat(content);
+					//data[fieldGroup.Id] = parseFloat(content);
+					data[fieldGroup.Id] = content;
 				} else {
 					console.log("赋值错误,fieldGroup.dataSetId=" + fieldGroup.getDataSetId() + ", fieldGroup.Id=" + fieldGroup.Id + ", expect type is:" + floatArray.join(",") + ", but value=" + content);
 				}

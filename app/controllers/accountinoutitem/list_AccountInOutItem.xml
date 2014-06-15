@@ -25,9 +25,9 @@
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression>1 == 1</expression>
 		</checkbox-column>
-		<id-column name="id" text="编号" hideable="true" />
+		<id-column name="id" text="编号" hideable="false" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<!-- <virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
 				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=AccountInOutItem&amp;id={id}">
 				</button>
@@ -36,22 +36,50 @@
 				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=AccountInOutItem&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
-		</virtual-column>
+		</virtual-column> -->
 
-		<auto-column name="code" />
-		<auto-column name="name" />
-		<auto-column name="accountInOutItemSign" />
-		<auto-column name="roundingWay" />
-		<auto-column name="amtDecimals" />
-		<auto-column name="upDecimals" />
+		<auto-column name="accountType" />
+		<auto-column name="accountId" />
+		<auto-column name="currencyTypeId" />
+		<auto-column name="exchangeRateShow" />
+		<auto-column name="exchangeRate" />
+		<auto-column name="amtIncrease" />
+		<auto-column name="amtReduce" />
+		<auto-column name="billTypeId" />
+		<auto-column name="billDataSourceName" />
+		<auto-column name="billCollectionName" />
+		<auto-column name="billDetailName" />
+		<auto-column name="billId" />
+		<auto-column name="billDetailId" />
+		<auto-column name="billNo" />
+		<auto-column name="billDate" />
+		<auto-column name="balanceDate" />
+		<auto-column name="balanceTypeId" />
+		<auto-column name="balanceNo" />
+		<auto-column name="chamberlainType" />
+		<auto-column name="chamberlainId" />
 	</column-model>
 
 	<query-parameters dataSetId="A">
-		<query-parameter name="code" auto="true" text=""></query-parameter>
-		<query-parameter name="name" auto="true" text=""></query-parameter>
-		<query-parameter name="accountInOutItemSign" auto="true" text=""></query-parameter>
-		<query-parameter name="roundingWay" auto="true" text=""></query-parameter>
-		<query-parameter name="amtDecimals" auto="true" text=""></query-parameter>
-		<query-parameter name="upDecimals" auto="true" text=""></query-parameter>
+		<query-parameter name="accountType" auto="true" text=""></query-parameter>
+		<query-parameter name="accountId" auto="true" text=""></query-parameter>
+		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
+		<query-parameter name="exchangeRateShow" auto="true" text=""></query-parameter>
+		<query-parameter name="exchangeRate" auto="true" text=""></query-parameter>
+		<query-parameter name="amtIncrease" auto="true" text=""></query-parameter>
+		<query-parameter name="amtReduce" auto="true" text=""></query-parameter>
+		<query-parameter name="billTypeId" auto="true" text=""></query-parameter>
+		<query-parameter name="billDataSourceName" auto="true" text=""></query-parameter>
+		<query-parameter name="billCollectionName" auto="true" text=""></query-parameter>
+		<query-parameter name="billDetailName" auto="true" text=""></query-parameter>
+		<query-parameter name="billId" auto="true" text=""></query-parameter>
+		<query-parameter name="billDetailId" auto="true" text=""></query-parameter>
+		<query-parameter name="billNo" auto="true" text=""></query-parameter>
+		<query-parameter name="billDate" auto="true" text=""></query-parameter>
+		<query-parameter name="balanceDate" auto="true" text=""></query-parameter>
+		<query-parameter name="balanceTypeId" auto="true" text=""></query-parameter>
+		<query-parameter name="balanceNo" auto="true" text=""></query-parameter>
+		<query-parameter name="chamberlainType" auto="true" text=""></query-parameter>
+		<query-parameter name="chamberlainId" auto="true" text=""></query-parameter>
 	</query-parameters>
 </list-template>

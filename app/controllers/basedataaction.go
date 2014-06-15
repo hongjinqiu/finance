@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 	"fmt"
+	"log"
 )
 
 func init() {
@@ -50,7 +51,8 @@ type ModelRenderVO struct {
 	DataSource DataSource
 }
 
-type ActionSupport struct{}
+type ActionSupport struct{
+}
 
 func (o ActionSupport) beforeNewData(sessionId int, dataSource DataSource)                                          {}
 func (o ActionSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{})               {}
@@ -85,7 +87,7 @@ type BaseDataAction struct {
 
 func (c BaseDataAction) setCreateFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 	var result interface{} = ""
-	userId, err := strconv.Atoi(c.Session["userId"])
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
 		panic(err)
 	}
@@ -112,7 +114,7 @@ func (c BaseDataAction) setCreateFixFieldValue(sessionId int, dataSource DataSou
 
 func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 	var result interface{} = ""
-	userId, err := strconv.Atoi(c.Session["userId"])
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
 		panic(err)
 	}
@@ -132,10 +134,16 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 	
 	srcBo := map[string]interface{}{}
 	srcQuery := map[string]interface{}{
-		"_id": (*bo)["_id"],
+		"_id": (*bo)["id"],
 	}
+	// log
 	modelTemplateFactory := ModelTemplateFactory{}
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	srcQueryByte, err := json.Marshal(&srcQuery)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("setModifyFixFieldValue,collectionName:" + collectionName + ", query:" + string(srcQueryByte))
 	db.C(collectionName).Find(srcQuery).One(&srcBo)
 	modelIterator := ModelIterator{}
 	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}){
@@ -227,6 +235,7 @@ func (c BaseDataAction) NewData() revel.Result {
 
 func (c BaseDataAction) newDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 	
@@ -262,6 +271,7 @@ func (c BaseDataAction) GetData() revel.Result {
 
 func (c BaseDataAction) getDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -319,6 +329,7 @@ func (c BaseDataAction) CopyData() revel.Result {
 
 func (c BaseDataAction) copyDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -374,6 +385,7 @@ func (c BaseDataAction) EditData() revel.Result {
 
 func (c BaseDataAction) editDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -436,6 +448,7 @@ func (c BaseDataAction) SaveData() revel.Result {
 
 func (c BaseDataAction) saveCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -472,7 +485,7 @@ func (c BaseDataAction) saveCommon() (ModelRenderVO) {
 	
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id": bo["_id"],
+		"_id": bo["id"],
 	}
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
@@ -507,6 +520,7 @@ func (c BaseDataAction) GiveUpData() revel.Result {
 
 func (c BaseDataAction) giveUpDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -563,8 +577,25 @@ func (c BaseDataAction) DeleteData() revel.Result {
 	return c.renderCommon(modelRenderVO)
 }
 
+func (c BaseDataAction) setRequestParameterToBo(bo *map[string]interface{}) {
+	keyLi := []string{"dataSourceModelId", "formTemplateId", "id"}
+	for k, v := range c.Params.Form {
+		isIn := false
+		for _, item := range keyLi {
+			if item == k {
+				isIn = true
+				break
+			}
+		}
+		if !isIn {
+			(*bo)[k] = strings.Join(v, ",")
+		}
+	}
+}
+
 func (c BaseDataAction) deleteDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -587,6 +618,8 @@ func (c BaseDataAction) deleteDataCommon() (ModelRenderVO) {
 	if !found {
 		panic("DeleteData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
+	// 将客户端传入的各种参数写入,程序在业务方法before,after中有可能会用到
+	c.setRequestParameterToBo(&bo)
 	
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.actionSupport.beforeDeleteData(sessionId, dataSource, &bo)
@@ -597,7 +630,7 @@ func (c BaseDataAction) deleteDataCommon() (ModelRenderVO) {
 
 	usedCheck := UsedCheck{}
 	if usedCheck.CheckUsed(sessionId, dataSource, bo) {
-		panic(BusinessError{"已被用，不能删除"})
+		panic(BusinessError{Message: "已被用，不能删除"})
 	}
 	
 	modelIterator := ModelIterator{}
@@ -647,6 +680,7 @@ func (c BaseDataAction) RefreshData() revel.Result {
 
 func (c BaseDataAction) refreshDataCommon() (ModelRenderVO) {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 

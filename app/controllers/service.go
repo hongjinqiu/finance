@@ -28,7 +28,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 	// 主数据集和分录数据校验
 	message := o.validateBO(sessionId, dataSource, (*bo))
 	if message != "" {
-		panic(BusinessError{message})
+		panic(BusinessError{Message: message})
 	}
 	_, db := global.GetConnection(sessionId)
 
@@ -97,9 +97,16 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 			SrcBo:        srcBo,
 		})
 	})
+	
+	usedCheck := UsedCheck{}
+	// 删除的分录行数据的被用判断
+	for _, diffDataRow := range diffDataRowLi {
+		if usedCheck.CheckDeleteDetailRecordUsed(sessionId, dataSource, *bo, diffDataRow) {
+			panic(BusinessError{Message: "部分分录数据已被用，不可删除"})
+		}
+	}
 
 	// 被用差异行处理
-	usedCheck := UsedCheck{}
 	for i, _ := range diffDataRowLi {
 		fieldGroupLi := diffDataRowLi[i].FieldGroupLi
 		destData := diffDataRowLi[i].DestData
@@ -230,7 +237,14 @@ func (o FinanceService) validateMasterDataDuplicate(sessionId int, dataSource Da
 	message := ""
 	modelTemplateFactory := ModelTemplateFactory{}
 	strId := modelTemplateFactory.GetStrId(bo)
-	andQueryLi := []map[string]interface{}{}
+	andQueryLi := []map[string]interface{}{
+	}
+	
+	andQueryLi = append(andQueryLi, map[string]interface{}{
+		"deleteFlag": map[string]interface{}{
+			"$ne": 9,
+		},
+	})
 	andFieldNameLi := []string{}
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
@@ -244,7 +258,7 @@ func (o FinanceService) validateMasterDataDuplicate(sessionId int, dataSource Da
 			}
 		}
 	})
-	if len(andQueryLi) > 0 {
+	if len(andFieldNameLi) > 0 {
 		if !(strId == "" || strId == "0") {
 			andQueryLi = append(andQueryLi, map[string]interface{}{
 				"_id": map[string]interface{}{

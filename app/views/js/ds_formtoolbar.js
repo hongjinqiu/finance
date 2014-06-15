@@ -51,6 +51,7 @@ function newData() {
 			"formTemplateId": g_formTemplateJsonData.Id
 		},
 		callback: function(o) {
+			formManager.setDetailIncId(g_dataSourceJson, o.bo);
 			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
@@ -69,6 +70,7 @@ function copyData() {
 			"id": bo["id"]
 		},
 		callback: function(o) {
+			formManager.setDetailIncId(g_dataSourceJson, o.bo);
 			formManager.applyGlobalParamFromAjaxData(o);
 			formManager.loadData2Form(g_dataSourceJson, o.bo);
 			formManager.setFormStatus("edit");
@@ -79,7 +81,7 @@ function copyData() {
 function giveUpData() {
 	var formManager = new FormManager();
 	var bo = formManager.getBo();
-	showWarning("您确定要放弃吗？", function(){
+	showConfirm("您确定要放弃吗？", function(){
 		if (!bo["id"] || bo["id"] == "0") {
 			location.href = "/console/listschema?@name=" + g_dataSourceJson.Id;
 		} else {
@@ -101,7 +103,7 @@ function giveUpData() {
 }
 
 function deleteData() {
-	showWarning("您确定要删除吗？", function(){
+	showConfirm("您确定要删除吗？", function(){
 		var formManager = new FormManager();
 		var bo = formManager.getBo();
 		ajaxRequest({
@@ -216,20 +218,24 @@ function setBorderTmp(btn, status) {
 
 ToolbarManager.prototype.enableDisableToolbarBtn = function() {
 	if (g_formStatus == "view") {
-		var viewEnableBtnLi = ["listBtn","newBtn","copyBtn","editBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
+		var viewEnableBtnLi = ["listBtn","newBtn","copyBtn","cancelBtn","unCancelBtn","refreshBtn","usedQueryBtn"];
 		var viewDisableBtnLi = ["saveBtn","giveUpBtn"];
 		
 		// cancelBtn,
 		if (g_masterFormFieldDict["billStatus"]) {
-			if (g_masterFormFieldDict["billStatus"].get("value") == "0") {
+			if (g_masterFormFieldDict["billStatus"].get("value") == "1") {// 正常
 				viewEnableBtnLi.push("cancelBtn");
+				viewEnableBtnLi.push("editBtn");
 			} else {
 				viewDisableBtnLi.push("cancelBtn");
+				viewDisableBtnLi.push("editBtn");
 			}
+		} else {
+			viewEnableBtnLi.push("editBtn");
 		}
 		// unCancelBtn,
 		if (g_masterFormFieldDict["billStatus"]) {
-			if (g_masterFormFieldDict["billStatus"].get("value") == "4") {
+			if (g_masterFormFieldDict["billStatus"].get("value") == "4") {// 作废
 				viewEnableBtnLi.push("unCancelBtn");
 			} else {
 				viewDisableBtnLi.push("unCancelBtn");
@@ -262,7 +268,7 @@ ToolbarManager.prototype.enableDisableToolbarBtn = function() {
 		/*
 		var cancelBtn = document.getElementById("cancelBtn");
 		if (cancelBtn && g_masterFormFieldDict["billStatus"]) {
-			if (g_masterFormFieldDict["billStatus"].get("value") == "0") {
+			if (g_masterFormFieldDict["billStatus"].get("value") == "1") {
 				cancelBtn.disabled = "";
 				setBorderTmp(cancelBtn, "");
 			} else {

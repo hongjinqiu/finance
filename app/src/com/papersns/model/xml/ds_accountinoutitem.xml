@@ -46,8 +46,8 @@
 				<relationDS>
 					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("accountType")) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "1"</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -55,8 +55,8 @@
 					</relationItem>
 					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("accountType")) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "2"</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code</displayField>
@@ -92,14 +92,14 @@
 				<limitMin>0</limitMin>
 				<limitMax>100</limitMax>
 			</field>
-			<field id="amtGathering" extends="FLOAT_FIELD">
+			<field id="amtIncrease" extends="FLOAT_FIELD">
 				<displayName>收款金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
 			</field>
-			<field id="amtPay" extends="FLOAT_FIELD">
+			<field id="amtReduce" extends="FLOAT_FIELD">
 				<displayName>付款金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<limitOption>limitRange</limitOption>
@@ -124,6 +124,16 @@
 					</relationItem>
 				</relationDS>
 			</field>
+			<field id="billDataSourceName" extends="STRING_FIELD">
+				<displayName>单据数据源模型</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>100</fieldLength>
+			</field>
+			<field id="billCollectionName" extends="STRING_FIELD">
+				<displayName>单据数据源模型MongoDB collection name</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>100</fieldLength>
+			</field>
 			<field id="billDetailName" extends="STRING_FIELD">
 				<displayName>单据分录明细名称</displayName>
 				<allowEmpty>true</allowEmpty>
@@ -135,20 +145,20 @@
 				<relationDS>
 					<relationItem name="GatheringBill">
 						<id>GatheringBillSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("billTypeId")) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["billTypeId"] == "1"</jsRelationExpr>
 						<relationModelId>GatheringBill</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>billNo</displayField>
+						<displayField>id</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 					<relationItem name="PayBill">
 						<id>PayBillSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("billTypeId")) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["billTypeId"] == "2"</jsRelationExpr>
 						<relationModelId>PayBill</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>billNo</displayField>
+						<displayField>id</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
@@ -157,10 +167,99 @@
 				<displayName>单据分录明细ID</displayName>
 				<allowEmpty>true</allowEmpty>
 			</field>
-			<field id="accountInOutId" extends="INT_FIELD">
+			<field id="billNo" extends="STRING_FIELD">
+				<displayName>单据编号</displayName>
+				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<fieldLength>30</fieldLength>
+				<allowDuplicate>false</allowDuplicate>
+				<allowCopy>false</allowCopy>
+			</field>
+			<field id="billDate" extends="DATE_FIELD">
+				<displayName>单据日期</displayName>
+				<allowEmpty>false</allowEmpty>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<field id="balanceDate" extends="DATE_FIELD">
+				<displayName>结算日期</displayName>
+				<allowEmpty>true</allowEmpty>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<field id="balanceTypeId" extends="INT_FIELD">
+				<displayName>结算方式</displayName>
+				<allowEmpty>true</allowEmpty>
+				<relationDS>
+					<relationItem name="BalanceType">
+						<id>BalanceTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>BalanceType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<field id="balanceNo" extends="STRING_FIELD">
+				<displayName>结算号</displayName>
+				<allowEmpty>true</allowEmpty>
+				<fieldLength>30</fieldLength>
+			</field>
+			<field id="chamberlainType" extends="INT_FIELD">
+				<displayName>收款对象类型</displayName>
+				<allowEmpty>false</allowEmpty>
+				<dictionary>D_FIN_OBJECT_TYPE</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+			</field>
+			<field id="chamberlainId" extends="INT_FIELD">
+				<displayName>收款对象</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr></defaultValueExpr>
+				<relationDS><!-- 客户,供应商,人员 -->
+					<relationItem name="Customer">
+						<id>CustomerSelector</id>
+						<relationExpr mode="python">str(data["chamberlainType"]) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["chamberlainType"] == "1"</jsRelationExpr>
+						<relationModelId>Customer</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="Provider">
+						<id>ProviderSelector</id>
+						<relationExpr mode="python">str(data["chamberlainType"]) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["chamberlainType"] == "2"</jsRelationExpr>
+						<relationModelId>Provider</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="SysUser">
+						<id>SysUserSelector</id>
+						<relationExpr mode="python">str(data["chamberlainType"]) == "3"</relationExpr>
+						<jsRelationExpr mode="js">data["chamberlainType"] == "3"</jsRelationExpr>
+						<relationModelId>SysUser</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="Null">
+						<id>NullSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>Null</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<!-- <field id="accountInOutId" extends="INT_FIELD">
 				<displayName>月档ID</displayName>
 				<allowEmpty>false</allowEmpty>
-			</field>
+			</field> -->
 		</bizField>
 	</masterData>
 </datasource>

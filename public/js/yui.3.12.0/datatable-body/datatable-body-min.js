@@ -5,5 +5,1196 @@ Licensed under the BSD License.
 http://yuilibrary.com/license/
 */
 
-YUI.add("datatable-body",function(e,t){var n=e.Lang,r=n.isArray,i=n.isNumber,s=n.isString,o=n.sub,u=e.Escape.html,a=e.Array,f=e.bind,l=e.Object,c=/\{value\}/g;e.namespace("DataTable").BodyView=e.Base.create("tableBody",e.View,[],{CELL_TEMPLATE:'<td {headers} class="{className}">{content}</td>',ROW_TEMPLATE:'<tr id="{rowId}" data-yui3-record="{clientId}" class="{rowClass}">{content}</tr>',TBODY_TEMPLATE:'<tbody class="{className}"></tbody>',getCell:function(t,n){var i=this.tbodyNode,o,u,a,f;if(t&&i){r(t)?(o=i.get("children").item(t[0]),u=o&&o.get("children").item(t[1])):e.instanceOf(t,e.Node)&&(u=t.ancestor("."+this.getClassName("cell"),!0));if(u&&n){f=i.get("firstChild.rowIndex");if(s(n))switch(n){case"above":n=[-1,0];break;case"below":n=[1,0];break;case"next":n=[0,1];break;case"previous":n=[0,-1]}r(n)&&(a=u.get("parentNode.rowIndex")+n[0]-f,o=i.get("children").item(a),a=u.get("cellIndex")+n[1],u=o&&o.get("children").item(a))}}return u||null},getClassName:function(){var t=this.host,n;return t&&t.getClassName?t.getClassName.apply(t,arguments):(n=a(arguments),n.unshift(this.constructor.NAME),e.ClassNameManager.getClassName.apply(e.ClassNameManager,n))},getRecord:function(t){var n=this.get("modelList"),r=this.tbodyNode,i=null,o;return r&&(s(t)&&(t=r.one("#"+t)),e.instanceOf(t,e.Node)&&(i=t.ancestor(function(e){return e.get("parentNode").compareTo(r)},!0),o=i&&n.getByClientId(i.getData("yui3-record")))),o||null},getRow:function(e){var t=this.tbodyNode,n=null;return t&&(e&&(e=this._idMap[e.get?e.get("clientId"):e]||e),n=i(e)?t.get("children").item(e):t.one("#"+e)),n},render:function(){var e=this.get("container"),t=this.get("modelList"),n=this.get("columns"),r=this.tbodyNode||(this.tbodyNode=this._createTBodyNode());return this._createRowTemplate(n),t&&(r.setHTML(this._createDataHTML(n)),this._applyNodeFormatters(r,n)),r.get("parentNode")!==e&&e.appendChild(r),this.bindUI(),this},refreshRow:function(e,t,n){var r,i,s=n.length,o;for(o=0;o<s;o++)r=n[o],i=e.one("."+this.getClassName("col",r)),this.refreshCell(i,t);return this},refreshCell:function(t,n,r){var i,s,o,u=n.toJSON();t=this.getCell(t),n||(n=this.getRecord(t)),r||(r=this.getColumn(t));if(r.nodeFormatter)o={cell:t.one("."+this.getClassName("liner"))||t,column:r,data:u,record:n,rowIndex:this._getRowIndex(t.ancestor("tr")),td:t,value:u[r.key]},keep=r.nodeFormatter.call(host,o),keep===!1&&t.destroy(!0);else if(r.formatter){r._formatterFn||(r=this._setColumnsFormatterFn([r])[0]),s=r._formatterFn||null,s&&(o={value:u[r.key],data:u,column:r,record:n,className:"",rowClass:"",rowIndex:this._getRowIndex(t.ancestor("tr"))},i=s.call(this.get("host"),o),i===undefined&&(i=o.value));if(i===undefined||i===null||i==="")i=r.emptyCellValue||""}else i=u[r.key]||r.emptyCellValue||"";return t.setHTML(r.allowHTML?i:e.Escape.html(i)),this},getColumn:function(t){e.instanceOf(t,e.Node)&&(t=t.get("className").match(new RegExp(this.getClassName("col")+"-([^ ]*)"))[1]);var n=this.get("columns"),r=null;return e.Array.some(n,function(e){if(e.key===t)return r=e,!0}),r},_afterColumnsChange:function(){this.render()},_afterDataChange:function(t){var n=(t.type.match(/:(add|change|remove)$/)||[])[1],r=t.index,i=this.get("columns"),s,o=t.changed&&e.Object.keys(t.changed),u,a,f,l;for(f=0,l=i.length;f<l;f++){s=i[f];if(s.hasOwnProperty("nodeFormatter")){this.render();return}}switch(n){case"change":for(f=0,l=i.length;f<l;f++)s=i[f],u=s.key||s.name,s.formatter&&!t.changed[u]&&o.push(u);this.refreshRow(this.getRow(t.target),t.target,o);break;case"add":r=Math.min(r,this.get("modelList").size()-1),this._setColumnsFormatterFn(i),a=e.Node.create(this._createRowHTML(t.model,r,i)),this.tbodyNode.insert(a,r),this._restripe(r);break;case"remove":this.getRow(r).remove(!0),this._restripe(r-1);break;default:this.render()}},_restripe:function(e){var t=this._restripeTask,n;e=Math.max(e|0,0),t?t.index=Math.min(t.index,e):(n=this,this._restripeTask={timer:setTimeout(function(){if(!n||n.get("destroy")||!n.tbodyNode||!n.tbodyNode.inDoc()){n._restripeTask=null;return}var e=[n.CLASS_ODD,n.CLASS_EVEN],t=[n.CLASS_EVEN,n.CLASS_ODD],r=n._restripeTask.index;n.tbodyNode.get("childNodes").slice(r).each(function(n,i){n.replaceClass.apply(n,(r+i)%2?t:e)}),n._restripeTask=null},0),index:e})},_afterModelListChange:function(){var e=this._eventHandles;e.dataChange&&(e.dataChange.detach(),delete e.dataChange,this.bindUI()),this.tbodyNode&&this.render()},_applyNodeFormatters:function(e,t){var n=this.host||this,r=this.get("modelList"),i=[],s="."+this.getClassName("liner"),o,u,a;for(u=0,a=t.length;u<a;++u)t[u].nodeFormatter&&i.push(u);r&&i.length&&(o=e.get("childNodes"),r.each(function(e,r){var u={data:e.toJSON(),record:e,rowIndex:r},a=o.item(r),f,l,c,h,p,d,v;if(a){p=a.get("childNodes");for(f=0,l=i.length;f<l;++f)d=p.item(i[f]),d&&(c=u.column=t[i[f]],h=c.key||c.id,u.value=e.get(h),u.td=d,u.cell=d.one(s)||d,v=c.nodeFormatter.call(n,u),v===!1&&d.destroy(!0))}}))},bindUI:function(){var e=this._eventHandles,t=this.get("modelList"),n=t.model.NAME+":change";e.columnsChange||(e.columnsChange=this.after("columnsChange",f("_afterColumnsChange",this))),t&&!e.dataChange&&(e.dataChange=t.after(["add","remove","reset",n],f("_afterDataChange",this)))},_createDataHTML:function(e){var t=this.get("modelList"),n="";return t&&t.each(function(t,r){n+=this._createRowHTML(t,r,e)},this),n},_createRowHTML:function(e,t,n){var r=e.toJSON(),i=e.get("clientId"),s={rowId:this._getRowId(i),clientId:i,rowClass:t%2?this.CLASS_ODD:this.CLASS_EVEN},a=this.host||this,f,l,c,h,p,d;for(f=0,l=n.length;f<l;++f){c=n[f],p=r[c.key],h=c._id||c.key,s[h+"-className"]="",c._formatterFn&&(d={value:p,data:r,column:c,record:e,className:"",rowClass:"",rowIndex:t},p=c._formatterFn.call(a,d),p===undefined&&(p=d.value),s[h+"-className"]=d.className,s.rowClass+=" "+d.rowClass);if(!s.hasOwnProperty(h)||r.hasOwnProperty(c.key)){if(p===undefined||p===null||p==="")p=c.emptyCellValue||"";s[h]=c.allowHTML?p:u(p)}}return s.rowClass=s.rowClass.replace(/\s+/g," "),o(this._rowTemplate
-,s)},_getRowIndex:function(e){var t=this.tbodyNode,n=1;if(t&&e){if(e.ancestor("tbody")!==t)return null;while(e=e.previous())n++}return n},_createRowTemplate:function(e){var t="",n=this.CELL_TEMPLATE,r,i,s,u,a,f,l,h;this._setColumnsFormatterFn(e);for(r=0,i=e.length;r<i;++r)s=e[r],u=s.key,a=s._id||u,h=s._formatterFn,f=(s._headers||[]).length>1?'headers="'+s._headers.join(" ")+'"':"",l={content:"{"+a+"}",headers:f,className:this.getClassName("col",a)+" "+(s.className||"")+" "+this.getClassName("cell")+" {"+a+"-className}"},!h&&s.formatter&&(l.content=s.formatter.replace(c,l.content)),s.nodeFormatter&&(l.content=""),t+=o(s.cellTemplate||n,l);this._rowTemplate=o(this.ROW_TEMPLATE,{content:t})},_setColumnsFormatterFn:function(t){var r=e.DataTable.BodyView.Formatters,i,s,o,u;for(o=0,u=t.length;o<u;o++)s=t[o],i=s.formatter,!s._formatterFn&&i&&(n.isFunction(i)?s._formatterFn=i:i in r&&(s._formatterFn=r[i].call(this.host||this,s)));return t},_createTBodyNode:function(){return e.Node.create(o(this.TBODY_TEMPLATE,{className:this.getClassName("data")}))},destructor:function(){(new e.EventHandle(l.values(this._eventHandles))).detach()},_getRowId:function(t){return this._idMap[t]||(this._idMap[t]=e.guid())},initializer:function(e){this.host=e.host,this._eventHandles={modelListChange:this.after("modelListChange",f("_afterModelListChange",this))},this._idMap={},this.CLASS_ODD=this.getClassName("odd"),this.CLASS_EVEN=this.getClassName("even")}},{Formatters:{}})},"3.11.0",{requires:["datatable-core","view","classnamemanager"]});
+YUI.add('datatable-body', function (Y, NAME) {
+
+/**
+View class responsible for rendering the `<tbody>` section of a table. Used as
+the default `bodyView` for `Y.DataTable.Base` and `Y.DataTable` classes.
+
+@module datatable
+@submodule datatable-body
+@since 3.5.0
+**/
+var Lang         = Y.Lang,
+    isArray      = Lang.isArray,
+    isNumber     = Lang.isNumber,
+    isString     = Lang.isString,
+    fromTemplate = Lang.sub,
+    htmlEscape   = Y.Escape.html,
+    toArray      = Y.Array,
+    bind         = Y.bind,
+    YObject      = Y.Object,
+    valueRegExp  = /\{value\}/g;
+
+/**
+View class responsible for rendering the `<tbody>` section of a table. Used as
+the default `bodyView` for `Y.DataTable.Base` and `Y.DataTable` classes.
+
+Translates the provided `modelList` into a rendered `<tbody>` based on the data
+in the constituent Models, altered or amended by any special column
+configurations.
+
+The `columns` configuration, passed to the constructor, determines which
+columns will be rendered.
+
+The rendering process involves constructing an HTML template for a complete row
+of data, built by concatenating a customized copy of the instance's
+`CELL_TEMPLATE` into the `ROW_TEMPLATE` once for each column.  This template is
+then populated with values from each Model in the `modelList`, aggregating a
+complete HTML string of all row and column data.  A `<tbody>` Node is then created from the markup and any column `nodeFormatter`s are applied.
+
+Supported properties of the column objects include:
+
+  * `key` - Used to link a column to an attribute in a Model.
+  * `name` - Used for columns that don't relate to an attribute in the Model
+    (`formatter` or `nodeFormatter` only) if the implementer wants a
+    predictable name to refer to in their CSS.
+  * `cellTemplate` - Overrides the instance's `CELL_TEMPLATE` for cells in this
+    column only.
+  * `formatter` - Used to customize or override the content value from the
+    Model.  These do not have access to the cell or row Nodes and should
+    return string (HTML) content.
+  * `nodeFormatter` - Used to provide content for a cell as well as perform any
+    custom modifications on the cell or row Node that could not be performed by
+    `formatter`s.  Should be used sparingly for better performance.
+  * `emptyCellValue` - String (HTML) value to use if the Model data for a
+    column, or the content generated by a `formatter`, is the empty string,
+    `null`, or `undefined`.
+  * `allowHTML` - Set to `true` if a column value, `formatter`, or
+    `emptyCellValue` can contain HTML.  This defaults to `false` to protect
+    against XSS.
+  * `className` - Space delimited CSS classes to add to all `<td>`s in a column.
+
+A column `formatter` can be:
+
+  * a function, as described below.
+  * a string which can be:
+      * the name of a pre-defined formatter function
+        which can be located in the `Y.DataTable.BodyView.Formatters` hash using the
+        value of the `formatter` property as the index.
+      * A template that can use the `{value}` placeholder to include the value
+        for the current cell or the name of any field in the underlaying model
+        also enclosed in curly braces.  Any number and type of these placeholders
+        can be used.
+
+Column `formatter`s are passed an object (`o`) with the following properties:
+
+  * `value` - The current value of the column's associated attribute, if any.
+  * `data` - An object map of Model keys to their current values.
+  * `record` - The Model instance.
+  * `column` - The column configuration object for the current column.
+  * `className` - Initially empty string to allow `formatter`s to add CSS
+    classes to the cell's `<td>`.
+  * `rowIndex` - The zero-based row number.
+  * `rowClass` - Initially empty string to allow `formatter`s to add CSS
+    classes to the cell's containing row `<tr>`.
+
+They may return a value or update `o.value` to assign specific HTML content.  A
+returned value has higher precedence.
+
+Column `nodeFormatter`s are passed an object (`o`) with the following
+properties:
+
+  * `value` - The current value of the column's associated attribute, if any.
+  * `td` - The `<td>` Node instance.
+  * `cell` - The `<div>` liner Node instance if present, otherwise, the `<td>`.
+    When adding content to the cell, prefer appending into this property.
+  * `data` - An object map of Model keys to their current values.
+  * `record` - The Model instance.
+  * `column` - The column configuration object for the current column.
+  * `rowIndex` - The zero-based row number.
+
+They are expected to inject content into the cell's Node directly, including
+any "empty" cell content.  Each `nodeFormatter` will have access through the
+Node API to all cells and rows in the `<tbody>`, but not to the `<table>`, as
+it will not be attached yet.
+
+If a `nodeFormatter` returns `false`, the `o.td` and `o.cell` Nodes will be
+`destroy()`ed to remove them from the Node cache and free up memory.  The DOM
+elements will remain as will any content added to them.  _It is highly
+advisable to always return `false` from your `nodeFormatter`s_.
+
+@class BodyView
+@namespace DataTable
+@extends View
+@since 3.5.0
+**/
+Y.namespace('DataTable').BodyView = Y.Base.create('tableBody', Y.View, [], {
+    // -- Instance properties -------------------------------------------------
+
+    /**
+    HTML template used to create table cells.
+
+    @property CELL_TEMPLATE
+    @type {HTML}
+    @default '<td {headers} class="{className}">{content}</td>'
+    @since 3.5.0
+    **/
+    CELL_TEMPLATE: '<td {headers} class="{className}">{content}</td>',
+
+    /**
+    CSS class applied to even rows.  This is assigned at instantiation.
+
+    For DataTable, this will be `yui3-datatable-even`.
+
+    @property CLASS_EVEN
+    @type {String}
+    @default 'yui3-table-even'
+    @since 3.5.0
+    **/
+    //CLASS_EVEN: null
+
+    /**
+    CSS class applied to odd rows.  This is assigned at instantiation.
+
+    When used by DataTable instances, this will be `yui3-datatable-odd`.
+
+    @property CLASS_ODD
+    @type {String}
+    @default 'yui3-table-odd'
+    @since 3.5.0
+    **/
+    //CLASS_ODD: null
+
+    /**
+    HTML template used to create table rows.
+
+    @property ROW_TEMPLATE
+    @type {HTML}
+    @default '<tr id="{rowId}" data-yui3-record="{clientId}" class="{rowClass}">{content}</tr>'
+    @since 3.5.0
+    **/
+    ROW_TEMPLATE : '<tr id="{rowId}" data-yui3-record="{clientId}" class="{rowClass}">{content}</tr>',
+
+    /**
+    The object that serves as the source of truth for column and row data.
+    This property is assigned at instantiation from the `host` property of
+    the configuration object passed to the constructor.
+
+    @property host
+    @type {Object}
+    @default (initially unset)
+    @since 3.5.0
+    **/
+    //TODO: should this be protected?
+    //host: null,
+
+    /**
+    HTML templates used to create the `<tbody>` containing the table rows.
+
+    @property TBODY_TEMPLATE
+    @type {HTML}
+    @default '<tbody class="{className}">{content}</tbody>'
+    @since 3.6.0
+    **/
+    TBODY_TEMPLATE: '<tbody class="{className}"></tbody>',
+
+    // -- Public methods ------------------------------------------------------
+
+    /**
+    Returns the `<td>` Node from the given row and column index.  Alternately,
+    the `seed` can be a Node.  If so, the nearest ancestor cell is returned.
+    If the `seed` is a cell, it is returned.  If there is no cell at the given
+    coordinates, `null` is returned.
+
+    Optionally, include an offset array or string to return a cell near the
+    cell identified by the `seed`.  The offset can be an array containing the
+    number of rows to shift followed by the number of columns to shift, or one
+    of "above", "below", "next", or "previous".
+
+    <pre><code>// Previous cell in the previous row
+    var cell = table.getCell(e.target, [-1, -1]);
+
+    // Next cell
+    var cell = table.getCell(e.target, 'next');
+    var cell = table.getCell(e.target, [0, 1];</pre></code>
+
+    @method getCell
+    @param {Number[]|Node} seed Array of row and column indexes, or a Node that
+        is either the cell itself or a descendant of one.
+    @param {Number[]|String} [shift] Offset by which to identify the returned
+        cell Node
+    @return {Node}
+    @since 3.5.0
+    **/
+    getCell: function (seed, shift) {
+        var tbody = this.tbodyNode,
+            row, cell, index, rowIndexOffset;
+
+        if (seed && tbody) {
+            if (isArray(seed)) {
+                row = tbody.get('children').item(seed[0]);
+                cell = row && row.get('children').item(seed[1]);
+            } else if (Y.instanceOf(seed, Y.Node)) {
+                cell = seed.ancestor('.' + this.getClassName('cell'), true);
+            }
+
+            if (cell && shift) {
+                rowIndexOffset = tbody.get('firstChild.rowIndex');
+                if (isString(shift)) {
+                    // TODO this should be a static object map
+                    switch (shift) {
+                        case 'above'   : shift = [-1, 0]; break;
+                        case 'below'   : shift = [1, 0]; break;
+                        case 'next'    : shift = [0, 1]; break;
+                        case 'previous': shift = [0, -1]; break;
+                    }
+                }
+
+                if (isArray(shift)) {
+                    index = cell.get('parentNode.rowIndex') +
+                                shift[0] - rowIndexOffset;
+                    row   = tbody.get('children').item(index);
+
+                    index = cell.get('cellIndex') + shift[1];
+                    cell  = row && row.get('children').item(index);
+                }
+            }
+        }
+
+        return cell || null;
+    },
+
+    /**
+    Returns the generated CSS classname based on the input.  If the `host`
+    attribute is configured, it will attempt to relay to its `getClassName`
+    or use its static `NAME` property as a string base.
+
+    If `host` is absent or has neither method nor `NAME`, a CSS classname
+    will be generated using this class's `NAME`.
+
+    @method getClassName
+    @param {String} token* Any number of token strings to assemble the
+        classname from.
+    @return {String}
+    @protected
+    @since 3.5.0
+    **/
+    getClassName: function () {
+        var host = this.host,
+            args;
+
+        if (host && host.getClassName) {
+            return host.getClassName.apply(host, arguments);
+        } else {
+            args = toArray(arguments);
+            args.unshift(this.constructor.NAME);
+            return Y.ClassNameManager.getClassName
+                .apply(Y.ClassNameManager, args);
+        }
+    },
+
+    /**
+    Returns the Model associated to the row Node or id provided. Passing the
+    Node or id for a descendant of the row also works.
+
+    If no Model can be found, `null` is returned.
+
+    @method getRecord
+    @param {String|Node} seed Row Node or `id`, or one for a descendant of a row
+    @return {Model}
+    @since 3.5.0
+    **/
+    getRecord: function (seed) {
+        var modelList = this.get('modelList'),
+            tbody     = this.tbodyNode,
+            row       = null,
+            record;
+
+        if (tbody) {
+            if (isString(seed)) {
+                seed = tbody.one('#' + seed);
+            }
+
+            if (Y.instanceOf(seed, Y.Node)) {
+                row = seed.ancestor(function (node) {
+                    return node.get('parentNode').compareTo(tbody);
+                }, true);
+
+                record = row &&
+                    modelList.getByClientId(row.getData('yui3-record'));
+            }
+        }
+
+        return record || null;
+    },
+
+    /**
+    Returns the `<tr>` Node from the given row index, Model, or Model's
+    `clientId`.  If the rows haven't been rendered yet, or if the row can't be
+    found by the input, `null` is returned.
+
+    @method getRow
+    @param {Number|String|Model} id Row index, Model instance, or clientId
+    @return {Node}
+    @since 3.5.0
+    **/
+    getRow: function (id) {
+        var tbody = this.tbodyNode,
+            row = null;
+
+        if (tbody) {
+            if (id) {
+                id = this._idMap[id.get ? id.get('clientId') : id] || id;
+            }
+
+            row = isNumber(id) ?
+                tbody.get('children').item(id) :
+                tbody.one('#' + id);
+        }
+
+        return row;
+    },
+
+    /**
+    Creates the table's `<tbody>` content by assembling markup generated by
+    populating the `ROW\_TEMPLATE`, and `CELL\_TEMPLATE` templates with content
+    from the `columns` and `modelList` attributes.
+
+    The rendering process happens in three stages:
+
+    1. A row template is assembled from the `columns` attribute (see
+       `_createRowTemplate`)
+
+    2. An HTML string is built up by concatenating the application of the data in
+       each Model in the `modelList` to the row template. For cells with
+       `formatter`s, the function is called to generate cell content. Cells
+       with `nodeFormatter`s are ignored. For all other cells, the data value
+       from the Model attribute for the given column key is used.  The
+       accumulated row markup is then inserted into the container.
+
+    3. If any column is configured with a `nodeFormatter`, the `modelList` is
+       iterated again to apply the `nodeFormatter`s.
+
+    Supported properties of the column objects include:
+
+      * `key` - Used to link a column to an attribute in a Model.
+      * `name` - Used for columns that don't relate to an attribute in the Model
+        (`formatter` or `nodeFormatter` only) if the implementer wants a
+        predictable name to refer to in their CSS.
+      * `cellTemplate` - Overrides the instance's `CELL_TEMPLATE` for cells in
+        this column only.
+      * `formatter` - Used to customize or override the content value from the
+        Model.  These do not have access to the cell or row Nodes and should
+        return string (HTML) content.
+      * `nodeFormatter` - Used to provide content for a cell as well as perform
+        any custom modifications on the cell or row Node that could not be
+        performed by `formatter`s.  Should be used sparingly for better
+        performance.
+      * `emptyCellValue` - String (HTML) value to use if the Model data for a
+        column, or the content generated by a `formatter`, is the empty string,
+        `null`, or `undefined`.
+      * `allowHTML` - Set to `true` if a column value, `formatter`, or
+        `emptyCellValue` can contain HTML.  This defaults to `false` to protect
+        against XSS.
+      * `className` - Space delimited CSS classes to add to all `<td>`s in a
+        column.
+
+    Column `formatter`s are passed an object (`o`) with the following
+    properties:
+
+      * `value` - The current value of the column's associated attribute, if
+        any.
+      * `data` - An object map of Model keys to their current values.
+      * `record` - The Model instance.
+      * `column` - The column configuration object for the current column.
+      * `className` - Initially empty string to allow `formatter`s to add CSS
+        classes to the cell's `<td>`.
+      * `rowIndex` - The zero-based row number.
+      * `rowClass` - Initially empty string to allow `formatter`s to add CSS
+        classes to the cell's containing row `<tr>`.
+
+    They may return a value or update `o.value` to assign specific HTML
+    content.  A returned value has higher precedence.
+
+    Column `nodeFormatter`s are passed an object (`o`) with the following
+    properties:
+
+      * `value` - The current value of the column's associated attribute, if
+        any.
+      * `td` - The `<td>` Node instance.
+      * `cell` - The `<div>` liner Node instance if present, otherwise, the
+        `<td>`.  When adding content to the cell, prefer appending into this
+        property.
+      * `data` - An object map of Model keys to their current values.
+      * `record` - The Model instance.
+      * `column` - The column configuration object for the current column.
+      * `rowIndex` - The zero-based row number.
+
+    They are expected to inject content into the cell's Node directly, including
+    any "empty" cell content.  Each `nodeFormatter` will have access through the
+    Node API to all cells and rows in the `<tbody>`, but not to the `<table>`,
+    as it will not be attached yet.
+
+    If a `nodeFormatter` returns `false`, the `o.td` and `o.cell` Nodes will be
+    `destroy()`ed to remove them from the Node cache and free up memory.  The
+    DOM elements will remain as will any content added to them.  _It is highly
+    advisable to always return `false` from your `nodeFormatter`s_.
+
+    @method render
+    @return {BodyView} The instance
+    @chainable
+    @since 3.5.0
+    **/
+    render: function () {
+        var table   = this.get('container'),
+            data    = this.get('modelList'),
+            columns = this.get('columns'),
+            tbody   = this.tbodyNode ||
+                      (this.tbodyNode = this._createTBodyNode());
+
+        // Needed for mutation
+        this._createRowTemplate(columns);
+
+        if (data) {
+            tbody.setHTML(this._createDataHTML(columns));
+
+            this._applyNodeFormatters(tbody, columns);
+        }
+
+        if (tbody.get('parentNode') !== table) {
+            table.appendChild(tbody);
+        }
+
+        this.bindUI();
+
+        return this;
+    },
+
+    /**
+     Refreshes the provided row against the provided model and the Array of
+     columns to be updated.
+
+     @method refreshRow
+     @param {Y.Node} row
+     @param {Y.Model} model Y.Model representation of the row
+     @param {Object[]} columns Array of column configuration objects
+
+     @chainable
+     */
+    refreshRow: function (row, model, columns) {
+        var key,
+            cell,
+            len = columns.length,
+            i;
+
+        for (i = 0; i < len; i++) {
+            key = columns[i];
+            cell = row.one('.' + this.getClassName('col', key));
+            if (cell) {// 在我的使用中,隐藏字段会有问题,因此,加一行空判断
+            	this.refreshCell(cell, model);
+            }
+        }
+
+        return this;
+    },
+
+    /**
+     Refreshes the given cell with the provided model data and the provided
+     column configuration.
+
+     Uses the provided column formatter if aviable.
+
+     @method refreshCell
+     @param {Y.Node} cell Y.Node pointer to the cell element to be updated
+     @param {Y.Model} [model] Y.Model representation of the row
+     @param {Object} [col] Column configuration object for the cell
+
+     @chainable
+     */
+    refreshCell: function (cell, model, col) {
+        var content,
+            formatterFn,
+            formatterData,
+            data = model.toJSON();
+
+        cell = this.getCell(cell);
+        model || (model = this.getRecord(cell));
+        col || (col = this.getColumn(cell));
+
+        if (col.nodeFormatter) {
+            formatterData = {
+                cell: cell.one('.' + this.getClassName('liner')) || cell,
+                column: col,
+                data: data,
+                record: model,
+                rowIndex: this._getRowIndex(cell.ancestor('tr')),
+                td: cell,
+                value: data[col.key]
+            };
+
+            keep = col.nodeFormatter.call(host,formatterData);
+
+            if (keep === false) {
+                // Remove from the Node cache to reduce
+                // memory footprint.  This also purges events,
+                // which you shouldn't be scoping to a cell
+                // anyway.  You've been warned.  Incidentally,
+                // you should always return false. Just sayin.
+                cell.destroy(true);
+            }
+
+        } else if (col.formatter) {
+            if (!col._formatterFn) {
+                col = this._setColumnsFormatterFn([col])[0];
+            }
+
+            formatterFn = col._formatterFn || null;
+
+            if (formatterFn) {
+                formatterData = {
+                    value    : data[col.key],
+                    data     : data,
+                    column   : col,
+                    record   : model,
+                    className: '',
+                    rowClass : '',
+                    rowIndex : this._getRowIndex(cell.ancestor('tr'))
+                };
+
+                // Formatters can either return a value ...
+                content = formatterFn.call(this.get('host'), formatterData);
+
+                // ... or update the value property of the data obj passed
+                if (content === undefined) {
+                    content = formatterData.value;
+                }
+            }
+
+            if (content === undefined || content === null || content === '') {
+                content = col.emptyCellValue || '';
+            }
+
+        } else {
+            content = data[col.key] || col.emptyCellValue || '';
+        }
+
+        cell.setHTML(col.allowHTML ? content : Y.Escape.html(content));
+
+        return this;
+    },
+
+    /**
+     Returns column data from this.get('columns'). If a Y.Node is provided as
+     the key, will try to determine the key from the classname
+     @method getColumn
+     @param {String|Y.Node} key
+     @return {Object} Returns column configuration
+     */
+    getColumn: function (key) {
+        if (Y.instanceOf(key, Y.Node)) {
+            // get column name from node
+            key = key.get('className').match(
+                new RegExp( this.getClassName('col') +'-([^ ]*)' )
+            )[1];
+        }
+
+        var cols = this.get('columns'),
+            col = null;
+
+        Y.Array.some(cols, function (_col) {
+            if (_col.key === key) {
+                col = _col;
+                return true;
+            }
+        });
+
+        return col;
+    },
+
+    // -- Protected and private methods ---------------------------------------
+    /**
+    Handles changes in the source's columns attribute.  Redraws the table data.
+
+    @method _afterColumnsChange
+    @param {EventFacade} e The `columnsChange` event object
+    @protected
+    @since 3.5.0
+    **/
+    // TODO: Preserve existing DOM
+    // This will involve parsing and comparing the old and new column configs
+    // and reacting to four types of changes:
+    // 1. formatter, nodeFormatter, emptyCellValue changes
+    // 2. column deletions
+    // 3. column additions
+    // 4. column moves (preserve cells)
+    _afterColumnsChange: function () {
+        this.render();
+    },
+
+    /**
+    Handles modelList changes, including additions, deletions, and updates.
+
+    Modifies the existing table DOM accordingly.
+
+    @method _afterDataChange
+    @param {EventFacade} e The `change` event from the ModelList
+    @protected
+    @since 3.5.0
+    **/
+    _afterDataChange: function (e) {
+        var type = (e.type.match(/:(add|change|remove)$/) || [])[1],
+            index = e.index,
+            columns = this.get('columns'),
+            col,
+            changed = e.changed && Y.Object.keys(e.changed),
+            key,
+            row,
+            i,
+            len;
+
+        for (i = 0, len = columns.length; i < len; i++ ) {
+            col = columns[i];
+
+            // since nodeFormatters typcially make changes outside of it's
+            // cell, we need to see if there are any columns that have a
+            // nodeFormatter and if so, we need to do a full render() of the
+            // tbody
+            if (col.hasOwnProperty('nodeFormatter')) {
+                this.render();
+                return;
+            }
+        }
+
+        // TODO: if multiple rows are being added/remove/swapped, can we avoid the restriping?
+        switch (type) {
+            case 'change':
+                for (i = 0, len = columns.length; i < len; i++) {
+                    col = columns[i];
+                    key = col.key || col.name;
+                    if (col.formatter && !e.changed[key]) {
+                        changed.push(key);
+                    }
+                }
+                this.refreshRow(this.getRow(e.target), e.target, changed);
+                break;
+            case 'add':
+                // we need to make sure we don't have an index larger than the data we have
+                index =  Math.min(index, this.get('modelList').size() - 1);
+
+                // updates the columns with formatter functions
+                this._setColumnsFormatterFn(columns);
+                row = Y.Node.create(this._createRowHTML(e.model, index, columns));
+                this.tbodyNode.insert(row, index);
+                this._restripe(index);
+                break;
+            case 'remove':
+                this.getRow(index).remove(true);
+                // we removed a row, so we need to back up our index to stripe
+                this._restripe(index - 1);
+                break;
+            default:
+                this.render();
+        }
+    },
+
+    /**
+     Toggles the odd/even classname of the row after the given index. This method
+     is used to update rows after a row is inserted into or removed from the table.
+     Note this event is delayed so the table is only restriped once when multiple
+     rows are updated at one time.
+
+     @protected
+     @method _restripe
+     @param {Number} [index] Index of row to start restriping after
+     @since 3.11.0
+     */
+    _restripe: function (index) {
+        var task = this._restripeTask,
+            self;
+
+        // index|0 to force int, avoid NaN. Math.max() to avoid neg indexes.
+        index = Math.max((index|0), 0);
+
+        if (!task) {
+            self = this;
+
+            this._restripeTask = {
+                timer: setTimeout(function () {
+                    // Check for self existence before continuing
+                    if (!self || self.get('destroy') || !self.tbodyNode || !self.tbodyNode.inDoc()) {
+                        self._restripeTask = null;
+                        return;
+                    }
+
+                    var odd  = [self.CLASS_ODD, self.CLASS_EVEN],
+                        even = [self.CLASS_EVEN, self.CLASS_ODD],
+                        index = self._restripeTask.index;
+
+                    self.tbodyNode.get('childNodes')
+                        .slice(index)
+                        .each(function (row, i) { // TODO: each vs batch
+                            row.replaceClass.apply(row, (index + i) % 2 ? even : odd);
+                        });
+
+                    self._restripeTask = null;
+                }, 0),
+
+                index: index
+            };
+        } else {
+            task.index = Math.min(task.index, index);
+        }
+
+    },
+
+    /**
+    Handles replacement of the modelList.
+
+    Rerenders the `<tbody>` contents.
+
+    @method _afterModelListChange
+    @param {EventFacade} e The `modelListChange` event
+    @protected
+    @since 3.6.0
+    **/
+    _afterModelListChange: function () {
+        var handles = this._eventHandles;
+
+        if (handles.dataChange) {
+            handles.dataChange.detach();
+            delete handles.dataChange;
+            this.bindUI();
+        }
+
+        if (this.tbodyNode) {
+            this.render();
+        }
+    },
+
+    /**
+    Iterates the `modelList`, and calls any `nodeFormatter`s found in the
+    `columns` param on the appropriate cell Nodes in the `tbody`.
+
+    @method _applyNodeFormatters
+    @param {Node} tbody The `<tbody>` Node whose columns to update
+    @param {Object[]} columns The column configurations
+    @protected
+    @since 3.5.0
+    **/
+    _applyNodeFormatters: function (tbody, columns) {
+        var host = this.host || this,
+            data = this.get('modelList'),
+            formatters = [],
+            linerQuery = '.' + this.getClassName('liner'),
+            rows, i, len;
+
+        // Only iterate the ModelList again if there are nodeFormatters
+        for (i = 0, len = columns.length; i < len; ++i) {
+            if (columns[i].nodeFormatter) {
+                formatters.push(i);
+            }
+        }
+
+        if (data && formatters.length) {
+            rows = tbody.get('childNodes');
+
+            data.each(function (record, index) {
+                var formatterData = {
+                        data      : record.toJSON(),
+                        record    : record,
+                        rowIndex  : index
+                    },
+                    row = rows.item(index),
+                    i, len, col, key, cells, cell, keep;
+
+
+                if (row) {
+                    cells = row.get('childNodes');
+                    for (i = 0, len = formatters.length; i < len; ++i) {
+                        cell = cells.item(formatters[i]);
+
+                        if (cell) {
+                            col = formatterData.column = columns[formatters[i]];
+                            key = col.key || col.id;
+
+                            formatterData.value = record.get(key);
+                            formatterData.td    = cell;
+                            formatterData.cell  = cell.one(linerQuery) || cell;
+
+                            keep = col.nodeFormatter.call(host,formatterData);
+
+                            if (keep === false) {
+                                // Remove from the Node cache to reduce
+                                // memory footprint.  This also purges events,
+                                // which you shouldn't be scoping to a cell
+                                // anyway.  You've been warned.  Incidentally,
+                                // you should always return false. Just sayin.
+                                cell.destroy(true);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    },
+
+    /**
+    Binds event subscriptions from the UI and the host (if assigned).
+
+    @method bindUI
+    @protected
+    @since 3.5.0
+    **/
+    bindUI: function () {
+        var handles     = this._eventHandles,
+            modelList   = this.get('modelList'),
+            changeEvent = modelList.model.NAME + ':change';
+
+        if (!handles.columnsChange) {
+            handles.columnsChange = this.after('columnsChange',
+                bind('_afterColumnsChange', this));
+        }
+
+        if (modelList && !handles.dataChange) {
+            handles.dataChange = modelList.after(
+                ['add', 'remove', 'reset', changeEvent],
+                bind('_afterDataChange', this));
+        }
+    },
+
+    /**
+    Iterates the `modelList` and applies each Model to the `_rowTemplate`,
+    allowing any column `formatter` or `emptyCellValue` to override cell
+    content for the appropriate column.  The aggregated HTML string is
+    returned.
+
+    @method _createDataHTML
+    @param {Object[]} columns The column configurations to customize the
+                generated cell content or class names
+    @return {HTML} The markup for all Models in the `modelList`, each applied
+                to the `_rowTemplate`
+    @protected
+    @since 3.5.0
+    **/
+    _createDataHTML: function (columns) {
+        var data = this.get('modelList'),
+            html = '';
+
+        if (data) {
+            data.each(function (model, index) {
+                html += this._createRowHTML(model, index, columns);
+            }, this);
+        }
+
+        return html;
+    },
+
+    /**
+    Applies the data of a given Model, modified by any column formatters and
+    supplemented by other template values to the instance's `_rowTemplate` (see
+    `_createRowTemplate`).  The generated string is then returned.
+
+    The data from Model's attributes is fetched by `toJSON` and this data
+    object is appended with other properties to supply values to {placeholders}
+    in the template.  For a template generated from a Model with 'foo' and 'bar'
+    attributes, the data object would end up with the following properties
+    before being used to populate the `_rowTemplate`:
+
+      * `clientID` - From Model, used the assign the `<tr>`'s 'id' attribute.
+      * `foo` - The value to populate the 'foo' column cell content.  This
+        value will be the value stored in the Model's `foo` attribute, or the
+        result of the column's `formatter` if assigned.  If the value is '',
+        `null`, or `undefined`, and the column's `emptyCellValue` is assigned,
+        that value will be used.
+      * `bar` - Same for the 'bar' column cell content.
+      * `foo-className` - String of CSS classes to apply to the `<td>`.
+      * `bar-className` - Same.
+      * `rowClass`      - String of CSS classes to apply to the `<tr>`. This
+        will be the odd/even class per the specified index plus any additional
+        classes assigned by column formatters (via `o.rowClass`).
+
+    Because this object is available to formatters, any additional properties
+    can be added to fill in custom {placeholders} in the `_rowTemplate`.
+
+    @method _createRowHTML
+    @param {Model} model The Model instance to apply to the row template
+    @param {Number} index The index the row will be appearing
+    @param {Object[]} columns The column configurations
+    @return {HTML} The markup for the provided Model, less any `nodeFormatter`s
+    @protected
+    @since 3.5.0
+    **/
+    _createRowHTML: function (model, index, columns) {
+        var data     = model.toJSON(),
+            clientId = model.get('clientId'),
+            values   = {
+                rowId   : this._getRowId(clientId),
+                clientId: clientId,
+                rowClass: (index % 2) ? this.CLASS_ODD : this.CLASS_EVEN
+            },
+            host = this.host || this,
+            i, len, col, token, value, formatterData;
+
+        for (i = 0, len = columns.length; i < len; ++i) {
+            col   = columns[i];
+            value = data[col.key];
+            token = col._id || col.key;
+
+            values[token + '-className'] = '';
+
+            if (col._formatterFn) {
+                formatterData = {
+                    value    : value,
+                    data     : data,
+                    column   : col,
+                    record   : model,
+                    className: '',
+                    rowClass : '',
+                    rowIndex : index
+                };
+
+                // Formatters can either return a value
+                value = col._formatterFn.call(host, formatterData);
+
+                // or update the value property of the data obj passed
+                if (value === undefined) {
+                    value = formatterData.value;
+                }
+
+                values[token + '-className'] = formatterData.className;
+                values.rowClass += ' ' + formatterData.rowClass;
+            }
+
+            // if the token missing OR is the value a legit value
+            if (!values.hasOwnProperty(token) || data.hasOwnProperty(col.key)) {
+                if (value === undefined || value === null || value === '') {
+                    value = col.emptyCellValue || '';
+                }
+
+                values[token] = col.allowHTML ? value : htmlEscape(value);
+            }
+        }
+
+        // replace consecutive whitespace with a single space
+        values.rowClass = values.rowClass.replace(/\s+/g, ' ');
+
+        return fromTemplate(this._rowTemplate, values);
+    },
+
+    /**
+     Locates the row within the tbodyNode and returns the found index, or Null
+     if it is not found in the tbodyNode
+     @param {Y.Node} row
+     @return {Number} Index of row in tbodyNode
+     */
+    _getRowIndex: function (row) {
+        var tbody = this.tbodyNode,
+            index = 1;
+
+        if (tbody && row) {
+
+            //if row is not in the tbody, return
+            if (row.ancestor('tbody') !== tbody) {
+                return null;
+            }
+
+            // increment until we no longer have a previous node
+            while (row = row.previous()) { // NOTE: assignment
+                index++;
+            }
+        }
+
+        return index;
+    },
+
+    /**
+    Creates a custom HTML template string for use in generating the markup for
+    individual table rows with {placeholder}s to capture data from the Models
+    in the `modelList` attribute or from column `formatter`s.
+
+    Assigns the `_rowTemplate` property.
+
+    @method _createRowTemplate
+    @param {Object[]} columns Array of column configuration objects
+    @protected
+    @since 3.5.0
+    **/
+    _createRowTemplate: function (columns) {
+        var html         = '',
+            cellTemplate = this.CELL_TEMPLATE,
+            i, len, col, key, token, headers, tokenValues, formatter;
+
+        this._setColumnsFormatterFn(columns);
+
+        for (i = 0, len = columns.length; i < len; ++i) {
+            col     = columns[i];
+            key     = col.key;
+            token   = col._id || key;
+            formatter = col._formatterFn;
+            // Only include headers if there are more than one
+            headers = (col._headers || []).length > 1 ?
+                        'headers="' + col._headers.join(' ') + '"' : '';
+
+            tokenValues = {
+                content  : '{' + token + '}',
+                headers  : headers,
+                className: this.getClassName('col', token) + ' ' +
+                           (col.className || '') + ' ' +
+                           this.getClassName('cell') +
+                           ' {' + token + '-className}'
+            };
+            if (!formatter && col.formatter) {
+                tokenValues.content = col.formatter.replace(valueRegExp, tokenValues.content);
+            }
+
+            if (col.nodeFormatter) {
+                // Defer all node decoration to the formatter
+                tokenValues.content = '';
+            }
+
+            html += fromTemplate(col.cellTemplate || cellTemplate, tokenValues);
+        }
+
+        this._rowTemplate = fromTemplate(this.ROW_TEMPLATE, {
+            content: html
+        });
+    },
+
+    /**
+     Parses the columns array and defines the column's _formatterFn if there
+     is a formatter available on the column
+     @protected
+     @method _setColumnsFormatterFn
+     @param {Object[]} columns Array of column configuration objects
+
+     @return {Object[]} Returns modified columns configuration Array
+     */
+    _setColumnsFormatterFn: function (columns) {
+        var Formatters = Y.DataTable.BodyView.Formatters,
+            formatter,
+            col,
+            i,
+            len;
+
+        for (i = 0, len = columns.length; i < len; i++) {
+            col = columns[i];
+            formatter = col.formatter;
+
+            if (!col._formatterFn && formatter) {
+                if (Lang.isFunction(formatter)) {
+                    col._formatterFn = formatter;
+                } else if (formatter in Formatters) {
+                    col._formatterFn = Formatters[formatter].call(this.host || this, col);
+                }
+            }
+        }
+
+        return columns;
+    },
+
+    /**
+    Creates the `<tbody>` node that will store the data rows.
+
+    @method _createTBodyNode
+    @return {Node}
+    @protected
+    @since 3.6.0
+    **/
+    _createTBodyNode: function () {
+        return Y.Node.create(fromTemplate(this.TBODY_TEMPLATE, {
+            className: this.getClassName('data')
+        }));
+    },
+
+    /**
+    Destroys the instance.
+
+    @method destructor
+    @protected
+    @since 3.5.0
+    **/
+    destructor: function () {
+        (new Y.EventHandle(YObject.values(this._eventHandles))).detach();
+    },
+
+    /**
+    Holds the event subscriptions needing to be detached when the instance is
+    `destroy()`ed.
+
+    @property _eventHandles
+    @type {Object}
+    @default undefined (initially unset)
+    @protected
+    @since 3.5.0
+    **/
+    //_eventHandles: null,
+
+    /**
+    Returns the row ID associated with a Model's clientId.
+
+    @method _getRowId
+    @param {String} clientId The Model clientId
+    @return {String}
+    @protected
+    **/
+    _getRowId: function (clientId) {
+        return this._idMap[clientId] || (this._idMap[clientId] = Y.guid());
+    },
+
+    /**
+    Map of Model clientIds to row ids.
+
+    @property _idMap
+    @type {Object}
+    @protected
+    **/
+    //_idMap,
+
+    /**
+    Initializes the instance. Reads the following configuration properties in
+    addition to the instance attributes:
+
+      * `columns` - (REQUIRED) The initial column information
+      * `host`    - The object to serve as source of truth for column info and
+                    for generating class names
+
+    @method initializer
+    @param {Object} config Configuration data
+    @protected
+    @since 3.5.0
+    **/
+    initializer: function (config) {
+        this.host = config.host;
+
+        this._eventHandles = {
+            modelListChange: this.after('modelListChange',
+                bind('_afterModelListChange', this))
+        };
+        this._idMap = {};
+
+        this.CLASS_ODD  = this.getClassName('odd');
+        this.CLASS_EVEN = this.getClassName('even');
+
+    }
+
+    /**
+    The HTML template used to create a full row of markup for a single Model in
+    the `modelList` plus any customizations defined in the column
+    configurations.
+
+    @property _rowTemplate
+    @type {HTML}
+    @default (initially unset)
+    @protected
+    @since 3.5.0
+    **/
+    //_rowTemplate: null
+},{
+    /**
+    Hash of formatting functions for cell contents.
+
+    This property can be populated with a hash of formatting functions by the developer
+    or a set of pre-defined functions can be loaded via the `datatable-formatters` module.
+
+    See: [DataTable.BodyView.Formatters](./DataTable.BodyView.Formatters.html)
+    @property Formatters
+    @type Object
+    @since 3.8.0
+    @static
+    **/
+    Formatters: {}
+});
+
+
+}, '3.11.0', {"requires": ["datatable-core", "view", "classnamemanager"]});

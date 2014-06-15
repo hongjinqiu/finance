@@ -105,8 +105,8 @@ DataTableManager.prototype.showLoadingImg = function() {
 	var xy = node.getXY();
 	x = xy[0];
 	y = xy[1];
-	var width = parseInt(node.getComputedStyle("width"));
-	var height = parseInt(node.getComputedStyle("height"));
+	var width = parseInt(node.getComputedStyle("width"), 10);
+	var height = parseInt(node.getComputedStyle("height"), 10);
 
 	var loadingNode = Y.one("#" + gridRenderId + "_loading");
 	if (!loadingNode) {
@@ -183,7 +183,6 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 		columnManager = param.columnManager;
 	}
 	var columns = columnManager.getColumns(param.columnModelName, columnModel, Y);
-	
 
 	//var dataSource = new Y.DataSource.Get({ source: url });
 	var dataSource = new Y.DataSource.IO({
@@ -262,6 +261,7 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 		}
 	}
 	var dt = new Y.DataTable(gridConfig);
+	this.dt = dt;// 这一行要放在dt.render之前,因为render时,里面的selectField会触发valueChange,应用到copyField里,需要从全局的g_gridPanelDict里面查找formFieldDict,
 	dt.dataSetId = columnModel.DataSetId;
 	dt.plug(Y.Plugin.DataTableDataSource, {
 		datasource : dataSource
@@ -303,7 +303,6 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 			Y.one(checkboxAllCssSelector).set("checked", isAllSelect ? "checked" : "");
 		}
 	}, checkboxItemInnerCssSelector, dt);
-	this.dt = dt;
 	return this;
 //	return dt;
 }

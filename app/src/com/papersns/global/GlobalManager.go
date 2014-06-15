@@ -38,10 +38,14 @@ func SetGlobalAttr(sId int, attr string, value interface{}) {
 	globalMapRwlock.Lock()
 	defer globalMapRwlock.Unlock()
 	
+	var objMap map[string]interface{}
 	if globalMap[sId] != nil {
-		objMap := globalMap[sId].(map[string]interface{})
-		objMap[attr] = value
+		objMap = globalMap[sId].(map[string]interface{})
+	} else {
+		objMap = map[string]interface{}{}
 	}
+	objMap[attr] = value
+	globalMap[sId] = objMap
 }
 
 func GetConnection(sId int) (*mgo.Session, *mgo.Database) {
