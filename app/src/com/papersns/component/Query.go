@@ -43,8 +43,15 @@ func (qb QuerySupport) Find(collection string, query string) (result map[string]
 
 func (qb QuerySupport) Index(collection string, query map[string]interface{}, pageNo int, pageSize int, orderBy string) (result map[string]interface{}) {
 	mongoDBFactory := mongo.GetInstance()
-	session, db := mongoDBFactory.GetConnection()
+	session, _ := mongoDBFactory.GetConnection()
 	defer session.Close()
+
+	return qb.IndexWithSession(session, collection, query, pageNo, pageSize, orderBy)
+}
+
+func (qb QuerySupport) IndexWithSession(session *mgo.Session, collection string, query map[string]interface{}, pageNo int, pageSize int, orderBy string) (result map[string]interface{}) {
+	mongoDBFactory := mongo.GetInstance()
+	db := mongoDBFactory.GetDatabase(session)
 
 	c := db.C(collection)
 

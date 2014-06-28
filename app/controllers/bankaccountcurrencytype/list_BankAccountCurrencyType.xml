@@ -25,7 +25,7 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选银行账户币别" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 		<auto-column name="bankAccountId" hideable="true"></auto-column>
@@ -48,7 +48,9 @@
 		<auto-column name="bankId" />
 		<auto-column name="accountProperty" />
 		<auto-column name="currencyTypeId" />
-		<auto-column name="bankAccountCurrencyTypeId" />
+		<auto-column name="bankAccountBId" />
+		<auto-column name="amtSecureBalance" hideable="false" />
+		<auto-column name="amtLimits" hideable="false" />
 	</column-model>
 
 	<query-parameters dataSetId="A">

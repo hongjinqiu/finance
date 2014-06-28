@@ -104,11 +104,12 @@ func (c BaseDataAction) setCreateFixFieldValue(sessionId int, dataSource DataSou
 	if err != nil {
 		panic(err)
 	}
+	sysUserMaster := sysUser["A"].(map[string]interface{})
 	modelIterator := ModelIterator{}
 	modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}){
 		(*data)["createBy"] = userId
 		(*data)["createTime"] = createTime
-		(*data)["createUnit"] = sysUser["createUnit"]
+		(*data)["createUnit"] = sysUserMaster["createUnit"]
 	})
 }
 
@@ -131,6 +132,7 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 	if err != nil {
 		panic(err)
 	}
+	sysUserMaster := sysUser["A"].(map[string]interface{})
 	
 	srcBo := map[string]interface{}{}
 	srcQuery := map[string]interface{}{
@@ -150,7 +152,7 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 		if destData != nil && srcData == nil {
 			(*destData)["createBy"] = userId
 			(*destData)["createTime"] = modifyTime
-			(*destData)["createUnit"] = sysUser["createUnit"]
+			(*destData)["createUnit"] = sysUserMaster["createUnit"]
 		} else if destData == nil && srcData != nil {
 			// 删除,不处理
 		} else if destData != nil && srcData != nil {
@@ -163,7 +165,7 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 				
 				(*destData)["modifyBy"] = userId
 				(*destData)["modifyTime"] = modifyTime
-				(*destData)["modifyUnit"] = sysUser["createUnit"]
+				(*destData)["modifyUnit"] = sysUserMaster["createUnit"]
 			}
 		}
 	})

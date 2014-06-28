@@ -9,12 +9,7 @@
 	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
-	<toolbar export="true">
-		<button text="新增" mode="url" handler="/console/formschema?@name=AccountInOutItem" iconCls="test" />
-
-		<button text="删除" mode="fn" handler="g_deleteRecords">
-		</button>
-	</toolbar>
+	<before-build-query>AccountInOutItemInterceptor.BeforeBuildQuery</before-build-query>
 
 	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
@@ -23,9 +18,9 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选日记账明细" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
-		<id-column name="id" text="编号" hideable="false" />
+		<id-column name="id" text="编号" hideable="true" />
 
 		<!-- <virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -61,8 +56,38 @@
 	</column-model>
 
 	<query-parameters dataSetId="A">
+		<query-parameter name="accountType" auto="true" text="" editor="hiddenfield"></query-parameter>
+		<query-parameter name="accountId" auto="true" text="" editor="hiddenfield"></query-parameter>
+		<query-parameter name="currencyTypeId" auto="true" text="" editor="hiddenfield"></query-parameter>
+		<query-parameter name="qBillDateBegin" columnName="billDate" text="单据日期开始" editor="hiddenfield" restriction="ge"></query-parameter>
+		<query-parameter name="qBillDateEnd" columnName="billDate" text="单据日期结束" editor="hiddenfield" restriction="le"></query-parameter>
+		
+		<!-- 
+		<query-parameter name="queryMode" text="按单据日期|按期间" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+
+		<query-parameter name="billDateBegin" text="按日期|单据日期开始" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+		<query-parameter name="billDateEnd" text="按日期|单据日期结束" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+		
+		<query-parameter name="accountingYearStart" text="按期间|年度开始" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+		<query-parameter name="accountingPeriodStart" text="按期间|会计期开始" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+		<query-parameter name="accountingYearEnd" text="按期间|年度结束" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+		<query-parameter name="accountingPeriodEnd" text="按期间|会计期结束" editor="hiddenfield" restriction="eq" use-in="none"></query-parameter>
+		 -->
+		
+		
+		
+		<!-- 
 		<query-parameter name="accountType" auto="true" text=""></query-parameter>
-		<query-parameter name="accountId" auto="true" text=""></query-parameter>
+		<query-parameter name="accountId" auto="true" text="">
+			<relationDS>
+				<relationItem name="CashAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="BankAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
 		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
 		<query-parameter name="exchangeRateShow" auto="true" text=""></query-parameter>
 		<query-parameter name="exchangeRate" auto="true" text=""></query-parameter>
@@ -81,5 +106,6 @@
 		<query-parameter name="balanceNo" auto="true" text=""></query-parameter>
 		<query-parameter name="chamberlainType" auto="true" text=""></query-parameter>
 		<query-parameter name="chamberlainId" auto="true" text=""></query-parameter>
+		 -->
 	</query-parameters>
 </list-template>

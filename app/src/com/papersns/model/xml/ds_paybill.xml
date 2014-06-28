@@ -27,7 +27,10 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<billStatus id="billStatus" extends="BILL_STATUS" />
+			<billStatus id="billStatus" extends="BILL_STATUS">
+				<allowCopy>false</allowCopy>
+				<fixReadOnly>true</fixReadOnly>
+			</billStatus>
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
@@ -35,13 +38,16 @@
 			<field id="billDate" extends="DATE_FIELD">
 				<displayName>单据日期</displayName>
 				<allowEmpty>false</allowEmpty>
-				<defaultValueExpr></defaultValueExpr>
+				<defaultValueExpr mode="python">datetime.datetime.now().strftime('%Y%m%d')</defaultValueExpr>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="billNo" extends="STRING_FIELD">
 				<displayName>单据编号</displayName>
 				<allowEmpty>false</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
 				<fieldLength>30</fieldLength>
+				<allowDuplicate>false</allowDuplicate>
+				<allowCopy>false</allowCopy>
 			</field>
 			<field id="property" extends="INT_FIELD">
 				<displayName>业务属性</displayName>
@@ -52,7 +58,7 @@
 			<field id="billTypeId" extends="INT_FIELD">
 				<displayName>单据类型</displayName>
 				<allowEmpty>false</allowEmpty>
-				<!-- <defaultValueExpr>1</defaultValueExpr> -->
+				<defaultValueExpr>2</defaultValueExpr>
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
 					<relationItem name="BillType">
@@ -73,8 +79,8 @@
 				<relationDS>
 					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
+						<relationExpr mode="python">str(data["property"]) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["property"] == "1"</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -82,9 +88,18 @@
 					</relationItem>
 					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data["property"]) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["property"] == "2"</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="Null">
+						<id>NullSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>Null</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
@@ -95,6 +110,7 @@
 				<displayName>结算日期</displayName>
 				<allowEmpty>true</allowEmpty>
 				<defaultValueExpr></defaultValueExpr>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="balanceTypeId" extends="INT_FIELD">
 				<displayName>结算方式</displayName>
@@ -130,8 +146,8 @@
 				<relationDS><!-- 客户,供应商,人员 -->
 					<relationItem name="Customer">
 						<id>CustomerSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
+						<relationExpr mode="python">str(data["payerType"]) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["payerType"] == "1"</jsRelationExpr>
 						<relationModelId>Customer</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -139,8 +155,8 @@
 					</relationItem>
 					<relationItem name="Provider">
 						<id>ProviderSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data["payerType"]) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["payerType"] == "2"</jsRelationExpr>
 						<relationModelId>Provider</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -148,14 +164,24 @@
 					</relationItem>
 					<relationItem name="SysUser">
 						<id>SysUserSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data["payerType"]) == "3"</relationExpr>
+						<jsRelationExpr mode="js">data["payerType"] == "3"</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
+					<relationItem name="Null">
+						<id>NullSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>Null</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
 				</relationDS>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="payerDesc" extends="STRING_FIELD">
 				<displayName>付款对象描述</displayName>
@@ -197,6 +223,8 @@
 			<field id="currencyTypeId" extends="INT_FIELD">
 				<displayName>币别</displayName>
 				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>1</defaultValueExpr>
+				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
 					<relationItem name="CurrencyType">
 						<id>CurrencyTypeSelector</id>
@@ -213,6 +241,8 @@
 				<displayName>汇率</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fieldLength>20</fieldLength>
+				<fixReadOnly>true</fixReadOnly>
+				<defaultValueExpr>1:1</defaultValueExpr>
 			</field>
 			<field id="exchangeRate" extends="FLOAT_FIELD">
 				<displayName>汇率隐藏</displayName>
@@ -221,34 +251,41 @@
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>100</limitMax>
+				<defaultValueExpr>1</defaultValueExpr>
 			</field>
 			<field id="amtPay" extends="FLOAT_FIELD">
 				<displayName>付款金额</displayName>
 				<allowEmpty>false</allowEmpty>
+				<allowCopy>false</allowCopy>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="amtAgainst" extends="FLOAT_FIELD">
 				<displayName>已冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
+				<allowCopy>false</allowCopy>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="amtNotAgainst" extends="FLOAT_FIELD">
 				<displayName>未冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
+				<allowCopy>false</allowCopy>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 			<field id="payeeName" extends="STRING_FIELD">
 				<displayName>收款人全称</displayName>
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>20</fieldLength>
 			</field>
-			<field id="bankId" extends="STRING_FIELD">
+			<field id="bankId" extends="INT_FIELD">
 				<displayName>银行代码</displayName>
 				<relationDS>
 					<relationItem name="Bank">
@@ -266,6 +303,7 @@
 				<displayName>银行名称</displayName>
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>30</fieldLength>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
 			<field id="bankAccount" extends="STRING_FIELD">
 				<displayName>银行帐号</displayName>
@@ -287,9 +325,7 @@
 	<detailData>
 		<id>B</id>
 		<displayName>付款费用信息</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
 		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
@@ -307,7 +343,7 @@
 				<displayName>费用账户类型</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_FEE_ACCOUNT_TYPE</dictionary>
-				<defaultValueExpr>2</defaultValueExpr>
+				<defaultValueExpr>1</defaultValueExpr>
 			</field>
 			<field id="accountId" extends="INT_FIELD">
 				<displayName>费用账户</displayName>
@@ -315,8 +351,8 @@
 				<relationDS>
 					<relationItem name="CashAccount">
 						<id>CashAccountSelector</id>
-						<relationExpr>true</relationExpr>
-						<jsRelationExpr>true</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("accountType")) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "1"</jsRelationExpr>
 						<relationModelId>CashAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -324,8 +360,8 @@
 					</relationItem>
 					<relationItem name="BankAccount">
 						<id>BankAccountSelector</id>
-						<relationExpr>false</relationExpr>
-						<jsRelationExpr>false</jsRelationExpr>
+						<relationExpr mode="python">str(data.get("accountType")) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "2"</jsRelationExpr>
 						<relationModelId>BankAccount</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
 						<displayField>code,name</displayField>
@@ -351,9 +387,11 @@
 			<field id="amtFee" extends="FLOAT_FIELD">
 				<displayName>费用金额</displayName>
 				<allowEmpty>false</allowEmpty>
+				<allowCopy>false</allowCopy>
 				<limitOption>limitRange</limitOption>
 				<limitMin>-1000000000</limitMin>
 				<limitMax>1000000000</limitMax>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 		</bizField>
 	</detailData>

@@ -92,6 +92,6 @@ function main() {
 			});
 		}
 		modelExtraInfo.A.property.listeners.valueChange(null, g_masterFormFieldDict["property"]);
-		modelExtraInfo.A.property.listeners.valueChange(null, g_masterFormFieldDict["chamberlainType"]);
+		modelExtraInfo.A.chamberlainType.listeners.valueChange(null, g_masterFormFieldDict["chamberlainType"]);
 	});
 }

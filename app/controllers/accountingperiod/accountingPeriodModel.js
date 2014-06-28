@@ -1,5 +1,39 @@
 var setGridFromServer = true;
 
+function updateDetailB(accountingYearFormObj, numAccountingPeriodFormObj) {
+	var accountingYearValue = accountingYearFormObj.get("value");
+	var formManager = new FormManager();
+	var modelTemplateFactory = new ModelTemplateFactory();
+	var numAccountingPeriodIntValue = parseInt(g_masterFormFieldDict["numAccountingPeriod"].get("value"), 10);
+	var datas = [];
+	YUI(g_financeModule).use("finance-module", function(Y){
+		var date = new Date();
+		for (var i = 0; i < numAccountingPeriodIntValue; i++) {
+			date.setYear(parseInt(accountingYearValue, 10));
+			date.setMonth(i + 1);
+			date.setDate(0);
+			
+			var id = modelTemplateFactory.getSequenceNo();
+			var data = formManager.getDataSetNewData("B");
+			data["_id"] = id;
+			data["id"] = id;
+			data["sequenceNo"] = i + 1;
+			var numStr = null;
+			if ((i + 1) < 10) {
+				numStr = accountingYearValue + "0" + (i + 1) + "01";
+			} else {
+				numStr = accountingYearValue + "" + (i + 1) + "01";
+			}
+			data["startDate"] = numStr;
+			data["endDate"] = Y.DataType.Date.format(date, {
+				format: "%Y%m%d"
+			});
+			datas.push(data);
+		}
+	});
+	g_gridPanelDict["B"].dt.set("data", datas);
+}
+
 var modelExtraInfo = {
 	"A": {
 		"numAccountingPeriod": {
@@ -11,37 +45,21 @@ var modelExtraInfo = {
 					}
 					var accountingYear = g_masterFormFieldDict["accountingYear"];
 					if (formObj.validateField() && accountingYear.validateField()) {
-						var accountingYearValue = accountingYear.get("value");
-						var formManager = new FormManager();
-						var modelTemplateFactory = new ModelTemplateFactory();
-						var numAccountingPeriodIntValue = parseInt(g_masterFormFieldDict["numAccountingPeriod"].get("value"), 10);
-						var datas = [];
-						YUI(g_financeModule).use("finance-module", function(Y){
-							var date = new Date();
-							for (var i = 0; i < numAccountingPeriodIntValue; i++) {
-								date.setYear(parseInt(accountingYearValue, 10));
-								date.setMonth(i + 1);
-								date.setDate(0);
-								
-								var id = modelTemplateFactory.getSequenceNo();
-								var data = formManager.getDataSetNewData("B");
-								data["_id"] = id;
-								data["id"] = id;
-								data["sequenceNo"] = i + 1;
-								var numStr = null;
-								if ((i + 1) < 10) {
-									numStr = accountingYearValue + "0" + (i + 1) + "01";
-								} else {
-									numStr = accountingYearValue + "" + (i + 1) + "01";
-								}
-								data["startDate"] = numStr;
-								data["endDate"] = Y.DataType.Date.format(date, {
-									format: "%Y%m%d"
-								});
-								datas.push(data);
-							}
-						});
-						g_gridPanelDict["B"].dt.set("data", datas);
+						updateDetailB(accountingYear, formObj);
+					}
+				}
+			}
+		},
+		"accountingYear": {
+			listeners : {
+				valueChange: function(e, formObj) {
+					if (setGridFromServer) {
+						setGridFromServer = false;
+						return;
+					}
+					var numAccountingPeriod = g_masterFormFieldDict["numAccountingPeriod"];
+					if (formObj.validateField() && numAccountingPeriod.validateField()) {
+						updateDetailB(formObj, numAccountingPeriod);
 					}
 				}
 			}

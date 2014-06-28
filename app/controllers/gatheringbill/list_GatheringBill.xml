@@ -6,7 +6,7 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>收款单列表</description>
-	<scripts>js/ds_listtoolbar.js</scripts>
+	<scripts>js/ds_listtoolbar.js&amp;gatheringbill/gatheringBillListTemplate.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
@@ -23,7 +23,7 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选收款单" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
@@ -61,12 +61,42 @@
 		<query-parameter name="billDateBegin" columnName="billDate" auto="true" text="单据日期从" restriction="ge" />
 		<query-parameter name="billDateEnd" columnName="billDate" auto="true" text="单据日期到" restriction="le" />
 		<query-parameter name="billNo" auto="true" text=""></query-parameter>
-		<query-parameter name="property" auto="true" text=""></query-parameter>
 		<query-parameter name="billStatus" auto="true" text=""></query-parameter>
-		<query-parameter name="accountId" auto="true" text="">
+		<query-parameter name="property" auto="true" text="">
+			<parameter-attribute name="observe" value="accountId"/>
 		</query-parameter>
-		<query-parameter name="chamberlainType" auto="true" text=""></query-parameter>
-		<query-parameter name="chamberlainId" auto="true" text=""></query-parameter>
+		<query-parameter name="accountId" auto="true" text="">
+			<relationDS>
+				<relationItem name="CashAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="BankAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="Null">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
+		<query-parameter name="chamberlainType" auto="true" text="">
+			<parameter-attribute name="observe" value="chamberlainId"/>
+		</query-parameter>
+		<query-parameter name="chamberlainId" auto="true" text="">
+			<relationDS>
+				<relationItem name="Customer">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="Provider">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="SysUser">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="Null">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
 		<query-parameter name="amtGatheringBegin" columnName="amtGathering" auto="true" text="收款金额从" restriction="ge" />
 		<query-parameter name="amtGatheringEnd" columnName="amtGathering" auto="true" text="收款金额到" restriction="le" />
 		<query-parameter name="chamberlainDesc" auto="true" text=""></query-parameter>

@@ -23,7 +23,7 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选客户" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 

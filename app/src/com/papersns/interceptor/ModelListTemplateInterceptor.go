@@ -6,7 +6,7 @@ import (
 
 type ModelListTemplateInterceptor struct{}
 
-func (o ModelListTemplateInterceptor) AfterQueryData(dataSetId string, items []interface{}) []interface{}  {
+func (o ModelListTemplateInterceptor) AfterQueryData(sessionId int, dataSetId string, items []interface{}) []interface{}  {
 	if dataSetId == "" {
 		return items
 	}

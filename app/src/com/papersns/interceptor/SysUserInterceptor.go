@@ -6,19 +6,19 @@ import (
 
 type SysUserInterceptor struct{}
 
-func (o SysUserInterceptor) BeforeBuildQuery(paramMap map[string]string) map[string]string {
+func (o SysUserInterceptor) BeforeBuildQuery(sessionId int, paramMap map[string]string) map[string]string {
 	paramMap["nick"] = ""
 	return paramMap
 }
 
-func (o SysUserInterceptor) AfterBuildQuery(queryLi []map[string]interface{}) []map[string]interface{} {
+func (o SysUserInterceptor) AfterBuildQuery(sessionId int, queryLi []map[string]interface{}) []map[string]interface{} {
 	queryLi = append(queryLi, map[string]interface{}{
 		"age": 20,
 	})
 	return queryLi
 }
 
-func (o SysUserInterceptor) AfterQueryData(dataSetId string, items []interface{}) []interface{}  {
+func (o SysUserInterceptor) AfterQueryData(sessionId int, dataSetId string, items []interface{}) []interface{}  {
 	for i, _ := range items {
 		item := items[i].(map[string]interface{})
 		item["UNIT_NAME"] = "单位名称aaa"

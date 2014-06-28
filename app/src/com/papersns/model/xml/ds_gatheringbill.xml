@@ -351,7 +351,7 @@
 				<displayName>费用账户类型</displayName>
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_FEE_ACCOUNT_TYPE</dictionary>
-				<defaultValueExpr>2</defaultValueExpr>
+				<defaultValueExpr>1</defaultValueExpr>
 			</field>
 			<field id="accountId" extends="INT_FIELD">
 				<displayName>费用账户</displayName>

@@ -45,18 +45,18 @@
 			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
 				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
-					<expression>1 == 1</expression>
+					<expression></expression>
 					<button-attribute name="code" value="U" />
 				</button>
 				<button text="查看" iconCls="ck_btn" mode="url^" handler="/console/formschema.go?@name=Demo&amp;id={id}">
-					<expression>1 == 1</expression>
+					<expression></expression>
 				</button>
 			</buttons>
 		</virtual-column>

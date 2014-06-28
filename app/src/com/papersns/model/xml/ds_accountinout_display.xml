@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>AccountInOutDisplay</id>
+	<displayName>月档统计显示</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName></collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<billStatus id="billStatus" extends="BILL_STATUS" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="bankAccountId" extends="INT_FIELD">
+				<displayName>银行账户</displayName>
+				<allowEmpty>true</allowEmpty>
+				<relationDS>
+					<relationItem name="BankAccount">
+						<id>BankAccountSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>BankAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="queryMode" extends="INT_FIELD">
+				<displayName>查询方式</displayName>
+				<allowEmpty>true</allowEmpty>
+			</field>
+			<field id="billDateBegin" extends="DATE_FIELD">
+				<displayName>单据日期开始</displayName>
+				<allowEmpty>true</allowEmpty>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<field id="billDateEnd" extends="DATE_FIELD">
+				<displayName>单据日期结束</displayName>
+				<allowEmpty>true</allowEmpty>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<field id="cashAccountId" extends="INT_FIELD">
+				<displayName>现金账户</displayName>
+				<allowEmpty>true</allowEmpty>
+				<relationDS>
+					<relationItem name="CashAccount">
+						<id>CashAccountSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>CashAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="accountingYearStart" extends="INT_FIELD">
+				<displayName>会计期间年开始</displayName>
+				<allowEmpty>true</allowEmpty>
+				<dictionary>ACCOUNTING_YEAR_START_TREE</dictionary>
+			</field>
+			<field id="accountingYearEnd" extends="INT_FIELD">
+				<displayName>会计期间年结束</displayName>
+				<allowEmpty>true</allowEmpty>
+				<dictionary>ACCOUNTING_YEAR_END_TREE</dictionary>
+			</field>
+			<field id="accountingPeriodStart" extends="INT_FIELD">
+				<displayName>会计期间期开始</displayName>
+				<allowEmpty>true</allowEmpty>
+				<dictionary>ACCOUNTING_PERIOD_START_TREE</dictionary>
+			</field>
+			<field id="accountingPeriodEnd" extends="INT_FIELD">
+				<displayName>会计期间期结束</displayName>
+				<allowEmpty>true</allowEmpty>
+				<dictionary>ACCOUNTING_PERIOD_END_TREE</dictionary>
+			</field>
+			<field id="currencyTypeId" extends="INT_FIELD">
+				<displayName>币别</displayName>
+				<allowEmpty>true</allowEmpty>
+				<defaultValueExpr>1</defaultValueExpr>
+				<fixReadOnly>true</fixReadOnly>
+				<relationDS>
+					<relationItem name="CurrencyType">
+						<id>CurrencyTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>CurrencyType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="property" extends="INT_FIELD">
+				<displayName>银行账户属性</displayName>
+				<allowEmpty>true</allowEmpty>
+				<dictionary>D_FIN_ACCOUNT_PROPERTY</dictionary>
+				<!-- <defaultValueExpr>1</defaultValueExpr> -->
+			</field>
+			<field id="displayMode" extends="INT_FIELD">
+				<displayName>无余额无发生额不显示</displayName>
+				<allowEmpty>true</allowEmpty>
+			</field>
+		</bizField>
+	</masterData>
+	<detailData>
+		<id>B</id>
+		<displayName></displayName><!-- <displayName>月档信息</displayName> -->
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<billStatus id="billStatus" extends="BILL_STATUS" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="accountType" extends="INT_FIELD">
+				<displayName>账户类型</displayName>
+				<allowEmpty>true</allowEmpty>
+				<dictionary>D_ACCOUNT_TYPE</dictionary>
+				<defaultValueExpr>1</defaultValueExpr>
+				<fixHide>false</fixHide>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="accountId" extends="INT_FIELD">
+				<displayName>账户代码</displayName>
+				<allowEmpty>true</allowEmpty>
+				<relationDS>
+					<relationItem name="CashAccount">
+						<id>CashAccountSelector</id>
+						<relationExpr mode="python">str(data.get("accountType")) == "1"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "1"</jsRelationExpr>
+						<relationModelId>CashAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="BankAccount">
+						<id>BankAccountSelector</id>
+						<relationExpr mode="python">str(data.get("accountType")) == "2"</relationExpr>
+						<jsRelationExpr mode="js">data["accountType"] == "2"</jsRelationExpr>
+						<relationModelId>BankAccount</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="bankAccountCurrencyTypeId" extends="INT_FIELD">
+				<displayName>银行账户币别</displayName>
+				<allowEmpty>true</allowEmpty>
+				<relationDS>
+					<relationItem name="BankAccountCurrencyType">
+						<id>BankAccountCurrencyTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>BankAccountCurrencyType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>id</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="currencyTypeId" extends="INT_FIELD">
+				<displayName>币别</displayName>
+				<allowEmpty>true</allowEmpty>
+				<relationDS>
+					<relationItem name="CurrencyType">
+						<id>CurrencyTypeSelector</id>
+						<relationExpr>true</relationExpr>
+						<jsRelationExpr>true</jsRelationExpr>
+						<relationModelId>CurrencyType</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+				</relationDS>
+			</field>
+			<field id="origBalance" extends="FLOAT_FIELD">
+				<displayName>上期结余</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>-1000000000</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="amtIncrease" extends="FLOAT_FIELD">
+				<displayName>本期增加</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="amtReduce" extends="FLOAT_FIELD">
+				<displayName>本期减少</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="finalBalance" extends="FLOAT_FIELD">
+				<displayName>期末结余</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>-1000000000</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="increaseCount" extends="INT_FIELD">
+				<displayName>增加笔数</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="reduceCount" extends="INT_FIELD">
+				<displayName>减少笔数</displayName>
+				<allowEmpty>true</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+		</bizField>
+	</detailData>
+</datasource>

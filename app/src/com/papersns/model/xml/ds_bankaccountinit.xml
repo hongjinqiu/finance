@@ -76,7 +76,7 @@
 				<fixHide>true</fixHide>
 				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="bankAccountCurrencyTypeId" extends="INT_FIELD">
+			<field id="bankAccountBId" extends="INT_FIELD">
 				<displayName>银行账户币别分录ID</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowDuplicate>false</allowDuplicate>

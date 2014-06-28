@@ -37,8 +37,8 @@
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_ACCOUNT_TYPE</dictionary>
 				<defaultValueExpr>1</defaultValueExpr>
-				<fixHide>true</fixHide>
-				<fixReadOnly>true</fixReadOnly>
+				<fixHide>false</fixHide>
+				<fixReadOnly>false</fixReadOnly>
 			</field>
 			<field id="accountId" extends="INT_FIELD">
 				<displayName>账户</displayName>
@@ -128,19 +128,22 @@
 				<displayName>单据数据源模型</displayName>
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>100</fieldLength>
+				<fixHide>true</fixHide>
 			</field>
 			<field id="billCollectionName" extends="STRING_FIELD">
 				<displayName>单据数据源模型MongoDB collection name</displayName>
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>100</fieldLength>
+				<fixHide>true</fixHide>
 			</field>
 			<field id="billDetailName" extends="STRING_FIELD">
 				<displayName>单据分录明细名称</displayName>
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>20</fieldLength>
+				<fixHide>true</fixHide>
 			</field>
 			<field id="billId" extends="INT_FIELD">
-				<displayName>单据</displayName>
+				<displayName>单据编号</displayName>
 				<allowEmpty>false</allowEmpty>
 				<relationDS>
 					<relationItem name="GatheringBill">
@@ -149,7 +152,7 @@
 						<jsRelationExpr mode="js">data["billTypeId"] == "1"</jsRelationExpr>
 						<relationModelId>GatheringBill</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>id</displayField>
+						<displayField>billNo</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 					<relationItem name="PayBill">
@@ -158,7 +161,7 @@
 						<jsRelationExpr mode="js">data["billTypeId"] == "2"</jsRelationExpr>
 						<relationModelId>PayBill</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>id</displayField>
+						<displayField>billNo</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
@@ -166,6 +169,7 @@
 			<field id="billDetailId" extends="INT_FIELD">
 				<displayName>单据分录明细ID</displayName>
 				<allowEmpty>true</allowEmpty>
+				<fixHide>true</fixHide>
 			</field>
 			<field id="billNo" extends="STRING_FIELD">
 				<displayName>单据编号</displayName>
@@ -174,6 +178,7 @@
 				<fieldLength>30</fieldLength>
 				<allowDuplicate>false</allowDuplicate>
 				<allowCopy>false</allowCopy>
+				<fixHide>true</fixHide>
 			</field>
 			<field id="billDate" extends="DATE_FIELD">
 				<displayName>单据日期</displayName>

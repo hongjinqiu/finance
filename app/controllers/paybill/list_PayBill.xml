@@ -6,7 +6,7 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>付款单列表</description>
-	<scripts>js/ds_listtoolbar.js</scripts>
+	<scripts>js/ds_listtoolbar.js&amp;paybill/payBillListTemplate.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
@@ -23,7 +23,7 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选付款单" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
@@ -41,13 +41,19 @@
 		<auto-column name="billDate" />
 		<auto-column name="billNo" />
 		<auto-column name="property" />
-		<auto-column name="accountId" />
+		<auto-column name="billStatus" />
+		<auto-column name="accountId">
+			<relationDS>
+				<relationItem name="BankAccount">
+					<copyConfig copyColumnName="payBankId" copyValueField="bankId"/>
+				</relationItem>
+			</relationDS>
+		</auto-column>
 		<auto-column name="payerType" />
 		<auto-column name="payerId" />
 		<auto-column name="currencyTypeId" />
 		<auto-column name="amtPay" />
-		<select-column name="payBankId" text="开户银行" displayField="code,name" valueField="id" selectorName="BankSelector" selectionMode="single" />
-		<string-column name="payBankAccount" text="银行帐号" />
+		<auto-column name="payBankId" dsFieldMap="BankAccount.A.bankId" />
 		<auto-column name="balanceDate" />
 	</column-model>
 
@@ -55,10 +61,42 @@
 		<query-parameter name="billDateBegin" columnName="billDate" auto="true" text="单据日期从" restriction="ge" />
 		<query-parameter name="billDateEnd" columnName="billDate" auto="true" text="单据日期到" restriction="le" />
 		<query-parameter name="billNo" auto="true" text=""></query-parameter>
-		<query-parameter name="property" auto="true" text=""></query-parameter>
-		<query-parameter name="accountId" auto="true" text=""></query-parameter>
-		<query-parameter name="payerType" auto="true" text=""></query-parameter>
-		<query-parameter name="payerId" auto="true" text=""></query-parameter>
+		<query-parameter name="billStatus" auto="true" text=""></query-parameter>
+		<query-parameter name="property" auto="true" text="">
+			<parameter-attribute name="observe" value="accountId"/>
+		</query-parameter>
+		<query-parameter name="accountId" auto="true" text="">
+			<relationDS>
+				<relationItem name="CashAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="BankAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="Null">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
+		<query-parameter name="payerType" auto="true" text="">
+			<parameter-attribute name="observe" value="payerId"/>
+		</query-parameter>
+		<query-parameter name="payerId" auto="true" text="">
+			<relationDS>
+				<relationItem name="Customer">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="Provider">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="SysUser">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="Null">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
 		<query-parameter name="amtPayBegin" columnName="amtPay" auto="true" text="收款金额从" restriction="ge" />
 		<query-parameter name="amtPayEnd" columnName="amtPay" auto="true" text="收款金额到" restriction="le" />
 		<query-parameter name="payerDesc" auto="true" text=""></query-parameter>

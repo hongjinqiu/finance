@@ -150,7 +150,10 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 			"bankId":                    bankAccountMasterData["bankId"],
 			"accountProperty":           bankAccountMasterData["accountProperty"],
 			"currencyTypeId":            addData["currencyTypeId"],
-			"bankAccountCurrencyTypeId": addData["id"],
+			"bankAccountBId": addData["id"],
+			"amtSecureBalance":          addData["amtSecureBalance"],
+			"amtLimits":                 addData["amtLimits"],
+			// TODO 安全余额,限额
 		}
 	} else if diffDataType == AFTER_UPDATE {
 		boMaster := bo["A"].(map[string]interface{})
@@ -160,7 +163,10 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 		boMaster["bankId"] = bankAccountMasterData["bankId"]
 		boMaster["accountProperty"] = bankAccountMasterData["accountProperty"]
 		boMaster["currencyTypeId"] = afterUpdateData["currencyTypeId"]
-		boMaster["bankAccountCurrencyTypeId"] = afterUpdateData["id"]
+		boMaster["bankAccountBId"] = afterUpdateData["id"]
+		boMaster["amtSecureBalance"] = afterUpdateData["amtSecureBalance"]
+		boMaster["amtLimits"] = afterUpdateData["amtLimits"]
+		// TODO 安全余额,限额
 		bo["A"] = boMaster
 	} else if diffDataType == BEFORE_UPDATE { // 不管
 

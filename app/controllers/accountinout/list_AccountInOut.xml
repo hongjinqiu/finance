@@ -23,9 +23,9 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选月档" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
-			<expression>1 == 1</expression>
+			<expression></expression>
 		</checkbox-column>
-		<id-column name="id" text="编号" hideable="false" />
+		<id-column name="id" text="编号" hideable="true" />
 
 		<!-- <virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
@@ -47,11 +47,22 @@
 		<auto-column name="accountingPeriodMonth" />
 		<auto-column name="amtIncrease" />
 		<auto-column name="amtReduce" />
+		<auto-column name="increaseCount" />
+		<auto-column name="reduceCount" />
 	</column-model>
 
 	<query-parameters dataSetId="A">
 		<query-parameter name="accountType" auto="true" text=""></query-parameter>
-		<query-parameter name="accountId" auto="true" text=""></query-parameter>
+		<query-parameter name="accountId" auto="true" text="">
+			<relationDS>
+				<relationItem name="CashAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+				<relationItem name="BankAccount">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
 		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
 		<query-parameter name="exchangeRateShow" auto="true" text=""></query-parameter>
 		<query-parameter name="exchangeRate" auto="true" text=""></query-parameter>

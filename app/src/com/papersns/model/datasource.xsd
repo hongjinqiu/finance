@@ -407,7 +407,7 @@
 				<simpleType>
 					<restriction base="int">
 						<minInclusive value="1" />
-						<maxInclusive value="999" />
+						<maxInclusive value="5000" />
 					</restriction>
 				</simpleType>
 			</element>

@@ -50,6 +50,9 @@ QueryParameterManager.prototype.applyObserveEventBehavior = function() {
 				if (queryParameter.ParameterAttributeLi) {
 					for (var j = 0; j < queryParameter.ParameterAttributeLi.length; j++) {
 						if (queryParameter.ParameterAttributeLi[j].Name == "observe") {
+//							function() {
+//								
+//							}();
 							YUI(g_financeModule).use("finance-module", function(Y){
 								self.after('valueChange', Y.bind(function(e) {
 									listTemplateIterator.iterateAnyTemplateQueryParameter(result, function(targetQueryParameter, result){
@@ -57,27 +60,33 @@ QueryParameterManager.prototype.applyObserveEventBehavior = function() {
 											var queryParameterManager = new QueryParameterManager();
 											var treeUrlAttr = queryParameterManager.findQueryParameterAttr(targetQueryParameter, "treeUrl");
 											
-											var uri = "/tree/" + treeUrlAttr.Value;
-											if (uri.indexOf("?") > -1) {
-												uri += "&parentId=" + g_masterFormFieldDict[queryParameter.Name].get("value");
-											} else {
-												uri += "?parentId=" + g_masterFormFieldDict[queryParameter.Name].get("value");
-											}
-											function complete(id, o, args) {
-												var id = id; // Transaction ID.
-												var data = Y.JSON.parse(o.responseText);
-												var choicesLi = [];
-												for (var k = 0; k < data.length; k++) {
-													choicesLi.push({
-														"label": data[k].name,
-														"value": data[k].code
-													});
+											if (treeUrlAttr) {
+												var uri = "/tree/" + treeUrlAttr.Value;
+												if (uri.indexOf("?") > -1) {
+													uri += "&parentId=" + g_masterFormFieldDict[queryParameter.Name].get("value");
+												} else {
+													uri += "?parentId=" + g_masterFormFieldDict[queryParameter.Name].get("value");
 												}
-												g_masterFormFieldDict[targetQueryParameter.Name].set("choices", choicesLi);
-												g_masterFormFieldDict[targetQueryParameter.Name].set("value", "");
-											};
-											Y.on('io:complete', complete, Y, []);
-											var request = Y.io(uri);
+												function complete(id, o, args) {
+													var id = id; // Transaction ID.
+													var data = Y.JSON.parse(o.responseText);
+													var choicesLi = [];
+													for (var k = 0; k < data.length; k++) {
+														choicesLi.push({
+															"label": data[k].name,
+															"value": data[k].code
+														});
+													}
+													g_masterFormFieldDict[targetQueryParameter.Name].set("choices", choicesLi);
+													g_masterFormFieldDict[targetQueryParameter.Name].set("value", "");
+												};
+												Y.on('io:complete', complete, Y, []);
+												var request = Y.io(uri);
+											} else {
+												if (g_masterFormFieldDict[targetQueryParameter.Name]) {
+													g_masterFormFieldDict[targetQueryParameter.Name].set("value", "");
+												}
+											}
 											
 											return true;
 										}
@@ -100,9 +109,11 @@ QueryParameterManager.prototype.applyObserveEventBehavior = function() {
 }
 
 QueryParameterManager.prototype.findQueryParameterAttr = function(queryParameter, name) {
-	for (var i = 0; i < queryParameter.ParameterAttributeLi.length; i++) {
-		if (queryParameter.ParameterAttributeLi[i].Name == name) {
-			return queryParameter.ParameterAttributeLi[i];
+	if (queryParameter.ParameterAttributeLi) {
+		for (var i = 0; i < queryParameter.ParameterAttributeLi.length; i++) {
+			if (queryParameter.ParameterAttributeLi[i].Name == name) {
+				return queryParameter.ParameterAttributeLi[i];
+			}
 		}
 	}
 	return null;

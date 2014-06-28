@@ -211,6 +211,22 @@ def getDictionaryLi():
             {'code': 4,'name': '作废','order': 2},
         ],
     })
+    li.append({
+        'code': 'D_BBSPOST_TYPE',
+        'name': '帖子类型',
+        'items': [
+            {'code': 1,'name': '主题帖','order': 1},
+            {'code': 2,'name': '主题帖回复','order': 2},
+        ],
+    })
+    li.append({
+        'code': 'D_BBSPOSTREAD_TYPE',
+        'name': '已读未读',
+        'items': [
+            {'code': 1,'name': '未读','order': 1},
+            {'code': 2,'name': '已读','order': 2},
+        ],
+    })
 
 
     return li

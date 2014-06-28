@@ -36,5 +36,7 @@ def getSequenceLi():
     li.append({'_id': 'payBillId', 'c': 100})
     li.append({'_id': 'accountInOutId', 'c': 100})
     li.append({'_id': 'accountInOutItemId', 'c': 100})
+    li.append({'_id': 'bbsPostId', 'c': 100})
+    li.append({'_id': 'bbsPostReadId', 'c': 100})
 
     return li

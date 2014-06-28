@@ -521,3 +521,74 @@ function limitControlUnCancelData(continueAnyAll) {
 		}
 	});
 }
+
+function getFormJsonData(formName) {
+	var form = document.forms[formName];
+	return getChildFormFieldValueMap(form);
+}
+
+function getChildFormFieldValueMap(elem, seperator) {
+	if (!seperator) {
+		seperator = ",";
+	}
+	var result = {};
+	var inputLi = elem.getElementsByTagName("input");
+	for (var i = 0; i < inputLi.length; i++) {
+		if (inputLi[i].type.toLowerCase() == "text" || inputLi[i].type.toLowerCase() == "hidden") {
+			var name = inputLi[i].name;
+			putOrAppend(result, inputLi[i].name, inputLi[i].value, seperator);
+		} else if (inputLi[i].type.toLowerCase() == "radio") {
+			if (inputLi[i].checked) {
+				putOrAppend(result, inputLi[i].name, inputLi[i].value, seperator);
+			}
+		} else if (inputLi[i].type.toLowerCase() == "checkbox") {
+			if (inputLi[i].checked) {
+				putOrAppend(result, inputLi[i].name, inputLi[i].value, seperator);
+			}
+		}
+	}
+	
+	var selectLi = elem.getElementsByTagName("select");
+	for (var i = 0; i < selectLi.length; i++) {
+		var name = selectLi[i].name;
+		putOrAppend(result, selectLi[i].name, selectLi[i].value, seperator);
+	}
+	
+	var textareaLi = elem.getElementsByTagName("textarea");
+	for (var i = 0; i < textareaLi.length; i++) {
+		var name = textareaLi[i].name;
+		putOrAppend(result, textareaLi[i].name, textareaLi[i].value, seperator);
+	}
+	
+	return result;
+}
+
+function getCheckboxValue(checkboxName) {
+	var seperator = ",";
+	var result = {};
+	var inputLi = document.getElementsByTagName("input");
+	for (var i = 0; i < inputLi.length; i++) {
+		if (inputLi[i].name == checkboxName && inputLi[i]["type"].toLowerCase() == "radio") {
+			if (inputLi[i].checked) {
+				putOrAppend(result, inputLi[i].name, inputLi[i].value, seperator);
+			}
+		} else if (inputLi[i].type.toLowerCase() == "checkbox") {
+			if (inputLi[i].checked) {
+				putOrAppend(result, inputLi[i].name, inputLi[i].value, seperator);
+			}
+		}
+	}
+	return result[checkboxName] || "";
+}
+
+function putOrAppend(dictObj, name, value, seperator) {
+	if (dictObj[name] !== undefined) {
+		if (seperator) {
+			dictObj[name] += seperator + value;
+		} else {
+			dictObj[name] += "," + value;
+		}
+	} else {
+		dictObj[name] = value || "";
+	}
+}

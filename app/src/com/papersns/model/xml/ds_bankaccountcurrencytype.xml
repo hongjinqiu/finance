@@ -89,11 +89,27 @@
 					</relationItem>
 				</relationDS>
 			</field>
-			<field id="bankAccountCurrencyTypeId" extends="INT_FIELD">
+			<field id="bankAccountBId" extends="INT_FIELD">
 				<displayName>银行账户币别分录ID</displayName>
 				<allowEmpty>false</allowEmpty>
 				<fixHide>true</fixHide>
 				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="amtSecureBalance" extends="FLOAT_FIELD">
+				<displayName>安全余额</displayName>
+				<allowEmpty>true</allowEmpty>
+				<allowCopy>true</allowCopy>
+				<limitOption>limitMin</limitOption>
+				<limitMin>0</limitMin>
+				<zeroShowEmpty>true</zeroShowEmpty>
+			</field>
+			<field id="amtLimits" extends="FLOAT_FIELD">
+				<displayName>限额</displayName>
+				<allowEmpty>true</allowEmpty>
+				<allowCopy>true</allowCopy>
+				<limitOption>limitMin</limitOption>
+				<limitMin>0</limitMin>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 		</bizField>
 	</masterData>

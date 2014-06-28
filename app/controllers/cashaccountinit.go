@@ -62,8 +62,13 @@ func (c CashAccountInitSupport) logCashAccount(sessionId int, dataSource DataSou
 	if err != nil {
 		panic(err)
 	}
+	currencyTypeId, err := strconv.Atoi(fmt.Sprint(data["currencyTypeId"]))
+	if err != nil {
+		panic(err)
+	}
 	accountInOutParam := AccountInOutParam{
 		AccountId:    accountId,
+		CurrencyTypeId: currencyTypeId,
 		AmtIncrease:  fmt.Sprint(data["amtEarly"]),
 		DiffDataType: diffDataType,
 	}

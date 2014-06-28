@@ -37,8 +37,8 @@
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_ACCOUNT_TYPE</dictionary>
 				<defaultValueExpr>1</defaultValueExpr>
-				<fixHide>true</fixHide>
-				<fixReadOnly>true</fixReadOnly>
+				<fixHide>false</fixHide>
+				<fixReadOnly>false</fixReadOnly>
 			</field>
 			<field id="accountId" extends="INT_FIELD">
 				<displayName>账户</displayName>
@@ -115,6 +115,20 @@
 			</field>
 			<field id="amtReduce" extends="FLOAT_FIELD">
 				<displayName>本期减少</displayName>
+				<allowEmpty>false</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="increaseCount" extends="INT_FIELD">
+				<displayName>增加笔数</displayName>
+				<allowEmpty>false</allowEmpty>
+				<limitOption>limitRange</limitOption>
+				<limitMin>0</limitMin>
+				<limitMax>1000000000</limitMax>
+			</field>
+			<field id="reduceCount" extends="INT_FIELD">
+				<displayName>减少笔数</displayName>
 				<allowEmpty>false</allowEmpty>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>

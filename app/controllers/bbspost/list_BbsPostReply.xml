@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>BbsPostReply</id>
+	<selector-id>BbsPostSelector</selector-id>
+	<data-source-model-id>BbsPost</data-source-model-id>
+
+	<adapter name="ModelListTemplateAdapter" />
+	<description>意见反馈详情</description>
+	<scripts>js/ds_listtoolbar.js&amp;bbspost/bbsPostReply.js</scripts>
+	<view-template view="BbsPostReply/BbsPostReply.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<!-- <toolbar export="true">
+		<button text="回复" mode="fn" handler="g_deleteRecords">
+		</button>
+	</toolbar> -->
+	
+	<after-build-query>BbsPostReplyInterceptor.AfterBuildQuery</after-build-query>
+	<after-query-data>BbsPostReplyInterceptor.AfterQueryData</after-query-data>
+
+	<data-provider size="10">
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选意见反馈" selectionTemplate="{title}" bsonOrderBy="A.id" dataSetId="A">
+		<checkbox-column name="checkboxSelect" hideable="false">
+			<expression></expression>
+		</checkbox-column>
+		<id-column name="id" text="编号" hideable="false" />
+
+		<auto-column name="type" hideable="false" />
+		<auto-column name="title" />
+		<auto-column name="content" />
+		<dictionary-column dictionary="D_BBSPOSTREAD_TYPE" name="bbsPostReadType" text="是否已读"></dictionary-column>
+		<auto-column name="createTime" />
+		<string-column name="createTimeDisplay" text="创建时间显示用" hideable="true"></string-column>
+		<auto-column name="createBy" />
+		<auto-column name="lastReplyBy" />
+		<auto-column name="lastReplyTime" />
+		<auto-column name="bbsPostId" />
+		<auto-column name="createUnit" />
+		<auto-column name="modifyUnit" />
+	</column-model>
+
+	<query-parameters dataSetId="A">
+		<query-parameter name="id" auto="true" text="" editor="hiddenfield"></query-parameter>
+		<query-parameter name="bbsPostId" auto="true" text="" editor="hiddenfield"></query-parameter>
+		
+		<!-- 注意BbsPostReplyInterceptor.AfterBuildQuery中做了硬处理,因此,以下这两个查询参数不能正确得到查询 -->
+		<query-parameter name="title" auto="true" text="" editor="hiddenfield"></query-parameter>
+		<query-parameter name="content" auto="true" text="" editor="hiddenfield"></query-parameter>
+	</query-parameters>
+</list-template>

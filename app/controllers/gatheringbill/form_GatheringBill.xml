@@ -123,13 +123,12 @@
 			</buttons>
 		</virtual-column>
 		<auto-column name="accountType">
-			<column-attribute name="observe" value="accountId,bankId,bankAccount"/>
+			<column-attribute name="observe" value="accountId,bankId"/>
 		</auto-column>
 		<auto-column name="accountId">
 			<relationDS>
 				<relationItem name="BankAccount">
 					<copyConfig copyColumnName="bankId" copyValueField="bankId" />
-					<!-- <copyConfig copyColumnName="bankAccount" copyValueField="bankAccount" /> -->
 				</relationItem>
 			</relationDS>
 		</auto-column>

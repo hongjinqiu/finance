@@ -1,9 +1,11 @@
 package interceptor
 
 import (
-	"sync"
+	"com/papersns/mongo"
+	"labix.org/v2/mgo"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 var rwlock sync.RWMutex = sync.RWMutex{}
@@ -15,6 +17,58 @@ func init() {
 	interceptorDict[reflect.TypeOf(SysUserInterceptor{}).Name()] = reflect.TypeOf(SysUserInterceptor{})
 	interceptorDict[reflect.TypeOf(ModelListTemplateInterceptor{}).Name()] = reflect.TypeOf(ModelListTemplateInterceptor{})
 	interceptorDict[reflect.TypeOf(PubReferenceLogInterceptor{}).Name()] = reflect.TypeOf(PubReferenceLogInterceptor{})
+	interceptorDict[reflect.TypeOf(AccountInOutItemInterceptor{}).Name()] = reflect.TypeOf(AccountInOutItemInterceptor{})
+	interceptorDict[reflect.TypeOf(BbsPostReplyInterceptor{}).Name()] = reflect.TypeOf(BbsPostReplyInterceptor{})
+	interceptorDict[reflect.TypeOf(BbsPostInterceptor{}).Name()] = reflect.TypeOf(BbsPostInterceptor{})
+}
+
+type InterceptorCommon struct{}
+
+func (o InterceptorCommon) FindByMapWithSession(session *mgo.Session, collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
+	mongoDBFactory := mongo.GetInstance()
+	db := mongoDBFactory.GetDatabase(session)
+	c := db.C(collection)
+
+	result = make(map[string]interface{})
+	err := c.Find(query).One(&result)
+	if err != nil {
+		return result, false
+	}
+
+	return result, true
+}
+
+func (o InterceptorCommon) IndexWithSession(session *mgo.Session, collection string, query map[string]interface{}, pageNo int, pageSize int, orderBy string) (result map[string]interface{}) {
+	mongoDBFactory := mongo.GetInstance()
+	db := mongoDBFactory.GetDatabase(session)
+
+	c := db.C(collection)
+
+	items := []map[string]interface{}{}
+	var err error
+	if orderBy != "" {
+		fieldLi := strings.Split(orderBy, ",")
+		err = c.Find(query).Sort(fieldLi...).Limit(pageSize).Skip((pageNo - 1) * pageSize).All(&items)
+	} else {
+		err = c.Find(query).Limit(pageSize).Skip((pageNo - 1) * pageSize).All(&items)
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	totalResults, err := c.Find(query).Count()
+	if err != nil {
+		panic(err)
+	}
+
+	mapItems := []interface{}{}
+	for _, item := range items {
+		mapItems = append(mapItems, item)
+	}
+	return map[string]interface{}{
+		"totalResults": totalResults,
+		"items":        mapItems,
+	}
 }
 
 func GetInterceptorDict() map[string]reflect.Type {
@@ -25,12 +79,13 @@ func GetInterceptorDict() map[string]reflect.Type {
 
 type InterceptorManager struct{}
 
-func (o InterceptorManager) ParseBeforeBuildQuery(classMethod string, paramMap map[string]string) map[string]string {
+func (o InterceptorManager) ParseBeforeBuildQuery(sessionId int, classMethod string, paramMap map[string]string) map[string]string {
 	if classMethod == "" {
 		return paramMap
 	}
 
 	paramLi := []interface{}{}
+	paramLi = append(paramLi, sessionId)
 	paramLi = append(paramLi, paramMap)
 	values := o.parse(classMethod, paramLi)
 	if values != nil {
@@ -39,12 +94,13 @@ func (o InterceptorManager) ParseBeforeBuildQuery(classMethod string, paramMap m
 	return paramMap
 }
 
-func (o InterceptorManager) ParseAfterBuildQuery(classMethod string, queryLi []map[string]interface{}) []map[string]interface{} {
+func (o InterceptorManager) ParseAfterBuildQuery(sessionId int, classMethod string, queryLi []map[string]interface{}) []map[string]interface{} {
 	if classMethod == "" {
 		return queryLi
 	}
-	
+
 	paramLi := []interface{}{}
+	paramLi = append(paramLi, sessionId)
 	paramLi = append(paramLi, queryLi)
 	values := o.parse(classMethod, paramLi)
 	if values != nil {
@@ -53,12 +109,13 @@ func (o InterceptorManager) ParseAfterBuildQuery(classMethod string, queryLi []m
 	return queryLi
 }
 
-func (o InterceptorManager) ParseAfterQueryData(classMethod string, dataSetId string, items []interface{}) []interface{} {
+func (o InterceptorManager) ParseAfterQueryData(sessionId int, classMethod string, dataSetId string, items []interface{}) []interface{} {
 	if classMethod == "" {
 		return items
 	}
 
 	paramLi := []interface{}{}
+	paramLi = append(paramLi, sessionId)
 	paramLi = append(paramLi, dataSetId)
 	paramLi = append(paramLi, items)
 	values := o.parse(classMethod, paramLi)

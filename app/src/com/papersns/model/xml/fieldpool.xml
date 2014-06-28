@@ -343,6 +343,12 @@
 		<fieldNumberType>DATE</fieldNumberType>
 	</field>
 	
+	<field id="DATETIME_FIELD" extends="ROOT_FIELD">
+		<displayName>日期时间</displayName>
+		<fieldDataType>LONGINT</fieldDataType>
+		<fieldNumberType>DATETIME</fieldNumberType>
+	</field>
+	
 	<field id="TIME_FIELD" extends="ROOT_FIELD">
 		<!-- <fieldName>timeField</fieldName> -->
 		<displayName>时间</displayName>

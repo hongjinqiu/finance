@@ -365,7 +365,7 @@ FormManager.prototype.dsFieldGroupValidator = function(value, dateSeperator, fie
 		}
 	}
 	if (isDataTypeNumber && isDate) {
-		var isAllowEmptyAndZero = fieldGroup.AllowEmpty == "true" && value == "0";
+		var isAllowEmptyAndZero = fieldGroup.AllowEmpty == "true" && (value == "0" || value == "");
 		if (fieldGroup.FieldNumberType == "YEAR") {
 			if (!/^\d{4}$/.test(value) && !isAllowEmptyAndZero) {
 				messageLi.push("格式错误，正确格式类似于：1970");
@@ -411,7 +411,12 @@ FormManager.prototype.dsFieldGroupValidator = function(value, dateSeperator, fie
 			}
 		}
 	} else if (isDataTypeNumber) {
-		if (fieldGroup.Id != "id" && !/^-?\d*(\.\d*)?$/.test(value)) {
+		// 经常用form模型来做报表查询页面,此时,界面上的控件经常是多选,因为,添加逗号支持
+		var regexp = /^-?\d*(\.\d*)?$/;
+		if (fieldGroup.RelationDS && fieldGroup.RelationDS.RelationItemLi && fieldGroup.RelationDS.RelationItemLi.length > 0) {
+			regexp = /^-?[\d,]*(\.\d*)?$/;
+		}
+		if (fieldGroup.Id != "id" && !regexp.test(value)) {
 			messageLi.push("必须由数字小数点组成");
 			return messageLi;
 		}

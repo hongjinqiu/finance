@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 	"fmt"
+	"strings"
 )
 
 type CommonUtil struct{}
@@ -31,7 +32,31 @@ func (o CommonUtil) IsFloat(str string) bool {
 }
 
 func (o CommonUtil) GetIntFromMap(data map[string]interface{}, name string) int {
-	return o.GetIntFromString(fmt.Sprint(data[name]))
+	if data[name] != nil {
+		return o.GetIntFromString(fmt.Sprint(data[name]))
+	}
+	return 0
+}
+
+func (o CommonUtil) GetFloat64FromMap(data map[string]interface{}, name string) float64 {
+	if data[name] != nil {
+		return o.GetFloat64FromString(fmt.Sprint(data[name]))
+	}
+	return 0
+}
+
+func (o CommonUtil) GetIntLiFromMap(data map[string]interface{}, name string) []int {
+	result := []int{}
+	if data[name] != nil {
+		value := fmt.Sprint(data[name])
+		valueStrLi := strings.Split(value, ",")
+		for _, item := range valueStrLi {
+			if item != "" && item != "0" {
+				result = append(result, o.GetIntFromString(item))
+			}
+		}
+	}
+	return result
 }
 
 func (o CommonUtil) GetIntFromString(str string) int {
@@ -39,7 +64,7 @@ func (o CommonUtil) GetIntFromString(str string) int {
 	if amtStr == "" {
 		amtStr = "0"
 	}
-	amt, err := strconv.Atoi(str)
+	amt, err := strconv.Atoi(amtStr)
 	if err != nil {
 		panic(err)
 	}
@@ -57,3 +82,4 @@ func (o CommonUtil) GetFloat64FromString(str string) float64 {
 	}
 	return amt
 }
+

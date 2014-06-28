@@ -9,7 +9,7 @@ import (
 
 type PubReferenceLogInterceptor struct{}
 
-func (o PubReferenceLogInterceptor) BeforeBuildQuery(paramMap map[string]string) map[string]string {
+func (o PubReferenceLogInterceptor) BeforeBuildQuery(sessionId int, paramMap map[string]string) map[string]string {
 	dataSourceModelId := paramMap["beReferenceDataSourceModelId"]
 	dataSetId := "A"
 	idName := "id"
@@ -35,7 +35,7 @@ func (o PubReferenceLogInterceptor) BeforeBuildQuery(paramMap map[string]string)
 	return paramMap
 }
 
-func (o PubReferenceLogInterceptor) AfterBuildQuery(queryLi []map[string]interface{}) []map[string]interface{} {
+func (o PubReferenceLogInterceptor) AfterBuildQuery(sessionId int, queryLi []map[string]interface{}) []map[string]interface{} {
 	for i, item := range queryLi {
 		for k, v := range item {
 			if k == "beReference" {
@@ -53,7 +53,7 @@ func (o PubReferenceLogInterceptor) AfterBuildQuery(queryLi []map[string]interfa
 	return queryLi
 }
 
-func (o PubReferenceLogInterceptor) AfterQueryData(dataSetId string, items []interface{}) []interface{}  {
+func (o PubReferenceLogInterceptor) AfterQueryData(sessionId int, dataSetId string, items []interface{}) []interface{}  {
 	result := []interface{}{}
 	modelTemplateFactory := ModelTemplateFactory{}
 	for _, item := range items {

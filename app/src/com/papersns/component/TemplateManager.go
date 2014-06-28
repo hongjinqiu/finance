@@ -532,9 +532,9 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 	return formTemplateInfo, nil
 }
 
-func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
+func (o TemplateManager) QueryDataForListTemplate(sessionId int, listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	interceptorManager := InterceptorManager{}
-	paramMap = interceptorManager.ParseBeforeBuildQuery(listTemplate.BeforeBuildQuery, paramMap)
+	paramMap = interceptorManager.ParseBeforeBuildQuery(sessionId, listTemplate.BeforeBuildQuery, paramMap)
 
 	queryMap := map[string]interface{}{}
 	queryLi := []map[string]interface{}{}
@@ -579,7 +579,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		}
 	}
 
-	queryLi = interceptorManager.ParseAfterBuildQuery(listTemplate.AfterBuildQuery, queryLi)
+	queryLi = interceptorManager.ParseAfterBuildQuery(sessionId, listTemplate.AfterBuildQuery, queryLi)
 
 	querySupport := QuerySupport{}
 	if len(queryLi) == 1 {
@@ -597,7 +597,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) + ",orderBy is:" + orderBy)
 		result := querySupport.Index(collection, queryMap, pageNo, pageSize, orderBy)
 		items := result["items"].([]interface{})
-		items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
+		items = interceptorManager.ParseAfterQueryData(sessionId, listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 		result["items"] = items
 		return result
 	}
@@ -618,7 +618,7 @@ func (o TemplateManager) QueryDataForListTemplate(listTemplate *ListTemplate, pa
 		item["id"] = item["_id"]
 		items = append(items, item)
 	}
-	items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
+	items = interceptorManager.ParseAfterQueryData(sessionId, listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 	return map[string]interface{}{
 		"totalResults": len(mapReduceLi),
 		"items":        items,
@@ -1149,8 +1149,8 @@ func (o TemplateManager) GetToolbarBo(toolbar Toolbar) []interface{} {
 /**
  * 获取模版业务对象
  */
-func (o TemplateManager) GetBoForListTemplate(listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
-	queryResult := o.QueryDataForListTemplate(listTemplate, paramMap, pageNo, pageSize)
+func (o TemplateManager) GetBoForListTemplate(sessionId int, listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
+	queryResult := o.QueryDataForListTemplate(sessionId, listTemplate, paramMap, pageNo, pageSize)
 	items := queryResult["items"].([]interface{})
 	itemsDict := o.GetColumnModelDataForListTemplate(*listTemplate, items)
 	bo := itemsDict["items"].([]interface{})
@@ -1313,6 +1313,9 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 		if err != nil {
 			panic(err)
 		}
+		if relationId == 0 {
+			continue
+		}
 		selectorId := fmt.Sprint(item["selectorId"])
 		listTemplate := o.GetSelectorTemplate(selectorId)
 		collection := listTemplate.DataProvider.Collection
@@ -1334,7 +1337,7 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 		}
 		items := []interface{}{element}
 		interceptorManager := InterceptorManager{}
-		items = interceptorManager.ParseAfterQueryData(listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
+		items = interceptorManager.ParseAfterQueryData(sId, listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 		if len(items) > 0 {
 			itemsDict := o.GetColumnModelDataForListTemplate(listTemplate, items)
 			items = itemsDict["items"].([]interface{})

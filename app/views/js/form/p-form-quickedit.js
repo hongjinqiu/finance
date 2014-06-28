@@ -184,10 +184,10 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 			}
 			
 			host.get('data').each(function(rec, recordIndex) {
-				if (!host.getRecord(recordIndex).formFieldLi) {
-					host.getRecord(recordIndex).formFieldLi = [];
-					if (!host.getRecord(recordIndex).formFieldDict) {
-						host.getRecord(recordIndex).formFieldDict = {};
+				if (!rec.formFieldLi) {
+					rec.formFieldLi = [];
+					if (!rec.formFieldDict) {
+						rec.formFieldDict = {};
 					}
 					//IdColumn,
 					var iterateResult = "";
@@ -196,8 +196,8 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 							//columnModel.IdColumn
 							var field = formFieldFactory.getFormField(Y, columnModel.IdColumn.Name, dataSetId);
 							field.set("value", rec.get(columnModel.IdColumn.Name));
-							host.getRecord(recordIndex).formFieldLi.push(field);
-							host.getRecord(recordIndex).formFieldDict[columnModel.IdColumn.Name] = field;
+							rec.formFieldLi.push(field);
+							rec.formFieldDict[columnModel.IdColumn.Name] = field;
 							return true;
 						}
 						return false;
@@ -208,8 +208,8 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 					templateIterator.iterateAllTemplateColumn(dataSetId, iterateResult, function IterateFunc(column, result) {
 						if (column.Hideable == "true") {
 							var field = formFieldFactory.getFormField(Y, column.Name, dataSetId);
-							host.getRecord(recordIndex).formFieldLi.push(field);
-							host.getRecord(recordIndex).formFieldDict[column.Name] = field;
+							rec.formFieldLi.push(field);
+							rec.formFieldDict[column.Name] = field;
 						}
 					});
 					
@@ -221,14 +221,14 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 						
 						var field = formFieldFactory.getFormField(Y, fieldName, dataSetId);
 						field.render("#" + list.item(j).get("id"));
-						host.getRecord(recordIndex).formFieldLi.push(field);
-						host.getRecord(recordIndex).formFieldDict[fieldName] = field;
+						rec.formFieldLi.push(field);
+						rec.formFieldDict[fieldName] = field;
 					}
 					
 					for (var i = 0; i < sequenceColumnLi.length; i++) {
 						if (sequenceColumnLi[i].isDsField) {// 对于非数据源模型中的字段,当前只有复制出来的字段,这种字段不管其,select-column set value会自动带出
 							var columnName = sequenceColumnLi[i].Name;
-							var field = host.getRecord(recordIndex).formFieldDict[columnName];
+							var field = rec.formFieldDict[columnName];
 							if (rec.get(columnName)) {
 								field.set("value", rec.get(columnName));
 							} else {
@@ -300,8 +300,8 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 			var result = [];
 			host.get("data").each(function(rec, i) {
 				var record = {};
-				for ( var j = 0; j < host.getRecord(i).formFieldLi.length; j++) {
-					var formField = host.getRecord(i).formFieldLi[j];
+				for ( var j = 0; j < rec.formFieldLi.length; j++) {
+					var formField = rec.formFieldLi[j];
 					record[formField.get("name")] = formField.get("value");
 				}
 				result.push(record);

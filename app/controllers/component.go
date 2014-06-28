@@ -5,6 +5,8 @@ import (
 	. "com/papersns/component"
 	"com/papersns/dictionary"
 	//	"github.com/sbinet/go-python"
+	"com/papersns/global"
+	. "com/papersns/script"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -15,7 +17,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	. "com/papersns/script"
 )
 
 func init() {
@@ -100,6 +101,9 @@ func (c Component) Schema() revel.Result {
 }
 
 func (c Component) ListTemplate() revel.Result {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+
 	file, err := os.Open("/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml")
 	defer file.Close()
 	if err != nil {
@@ -122,8 +126,8 @@ func (c Component) ListTemplate() revel.Result {
 
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
-//	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
-//	templateManager.ApplyTreeForQueryParameter(&listTemplate)
+	//	templateManager.ApplyDictionaryForQueryParameter(&listTemplate)
+	//	templateManager.ApplyTreeForQueryParameter(&listTemplate)
 	toolbarBo := templateManager.GetToolbarForListTemplate(listTemplate)
 	paramMap := map[string]string{}
 	for k, v := range c.Params.Form {
@@ -153,7 +157,7 @@ func (c Component) ListTemplate() revel.Result {
 			pageSize = int(pageSizeInt)
 		}
 	}
-	dataBo := templateManager.GetBoForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
+	dataBo := templateManager.GetBoForListTemplate(sessionId, &listTemplate, paramMap, pageNo, pageSize)
 
 	//	columns := templateManager.GetColumns(&listTemplate)
 
@@ -334,6 +338,9 @@ func (c Component) SchemaTest() revel.Result {
 }
 
 func (c Component) SchemaQueryParameterTest() revel.Result {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+
 	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
 	defer file.Close()
 	if err != nil {
@@ -368,7 +375,7 @@ func (c Component) SchemaQueryParameterTest() revel.Result {
 	}
 	pageNo := 1
 	pageSize := 10
-	queryResult := templateManager.QueryDataForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
+	queryResult := templateManager.QueryDataForListTemplate(sessionId, &listTemplate, paramMap, pageNo, pageSize)
 	items := queryResult["items"].([]interface{})
 	if len(items) > 1 {
 		queryResult["items"] = items[:1]
@@ -385,6 +392,9 @@ func (c Component) SchemaQueryParameterTest() revel.Result {
 }
 
 func (c Component) GetColumnModelDataForListTemplate() revel.Result {
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+
 	file, err := os.Open(`/home/hongjinqiu/goworkspace/src/finance/app/src/com/papersns/component/schema/SysUser.xml`)
 	defer file.Close()
 	if err != nil {
@@ -409,7 +419,7 @@ func (c Component) GetColumnModelDataForListTemplate() revel.Result {
 	paramMap := map[string]string{}
 	pageNo := 1
 	pageSize := 10
-	queryResult := templateManager.QueryDataForListTemplate(&listTemplate, paramMap, pageNo, pageSize)
+	queryResult := templateManager.QueryDataForListTemplate(sessionId, &listTemplate, paramMap, pageNo, pageSize)
 	items := queryResult["items"].([]interface{})
 	if len(items) > 1 {
 		queryResult["items"] = items[:1]

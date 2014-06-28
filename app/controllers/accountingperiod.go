@@ -95,6 +95,7 @@ func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result
 		qb := QuerySupport{}
 		//GatheringBill,PayBill
 		sessionId := global.GetSessionId()
+		defer global.CloseSession(sessionId)
 		session, _ := global.GetConnection(sessionId)
 		dataSourceIdLi := []string{"GatheringBill", "PayBill"}
 		for _, dataSourceId := range dataSourceIdLi {

@@ -11,22 +11,25 @@
 		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>
 		<button name="copyBtn" text="复制" mode="fn" handler="copyData"></button>
 		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
-		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="limitControlSaveData" iconCls=""></button>
 		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
-		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button>
-		<button name="cancelBtn" text="作废" mode="fn" handler="cancelData" iconCls=""></button>
-		<button name="unCancelBtn" text="反作废" mode="fn" handler="unCancelData" iconCls=""></button>
+		<button name="delBtn" text="删除" mode="fn" handler="limitControlDeleteData" iconCls=""></button>
+		<button name="cancelBtn" text="作废" mode="fn" handler="limitControlCancelData" iconCls=""></button>
+		<button name="unCancelBtn" text="反作废" mode="fn" handler="limitControlUnCancelData" iconCls=""></button>
 		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
 		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
 	</toolbar>
 	
-	<column-model dataSetId="A" colSpan="4">
+	<column-model dataSetId="A" colSpan="6">
 		<id-column name="id" text="编号" hideable="true" />
 		
 		<auto-column name="billDate" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<auto-column name="billNo" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<auto-column name="billTypeId" colSpan="2" labelWidth="13%" />
-		<auto-column name="property" colSpan="2" />
+		<auto-column name="property" colSpan="2">
+			<column-attribute name="observe" value="accountId,receiveBankId,accountProperty"/>
+		</auto-column>
+		<auto-column name="billStatus" colSpan="2" />
 	</column-model>
 	
 	<html><![CDATA[
@@ -42,10 +45,16 @@
 	]]></html>
 	
 	<column-model dataSetId="A" colSpan="6">
-		<auto-column name="accountId" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<select-column name="receiveBankId" text="开户银行" auto="true" dsFieldMap="BankAccount.A.bankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<string-column name="receiveBankAccount" text="银行帐号" colSpan="2" labelWidth="13%" />
-		<dictionary-column dictionary="D_FIN_ACCOUNT_PROPERTY" name="accountProperty" text="账户属性" colSpan="2" />
+		<auto-column name="accountId" colSpan="2" labelWidth="13%" columnWidth="20%">
+			<relationDS>
+				<relationItem name="BankAccount">
+					<copyConfig copyColumnName="receiveBankId" copyValueField="bankId"/>
+					<copyConfig copyColumnName="accountProperty" copyValueField="accountProperty"/>
+				</relationItem>
+			</relationDS>
+		</auto-column>
+		<auto-column name="receiveBankId" dsFieldMap="BankAccount.A.bankId" readOnly="true" fixReadOnly="true" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<auto-column name="accountProperty" dsFieldMap="BankAccount.A.accountProperty" readOnly="true" fixReadOnly="true" colSpan="2" labelWidth="13%" />
 		<auto-column name="balanceDate" colSpan="2" />
 		<auto-column name="balanceTypeId" colSpan="2" />
 		<auto-column name="balanceNo" colSpan="2" />
@@ -58,7 +67,9 @@
 	</html>
 	
 	<column-model dataSetId="A" colSpan="6">
-		<auto-column name="payerType" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<auto-column name="payerType" colSpan="2" labelWidth="13%" columnWidth="20%">
+			<column-attribute name="observe" value="payerId,chamberlainDesc"/>
+		</auto-column>
 		<auto-column name="payerId" colSpan="2" labelWidth="13%" columnWidth="20%" />
 		<auto-column name="payerDesc" colSpan="2" labelWidth="13%" />
 		<auto-column name="sysUserId" colSpan="2" />
@@ -79,7 +90,13 @@
 	
 	<column-model dataSetId="A" colSpan="6">
 		<auto-column name="payeeName" colSpan="2" labelWidth="13%" columnWidth="20%" />
-		<auto-column name="bankId" colSpan="2" labelWidth="13%" columnWidth="20%" />
+		<auto-column name="bankId" colSpan="2" labelWidth="13%" columnWidth="20%">
+			<relationDS>
+				<relationItem name="Bank">
+					<copyConfig copyColumnName="bankShort" copyValueField="bankShort"/>
+				</relationItem>
+			</relationDS>
+		</auto-column>
 		<auto-column name="bankShort" colSpan="2" labelWidth="13%" />
 		<auto-column name="bankAccount" colSpan="2" />
 		<auto-column name="linkman" colSpan="2" />
@@ -88,11 +105,14 @@
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<button text="选择" mode="fn" handler="actionTestBSelect" iconCls="test"></button>
 			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
 			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
 			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
 		</toolbar>
+		<editor-toolbar>
+			<button text="新增" mode="fn" handler="g_pluginAddRow" iconCls="yui3-button btn-show"></button>
+			<button text="删除" mode="fn" handler="g_pluginRemoveRow" iconCls="test"></button>
+		</editor-toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false" />
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作">
@@ -102,10 +122,17 @@
 				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
 			</buttons>
 		</virtual-column>
-		<auto-column name="accountType" />
-		<auto-column name="accountId" />
-		<select-column name="bankId" text="费用银行" auto="true" dsFieldMap="BankAccount.A.bankId"/>
-		<string-column name="bankAccount" text="费用银行帐号" />
+		<auto-column name="accountType">
+			<column-attribute name="observe" value="accountId,bankId"/>
+		</auto-column>
+		<auto-column name="accountId">
+			<relationDS>
+				<relationItem name="BankAccount">
+					<copyConfig copyColumnName="bankId" copyValueField="bankId" />
+				</relationItem>
+			</relationDS>
+		</auto-column>
+		<auto-column name="bankId" text="费用银行" dsFieldMap="BankAccount.A.bankId" fixReadOnly="true" />
 		<auto-column name="incomeItemId" />
 		<auto-column name="amtFee" />
 	</column-model>

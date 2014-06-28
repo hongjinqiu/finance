@@ -1,4 +1,4 @@
-package sysuser
+package console
 
 import "github.com/robfig/revel"
 import (
@@ -216,12 +216,15 @@ func (c Console) ListSchema() revel.Result {
 		c.Response.ContentType = "text/javascript; charset=utf-8"
 		return c.RenderText(callback + "(" + dataBoText + ");")
 	} else {
-		return c.Render(result)
+		c.RenderArgs["result"] = result
+		return c.RenderTemplate(listTemplate.ViewTemplate.View)
+//		return c.Render(result)
 	}
 }
 
 func (c Console) SelectorSchema() revel.Result {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 
 	schemaName := c.Params.Get("@name")
@@ -321,6 +324,7 @@ func (c Console) setDisplayField(listTemplate *ListTemplate) {
 
 func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) map[string]interface{} {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 	
 	// 1.toolbar bo
@@ -383,7 +387,7 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	usedCheckBo := map[string]interface{}{}
 	//if c.Params.Get("@entrance") != "true" {
 	if isGetBo {
-		dataBo = templateManager.GetBoForListTemplate(listTemplate, paramMap, pageNo, pageSize)
+		dataBo = templateManager.GetBoForListTemplate(sessionId, listTemplate, paramMap, pageNo, pageSize)
 		relationBo = dataBo["relationBo"].(map[string]interface{})
 		//delete(dataBo, "relationBo")
 		
@@ -468,6 +472,7 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 // TODO,by test
 func (c Console) FormSchema() revel.Result {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 
 	schemaName := c.Params.Get("@name")
@@ -718,6 +723,7 @@ func (c Console) getQueryParameterRenderLi(listTemplate ListTemplate) [][]map[st
 
 func (c Console) Relation() revel.Result {
 	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	defer global.CloseSession(sessionId)
 
 	selectorId := c.Params.Get("selectorId")

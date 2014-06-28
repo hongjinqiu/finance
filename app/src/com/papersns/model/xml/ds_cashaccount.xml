@@ -44,6 +44,7 @@
 			<field id="currencyTypeId" extends="INT_FIELD">
 				<displayName>币别</displayName>
 				<allowEmpty>false</allowEmpty>
+				<defaultValueExpr>1</defaultValueExpr>
 				<relationDS>
 					<relationItem name="CurrencyType">
 						<id>CurrencyTypeSelector</id>

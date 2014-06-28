@@ -59,7 +59,7 @@
 						<relationExpr>true</relationExpr>
 						<jsRelationExpr>true</jsRelationExpr>
 						<relationConfig selectorName="BankAccountCurrencyTypeSelector" displayField="code,name" valueField="id" selectionMode="multi" />
-						<copyConfig copyColumnName="bankAccountCurrencyTypeId" copyValueField="bankAccountCurrencyTypeId" />
+						<copyConfig copyColumnName="bankAccountBId" copyValueField="bankAccountBId" />
 						<copyConfig copyColumnName="accountId" copyValueField="bankAccountId" />
 						<copyConfig copyColumnName="currencyTypeId" copyValueField="currencyTypeId" />
 					</relationItem>
@@ -83,7 +83,7 @@
 			</buttons>
 		</virtual-column>
 		<auto-column name="accountType" />
-		<auto-column name="bankAccountCurrencyTypeId" />
+		<auto-column name="bankAccountBId" />
 		<auto-column name="accountId">
 			<relationDS>
 				<relationItem name="BankAccount">

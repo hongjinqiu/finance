@@ -10,6 +10,7 @@ import (
 	. "com/papersns/mongo"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 )
@@ -22,6 +23,67 @@ const (
 	LIMIT_CONTROL_WARN    = 3 // 赤字警告
 )
 
+func (o AccountInOutService) GetFirstAccountingPeriodStartEndDate(sessionId int, year int) (int, int) {
+	session, _ := global.GetConnection(sessionId)
+	dataSourceModelId := "AccountingPeriod"
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	queryMap := map[string]interface{}{
+		"A.accountingYear": year,
+	}
+	qb := QuerySupport{}
+	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
+	if !found {
+		//		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
+		log.Println("会计年度:" + fmt.Sprint(year) + "未找到对应会计期")
+		return 0, 0
+	}
+	var startDate int
+	var endDate int
+	bDataSetLi := accountingPeriod["B"].([]interface{})
+	commonUtil := CommonUtil{}
+	for _, item := range bDataSetLi {
+		line := item.(map[string]interface{})
+		startDate = commonUtil.GetIntFromMap(line, "startDate")
+		endDate = commonUtil.GetIntFromMap(line, "endDate")
+		break
+	}
+	return startDate, endDate
+}
+
+func (o AccountInOutService) GetAccountingPeriodStartEndDate(sessionId int, year int, sequenceNo int) (int, int) {
+	session, _ := global.GetConnection(sessionId)
+	dataSourceModelId := "AccountingPeriod"
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
+	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	queryMap := map[string]interface{}{
+		"A.accountingYear": year,
+		"B.sequenceNo":     sequenceNo,
+	}
+	qb := QuerySupport{}
+	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
+	if !found {
+		//		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
+		log.Println("会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期")
+		return 0, 0
+	}
+	var startDate int
+	var endDate int
+	bDataSetLi := accountingPeriod["B"].([]interface{})
+	commonUtil := CommonUtil{}
+	for _, item := range bDataSetLi {
+		line := item.(map[string]interface{})
+		if fmt.Sprint(line["sequenceNo"]) == fmt.Sprint(sequenceNo) {
+			startDate = commonUtil.GetIntFromMap(line, "startDate")
+			endDate = commonUtil.GetIntFromMap(line, "endDate")
+			break
+		}
+	}
+	return startDate, endDate
+}
+
 func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ymd int) (int, int) {
 	session, _ := global.GetConnection(sessionId)
 	dataSourceModelId := "AccountingPeriod"
@@ -30,10 +92,10 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 	queryMap := map[string]interface{}{
 		"B.startDate": map[string]interface{}{
-			"$gte": ymd,
+			"$lte": ymd,
 		},
 		"B.endDate": map[string]interface{}{
-			"$lt": ymd,
+			"$gte": ymd,
 		},
 	}
 	qb := QuerySupport{}
@@ -43,7 +105,9 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 		if err != nil {
 			panic(err)
 		}
-		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期"})
+		log.Println("单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期")
+		return 0,0
+//		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期"})
 	}
 	masterData := accountingPeriod["A"].(map[string]interface{})
 	year, err := strconv.Atoi(fmt.Sprint(masterData["accountingYear"]))
@@ -54,7 +118,7 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 	bDataSetLi := accountingPeriod["B"].([]interface{})
 	for _, item := range bDataSetLi {
 		line := item.(map[string]interface{})
-		if fmt.Sprint(line["startDate"]) <= fmt.Sprint(ymd) && fmt.Sprint(ymd) < fmt.Sprint(line["endDate"]) {
+		if fmt.Sprint(line["startDate"]) <= fmt.Sprint(ymd) && fmt.Sprint(ymd) <= fmt.Sprint(line["endDate"]) {
 			sequenceNo, err = strconv.Atoi(fmt.Sprint(line["sequenceNo"]))
 			if err != nil {
 				panic(err)
@@ -62,6 +126,13 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 			break
 		}
 	}
+//	if sequenceNo == 0 {
+//		billDate, err := time.Parse("20060102", fmt.Sprint(ymd))
+//		if err != nil {
+//			panic(err)
+//		}
+//		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "找到年度" + fmt.Sprint(year) + ",未找到会计期"})
+//	}
 
 	return year, sequenceNo
 }
@@ -323,13 +394,13 @@ func (o AccountInOutService) LogCashAccountInOut(sessionId int, accountInOutPara
 		}
 		panic(BusinessError{Message: "现金账户没找到，查询条件为:" + string(queryMapByte)})
 	}
-	
+
 	commonUtil := CommonUtil{}
 	cashAccount := cashAccountBo["A"].(map[string]interface{})
 	if fmt.Sprint(cashAccount["currencyTypeId"]) != fmt.Sprint(accountInOutParam.CurrencyTypeId) {
 		panic(BusinessError{Message: "过账现金账户:" + fmt.Sprint(cashAccount["name"]) + "未找到对应币别"})
 	}
-	
+
 	amtOriginalCurrencyBalanceStr := fmt.Sprint(cashAccount["amtOriginalCurrencyBalance"])
 	amtOriginalCurrencyBalance := commonUtil.GetFloat64FromString(amtOriginalCurrencyBalanceStr)
 
@@ -482,15 +553,34 @@ func (o AccountInOutService) logMonthInOut(sessionId int, accountInOutParam Acco
 	amtIncreaseInDb := commonUtil.GetFloat64FromString(fmt.Sprint(masterData["amtIncrease"]))
 	amtReduceInDb := commonUtil.GetFloat64FromString(fmt.Sprint(masterData["amtReduce"]))
 
+	increaseCountInDb := commonUtil.GetIntFromString(fmt.Sprint(masterData["increaseCount"]))
+	reduceCountInDb := commonUtil.GetIntFromString(fmt.Sprint(masterData["reduceCount"]))
+
 	if accountInOutParam.DiffDataType == ADD || accountInOutParam.DiffDataType == AFTER_UPDATE {
 		amtIncreaseInDb += amtIncrease
 		amtReduceInDb += amtReduce
+
+		if amtIncrease > 0 {
+			increaseCountInDb += 1
+		}
+		if amtReduce > 0 {
+			reduceCountInDb += 1
+		}
 	} else {
 		amtIncreaseInDb -= amtIncrease
 		amtReduceInDb -= amtReduce
+
+		if amtIncrease > 0 {
+			increaseCountInDb -= 1
+		}
+		if amtReduce > 0 {
+			reduceCountInDb -= 1
+		}
 	}
 	masterData["amtIncrease"] = fmt.Sprint(amtIncreaseInDb)
 	masterData["amtReduce"] = fmt.Sprint(amtReduceInDb)
+	masterData["increaseCount"] = increaseCountInDb
+	masterData["reduceCount"] = reduceCountInDb
 
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
