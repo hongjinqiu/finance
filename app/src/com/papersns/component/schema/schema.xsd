@@ -85,6 +85,7 @@
 				<element ref="tns:description" minOccurs="0" />
 				<element ref="tns:scripts" minOccurs="0" />
 				<element ref="tns:view-template" minOccurs="0" />
+				<element ref="tns:security" minOccurs="0" />
 				<choice minOccurs="1" maxOccurs="unbounded">
 					<element ref="tns:toolbar" minOccurs="0" />
 					<element ref="tns:column-model" maxOccurs="unbounded" />
@@ -327,6 +328,15 @@
 					<enumeration value="fn" />
 					<enumeration value="url" />
 					<enumeration value="url^" />
+					<enumeration value="url!" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="use-in">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="list"></enumeration>
+					<enumeration value="selector"></enumeration>
 				</restriction>
 			</simpleType>
 		</attribute>
@@ -334,7 +344,9 @@
 
 	<element name="security">
 		<complexType>
-			<attribute name="functionId" type="long" use="required"></attribute>
+			<attribute name="byUnit" type="boolean" default="true"></attribute>
+			<attribute name="byAdmin" type="boolean" default="true"></attribute>
+			<attribute name="functionId" type="long"></attribute>
 			<attribute name="override" type="boolean"></attribute>
 			<attribute name="DEFAULT_RESOURCE_CODE">
 				<simpleType>
@@ -582,7 +594,15 @@
 								<element name="expression" minOccurs="0"></element>
 							</choice>
 							<attributeGroup ref="tns:column-attributes" />
-							<attribute name="forEditor" type="boolean"></attribute>
+							<attribute name="use-in">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="editor"></enumeration>
+										<enumeration value="list"></enumeration>
+										<enumeration value="selector"></enumeration>
+									</restriction>
+								</simpleType>
+							</attribute>
 						</complexType>
 					</element>
 					<element name="select-column">

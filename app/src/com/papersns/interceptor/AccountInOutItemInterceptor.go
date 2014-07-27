@@ -5,6 +5,7 @@ import (
 	"com/papersns/global"
 	"fmt"
 	"log"
+	"strconv"
 )
 
 type AccountInOutItemInterceptor struct{}
@@ -97,13 +98,21 @@ func (o AccountInOutItemInterceptor) BeforeBuildQuery(sessionId int, paramMap ma
 }
 
 func (o AccountInOutItemInterceptor) GetMinAccountingPeriod(sessionId int) (map[string]interface{}, bool) {
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
 	session, _ := global.GetConnection(sessionId)
 	collectionName := "AccountingPeriod"
-	queryMap := map[string]interface{}{}
+	interceptorCommon := InterceptorCommon{}
+	queryMap := map[string]interface{}{
+		"A.createUnit": interceptorCommon.GetCreateUnitByUserId(session, userId),
+	}
 	pageNo := 1
 	pageSize := 1
 	orderBy := "A.accountingYear"
-	queryResult := InterceptorCommon{}.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
+	queryResult := interceptorCommon.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
 	items := queryResult["items"].([]interface{})
 	if len(items) > 0 {
 		return items[0].(map[string]interface{}), true
@@ -112,13 +121,21 @@ func (o AccountInOutItemInterceptor) GetMinAccountingPeriod(sessionId int) (map[
 }
 
 func (o AccountInOutItemInterceptor) GetMaxAccountingPeriod(sessionId int) (map[string]interface{}, bool) {
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
 	session, _ := global.GetConnection(sessionId)
 	collectionName := "AccountingPeriod"
-	queryMap := map[string]interface{}{}
+	interceptorCommon := InterceptorCommon{}
+	queryMap := map[string]interface{}{
+		"A.createUnit": interceptorCommon.GetCreateUnitByUserId(session, userId),
+	}
 	pageNo := 1
 	pageSize := 1
 	orderBy := "-A.accountingYear"
-	queryResult := InterceptorCommon{}.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
+	queryResult := interceptorCommon.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
 	items := queryResult["items"].([]interface{})
 	if len(items) > 0 {
 		return items[0].(map[string]interface{}), true
@@ -129,8 +146,15 @@ func (o AccountInOutItemInterceptor) GetMaxAccountingPeriod(sessionId int) (map[
 func (o AccountInOutItemInterceptor) GetAccountingPeriod(sessionId int, year int) (map[string]interface{}, bool) {
 	session, _ := global.GetConnection(sessionId)
 	collectionName := "AccountingPeriod"
+
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
+		"A.createUnit":     InterceptorCommon{}.GetCreateUnitByUserId(session, userId),
 	}
 	accountingPeriod, found := InterceptorCommon{}.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -143,9 +167,14 @@ func (o AccountInOutItemInterceptor) GetAccountingPeriod(sessionId int, year int
 
 func (o AccountInOutItemInterceptor) GetAccountingPeriodFirstStartEndDate(sessionId int, year int) (int, int) {
 	session, _ := global.GetConnection(sessionId)
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	collectionName := "AccountingPeriod"
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
+		"A.createUnit":     InterceptorCommon{}.GetCreateUnitByUserId(session, userId),
 	}
 	accountingPeriod, found := InterceptorCommon{}.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -168,9 +197,14 @@ func (o AccountInOutItemInterceptor) GetAccountingPeriodFirstStartEndDate(sessio
 
 func (o AccountInOutItemInterceptor) GetAccountingPeriodLastStartEndDate(sessionId int, year int) (int, int) {
 	session, _ := global.GetConnection(sessionId)
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	collectionName := "AccountingPeriod"
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
+		"A.createUnit":     InterceptorCommon{}.GetCreateUnitByUserId(session, userId),
 	}
 	accountingPeriod, found := InterceptorCommon{}.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -192,10 +226,15 @@ func (o AccountInOutItemInterceptor) GetAccountingPeriodLastStartEndDate(session
 
 func (o AccountInOutItemInterceptor) GetAccountingPeriodStartEndDate(sessionId int, year int, sequenceNo int) (int, int) {
 	session, _ := global.GetConnection(sessionId)
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	collectionName := "AccountingPeriod"
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
 		"B.sequenceNo":     sequenceNo,
+		"A.createUnit":     InterceptorCommon{}.GetCreateUnitByUserId(session, userId),
 	}
 	accountingPeriod, found := InterceptorCommon{}.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -217,4 +256,3 @@ func (o AccountInOutItemInterceptor) GetAccountingPeriodStartEndDate(sessionId i
 	}
 	return startDate, endDate
 }
-

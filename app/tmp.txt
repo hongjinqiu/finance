@@ -1,1 +1,46 @@
-{"$and": [{"code": {"$ne": "RMB"}},{"name": {"$ne": "RMB"}}]}
+---------------------------------------------------
+function clearIframe(id){
+    var el = document.getElementById(id),
+        iframe = el.contentWindow;
+    if(el){
+        el.src = 'about:blank';
+        try{
+            iframe.document.write('');
+            iframe.document.clear();
+        }catch(e){};
+        //以上可以清除大部分的内存和文档节点记录数了
+        //最后删除掉这个 iframe 就哦咧。
+        document.body.removeChild(el);
+    }
+}
+
+clearIframe('iframe_id');
+---------------------------------------------------
+
+---------------------------------------------------
+Google Chrome浏览器提供了非常强大的JS调试工具
+JS内存泄漏排查方法(Chrome Profiles)
+---------------------------------------------------
+
+---------------------------------------------------
+项目小记： IFRAME引起内存泄露的解决方法
+
+项目中用到一个IFRAME做页面跳转前的处理，运行时发现每次通过IFRAME并关闭页面后，IE的内存会增加3M左右，调查发现是IFRAME没有释放掉，所以对代码做了修改：
+
+<body style="margin-left:0px;margin-top:0px;margin-right:0px;margin-bottom:0px;" onunload="winClose()">
+<iframe id="frame1" width="100%" height="100%" frameborder=no marginwidth=0 marginheight=0 scrolling=auto allowtransparency=true></iframe>
+<script type="text/javascript">
+document.getElementsByTagName("iframe")[0].src = window.dialogArguments["url_iframe"];
+document.title = window.dialogArguments["ModelDialogTitle"]!=null?window.dialogArguments["ModelDialogTitle"]:"";
+
+function winClose()
+{
+obj=document.getElementById("frame1");
+obj.src="javascript:false";
+obj.removeNode(true); 
+obj=null 
+CollectGarbage();
+}
+</script>
+---------------------------------------------------
+

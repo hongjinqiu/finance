@@ -1,6 +1,6 @@
 DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 	var self = this;
-	YUI(g_financeModule).use("finance-module",
+	executeGYUI(
 			 function(Y) {
 				var pluginDataTableManager = new DataTableManager();
 				var doPopupConfirm = function() {
@@ -251,7 +251,7 @@ function g_selectRow(dataSetId, btnName) {
         	};
         	if (button.CRelationDS && button.CRelationDS.CRelationItemLi) {
     			var relationItem = button.CRelationDS.CRelationItemLi[0];
-    			var url = "/console/selectorschema?@name={NAME_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}";
+    			var url = "/console/selectorschema?@name={NAME_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}&date=" + new Date();
     			var selectorName = relationItem.CRelationConfig.SelectorName;
     			url = url.replace("{NAME_VALUE}", selectorName);
     			var multi = relationItem.CRelationConfig.SelectionMode == "multi";

@@ -14,9 +14,11 @@
 		</button>
 	</toolbar> -->
 	
+	<!-- <security byUnit="true"/> -->
+
 	<after-build-query>BbsPostReplyInterceptor.AfterBuildQuery</after-build-query>
 	<after-query-data>BbsPostReplyInterceptor.AfterQueryData</after-query-data>
-
+	
 	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->

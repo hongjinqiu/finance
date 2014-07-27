@@ -5,7 +5,7 @@
 				{{range $index, $item := .result.hiddenParameterLi}}
 					<div id="q_{{$item.Name}}_render" style="display: none"></div>
 					<script type="text/javascript">
-					YUI(g_financeModule).use("finance-module", function(Y) {
+					g_yuiCommondLi.push(function(Y) {
 						var queryParameterManager = new QueryParameterManager();
 						var field = queryParameterManager.getQueryField(Y, '{{$item.Name}}');
 						field.render("#q_{{$item.Name}}_render");
@@ -24,7 +24,7 @@
 									<td width="" colspan="">
 										<div id="q_{{$tdItem.name}}_render"></div>
 										<script type="text/javascript">
-										YUI(g_financeModule).use("finance-module", function(Y) {
+										g_yuiCommondLi.push(function(Y) {
 											var queryParameterManager = new QueryParameterManager();
 											var field = queryParameterManager.getQueryField(Y, '{{$tdItem.name}}');
 											field.render("#q_{{$tdItem.name}}_render");

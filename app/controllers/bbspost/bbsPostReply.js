@@ -41,7 +41,7 @@ function reply() {
 			var createTimeDisplay = createTime.substring(0,4) + "-" + createTime.substring(4,6) + "-" + createTime.substring(6,8) + " " + createTime.substring(8,10) + ":" + createTime.substring(10,12) + ":" + createTime.substring(12,14);
 			trHtml = trHtml.replace("{createTime}", createTimeDisplay);
 			trHtml = trHtml.replace("{content}", o.bo.A.content);
-			YUI(g_financeModule).use("finance-module", function(Y){
+			executeGYUI(function(Y){
 				Y.one("#datalist").append(trHtml);
 			});
 			document.getElementById("replyDiv").style.display = "none";
@@ -58,12 +58,10 @@ function getUserDisplay(id) {
 	return "";
 }
 
-function main() {
-	YUI(g_financeModule).use("finance-module", function(Y){
+function main(Y) {
 		//applyDateLocale(Y);
 		var queryParameterManager = new QueryParameterManager();
-		queryParameterManager.applyQueryDefaultValue();
-		queryParameterManager.applyFormData();
+		queryParameterManager.applyQueryDefaultValue(Y);
+		queryParameterManager.applyFormData(Y);
 		queryParameterManager.applyObserveEventBehavior();
-	});
 }

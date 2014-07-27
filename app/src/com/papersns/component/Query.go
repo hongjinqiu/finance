@@ -3,7 +3,9 @@ package component
 import (
 	"com/papersns/mongo"
 	"encoding/json"
+	"fmt"
 	"labix.org/v2/mgo"
+	"strconv"
 	"strings"
 )
 
@@ -30,6 +32,50 @@ func (qb QuerySupport) FindByMapWithSession(session *mgo.Session, collection str
 
 	return result, true
 }
+
+//func (qb QuerySupport) GetFixQueryByUserId(session *mgo.Session, userId int) map[string]interface{} {
+//	collectionName := "SysUser"
+//	query := map[string]interface{}{
+//		"_id": userId,
+//	}
+//	sysUser := qb.FindByMapWithSessionExact(session, collectionName, query)
+//	createUnit := qb.GetCreateUnitFromSysUser(sysUser)
+//	return map[string]interface{}{
+//		"A.createUnit": createUnit,
+//	}
+//}
+
+func (qb QuerySupport) GetCreateUnitByUserId(session *mgo.Session, userId int) int {
+	collectionName := "SysUser"
+	query := map[string]interface{}{
+		"_id": userId,
+	}
+	sysUser := qb.FindByMapWithSessionExact(session, collectionName, query)
+	return qb.GetCreateUnitFromSysUser(sysUser)
+}
+
+func (qb QuerySupport) GetCreateUnitFromSysUser(sysUser map[string]interface{}) int {
+	master := sysUser["A"].(map[string]interface{})
+	createUnit, err := strconv.Atoi(fmt.Sprint(master["createUnit"]))
+	if err != nil {
+		panic(err)
+	}
+	return createUnit
+}
+
+func (qb QuerySupport) FindByMapWithSessionExact(session *mgo.Session, collection string, query map[string]interface{}) map[string]interface{} {
+	result, found := qb.FindByMapWithSession(session, collection, query)
+	if !found {
+		queryByte, err := json.MarshalIndent(&query, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		panic("not found, query is:" + string(queryByte))
+	}
+	return result
+}
+/*
+*/
 
 func (qb QuerySupport) Find(collection string, query string) (result map[string]interface{}, found bool) {
 	queryMap := map[string]interface{}{}
@@ -86,26 +132,26 @@ func (qb QuerySupport) MapReduceAll(collection string, query map[string]interfac
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
-	
+
 	result = []map[string]interface{}{}
 	_, err := db.C(collection).Find(query).MapReduce(&mapReduce, &result)
 	if err != nil {
 		panic(err)
 	}
-	
-	return result 
+
+	return result
 }
 
 func (qb QuerySupport) MapReduce(collection string, query map[string]interface{}, mapReduce mgo.MapReduce, pageNo int, pageSize int) (result []map[string]interface{}) {
 	mongoDBFactory := mongo.GetInstance()
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
-	
+
 	result = []map[string]interface{}{}
-	_, err := db.C(collection).Find(query).Limit(pageSize).Skip((pageNo - 1) * pageSize).MapReduce(&mapReduce, &result)
+	_, err := db.C(collection).Find(query).Limit(pageSize).Skip((pageNo-1)*pageSize).MapReduce(&mapReduce, &result)
 	if err != nil {
 		panic(err)
 	}
-	
-	return result 
+
+	return result
 }

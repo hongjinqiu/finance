@@ -85,6 +85,7 @@
 						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
+				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
 		</bizField>
 	</masterData>

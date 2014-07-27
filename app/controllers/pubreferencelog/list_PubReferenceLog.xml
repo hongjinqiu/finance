@@ -12,10 +12,13 @@
 	<toolbar export="true">
 	</toolbar>
 
+	<security byUnit="true"/>
+
 	<before-build-query>PubReferenceLogInterceptor.BeforeBuildQuery</before-build-query>
 	<after-build-query>PubReferenceLogInterceptor.AfterBuildQuery</after-build-query>
 	<after-query-data>PubReferenceLogInterceptor.AfterQueryData</after-query-data>
 
+	
 	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->

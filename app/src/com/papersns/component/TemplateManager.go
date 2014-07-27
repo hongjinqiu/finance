@@ -535,9 +535,19 @@ func (o TemplateManager) loadSingleFormTemplate(path string) (FormTemplateInfo, 
 func (o TemplateManager) QueryDataForListTemplate(sessionId int, listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	interceptorManager := InterceptorManager{}
 	paramMap = interceptorManager.ParseBeforeBuildQuery(sessionId, listTemplate.BeforeBuildQuery, paramMap)
-
-	queryMap := map[string]interface{}{}
-	queryLi := []map[string]interface{}{}
+	
+	session, _ := global.GetConnection(sessionId)
+	querySupport := QuerySupport{}
+	queryMap := map[string]interface{}{
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, listTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
+	queryLi := []map[string]interface{}{
+	}
 
 	collection := listTemplate.DataProvider.Collection
 	mapStr := listTemplate.DataProvider.Map
@@ -581,9 +591,10 @@ func (o TemplateManager) QueryDataForListTemplate(sessionId int, listTemplate *L
 
 	queryLi = interceptorManager.ParseAfterBuildQuery(sessionId, listTemplate.AfterBuildQuery, queryLi)
 
-	querySupport := QuerySupport{}
 	if len(queryLi) == 1 {
-		queryMap = queryLi[0]
+		for k, v := range queryLi[0] {
+			queryMap[k] = v
+		}
 	} else if len(queryLi) > 1 {
 		queryMap["$and"] = queryLi
 	}
@@ -595,7 +606,7 @@ func (o TemplateManager) QueryDataForListTemplate(sessionId int, listTemplate *L
 	if mapStr == "" {
 		orderBy := listTemplate.ColumnModel.BsonOrderBy
 		log.Println("QueryDataForListTemplate,collection:" + collection + ",query is:" + string(queryByte) + ",orderBy is:" + orderBy)
-		result := querySupport.Index(collection, queryMap, pageNo, pageSize, orderBy)
+		result := querySupport.IndexWithSession(session, collection, queryMap, pageNo, pageSize, orderBy)
 		items := result["items"].([]interface{})
 		items = interceptorManager.ParseAfterQueryData(sessionId, listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 		result["items"] = items
@@ -625,12 +636,12 @@ func (o TemplateManager) QueryDataForListTemplate(sessionId int, listTemplate *L
 	}
 }
 
-func (o TemplateManager) GetColumnModelDataForListTemplate(listTemplate ListTemplate, items []interface{}) map[string]interface{} {
+func (o TemplateManager) GetColumnModelDataForListTemplate(sessionId int, listTemplate ListTemplate, items []interface{}) map[string]interface{} {
 	//	o.applyAdapterColumnName(listTemplate)
-	return o.GetColumnModelDataForColumnModel(listTemplate.ColumnModel, items)
+	return o.GetColumnModelDataForColumnModel(sessionId, listTemplate.ColumnModel, items)
 }
 
-func (o TemplateManager) GetColumnModelDataForFormTemplate(formTemplate FormTemplate, bo map[string]interface{}) map[string]interface{} {
+func (o TemplateManager) GetColumnModelDataForFormTemplate(sessionId int, formTemplate FormTemplate, bo map[string]interface{}) map[string]interface{} {
 	relationBo := map[string]interface{}{}
 	formTemplateIterator := FormTemplateIterator{}
 	var result interface{} = ""
@@ -642,7 +653,7 @@ func (o TemplateManager) GetColumnModelDataForFormTemplate(formTemplate FormTemp
 						"A": bo["A"],
 					},
 				}
-				columnModelData := o.GetColumnModelDataForColumnModel(columnModel, items)
+				columnModelData := o.GetColumnModelDataForColumnModel(sessionId, columnModel, items)
 				columnModelItems := columnModelData["items"].([]interface{})
 				if len(columnModelItems) > 0 {
 					// 主数据集有多个,因此,需要累加
@@ -666,7 +677,7 @@ func (o TemplateManager) GetColumnModelDataForFormTemplate(formTemplate FormTemp
 						columnModel.DataSetId: item,
 					})
 				}
-				columnModelData := o.GetColumnModelDataForColumnModel(columnModel, dataSetItems)
+				columnModelData := o.GetColumnModelDataForColumnModel(sessionId, columnModel, dataSetItems)
 				
 				items = columnModelData["items"].([]interface{})
 				
@@ -775,10 +786,7 @@ func (o TemplateManager) GetSelectorInfoForListTemplate(listTemplate ListTemplat
 	return result
 }
 
-func (o TemplateManager) GetColumnModelDataForColumnModel(columnModel ColumnModel, items []interface{}) map[string]interface{} {
-	sessionId := global.GetSessionId()
-	defer global.CloseSession(sessionId)
-	
+func (o TemplateManager) GetColumnModelDataForColumnModel(sessionId int, columnModel ColumnModel, items []interface{}) map[string]interface{} {
 	// set dataSetId to columnItem.DataSetId
 	o.recursionSetDefaultDataSetId(columnModel.DataSetId, &columnModel)
 	columnDict := map[string]Column{}
@@ -1152,7 +1160,7 @@ func (o TemplateManager) GetToolbarBo(toolbar Toolbar) []interface{} {
 func (o TemplateManager) GetBoForListTemplate(sessionId int, listTemplate *ListTemplate, paramMap map[string]string, pageNo int, pageSize int) map[string]interface{} {
 	queryResult := o.QueryDataForListTemplate(sessionId, listTemplate, paramMap, pageNo, pageSize)
 	items := queryResult["items"].([]interface{})
-	itemsDict := o.GetColumnModelDataForListTemplate(*listTemplate, items)
+	itemsDict := o.GetColumnModelDataForListTemplate(sessionId, *listTemplate, items)
 	bo := itemsDict["items"].([]interface{})
 	relationBo := itemsDict["relationBo"].(map[string]interface{})
 	
@@ -1243,7 +1251,7 @@ func (o TemplateManager) GetLayerForFormTemplate(sId int, formTemplate FormTempl
 		if item.XMLName.Local == "column-model" {
 			for _, column := range item.ColumnModel.ColumnLi {
 				if column.Dictionary != "" {
-					layerMap := layerManager.GetLayerBySession(db, column.Dictionary)
+					layerMap := layerManager.GetLayerBySession(sId, db, column.Dictionary)
 					if layerMap != nil {
 						items := layerMap["items"]
 						if items != nil {
@@ -1281,7 +1289,7 @@ func (o TemplateManager) GetLayerForListTemplate(sId int, listTemplate ListTempl
 	var iterateResult interface{} = ""
 	listTemplateIterator.IterateTemplateColumn(listTemplate, &iterateResult, func(column Column, iterateResult *interface{}) {
 		if column.Dictionary != "" {
-			layerMap := layerManager.GetLayerBySession(db, column.Dictionary)
+			layerMap := layerManager.GetLayerBySession(sId, db, column.Dictionary)
 			if layerMap != nil {
 				items := layerMap["items"]
 				if items != nil {
@@ -1339,7 +1347,7 @@ func (o TemplateManager) GetRelationBo(sId int, relationLi []map[string]interfac
 		interceptorManager := InterceptorManager{}
 		items = interceptorManager.ParseAfterQueryData(sId, listTemplate.AfterQueryData, listTemplate.ColumnModel.DataSetId, items)
 		if len(items) > 0 {
-			itemsDict := o.GetColumnModelDataForListTemplate(listTemplate, items)
+			itemsDict := o.GetColumnModelDataForListTemplate(sId, listTemplate, items)
 			items = itemsDict["items"].([]interface{})
 			element = items[0].(map[string]interface{})
 		} else {

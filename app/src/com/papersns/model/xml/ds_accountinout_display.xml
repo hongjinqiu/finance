@@ -99,7 +99,7 @@
 			<field id="currencyTypeId" extends="INT_FIELD">
 				<displayName>币别</displayName>
 				<allowEmpty>true</allowEmpty>
-				<defaultValueExpr>1</defaultValueExpr>
+				<!-- <defaultValueExpr>1</defaultValueExpr> -->
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
 					<relationItem name="CurrencyType">

@@ -1,0 +1,12 @@
+{
+		"oAuthInfo":   rsp,
+		"top_session": rsp["access_token"],
+		"app_key":     paramDict["client_id"],
+		"top_appkey":  paramDict["client_id"],
+		"topParameter": map[string]interface{}{
+			"visitor_nick": rsp["taobao_user_nick"],
+			"visitor_id":   rsp["taobao_user_id"],
+			"sub_taobao_user_id": rsp["sub_taobao_user_id"],
+			"sub_taobao_user_nick": rsp["sub_taobao_user_nick"],
+		},
+	}

@@ -14,10 +14,12 @@
 
 		<button text="删除" mode="fn" handler="g_deleteRecords">
 		</button>
-	</toolbar>
+		<button text="新增" mode="url" handler="/console/formschema?@name=BbsPost" iconCls="test" use-in="selector" />	</toolbar>
 	
-	<after-query-data>BbsPostInterceptor.AfterQueryData</after-query-data>
+	<security byUnit="true"/>
 
+	<after-query-data>BbsPostInterceptor.AfterQueryData</after-query-data>
+	
 	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
@@ -31,6 +33,8 @@
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
+				<button text="复制" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=BbsPost&amp;id={id}&amp;copyFlag=true">
+				</button>
 				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=BbsPost&amp;id={id}">
 				</button>
 				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">

@@ -27,7 +27,6 @@
 			<modifyBy id="modifyBy" extends="MODIFY_BY" />
 			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
 			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
-			<billStatus id="billStatus" extends="BILL_STATUS" />
 			<attachCount id="attachCount" extends="ATTACH_COUNT" />
 			<remark id="remark" extends="REMARK" />
 		</fixField>
@@ -52,12 +51,12 @@ nick:昵称,例如:五行色东辉专卖店:小张
 				<dictionary>D_TAOBAO_TYPE</dictionary>
 				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="status" extends="INT_FIELD">
+			<field id="status" extends="INT_FIELD"><!-- 没用了 -->
 				<displayName>状态</displayName>
 				<dictionary>D_TAOBAO_STATUS</dictionary>
 				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="sellerId" extends="INT_FIELD">
+			<!-- <field id="sellerId" extends="INT_FIELD">
 				<displayName>卖家ID</displayName>
 				<fixReadOnly>true</fixReadOnly>
 			</field>
@@ -65,7 +64,7 @@ nick:昵称,例如:五行色东辉专卖店:小张
 				<displayName>卖家昵称</displayName>
 				<fieldLength>100</fieldLength>
 				<fixReadOnly>true</fixReadOnly>
-			</field>
+			</field> -->
 			<field id="nick" extends="STRING_FIELD">
 				<displayName>昵称</displayName>
 				<fieldLength>100</fieldLength>

@@ -7,11 +7,13 @@
 	<scripts></scripts>
 	<view-template view="Console/FormSchema.html"/>
 	
+	<security byUnit="true"/>
+	
 	<html>
 		<![CDATA[
 			<div id="form_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RFormField({
 						label: "form_field：",
 						name: "formField",
@@ -25,7 +27,7 @@
 			
 			<div id="text_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RTextField({
 						label: "text_field：",
 						name: "textField",
@@ -39,7 +41,7 @@
 			
 			<div id="textarea_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RTextareaField({
 						label: "textarea_field：",
 						name: "textareaField",
@@ -53,7 +55,7 @@
 			
 			<div id="display_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RDisplayField({
 						label: "display_field：",
 						name: "displayField",
@@ -67,7 +69,7 @@
 			
 			<div id="hidden_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RHiddenField({
 						label: "hidden_field：",
 						name: "hiddenField",
@@ -81,7 +83,7 @@
 			
 			<div id="number_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RNumberField({
 						label: "number_field：",
 						name: "numberField",
@@ -95,7 +97,7 @@
 			
 			<div id="choice_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RChoiceField({
 						label: "choice_field：",
 						name: "choiceField",
@@ -119,7 +121,7 @@
 			
 			<div id="select_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RSelectField({
 						label: "select_field：",
 						name: "selectField",
@@ -143,7 +145,7 @@
 			
 			<div id="date_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RDateField({
 						name: "dateField",
 						value: "dateFieldValue2",
@@ -167,7 +169,7 @@
 			<div style="clear: both"></div>
 			<div id="trigger_field"></div>
 			<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var field = new Y.RTriggerField({
 						name: "triggerField",
 						value: "",

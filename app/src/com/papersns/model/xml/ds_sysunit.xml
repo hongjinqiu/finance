@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>SysUnit</id>
+	<displayName>系统店铺</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName>SysUnit</collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="code" extends="CODE_FIELD"><!-- sid -->
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="name" extends="NAME_FIELD"><!-- name -->
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+<!-- 
+'_id':#mongoDB 递增ID，deptId
+'id':#与_id相同，冗余字段，方便在django template上显示，template上不能用_id
+'name': #商家名称
+'user_id': #管理员id,关联的SysUser的id
+'user_nick': #管理员nick,关联的SysUser的nick
+'sid': #淘宝中的字段,
+'cid': #淘宝中的字段,
+'evaluationCount': #评价个数
+'tradeCount': #交易个数
+'createTime':#创建时间
+'eServicePermission': #店铺主管理员是否有E客服权限,0没有,1有
+'customerChatClassify_type': #聊天分类,默认为0,无分类,而用户可以进行自己进行修改,对应CustomerChatClassify中的type
+ -->
+			<field id="sysUserId" extends="INT_FIELD">
+				<displayName>管理员</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="sysUserNick" extends="STRING_FIELD">
+				<displayName>管理员nick</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="sid" extends="STRING_FIELD">
+				<displayName>sid</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="cid" extends="STRING_FIELD">
+				<displayName>卖家昵称</displayName>
+				<fieldLength>100</fieldLength>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="userNick" extends="STRING_FIELD">
+				<displayName>用户管理员nick</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<!-- <field id="evaluationCount" extends="STRING_FIELD">
+				<displayName>评价个数</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="eServicePermission" extends="STRING_FIELD">
+				<displayName>店铺主管理员是否有E客服权限(0没有,1有)</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field> -->
+		</bizField>
+	</masterData>
+</datasource>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.papersns.com/datasource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/datasource http://www.papersns.com/datasource ">
+	<id>SysStep</id>
+	<displayName>系统步骤</displayName>
+	<systemId>FINANCE</systemId>
+	<codeFieldName></codeFieldName>
+	<businessDateField></businessDateField>
+	<accountBookIdField></accountBookIdField>
+	<modelType>BASE</modelType>
+	<inUsedDenyEdit>false</inUsedDenyEdit>
+	<actionNameSpace></actionNameSpace>
+	<listUrl></listUrl>
+	<collectionName>SysStep</collectionName>
+	<billTypeField></billTypeField>
+	<billTypeParamDataSource></billTypeParamDataSource>
+	<hasCheckField></hasCheckField>
+	<listSortFields></listSortFields>
+	<masterData>
+		<id>A</id>
+		<displayName>主数据集</displayName>
+		<allowCopy>true</allowCopy>
+		<fixField>
+			<primaryKey id="id" extends="PRIMARY_KEY" />
+			<createBy id="createBy" extends="CREATE_BY" />
+			<createTime id="createTime" extends="CREATE_TIME" />
+			<createUnit id="createUnit" extends="CREATE_UNIT" />
+			<modifyBy id="modifyBy" extends="MODIFY_BY" />
+			<modifyUnit id="modifyUnit" extends="MODIFY_UNIT" />
+			<modifyTime id="modifyTime" extends="MODIFY_TIME" />
+			<attachCount id="attachCount" extends="ATTACH_COUNT" />
+			<remark id="remark" extends="REMARK" />
+		</fixField>
+		<bizField>
+			<field id="name" extends="STRING_FIELD">
+				<displayName>步骤名称</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="type" extends="INT_FIELD">
+				<displayName>步骤类型</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="status" extends="INT_FIELD">
+				<displayName>状态</displayName>
+				<dictionary>D_STEP_STATUS</dictionary>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="sysUserId" extends="INT_FIELD">
+				<displayName>关联的用户ID</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+			<field id="sysUnitId" extends="INT_FIELD">
+				<displayName>关联的店铺ID</displayName>
+				<fixReadOnly>true</fixReadOnly>
+			</field>
+		</bizField>
+	</masterData>
+</datasource>

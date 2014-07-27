@@ -6,7 +6,7 @@ function updateDetailB(accountingYearFormObj, numAccountingPeriodFormObj) {
 	var modelTemplateFactory = new ModelTemplateFactory();
 	var numAccountingPeriodIntValue = parseInt(g_masterFormFieldDict["numAccountingPeriod"].get("value"), 10);
 	var datas = [];
-	YUI(g_financeModule).use("finance-module", function(Y){
+	executeGYUI(function(Y){
 		var date = new Date();
 		for (var i = 0; i < numAccountingPeriodIntValue; i++) {
 			date.setYear(parseInt(accountingYearValue, 10));
@@ -89,7 +89,7 @@ var modelExtraInfo = {
 									date.setFullYear(parseInt(startDateValue.substring(0,4), 10));
 									date.setMonth(parseInt(startDateValue.substring(4,6), 10) - 1);
 									date.setDate(parseInt(startDateValue.substring(6,8), 10));
-									YUI(g_financeModule).use("finance-module", function(Y) {
+									executeGYUI(function(Y) {
 										date = Y.DataType.Date.addDays(date, 1);
 										var dateValue = Y.DataType.Date.format(date, {
 											format: "%Y%m%d"
@@ -133,23 +133,40 @@ function editAccountingDetail(dataSetId) {
 	}
 }
 
-function main() {
-	YUI(g_financeModule).use("finance-module", function(YNotUse){// 不能直接在父函数用use finance-module,会报错,因为在js父函数直接加载,其会直接使用调用
+function main(Y) {
 		if (g_id) {
-			ajaxRequest({
-				url: "/" + g_dataSourceJson.Id + "/GetData?format=json"
-				,params: {
-					"dataSourceModelId": g_dataSourceJson.Id,
-					"formTemplateId": g_formTemplateJsonData.Id,
-					"id": g_id
-				},
-				callback: function(o) {
-					var formManager = new FormManager();
-					formManager.applyGlobalParamFromAjaxData(o);
-					formManager.loadData2Form(g_dataSourceJson, o.bo);
-					formManager.setFormStatus(g_formStatus);
-				}
-			});
+			if (g_copyFlag == "true") {// 复制
+				ajaxRequest({
+					url: "/" + g_dataSourceJson.Id + "/CopyData?format=json"
+					,params: {
+						"dataSourceModelId": g_dataSourceJson.Id,
+						"formTemplateId": g_formTemplateJsonData.Id,
+						"id": g_id
+					},
+					callback: function(o) {
+						var formManager = new FormManager();
+						formManager.setDetailIncId(g_dataSourceJson, o.bo);
+						formManager.applyGlobalParamFromAjaxData(o);
+						formManager.loadData2Form(g_dataSourceJson, o.bo);
+						formManager.setFormStatus("edit");
+					}
+				});
+			} else {
+				ajaxRequest({
+					url: "/" + g_dataSourceJson.Id + "/GetData?format=json"
+					,params: {
+						"dataSourceModelId": g_dataSourceJson.Id,
+						"formTemplateId": g_formTemplateJsonData.Id,
+						"id": g_id
+					},
+					callback: function(o) {
+						var formManager = new FormManager();
+						formManager.applyGlobalParamFromAjaxData(o);
+						formManager.loadData2Form(g_dataSourceJson, o.bo);
+						formManager.setFormStatus(g_formStatus);
+					}
+				});
+			}
 		} else {
 			ajaxRequest({
 				url: "/" + g_dataSourceJson.Id + "/NewData?format=json"
@@ -165,5 +182,4 @@ function main() {
 				}
 			});
 		}
-	});
-}
+	}

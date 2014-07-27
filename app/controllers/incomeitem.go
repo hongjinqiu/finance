@@ -82,6 +82,7 @@ func (c IncomeItem) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }
 

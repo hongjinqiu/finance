@@ -38,5 +38,12 @@ def getSequenceLi():
     li.append({'_id': 'accountInOutItemId', 'c': 100})
     li.append({'_id': 'bbsPostId', 'c': 100})
     li.append({'_id': 'bbsPostReadId', 'c': 100})
+    li.append({'_id': 'accountInOutDisplayId', 'c': 100})
+    li.append({'_id': 'nullId', 'c': 100})
+    li.append({'_id': 'sysUserId', 'c': 100})
+    li.append({'_id': 'sysUnitId', 'c': 100})
+    li.append({'_id': 'sysStepId', 'c': 100})
+    li.append({'_id': 'lastSessionDataId', 'c': 100})
+    li.append({'_id': 'menuId', 'c': 100})
 
     return li

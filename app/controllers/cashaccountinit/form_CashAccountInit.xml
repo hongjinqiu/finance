@@ -6,6 +6,8 @@
 	<description>现金账户初始化表单</description>
 	<scripts>cashaccountinit/cashAccountInitModel.js</scripts>
 	<view-template view="Console/FormSchema.html" />
+	<security byUnit="true"/>
+	
 	<toolbar>
 		<!-- <button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=CashAccountInit" iconCls="test"></button> -->
 		<!-- <button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button> -->
@@ -35,7 +37,7 @@
 			<td width="20%" colspan="1">
 				<div id="A_accountId_render"></div>
 				<script type="text/javascript">
-				YUI(g_financeModule).use("finance-module", function(Y) {
+				g_yuiCommondLi.push(function(Y) {
 					var formFieldFactory = new FormFieldFactory();
 					var field = formFieldFactory.getFormField(Y, 'accountId', 'A');
 					field.render("#A_accountId_render");
@@ -50,7 +52,7 @@
 			</td>
 		]]></html>
 	</column-model>
-
+	
 	<column-model dataSetId="B">
 		<toolbar>
 			<button name="selectRowBtn" text="选择" mode="fn" handler="g_selectRow" iconCls="yui3-button btn-show">

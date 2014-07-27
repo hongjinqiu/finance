@@ -6,6 +6,8 @@
 	<description>ActionTest表单</description>
 	<scripts>actiontest/actionTestModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
+	<security byUnit="true"/>
+	
 	<toolbar>
 		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=ActionTest" iconCls="test"></button>
 		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>

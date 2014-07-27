@@ -261,6 +261,9 @@ func (o CommonMethod) applyColumnExtend(fieldGroup FieldGroup, column *Column) {
 	} else if column.XMLName.Local == "string-column" {
 		// do nothing
 	} else if column.XMLName.Local == "number-column" {
+		if column.CurrencyField == "" {
+			column.CurrencyField = fieldGroup.FormatExpr
+		}
 		if strings.ToLower(fieldGroup.FieldNumberType) == strings.ToLower("MONEY") {
 			if column.IsMoney == "" {
 				column.IsMoney = "true"

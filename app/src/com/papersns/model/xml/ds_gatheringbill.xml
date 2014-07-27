@@ -168,7 +168,7 @@
 						<jsRelationExpr mode="js">data["chamberlainType"] == "3"</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
+						<displayField>code,nick</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 					<relationItem name="Null">
@@ -199,7 +199,7 @@
 						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
+						<displayField>code,nick</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>
@@ -223,7 +223,7 @@
 			<field id="currencyTypeId" extends="INT_FIELD">
 				<displayName>币别</displayName>
 				<allowEmpty>false</allowEmpty>
-				<defaultValueExpr>1</defaultValueExpr>
+				<!-- <defaultValueExpr>1</defaultValueExpr> -->
 				<fixReadOnly>true</fixReadOnly>
 				<relationDS>
 					<relationItem name="CurrencyType">
@@ -253,25 +253,27 @@
 				<limitMax>100</limitMax>
 				<defaultValueExpr>1</defaultValueExpr>
 			</field>
-			<field id="amtGathering" extends="FLOAT_FIELD">
+			<field id="amtGathering" extends="AMOUNT_FIELD">
 				<displayName>收款金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
-			<field id="amtAgainst" extends="FLOAT_FIELD">
+			<field id="amtAgainst" extends="AMOUNT_FIELD">
 				<displayName>已冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>currencyTypeId</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
-			<field id="amtNotAgainst" extends="FLOAT_FIELD">
+			<field id="amtNotAgainst" extends="AMOUNT_FIELD">
 				<displayName>未冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
@@ -392,7 +394,7 @@
 					</relationItem>
 				</relationDS>
 			</field>
-			<field id="amtFee" extends="FLOAT_FIELD">
+			<field id="amtFee" extends="AMOUNT_FIELD">
 				<displayName>费用金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>false</allowCopy>

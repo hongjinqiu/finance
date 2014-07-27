@@ -2,8 +2,11 @@ package interceptor
 
 import (
 	"com/papersns/mongo"
+	"encoding/json"
+	"fmt"
 	"labix.org/v2/mgo"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -20,9 +23,42 @@ func init() {
 	interceptorDict[reflect.TypeOf(AccountInOutItemInterceptor{}).Name()] = reflect.TypeOf(AccountInOutItemInterceptor{})
 	interceptorDict[reflect.TypeOf(BbsPostReplyInterceptor{}).Name()] = reflect.TypeOf(BbsPostReplyInterceptor{})
 	interceptorDict[reflect.TypeOf(BbsPostInterceptor{}).Name()] = reflect.TypeOf(BbsPostInterceptor{})
+	interceptorDict[reflect.TypeOf(BbsPostAdminInterceptor{}).Name()] = reflect.TypeOf(BbsPostAdminInterceptor{})
 }
 
 type InterceptorCommon struct{}
+
+func (qb InterceptorCommon) GetCreateUnitByUserId(session *mgo.Session, userId int) int {
+	collectionName := "SysUser"
+	query := map[string]interface{}{
+		"_id": userId,
+	}
+	sysUser := qb.FindByMapWithSessionExact(session, collectionName, query)
+	return qb.GetCreateUnitFromSysUser(sysUser)
+}
+
+func (qb InterceptorCommon) GetCreateUnitFromSysUser(sysUser map[string]interface{}) int {
+	master := sysUser["A"].(map[string]interface{})
+	createUnit, err := strconv.Atoi(fmt.Sprint(master["createUnit"]))
+	if err != nil {
+		panic(err)
+	}
+	return createUnit
+}
+
+func (qb InterceptorCommon) FindByMapWithSessionExact(session *mgo.Session, collection string, query map[string]interface{}) map[string]interface{} {
+	result, found := qb.FindByMapWithSession(session, collection, query)
+	if !found {
+		queryByte, err := json.MarshalIndent(&query, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		panic("not found, query is:" + string(queryByte))
+	}
+	return result
+}
+/*
+*/
 
 func (o InterceptorCommon) FindByMapWithSession(session *mgo.Session, collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
 	mongoDBFactory := mongo.GetInstance()

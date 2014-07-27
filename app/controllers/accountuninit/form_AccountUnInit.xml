@@ -7,6 +7,8 @@
 	<scripts>accountuninit/accountUnInitModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
 	
+	<security byUnit="true"/>
+	
 	<column-model dataSetId="A" colSpan="1">
 		<id-column name="id" text="编号" hideable="true" />
 		

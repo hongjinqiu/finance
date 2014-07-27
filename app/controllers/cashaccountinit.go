@@ -3,6 +3,7 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	. "com/papersns/accountinout"
+	. "com/papersns/component"
 	. "com/papersns/error"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
@@ -18,7 +19,7 @@ type CashAccountInitSupport struct {
 	ActionSupport
 }
 
-func (c CashAccountInitSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+func (c CashAccountInitSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
 	for _, item := range *diffDateRowLi {
 		if item.SrcData != nil && item.DestData != nil { // 修改
 			// 旧数据反过账,新数据正过账
@@ -31,7 +32,7 @@ func (c CashAccountInitSupport) afterSaveData(sessionId int, dataSource DataSour
 	}
 }
 
-func (c CashAccountInitSupport) afterDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c CashAccountInitSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 反过账
 	data := (*bo)["A"].(map[string]interface{})
 	c.logCashAccount(sessionId, dataSource, data, DELETE)
@@ -67,10 +68,10 @@ func (c CashAccountInitSupport) logCashAccount(sessionId int, dataSource DataSou
 		panic(err)
 	}
 	accountInOutParam := AccountInOutParam{
-		AccountId:    accountId,
+		AccountId:      accountId,
 		CurrencyTypeId: currencyTypeId,
-		AmtIncrease:  fmt.Sprint(data["amtEarly"]),
-		DiffDataType: diffDataType,
+		AmtIncrease:    fmt.Sprint(data["amtEarly"]),
+		DiffDataType:   diffDataType,
 	}
 
 	accountInOutService := AccountInOutService{}
@@ -147,5 +148,6 @@ func (c CashAccountInit) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }

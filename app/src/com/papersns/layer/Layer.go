@@ -4,6 +4,7 @@ import (
 	"com/papersns/dictionary"
 	"labix.org/v2/mgo"
 	"com/papersns/mongo"
+	"com/papersns/global"
 )
 
 func GetInstance() LayerManager {
@@ -18,15 +19,18 @@ func (o LayerManager) GetLayer(code string) map[string]interface{} {
 	session, db := connectionFactory.GetConnection()
 	defer session.Close()
 
-	return o.GetLayerBySession(db, code)
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	
+	return o.GetLayerBySession(sessionId, db, code)
 }
 
-func (o LayerManager) GetLayerBySession(db *mgo.Database, code string) map[string]interface{} {
+func (o LayerManager) GetLayerBySession(sessionId int, db *mgo.Database, code string) map[string]interface{} {
 	dictionaryManager := dictionary.GetInstance()
 	result := dictionaryManager.GetDictionaryBySession(db, code)
 	if result == nil {
 		programDictionaryManager := dictionary.GetProgramDictionaryInstance()
-		result = programDictionaryManager.GetProgramDictionaryBySession(db, code)
+		result = programDictionaryManager.GetProgramDictionaryBySession(sessionId, db, code)
 	}
 	return result
 }

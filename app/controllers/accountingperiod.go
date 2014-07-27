@@ -19,7 +19,7 @@ type AccountingPeriodSupport struct {
 	ActionSupport
 }
 
-func (o AccountingPeriodSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (o AccountingPeriodSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	masterData := (*bo)["A"].(map[string]interface{})
 
 	year := time.Now().Year()
@@ -85,24 +85,29 @@ func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result
 		firstStartDate := commonUtil.GetIntFromMap(firstLineData, "startDate")
 		lastEndDate := commonUtil.GetIntFromMap(lastLineData, "endDate")
 
+		qb := QuerySupport{}
+		//GatheringBill,PayBill
+		sessionId := global.GetSessionId()
+		global.SetGlobalAttr(sessionId, "userId", fmt.Sprint(modelRenderVO.UserId))
+		defer global.CloseSession(sessionId)
+		session, _ := global.GetConnection(sessionId)
+
 		queryMap := map[string]interface{}{
 			"A.billDate": map[string]interface{}{
 				"$gte": firstStartDate,
 				"$lt":  lastEndDate,
 			},
 		}
+		permissionSupport := PermissionSupport{}
+		permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, modelRenderVO.FormTemplate.Security)
+		for k, v := range permissionQueryDict {
+			queryMap[k] = v
+		}
 
-		qb := QuerySupport{}
-		//GatheringBill,PayBill
-		sessionId := global.GetSessionId()
-		defer global.CloseSession(sessionId)
-		session, _ := global.GetConnection(sessionId)
 		dataSourceIdLi := []string{"GatheringBill", "PayBill"}
 		for _, dataSourceId := range dataSourceIdLi {
 			tmpDataSource := modelTemplateFactory.GetDataSource(dataSourceId)
 			collectionName := modelTemplateFactory.GetCollectionName(tmpDataSource)
-			// TODO
-			//			func (qb QuerySupport) FindByMapWithSession(session *mgo.Session, collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
 			_, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 			if found {
 				// 主数据集设置被用标记
@@ -145,6 +150,7 @@ func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result
 			//"dataSource": dataSource,
 		})
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }
 
@@ -214,5 +220,6 @@ func (c AccountingPeriod) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }

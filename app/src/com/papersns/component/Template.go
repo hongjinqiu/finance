@@ -32,6 +32,7 @@ type FormTemplate struct {
 	Description       string       `xml:"description"`
 	Scripts           template.URL `xml:"scripts"`
 	ViewTemplate      ViewTemplate `xml:"view-template"`
+	Security          Security     `xml:"security"`
 	FormElemLi        []FormElem   `xml:",any"`
 }
 
@@ -93,6 +94,8 @@ type ToolbarCommon struct {
 type Security struct {
 	XMLName xml.Name `xml:"security"`
 
+	ByUnit                string `xml:"byUnit,attr,omitempty"`
+	ByAdmin               string `xml:"byAdmin,attr,omitempty"`
 	FunctionId            string `xml:"functionId,attr,omitempty"`
 	Override              string `xml:"override,attr,omitempty"`
 	DEFAULT_RESOURCE_CODE string `xml:"DEFAULT_RESOURCE_CODE,attr,omitempty"`
@@ -243,8 +246,8 @@ type Column struct {
 	IsPercent     string `xml:"isPercent,attr,omitempty"`     // 是否百分比
 	IsQuantity    string `xml:"isQuantity,attr,omitempty"`    // 是否数量
 
-	Script    string `xml:"script,attr,omitempty"`
-	ForEditor string `xml:"forEditor,attr,omitempty"`
+	Script string `xml:"script,attr,omitempty"`
+	UseIn  string `xml:"use-in,attr,omitempty"`
 
 	// select-column的内容
 	//	DisplayField  string `xml:"displayField,attr,omitempty"`
@@ -417,4 +420,5 @@ type ButtonAttributeGroup struct {
 	Rowspan    string      `xml:"rowspan,attr,omitempty"`
 	Handler    template.JS `xml:"handler,attr,omitempty"`
 	Mode       string      `xml:"mode,attr,omitempty"`
+	UseIn      string      `xml:"use-in,attr,omitempty"`
 }

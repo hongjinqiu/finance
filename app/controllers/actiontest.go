@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/component"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"strings"
@@ -14,14 +15,13 @@ type ActionTestSupport struct {
 	ActionSupport
 }
 
-func (c ActionTestSupport) beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c ActionTestSupport) beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	println("ActionTestSupport beforeSaveData")
 }
 
-func (c ActionTestSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+func (c ActionTestSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
 	println("ActionTestSupport afterSaveData")
 }
-
 
 type ActionTest struct {
 	BillAction
@@ -35,7 +35,7 @@ func (c ActionTest) SaveData() revel.Result {
 
 func (c ActionTest) DeleteData() revel.Result {
 	c.actionSupport = ActionTestSupport{}
-	
+
 	modelRenderVO := c.deleteDataCommon()
 	return c.renderCommon(modelRenderVO)
 }
@@ -93,6 +93,7 @@ func (c ActionTest) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }
 

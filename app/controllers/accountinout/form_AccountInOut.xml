@@ -7,6 +7,8 @@
 	<scripts>accountinout/accountInOutModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
 	
+	<security byUnit="true"/>
+	
 	<column-model dataSetId="A" colSpan="4">
 		<id-column name="id" hideable="true"/>
 		<auto-column name="queryMode" hideable="true" ></auto-column>
@@ -39,7 +41,7 @@
 							<td>
 								<div id="A_billDateBegin_render"></div>
 								<script type="text/javascript">
-								YUI(g_financeModule).use("finance-module", function(Y) {
+								g_yuiCommondLi.push(function(Y) {
 									var formFieldFactory = new FormFieldFactory();
 									var field = formFieldFactory.getFormField(Y, 'billDateBegin', 'A');
 									field.render("#A_billDateBegin_render");
@@ -52,7 +54,7 @@
 							<td>
 								<div id="A_billDateEnd_render"></div>
 								<script type="text/javascript">
-								YUI(g_financeModule).use("finance-module", function(Y) {
+								g_yuiCommondLi.push(function(Y) {
 									var formFieldFactory = new FormFieldFactory();
 									var field = formFieldFactory.getFormField(Y, 'billDateEnd', 'A');
 									field.render("#A_billDateEnd_render");
@@ -87,7 +89,7 @@
 							<td>
 								<div id="A_accountingYearStart_render"></div>
 								<script type="text/javascript">
-								YUI(g_financeModule).use("finance-module", function(Y) {
+								g_yuiCommondLi.push(function(Y) {
 									var formFieldFactory = new FormFieldFactory();
 									var field = formFieldFactory.getFormField(Y, 'accountingYearStart', 'A');
 									field.render("#A_accountingYearStart_render");
@@ -100,7 +102,7 @@
 							<td>
 								<div id="A_accountingPeriodStart_render"></div>
 								<script type="text/javascript">
-								YUI(g_financeModule).use("finance-module", function(Y) {
+								g_yuiCommondLi.push(function(Y) {
 									var formFieldFactory = new FormFieldFactory();
 									var field = formFieldFactory.getFormField(Y, 'accountingPeriodStart', 'A');
 									field.render("#A_accountingPeriodStart_render");
@@ -114,7 +116,7 @@
 							<td>
 								<div id="A_accountingYearEnd_render"></div>
 								<script type="text/javascript">
-								YUI(g_financeModule).use("finance-module", function(Y) {
+								g_yuiCommondLi.push(function(Y) {
 									var formFieldFactory = new FormFieldFactory();
 									var field = formFieldFactory.getFormField(Y, 'accountingYearEnd', 'A');
 									field.render("#A_accountingYearEnd_render");
@@ -127,7 +129,7 @@
 							<td>
 								<div id="A_accountingPeriodEnd_render"></div>
 								<script type="text/javascript">
-								YUI(g_financeModule).use("finance-module", function(Y) {
+								g_yuiCommondLi.push(function(Y) {
 									var formFieldFactory = new FormFieldFactory();
 									var field = formFieldFactory.getFormField(Y, 'accountingPeriodEnd', 'A');
 									field.render("#A_accountingPeriodEnd_render");

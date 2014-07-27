@@ -127,7 +127,7 @@ FormManager.prototype.initializeAttr = function(formObj, Y) {
  */
 FormManager.prototype.updateAllFieldAttr4GlobalParam = function() {
 	var self = this;
-	YUI(g_financeModule).use("finance-module", function(Y){
+	executeGYUI(function(Y){
 		for (var key in g_masterFormFieldDict) {
 			var formObj = g_masterFormFieldDict[key];
 			self.updateSingleFieldAttr4GlobalParam(formObj, Y);

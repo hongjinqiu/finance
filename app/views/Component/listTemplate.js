@@ -82,8 +82,7 @@ function applyDateLocale(Y) {
 	}
 }
 
-function createGridWithUrl(url) {
-	YUI(g_financeModule).use("finance-module", function(Y){
+function createGridWithUrl(Y, url, config) {
 		//applyDateLocale(Y);
 		yInst = Y;
 		var dataTableManager = new DataTableManager();
@@ -104,23 +103,24 @@ function createGridWithUrl(url) {
 				paginatorContainer : '#pagContC',
 				paginatorTemplate : '#tmpl-bar'
 		};
+		if (config && config.columnManager) {
+			param.columnManager = config.columnManager;
+		}
 		dtInst = dataTableManager.createDataGrid(yInst, param);
 		g_gridPanelDict[columnModelName] = dtInst;
 		var queryParameterManager = new QueryParameterManager();
-		queryParameterManager.applyQueryDefaultValue();
-		queryParameterManager.applyFormData();
+		queryParameterManager.applyQueryDefaultValue(Y);
+		queryParameterManager.applyFormData(Y);
 		queryParameterManager.applyObserveEventBehavior();
-		applyQueryBtnBehavior();
-	});
+		applyQueryBtnBehavior(Y);
 }
 
-function listMain() {
+function listMain(Y) {
 	var url = "/console/listschema?@name=" + listTemplate.Id + "&format=json";
-	createGridWithUrl(url);
+	createGridWithUrl(Y, url);
 }
 
-function applyQueryBtnBehavior() {
-	YUI(g_financeModule).use("finance-module", function(Y){
+function applyQueryBtnBehavior(Y) {
 		if (Y.one("#queryBtn")) {
 			Y.one("#queryBtn").on("click", function(e){
 				var pagModel = dtInst.dt.get('paginator').get('model');
@@ -172,8 +172,7 @@ $("#btn_more").click(function(){
 			});
 			Y.one("#queryReset").on("click", function(e){
 				var queryParameterManager = new QueryParameterManager();
-				queryParameterManager.applyQueryDefaultValue();
+				queryParameterManager.applyQueryDefaultValue(Y);
 			});
 		}
-	});
 }

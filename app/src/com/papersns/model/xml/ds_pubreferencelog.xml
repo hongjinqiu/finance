@@ -146,7 +146,7 @@
 						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "SysUser"</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
+						<displayField>code,nick</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 					<relationItem name="TaxType">

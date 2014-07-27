@@ -222,7 +222,7 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     initializer: function() {
     	Y.RDateField.superclass.initializer.apply(this, arguments);
     	
-    },
+    }
 
 },
 {

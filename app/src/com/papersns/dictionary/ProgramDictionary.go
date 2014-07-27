@@ -2,10 +2,12 @@ package dictionary
 
 import (
 	"com/papersns/mongo"
+	"com/papersns/global"
 	"fmt"
 	"strconv"
 	"sort"
 	"labix.org/v2/mgo"
+	"encoding/json"
 )
 
 func GetProgramDictionaryInstance() ProgramDictionaryManager {
@@ -56,37 +58,48 @@ func (o ProgramDictionaryManager) GetProgramDictionary(code string) map[string]i
 	session, db := mongoDBFactory.GetConnection()
 	defer session.Close()
 	
-	return o.GetProgramDictionaryBySession(db, code)
+	sessionId := global.GetSessionId()
+	defer global.CloseSession(sessionId)
+	
+	return o.GetProgramDictionaryBySession(sessionId, db, code)
 }
 
-func (o ProgramDictionaryManager) GetProgramDictionaryBySession(db *mgo.Database, code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetProgramDictionaryBySession(sessionId int, db *mgo.Database, code string) map[string]interface{} {
 	if code == "SYSUSER_TREE" {
-		return o.GetSysUserProgramDictionary(db, code)
+		return o.GetSysUserProgramDictionary(sessionId, db, code)
 	}
 	if code == "ACCOUNTING_YEAR_START_TREE" {// 会计期年度开始
-		return o.GetAccountingYearStartProgramDictionary(db, code)
+		return o.GetAccountingYearStartProgramDictionary(sessionId, db, code)
 	}
 	if code == "ACCOUNTING_YEAR_END_TREE" {// 会计期年度结束
-		return o.GetAccountingYearEndProgramDictionary(db, code)
+		return o.GetAccountingYearEndProgramDictionary(sessionId, db, code)
 	}
 	if code == "ACCOUNTING_PERIOD_START_TREE" {// 会计期期间开始
-		return o.GetAccountingPeriodStartProgramDictionary(db, code)
+		return o.GetAccountingPeriodStartProgramDictionary(sessionId, db, code)
 	}
 	if code == "ACCOUNTING_PERIOD_END_TREE" {// 会计期期间结束
-		return o.GetAccountingPeriodEndProgramDictionary(db, code)
+		return o.GetAccountingPeriodEndProgramDictionary(sessionId, db, code)
 	}
 	
 	return nil
 }
 
-func (o ProgramDictionaryManager) GetAccountingYearStartProgramDictionary(db *mgo.Database, code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetAccountingYearStartProgramDictionary(sessionId int, db *mgo.Database, code string) map[string]interface{} {
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
 	collection := "AccountingPeriod"
 	c := db.C(collection)
 	
-	queryMap := map[string]interface{}{}
+	session, _ := global.GetConnection(sessionId)
+	queryMap := map[string]interface{}{
+		"A.createUnit": o.GetCreateUnitByUserId(session, userId),
+	}
 	
 	itemResult := []map[string]interface{}{}
-	err := c.Find(queryMap).All(&itemResult)
+	err = c.Find(queryMap).All(&itemResult)
 	if err != nil {
 		panic(err)
 	}
@@ -109,18 +122,26 @@ func (o ProgramDictionaryManager) GetAccountingYearStartProgramDictionary(db *mg
 	return result
 }
 
-func (o ProgramDictionaryManager) GetAccountingYearEndProgramDictionary(db *mgo.Database, code string) map[string]interface{} {
-	return o.GetAccountingYearStartProgramDictionary(db, code)
+func (o ProgramDictionaryManager) GetAccountingYearEndProgramDictionary(sessionId int, db *mgo.Database, code string) map[string]interface{} {
+	return o.GetAccountingYearStartProgramDictionary(sessionId, db, code)
 }
 
-func (o ProgramDictionaryManager) GetAccountingPeriodStartProgramDictionary(db *mgo.Database, code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetAccountingPeriodStartProgramDictionary(sessionId int, db *mgo.Database, code string) map[string]interface{} {
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
 	collection := "AccountingPeriod"
 	c := db.C(collection)
 	
-	queryMap := map[string]interface{}{}
+	session, _ := global.GetConnection(sessionId)
+	queryMap := map[string]interface{}{
+		"A.createUnit": o.GetCreateUnitByUserId(session, userId),
+	}
 	
 	itemResult := []map[string]interface{}{}
-	err := c.Find(queryMap).All(&itemResult)
+	err = c.Find(queryMap).All(&itemResult)
 	if err != nil {
 		panic(err)
 	}
@@ -156,18 +177,26 @@ func (o ProgramDictionaryManager) GetAccountingPeriodStartProgramDictionary(db *
 	return result
 }
 
-func (o ProgramDictionaryManager) GetAccountingPeriodEndProgramDictionary(db *mgo.Database, code string) map[string]interface{} {
-	return o.GetAccountingPeriodStartProgramDictionary(db, code)
+func (o ProgramDictionaryManager) GetAccountingPeriodEndProgramDictionary(sessionId int, db *mgo.Database, code string) map[string]interface{} {
+	return o.GetAccountingPeriodStartProgramDictionary(sessionId, db, code)
 }
 
-func (o ProgramDictionaryManager) GetSysUserProgramDictionary(db *mgo.Database, code string) map[string]interface{} {
+func (o ProgramDictionaryManager) GetSysUserProgramDictionary(sessionId int, db *mgo.Database, code string) map[string]interface{} {
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
 	collection := "SysUser"
 	c := db.C(collection)
 	
-	queryMap := map[string]interface{}{}
+	session, _ := global.GetConnection(sessionId)
+	queryMap := map[string]interface{}{
+		"A.createUnit": o.GetCreateUnitByUserId(session, userId),
+	}
 	
 	sysUserResult := []map[string]interface{}{}
-	err := c.Find(queryMap).Limit(10).All(&sysUserResult)
+	err = c.Find(queryMap).Limit(10).All(&sysUserResult)
 	if err != nil {
 		panic(err)
 	}
@@ -207,4 +236,50 @@ func (o ProgramDictionaryManager) sortProgramDictionary(programDictionary *map[s
 			o.sortProgramDictionary(&(itemsMapLi[i]))
 		}
 	}
+}
+
+func (qb ProgramDictionaryManager) GetCreateUnitByUserId(session *mgo.Session, userId int) int {
+	collectionName := "SysUser"
+	query := map[string]interface{}{
+		"_id": userId,
+	}
+	sysUser := qb.FindByMapWithSessionExact(session, collectionName, query)
+	return qb.GetCreateUnitFromSysUser(sysUser)
+}
+
+func (qb ProgramDictionaryManager) GetCreateUnitFromSysUser(sysUser map[string]interface{}) int {
+	master := sysUser["A"].(map[string]interface{})
+	createUnit, err := strconv.Atoi(fmt.Sprint(master["createUnit"]))
+	if err != nil {
+		panic(err)
+	}
+	return createUnit
+}
+
+func (qb ProgramDictionaryManager) FindByMapWithSessionExact(session *mgo.Session, collection string, query map[string]interface{}) map[string]interface{} {
+	result, found := qb.FindByMapWithSession(session, collection, query)
+	if !found {
+		queryByte, err := json.MarshalIndent(&query, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		panic("not found, query is:" + string(queryByte))
+	}
+	return result
+}
+/*
+*/
+
+func (qb ProgramDictionaryManager) FindByMapWithSession(session *mgo.Session, collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
+	mongoDBFactory := mongo.GetInstance()
+	db := mongoDBFactory.GetDatabase(session)
+	c := db.C(collection)
+
+	result = make(map[string]interface{})
+	err := c.Find(query).One(&result)
+	if err != nil {
+		return result, false
+	}
+
+	return result, true
 }

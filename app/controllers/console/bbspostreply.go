@@ -17,9 +17,13 @@ import (
 	"time"
 )
 
-func (c Console) BbsPostReplySchema() revel.Result {
+// 管理员查看页面,设置session.userId,以查看数据,
+func (c Console) BbsPostAdminReplySchema() revel.Result {
+	// 取一下bbsPostId
+
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
 
@@ -36,7 +40,7 @@ func (c Console) BbsPostReplySchema() revel.Result {
 	}
 	c.addOrUpdateBbsPostRead(sessionId, bbsPostId)
 	c.commitTxn(sessionId)
-	
+
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		callback := c.Params.Get("callback")
@@ -49,6 +53,47 @@ func (c Console) BbsPostReplySchema() revel.Result {
 		c.Response.ContentType = "text/javascript; charset=utf-8"
 		return c.RenderText(callback + "(" + dataBoText + ");")
 	} else {
+		//c.Response.ContentType = "text/html; charset=utf-8"
+		c.RenderArgs["result"] = result
+		return c.RenderTemplate(listTemplate.ViewTemplate.View)
+		//		return c.Render(result)
+	}
+}
+
+func (c Console) BbsPostReplySchema() revel.Result {
+	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
+	defer global.CloseSession(sessionId)
+	defer c.rollbackTxn(sessionId)
+
+	schemaName := c.Params.Get("@name")
+
+	templateManager := TemplateManager{}
+	listTemplate := templateManager.GetListTemplate(schemaName)
+
+	result := c.listSelectorCommon(&listTemplate, true)
+	bbsPostIdStr := c.Params.Get("bbsPostId")
+	bbsPostId, err := strconv.Atoi(bbsPostIdStr)
+	if err != nil {
+		panic(err)
+	}
+	c.addOrUpdateBbsPostRead(sessionId, bbsPostId)
+	c.commitTxn(sessionId)
+
+	format := c.Params.Get("format")
+	if strings.ToLower(format) == "json" {
+		callback := c.Params.Get("callback")
+		if callback == "" {
+			dataBo := result["dataBo"]
+			c.Response.ContentType = "application/json; charset=utf-8"
+			return c.RenderJson(&dataBo)
+		}
+		dataBoText := result["dataBoText"].(string)
+		c.Response.ContentType = "text/javascript; charset=utf-8"
+		return c.RenderText(callback + "(" + dataBoText + ");")
+	} else {
+		//c.Response.ContentType = "text/html; charset=utf-8"
 		c.RenderArgs["result"] = result
 		return c.RenderTemplate(listTemplate.ViewTemplate.View)
 		//		return c.Render(result)
@@ -91,12 +136,8 @@ func (c Console) addOrUpdateBbsPostRead(sessionId int, bbsPostId int) {
 	qb := QuerySupport{}
 
 	bbsPostRead, found := qb.FindByMapWithSession(session, "BbsPostRead", map[string]interface{}{
-		"A.bbsPostId": bbsPostId,
-		"A.readBy":    userId,
-	})
-	fmt.Print("update query is:", map[string]interface{}{
-		"A.bbsPostId": bbsPostId,
-		"A.readBy":    userId,
+		"A.bbsPostId":  bbsPostId,
+		"A.readBy":     userId,
 	})
 	if found {
 		c.setModifyFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
@@ -192,6 +233,7 @@ func (c Console) setModifyFixFieldValue(sessionId int, dataSource DataSource, bo
 	srcBo := map[string]interface{}{}
 	srcQuery := map[string]interface{}{
 		"_id": (*bo)["id"],
+		"A.createUnit": sysUserMaster["createUnit"],
 	}
 	// log
 	modelTemplateFactory := ModelTemplateFactory{}

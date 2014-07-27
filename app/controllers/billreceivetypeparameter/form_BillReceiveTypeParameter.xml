@@ -6,6 +6,8 @@
 	<description>收款单类型参数表单</description>
 	<scripts>billreceivetypeparameter/billReceiveTypeParameterModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
+	<security byUnit="true"/>
+	
 	<toolbar>
 		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=BillTypeParameter" iconCls="test"></button>
 		<!-- <button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button> -->
@@ -66,7 +68,7 @@
 				</div>
 			</div>
 			<script type="text/javascript">
-			YUI(g_financeModule).use("finance-module", function(Y) {
+			g_yuiCommondLi.push(function(Y) {
 				var tabview = new Y.TabView({srcNode:'#tabContent'});
 				tabview.render();
 				Y.one("#tabContent").setStyle("visibility", "visible");

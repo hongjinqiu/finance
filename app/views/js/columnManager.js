@@ -53,7 +53,11 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 		}
 
 		if (prefix !== null) {
-			return yInst.DataType.Number.format(o.value, {
+			var value = o.value;
+			if (typeof(o.value) == "string") {
+				value = parseFloat(value);
+			}
+			return yInst.DataType.Number.format(value, {
 				prefix : prefix,
 				decimalPlaces : decimalPlaces,
 				decimalSeparator : ".",
@@ -68,7 +72,11 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 			}
 		}
 	} else if (o.column.isPercent == "true") {// 本位币
-		return yInst.DataType.Number.format(o.value, {
+		var value = o.value;
+		if (typeof(o.value) == "string") {
+			value = parseFloat(value);
+		}
+		return yInst.DataType.Number.format(value, {
 			prefix : "",
 			decimalPlaces : sysParam["percentDecimalPlaces"],
 			decimalSeparator : ".",
@@ -76,7 +84,11 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 			suffix : "%"
 		});
 	}
-	return yInst.DataType.Number.format(o.value, {
+	var value = o.value;
+	if (typeof(o.value) == "string") {
+		value = parseFloat(value);
+	}
+	return yInst.DataType.Number.format(value, {
 		//    	prefix            : o.column.prefix     || '￥',
 		//		decimalPlaces     : o.column.decimalPlaces      || 2,
 		//		decimalSeparator  : o.column.decimalSeparator   || '.',
@@ -149,6 +161,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 			formatter:      function(virtualColumn){
 				return function(o){
 					var htmlLi = [];
+//					htmlLi.push("<div class='btnWrapper_" + virtualColumn.Name + "'>");
 					var buttonBoLi = null;
 					if (o.value) {
 						buttonBoLi = o.value[virtualColumn.Buttons.XMLName.Local];
@@ -159,6 +172,8 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 							btnTemplate = "<input type='button' value='{value}' onclick='doVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
 						} else if (virtualColumn.Buttons.ButtonLi[j].Mode == "url") {
 							btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
+						} else if (virtualColumn.Buttons.ButtonLi[j].Mode == "url!") {
+							btnTemplate = "<input type='button' value='{value}' onclick='openTabOrJump(\"{href}\")' class='{class}' />";
 						} else {
 							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
 						}
@@ -194,6 +209,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 							 */
 						}
 					}
+//					htmlLi.push("</div>");
 					return htmlLi.join("");
 				}
 			}(virtualColumn)
@@ -505,7 +521,7 @@ ColumnManager.prototype.createColumn = function(columnConfig) {
 	return null;
 }
 
-ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
+ColumnManager.prototype._getColumnsCommon = function(columnModelName, columnModel, Y, virtualColumnMatchFunc) {
 	var self = this;
 	self.yInst = Y;
 	var columns = [];
@@ -527,19 +543,22 @@ ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
 		if (column) {
 			columns.push(column);
 		} else {
-			if (columnModel.ColumnLi[i].ForEditor != "true") {
+			if (virtualColumnMatchFunc(columnModel.ColumnLi[i])) {
 				var virtualColumn = self.createVirtualColumn(columnModelName, columnModel, i);
 				if (virtualColumn) {
 					columns.push(virtualColumn);
 				}
 			}
 		}
-//		if (i == 2) {
-//			console.log(column);
-//			break;
-//		}
 	}
 	return columns;
+}
+
+ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
+	var self = this;
+	return self._getColumnsCommon(columnModelName, columnModel, Y, function(column){
+		return column.UseIn == "" || column.UseIn == "list";
+	});
 }
 
 

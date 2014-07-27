@@ -17,10 +17,32 @@ type CashAccountSupport struct {
 	ActionSupport
 }
 
+func (o CashAccountSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+	masterData := (*bo)["A"].(map[string]interface{})
+	(*bo)["A"] = masterData
+	
+	session, _ := global.GetConnection(sessionId)
+	qb := QuerySupport{}
+	query := map[string]interface{}{
+		"A.code": "RMB",
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		query[k] = v
+	}
+	
+	collectionName := "CurrencyType"
+	result, found := qb.FindByMapWithSession(session, collectionName, query)
+	if found {
+		masterData["currencyTypeId"] = result["id"]
+	}
+}
+
 /**
 * 为避免并发问题,重设amtOriginalCurrencyBalance为数据库中值
  */
-func (o CashAccountSupport) beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (o CashAccountSupport) beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	session, _ := global.GetConnection(sessionId)
 	modelTemplateFactory := ModelTemplateFactory{}
 	strId := modelTemplateFactory.GetStrId(*bo)
@@ -29,10 +51,16 @@ func (o CashAccountSupport) beforeSaveData(sessionId int, dataSource DataSource,
 		if err != nil {
 			panic(err)
 		}
-		queryMap := map[string]interface{}{
-			"_id": id,
-		}
 		qb := QuerySupport{}
+		queryMap := map[string]interface{}{
+			"_id":          id,
+		}
+		permissionSupport := PermissionSupport{}
+		permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+		for k, v := range permissionQueryDict {
+			queryMap[k] = v
+		}
+		
 		collectionName := "CashAccount"
 		boInDb, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 		if !found {
@@ -119,5 +147,6 @@ func (c CashAccount) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }

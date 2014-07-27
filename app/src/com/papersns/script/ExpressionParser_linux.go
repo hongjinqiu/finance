@@ -1,83 +1,22 @@
 package script
 
+import "github.com/robfig/revel"
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/sbinet/go-python"
-	"strings"
 	"sync"
+	"fmt"
+//	"os"
+//	"os/exec"
+	"strings"
+	"log"
+	"regexp"
+//	"strconv"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 )
 
 var pyrwlock sync.RWMutex = sync.RWMutex{}
 var flag bool = false
-var expressionMod *python.PyObject = nil
-var componentMod *python.PyObject = nil
-
-func getExpressionMod() *python.PyObject {
-	pyrwlock.RLock()
-	defer pyrwlock.RUnlock()
-
-	return expressionMod
-}
-
-func getComponentMod() *python.PyObject {
-	pyrwlock.RLock()
-	defer pyrwlock.RUnlock()
-
-	return componentMod
-}
-
-func isEnvInit() bool {
-	pyrwlock.RLock()
-	defer pyrwlock.RUnlock()
-
-	return flag
-}
-
-func InitPythonEnv() {
-	pyrwlock.Lock()
-	defer pyrwlock.Unlock()
-
-	if flag {
-		return
-	}
-
-	err := python.Initialize()
-	if err != nil {
-		panic(err)
-	}
-
-	sys_path := python.PySys_GetObject("path")
-	if sys_path == nil {
-		panic("get sys.path return nil")
-	}
-
-	path := python.PyString_FromString("/home/hongjinqiu/goworkspace/src/finance/app/pyscript")
-	if path == nil {
-		panic("get path return nil")
-	}
-
-	err = python.PyList_Append(sys_path, path)
-	if err != nil {
-		panic(err)
-	}
-
-	expressionMod = python.PyImport_ImportModule("expression")
-	if expressionMod == nil {
-		panic("get module expression return null")
-	}
-
-	componentMod = python.PyImport_ImportModule("component")
-	if componentMod == nil {
-		panic("get module component return null")
-	}
-
-	flag = true
-}
-
-func exitEnv() {
-	python.Finalize()
-}
 
 type ExpressionParser struct{}
 
@@ -90,166 +29,253 @@ func (o ExpressionParser) ParseGolang(bo map[string]interface{}, data map[string
 }
 
 func (o ExpressionParser) Parse(recordJson, expression string) bool {
-	if recordJson == "" || expression == "" {
+	if expression == "" {
 		return true
 	}
-	methodName := "trueOrFalse"
-	execResult := o.parseExpression(methodName, []string{recordJson, expression})
-	return strings.ToLower(execResult) == "true"
+	if recordJson == "" {
+		recordJson = "{}"
+	}
+	
+	values := url.Values{}
+	values.Add("method", "parse")
+	values.Add("jsonString", recordJson)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("Parse(recordJson, expression string) bool")
+		log.Fatal("recordJson:" + recordJson)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result == "true"
+	
+	/*
+	os.Chdir("/goworkspace/src/finance/app/pyscript")
+	recordJson = strconv.QuoteToASCII(recordJson)
+	recordJson = recordJson[1:len(recordJson) - 1]
+	
+	expression = strconv.QuoteToASCII(expression)
+	expression = expression[1:len(expression) - 1]
+	
+	cmd := exec.Command("python", "expression.py", "trueOrFalse", recordJson, expression)
+	out, err := cmd.Output()
+	if err != nil {
+		log.Println("Parse(recordJson, expression string) bool")
+		log.Println("recordJson:" + recordJson)
+		log.Println("expression:" + expression)
+		panic(err)
+	}
+	result := strings.ToLower(string(out))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	return result == "true"
+	*/
 }
 
 func (o ExpressionParser) Validate(text, expression string) bool {
 	if text == "" || expression == "" {
 		return true
 	}
-	methodName := "validate"
-	execResult := o.parseExpression(methodName, []string{text, expression})
-	return strings.ToLower(execResult) == "true"
+	
+	values := url.Values{}
+	values.Add("method", "validate")
+	values.Add("jsonString", text)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("Validate(text, expression string) bool")
+		log.Fatal("text:" + text)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result == "true"
+	
+	/*
+	os.Chdir("/goworkspace/src/finance/app/pyscript")
+	text = strconv.QuoteToASCII(text)
+	text = text[1:len(text) - 1]
+	
+	expression = strconv.QuoteToASCII(expression)
+	expression = expression[1:len(expression) - 1]
+	
+	cmd := exec.Command("python", "expression.py", "validate", text, expression)
+	out, err := cmd.Output()
+	if err != nil {
+		log.Println("Validate(text, expression string) bool")
+		log.Println("text:" + text)
+		log.Println("expression:" + expression)
+		panic(err)
+	}
+	result := strings.ToLower(string(out))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	return result == "true"
+	*/
 }
 
 func (o ExpressionParser) ParseString(recordJson, expression string) string {
-	methodName := "parseString"
-	execResult := o.parseExpression(methodName, []string{recordJson, expression})
-	return execResult
+	if expression == "" {
+		return ""
+	}
+	if recordJson == "" {
+		recordJson = "{}"
+	}
+	
+	values := url.Values{}
+	values.Add("method", "parseString")
+	values.Add("jsonString", recordJson)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("ParseString(recordJson, expression string) string")
+		log.Fatal("recordJson:" + recordJson)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result
+	
+	/*
+	os.Chdir("/goworkspace/src/finance/app/pyscript")
+	recordJson = strconv.QuoteToASCII(recordJson)
+	recordJson = recordJson[1:len(recordJson) - 1]
+	
+	expression = strconv.QuoteToASCII(expression)
+	expression = expression[1:len(expression) - 1]
+	
+	cmd := exec.Command("python", "expression.py", "parseString", recordJson, expression)
+	out, err := cmd.Output()
+	if err != nil {
+		log.Println("ParseString(recordJson, expression string) string")
+		log.Println("recordJson:" + recordJson)
+		log.Println("expression:" + expression)
+		panic(err)
+	}
+	result := string(out)
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	return result
+	*/
 }
 
 func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string {
-	methodName := "parseModel"
-	return o.parseExpression(methodName, []string{boJson, dataJson, expression})
-}
-
-//func (o ExpressionParser) parseExpression(methodName, recordJson, expression string) string {
-func (o ExpressionParser) parseExpression(methodName string, param []string) string {
-	expression := param[len(param)-1 : len(param)][0]
-	if strings.TrimSpace(expression) == "" {
+	if expression == "" {
 		return ""
 	}
-	if !isEnvInit() {
-		InitPythonEnv()
+	if boJson == "" {
+		boJson = "{}"
 	}
+	if dataJson == "" {
+		dataJson = "{}"
+	}
+	
+	values := url.Values{}
+	values.Add("method", "parseModel")
+	values.Add("bo", boJson)
+	values.Add("data", dataJson)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("ParseString(recordJson, expression string) string")
+		log.Fatal("boJson:" + boJson)
+		log.Fatal("dataJson:" + dataJson)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result
+	
 	/*
-		o.InitPythonEnv()
-		defer o.exitEnv()
-
+	os.Chdir("/goworkspace/src/finance/app/pyscript")
+	boJson = strconv.QuoteToASCII(boJson)
+	boJson = boJson[1:len(boJson) - 1]
+	
+	dataJson = strconv.QuoteToASCII(dataJson)
+	dataJson = dataJson[1:len(dataJson) - 1]
+	
+	expression = strconv.QuoteToASCII(expression)
+	expression = expression[1:len(expression) - 1]
+	
+	cmd := exec.Command("python", "expression.py", "parseModel", boJson, dataJson, expression)
+	out, err := cmd.Output()
+	if err != nil {
+		log.Println("ParseString(recordJson, expression string) string")
+		log.Println("boJson:" + boJson)
+		log.Println("dataJson:" + dataJson)
+		log.Println("expression:" + expression)
+		panic(err)
+	}
+	result := string(out)
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	return result
 	*/
-	/*
-		expressionMod := python.PyImport_ImportModule("expression")
-		if expressionMod == nil {
-			panic("get module return null")
-		}
-	*/
-
-	strfunc := getExpressionMod().GetAttrString(methodName)
-	if strfunc == nil {
-		panic("get function return null")
-	}
-
-	strargs := python.PyTuple_New(len(param))
-	if strargs == nil {
-		panic("build argument return null")
-	}
-
-	for i := 0; i < len(param); i++ {
-		args := python.PyString_FromString(strings.TrimSpace(param[i]))
-		python.PyTuple_SET_ITEM(strargs, i, args)
-	}
-
-	strret := strfunc.CallObject(strargs)
-	if strret == nil {
-		panic("call object return null")
-	}
-
-	python.PyErr_Print()
-	python.PyErr_Clear()
-
-	execResult := python.PyString_AS_STRING(strret)
-	return execResult
 }
 
 func (o ExpressionParser) ParseBeforeBuildQuery(classMethod string, paramMap map[string]string) map[string]string {
-	if strings.TrimSpace(classMethod) == "" {
-		return paramMap
-	}
-
-	execResult := o.parseClassMethod(classMethod, paramMap)
-
-	result := map[string]string{}
-	err := json.Unmarshal([]byte(execResult), &result)
-	if err != nil {
-		panic(err)
-	}
-	return result
+	return paramMap
 }
 
 func (o ExpressionParser) ParseAfterBuildQuery(classMethod string, queryLi []map[string]interface{}) []map[string]interface{} {
-	if strings.TrimSpace(classMethod) == "" {
-		return queryLi
-	}
-
-	execResult := o.parseClassMethod(classMethod, queryLi)
-
-	result := []map[string]interface{}{}
-	err := json.Unmarshal([]byte(execResult), &result)
-	if err != nil {
-		panic(err)
-	}
-	return result
+	return queryLi
 }
 
 /*
 func (o ExpressionParser) ParseAfterQueryData(classMethod string, items []interface{}) []interface{} {
-	if strings.TrimSpace(classMethod) == "" {
-		return items
-	}
-
-	execResult := o.parseClassMethod(classMethod, items)
-
-	result := []interface{}{}
-	err := json.Unmarshal([]byte(execResult), &result)
-	if err != nil {
-		panic(err)
-	}
-	return result
+	return items
 }
 */
-
-func (o ExpressionParser) parseClassMethod(classMethod string, obj interface{}) string {
-	if !isEnvInit() {
-		InitPythonEnv()
-	}
-
-	className := strings.Split(classMethod, ".")[0]
-	methodName := strings.Split(classMethod, ".")[1]
-
-	class := getComponentMod().GetAttrString(className)
-	if class == nil {
-		panic("get class:" + className + " return nil")
-	}
-
-	classArgs := python.PyTuple_New(0)
-	object := class.CallObject(classArgs)
-
-	method := object.GetAttrString(methodName)
-	if method == nil {
-		panic("get method:" + methodName + " return nil")
-	}
-
-	jsonStringByte, err := json.Marshal(&obj)
-	if err != nil {
-		panic(err)
-	}
-
-	strargs := python.PyTuple_New(1)
-	args1 := python.PyString_FromString(string(jsonStringByte))
-	python.PyTuple_SET_ITEM(strargs, 0, args1)
-
-	strret := method.CallObject(strargs)
-	if strret == nil {
-		panic("call object return null")
-	}
-
-	python.PyErr_Print()
-	python.PyErr_Clear()
-
-	return python.PyString_AS_STRING(strret)
-}

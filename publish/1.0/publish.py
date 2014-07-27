@@ -16,6 +16,7 @@ import pymongo,threading
 from dictionary import *
 from sequence import *
 from initdata import *
+from menu import *
 
 threadLocal = threading.local()
 MONGODB_HOST = 'localhost'
@@ -126,7 +127,7 @@ def initDemo():
             bLi = []
             cLi = []
             for i in range(25):
-                seq = mongoDB.counters.find_and_modify(query={'_id': 'demoBId'}, update={'$inc': {'c': 1}})
+                seq = mongoDB.counters.find_and_modify(query={'_id': 'demoId'}, update={'$inc': {'c': 1}})
                 bLi.append({
                     '_id': seq['c'],
                     'id': seq['c'],
@@ -154,7 +155,7 @@ def initDemo():
                     "dictionaryTest": random.randint(0,2),
                     "selectTest": 1,
                 })
-                seq = mongoDB.counters.find_and_modify(query={'_id': 'demoCId'}, update={'$inc': {'c': 1}})
+                seq = mongoDB.counters.find_and_modify(query={'_id': 'demoId'}, update={'$inc': {'c': 1}})
                 cLi.append({
                     '_id': seq['c'],
                     'id': seq['c'],
@@ -237,9 +238,28 @@ def initSysUser():
             item["A"]["type"] = 1
         mongoDB.SysUser.save(item)
 
+def initMenu():
+    mongoDB = getThreadLocalMongoDB()['mongoDB']
+    li = dealMenuLi()
+    levelLi = [item["level"] for item in li]
+    mongoDB.Menu.remove({'level': {'$nin': levelLi}})
+    for item in li:
+        if not mongoDB.Menu.find_one({'level': item["level"]}):
+            seq = mongoDB.counters.find_and_modify(query={'_id': 'menuId'}, update={'$inc': {'c': 1}})
+            item["_id"] = seq["c"]
+            item["id"] = seq["c"]
+            mongoDB.Menu.save(item)
+        else:
+            menuItem = mongoDB.Menu.find_one({'level': item["level"]})
+            for subItem in item:
+                if subItem != "id" and subItem != "_id":
+                    menuItem[subItem] = item[subItem]
+            mongoDB.Menu.save(menuItem)
+
 if __name__ == '__main__':
     initSequence()
     initDictionary()
     initInitData()
     initDemo()
-    initSysUser()
+    initMenu()
+    #initSysUser()

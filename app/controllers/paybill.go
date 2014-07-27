@@ -3,12 +3,14 @@ package controllers
 import "github.com/robfig/revel"
 import (
 	. "com/papersns/accountinout"
+	. "com/papersns/common"
 	. "com/papersns/component"
 	. "com/papersns/error"
 	"com/papersns/global"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -20,16 +22,21 @@ type PayBillSupport struct {
 	ActionSupport
 }
 
-func (c PayBillSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c PayBillSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	master := (*bo)["A"].(map[string]interface{})
 	modelTemplateFactory := ModelTemplateFactory{}
 	billTypeParameterDataSource := modelTemplateFactory.GetDataSource("BillPaymentTypeParameter")
 	collectionName := modelTemplateFactory.GetCollectionName(billTypeParameterDataSource)
 	session, _ := global.GetConnection(sessionId)
-	queryMap := map[string]interface{}{
-		"_id": 2,
-	}
 	qb := QuerySupport{}
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+	queryMap := map[string]interface{}{
+		"A.billTypeId": 2,
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+	}
 	//	FindByMapWithSession(session *mgo.Session, collection string, query map[string]interface{}) (result map[string]interface{}, found bool) {
 	billTypeParameter, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -40,6 +47,73 @@ func (c PayBillSupport) afterNewData(sessionId int, dataSource DataSource, bo *m
 	billTypeParameterMaster := billTypeParameter["A"].(map[string]interface{})
 	master["property"] = billTypeParameterMaster["property"]
 	(*bo)["A"] = master
+
+	// 币别默认值
+	currencyTypeQuery := map[string]interface{}{
+		"A.code":       "RMB",
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+	}
+	currencyTypeCollectionName := "CurrencyType"
+	result, found := qb.FindByMapWithSession(session, currencyTypeCollectionName, currencyTypeQuery)
+	if found {
+		master["currencyTypeId"] = result["id"]
+	}
+
+	// 单据编号
+	c.setBillNo(sessionId, bo)
+}
+
+func (o PayBillSupport) afterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+	// 单据编号
+	o.setBillNo(sessionId, bo)
+}
+
+func (o PayBillSupport) setBillNo(sessionId int, bo *map[string]interface{}) {
+	master := (*bo)["A"].(map[string]interface{})
+	(*bo)["A"] = master
+	session, _ := global.GetConnection(sessionId)
+
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+	// 单据编号
+	qb := QuerySupport{}
+	gatheringBillCollectionName := "GatheringBill"
+	billNoQuery := map[string]interface{}{
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+	}
+	pageNo := 1
+	pageSize := 1
+	orderBy := "-A.billNo"
+	result := qb.IndexWithSession(session, gatheringBillCollectionName, billNoQuery, pageNo, pageSize, orderBy)
+	items := result["items"].([]interface{})
+	dateUtil := DateUtil{}
+	if len(items) > 0 {
+		maxItem := items[0].(map[string]interface{})
+		maxItemA := maxItem["A"].(map[string]interface{})
+		maxBillNo := fmt.Sprint(maxItemA["billNo"])
+
+		regx := regexp.MustCompile(`^.*?(\d+)$`)
+		matchResult := regx.FindStringSubmatch(maxBillNo)
+		if len(matchResult) >= 2 {
+			matchNum := matchResult[1]
+			matchInt, err := strconv.Atoi(matchNum)
+			if err != nil {
+				master["billNo"] = fmt.Sprint(dateUtil.GetCurrentYyyyMMdd()) + "_001"
+			} else {
+				matchStr := fmt.Sprint(matchInt + 1)
+				if len(matchStr) < 3 {
+					matchStr = "000"[:(3-len(matchStr))] + matchStr
+				}
+				master["billNo"] = fmt.Sprint(dateUtil.GetCurrentYyyyMMdd()) + "_" + matchStr
+			}
+		} else {
+			master["billNo"] = fmt.Sprint(dateUtil.GetCurrentYyyyMMdd()) + "_001"
+		}
+	} else {
+		master["billNo"] = fmt.Sprint(dateUtil.GetCurrentYyyyMMdd()) + "_001"
+	}
 }
 
 func (c PayBillSupport) getSrcDiffDataRowItem(diffDataRow DiffDataRow) DiffDataRow {
@@ -56,7 +130,7 @@ func (c PayBillSupport) getDestDiffDataRowItem(diffDataRow DiffDataRow) DiffData
 	return tmpItem
 }
 
-func (c PayBillSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+func (c PayBillSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
 	for _, item := range *diffDataRowLi {
 		if item.SrcData != nil && item.DestData != nil { // 修改
 			// 旧数据反过账,新数据正过账
@@ -190,9 +264,9 @@ func (c PayBillSupport) checkLimitsControlPanicMessage(sessionId int, bo map[str
 	}
 }
 
-func (c PayBillSupport) afterDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c PayBillSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	masterData := (*bo)["A"].(map[string]interface{})
-	if fmt.Sprint(masterData["billStatus"]) == "4" {// 4为已作废,已作废单据不过账,不检查赤字
+	if fmt.Sprint(masterData["billStatus"]) == "4" { // 4为已作废,已作废单据不过账,不检查赤字
 		return
 	}
 	modelIterator := ModelIterator{}
@@ -420,8 +494,8 @@ func (c PayBillSupport) logAccountForDetailB(sessionId int, dataSource DataSourc
 
 /**
  * 作废过账,赤字判断
-*/
-func (c PayBillSupport) afterCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})   {
+ */
+func (c PayBillSupport) afterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	// 过账,
@@ -448,16 +522,16 @@ func (c PayBillSupport) afterCancelData(sessionId int, dataSource DataSource, bo
 
 /**
  * 反作废过账,赤字判断
-*/
-func (c PayBillSupport) afterUnCancelData(sessionId int, dataSource DataSource, bo *map[string]interface{})  {
+ */
+func (c PayBillSupport) afterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	// 过账,
 	modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		diffDataRow := DiffDataRow{
 			FieldGroupLi: fieldGroupLi,
-			DestBo:        bo,
-			DestData:      data,
+			DestBo:       bo,
+			DestData:     data,
 		}
 		c.logAccount(sessionId, dataSource, *bo, diffDataRow, *diffDataRow.DestData, ADD)
 	})
@@ -466,8 +540,8 @@ func (c PayBillSupport) afterUnCancelData(sessionId int, dataSource DataSource, 
 	modelIterator.IterateDataBo(dataSource, bo, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 		diffDataRow := DiffDataRow{
 			FieldGroupLi: fieldGroupLi,
-			DestBo:        bo,
-			DestData:      data,
+			DestBo:       bo,
+			DestData:     data,
 		}
 		diffDataRowLi = append(diffDataRowLi, diffDataRow)
 	})
@@ -486,7 +560,7 @@ func (c PayBill) SaveData() revel.Result {
 
 func (c PayBill) DeleteData() revel.Result {
 	c.actionSupport = PayBillSupport{}
-	
+
 	modelRenderVO := c.deleteDataCommon()
 	return c.renderCommon(modelRenderVO)
 }
@@ -544,6 +618,7 @@ func (c PayBill) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }
 
@@ -564,4 +639,3 @@ func (c PayBill) UnCancelData() revel.Result {
 	modelRenderVO := c.unCancelDataCommon()
 	return c.renderCommon(modelRenderVO)
 }
-

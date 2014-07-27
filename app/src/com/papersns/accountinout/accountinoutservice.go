@@ -29,10 +29,15 @@ func (o AccountInOutService) GetFirstAccountingPeriodStartEndDate(sessionId int,
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	qb := QuerySupport{}
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
-	qb := QuerySupport{}
 	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
 		//		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
@@ -58,11 +63,16 @@ func (o AccountInOutService) GetAccountingPeriodStartEndDate(sessionId int, year
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	qb := QuerySupport{}
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
 		"B.sequenceNo":     sequenceNo,
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
-	qb := QuerySupport{}
 	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
 		//		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
@@ -90,6 +100,11 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
+	qb := QuerySupport{}
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	queryMap := map[string]interface{}{
 		"B.startDate": map[string]interface{}{
 			"$lte": ymd,
@@ -97,8 +112,8 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 		"B.endDate": map[string]interface{}{
 			"$gte": ymd,
 		},
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
-	qb := QuerySupport{}
 	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
 		billDate, err := time.Parse("20060102", fmt.Sprint(ymd))
@@ -264,11 +279,16 @@ func (c AccountInOutService) isAccountIdCurrencyTypeIdExist(accountIdCurrencyTyp
  * code LIMIT_CONTROL_WARN:赤字字段为警告,保存时金额 < 0,需要调用方提供警告信息通知客户端
  */
 func (o AccountInOutService) CheckCashAccountLimitControl(sessionId int, accountId int) map[string]interface{} {
+	qb := QuerySupport{}
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	session, _ := global.GetConnection(sessionId)
 	queryMap := map[string]interface{}{
 		"_id": accountId,
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
-	qb := QuerySupport{}
 	collectionName := "CashAccount"
 	cashAccountBo, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -316,10 +336,15 @@ func (o AccountInOutService) CheckCashAccountLimitControl(sessionId int, account
  */
 func (o AccountInOutService) CheckBankAccountLimitControl(sessionId int, accountId int, currencyTypeId int) map[string]interface{} {
 	session, _ := global.GetConnection(sessionId)
-	queryMap := map[string]interface{}{
-		"_id": accountId,
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
 	}
 	qb := QuerySupport{}
+	queryMap := map[string]interface{}{
+		"_id": accountId,
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+	}
 	collectionName := "BankAccount"
 	bankAccountBo, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -381,10 +406,15 @@ func (o AccountInOutService) LogAllCashDeposit(sessionId int, accountInOutParam 
  */
 func (o AccountInOutService) LogCashAccountInOut(sessionId int, accountInOutParam AccountInOutParam) {
 	session, db := global.GetConnection(sessionId)
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
 	collectionName := "CashAccount"
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": accountInOutParam.AccountId,
+		"A.createUnit": querySupport.GetCreateUnitByUserId(session, userId),
 	}
 	cashAccountBo, found := querySupport.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
@@ -523,12 +553,19 @@ func (o AccountInOutService) logMonthInOut(sessionId int, accountInOutParam Acco
 	amtIncrease := commonUtil.GetFloat64FromString(accountInOutParam.AmtIncrease)
 	amtReduce := commonUtil.GetFloat64FromString(accountInOutParam.AmtReduce)
 
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+
+	qb := QuerySupport{}
 	query := map[string]interface{}{
 		"A.accountId":             accountInOutParam.AccountId,
 		"A.currencyTypeId":        accountInOutParam.CurrencyTypeId,
 		"A.accountType":           accountInOutParam.AccountType,
 		"A.accountingPeriodYear":  accountInOutParam.AccountingPeriodYear,
 		"A.accountingPeriodMonth": accountInOutParam.AccountingPeriodMonth,
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
 
 	dataSourceModelId := "AccountInOut"
@@ -536,7 +573,6 @@ func (o AccountInOutService) logMonthInOut(sessionId int, accountInOutParam Acco
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 
-	qb := QuerySupport{}
 	accountInOut, found := qb.FindByMapWithSession(session, collectionName, query)
 	if !found {
 		accountInOut = o.addFinAccountInOutForCash(sessionId, accountInOutParam)
@@ -648,10 +684,17 @@ func (o AccountInOutService) LogAllBankDeposit(sessionId int, accountInOutParam 
 func (o AccountInOutService) LogBankAccountInOut(sessionId int, accountInOutParam AccountInOutParam) {
 	// 从银行账户初始化那里面拷贝一份出来,
 	session, db := global.GetConnection(sessionId)
+	
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+	
 	collectionName := "BankAccount"
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"_id": accountInOutParam.AccountId,
+		"A.createUnit": querySupport.GetCreateUnitByUserId(session, userId),
 	}
 	bankAccountBo, found := querySupport.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {

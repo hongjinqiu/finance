@@ -27,7 +27,7 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 					var result = "";
 					var virtualColumnForEditor = null;
 					templateIterator.iterateAnyTemplateColumn(host.dataSetId, result, function IterateFunc(column, result) {
-						if (column.XMLName.Local == "virtual-column" && column.ForEditor == "true") {
+						if (column.XMLName.Local == "virtual-column" && column.UseIn == "editor") {
 							virtualColumnForEditor = column;
 							return true;
 						}

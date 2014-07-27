@@ -160,11 +160,6 @@ DataTableManager.prototype.hideLoadingImg = function() {
 	loadingNode.setStyle("display", "none");
 }
 
-/*
-DataTableManager.prototype.doAfterResponse = function(e) {
-	
-}
-*/
 DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	var self = this;
 	this.param = param;

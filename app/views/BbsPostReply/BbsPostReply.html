@@ -21,8 +21,10 @@
  -->
 <script type="text/javascript" src="/app/comboview?js/moduleConfig.js&js/common.js&js/dataTableExtend.js&js/columnManager.js&js/queryParameter.js&js/relationManager.js&js/listTemplateFactory.js&js/listTemplateService.js&Component/listTemplate.js&{{.result.listTemplate.Scripts}}"></script>
 <script type="text/javascript">
+	var g_yuiCommondLi = [];
+
 	DataTableManager.prototype.doAfterResponse = function(e) {
-		YUI(g_financeModule).use("finance-module", function(Y) {
+		g_yuiCommondLi.push(function(Y) {
 			var data = Y.JSON.parse(e.data.responseText);
 			if (data.relationBo) {
 				g_relationManager.mergeRelationBo(data.relationBo);
@@ -86,6 +88,7 @@
 	{{end}}
 	var g_relationManager = new RelationManager();
 	var g_masterFormFieldDict = {};
+	var g_Y = null;
 </script>
 <!-- 
 <script type="text/javascript" src="/app/comboview?js/moduleConfig.js&js/common.js&js/dataTableExtend.js&js/columnManager.js&js/queryParameter.js&js/listTemplateFactory.js&js/listTemplateService.js&Component/listTemplate.js&{{.result.listTemplate.Scripts}}"></script>
@@ -141,12 +144,18 @@
 		<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>
 	</div>
 	<script type="text/javascript">
-	if (typeof(listMain) !== "undefined") {
-		//listMain();
-	}
-	if (typeof(main) !== "undefined") {
-		main();
-	}
+	YUI(g_financeModule).use("finance-module", function(Y) {
+		g_Y = Y;
+		for (var i = 0; i < g_yuiCommondLi.length; i++) {
+			g_yuiCommondLi[i](Y);
+		}
+		if (typeof(listMain) !== "undefined") {
+//			listMain(Y);
+		}
+		if (typeof(main) !== "undefined") {
+			main(Y);
+		}
+	});
 	</script>
 </body>
 </html>

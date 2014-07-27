@@ -10,13 +10,21 @@ type BbsPostReplyInterceptor struct{}
 func (o BbsPostReplyInterceptor) AfterBuildQuery(sessionId int, queryLi []map[string]interface{}) []map[string]interface{} {
 	orQuery := map[string]interface{}{}
 	orLi := []map[string]interface{}{}
+	createUnitQuery := map[string]interface{}{}
 	for _, item := range queryLi {
-		orLi = append(orLi, item)
+		if item["A.createUnit"] == nil {
+			orLi = append(orLi, item)
+		} else {
+			createUnitQuery = item
+		}
 	}
 	orQuery["$or"] = orLi
 	if len(orLi) > 0 {
 		queryLi = []map[string]interface{}{
 			orQuery,
+		}
+		if len(createUnitQuery) > 0 {
+			queryLi = append(queryLi, createUnitQuery)
 		}
 	}
 	return queryLi

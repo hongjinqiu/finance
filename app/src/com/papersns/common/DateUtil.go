@@ -24,6 +24,14 @@ func (o DateUtil) GetCurrentYyyyMMddHHmmss() int64 {
 	return createTime
 }
 
+func (o DateUtil) ConvertDate2String(date string, sourcePattern string, targetPattern string) string {
+	dDate, err := time.Parse(sourcePattern, fmt.Sprint(date))
+	if err != nil {
+		panic(err)
+	}
+	return dDate.Format(targetPattern)
+}
+
 func (o DateUtil) GetNextDate(date int) int {
 	dDate, err := time.Parse("20060102", fmt.Sprint(date))
 	if err != nil {

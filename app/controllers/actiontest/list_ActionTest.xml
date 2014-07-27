@@ -24,9 +24,9 @@
 
 		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
 		</button>
-	</toolbar>
-
-	<!-- <security functionId="10018"></security> -->
+		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" use-in="selector" />	</toolbar>
+	
+	<security byUnit="true"/>
 
 	<!-- <before-build-query>ActionTest.beforeBuildQuery</before-build-query> <after-build-query>ActionTest.afterBuildQuery</after-build-query> -->
 	<!-- <after-query-data>ModelListTemplateInterceptor.AfterQueryData</after-query-data> -->
@@ -55,6 +55,13 @@
 					<expression></expression>
 					<button-attribute name="code" value="D" />
 				</button>
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
+					<expression></expression>
+				</button>
+			</buttons>
+		</virtual-column>
+		<virtual-column name="FUN_C_SELECTOR" text="操作" width="40" use-in="selector">
+			<buttons>
 				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
 					<expression></expression>
 				</button>

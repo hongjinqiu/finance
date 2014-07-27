@@ -18,6 +18,17 @@ var g_financeModule = {
         	           "array-extras","querystring-stringify","cssfonts","dataschema-json","datasource-io",
         	           "model-sync-rest","gallery-paginator-view","tabview","panel","dd-plugin",
         	           "gallery-layout","gallery-quickedit","gallery-paginator","datatable-base"]
+        },
+        "index-module": {
+        	fullpath: '/app/comboview?js/financeModule.js',
+        	requires: ["node","widget-base",
+        	           "widget-parent","widget-child","base-build",
+        	           "event","panel","dd-plugin",
+        	           "gallery-layout"]
+        },
+        "step-module": {
+        	fullpath: '/app/comboview?js/financeModule.js',
+        	requires: ["node","event","querystring-stringify","json","io-form","io-base"]
         }
     }
 }

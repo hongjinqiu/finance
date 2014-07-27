@@ -22,7 +22,7 @@ type BbsPostSupport struct {
 	ActionSupport
 }
 
-func (c BbsPostSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+func (c BbsPostSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
 	master := (*bo)["A"].(map[string]interface{})
 	if fmt.Sprint(master["type"]) == "1" { // 主题帖
 		c.bbsPostAfterSaveData(sessionId, dataSource, bo, diffDateRowLi)
@@ -44,10 +44,10 @@ func (c BbsPostSupport) bbsPostReplyAfterSaveData(sessionId int, dataSource Data
 	commonUtil := CommonUtil{}
 	dateUtil := DateUtil{}
 	master := (*bo)["A"].(map[string]interface{})
+	qb := QuerySupport{}
 	mainBbsPostQuery := map[string]interface{}{
 		"_id": commonUtil.GetIntFromMap(master, "bbsPostId"),
 	}
-	qb := QuerySupport{}
 	bbsPostCollectionName := "BbsPost"
 	mainBbsPost, found := qb.FindByMapWithSession(session, bbsPostCollectionName, mainBbsPostQuery)
 	if !found {
@@ -148,7 +148,7 @@ func (c BbsPostSupport) addBbsPostRead(sessionId int, bbsPostId int) {
 	txnManager.Insert(txnId, "BbsPostRead", bbsPostRead)
 }
 
-func (o BbsPostSupport) beforeDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{})   {
+func (o BbsPostSupport) beforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})   {
 	session, _ := global.GetConnection(sessionId)
 	// 已回复过的帖子不可删除
 	qb := QuerySupport{}
@@ -156,13 +156,19 @@ func (o BbsPostSupport) beforeDeleteData(sessionId int, dataSource DataSource, b
 	bbsPostReplyQuery := map[string]interface{}{
 		"A.bbsPostId": (*bo)["id"],
 	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		bbsPostReplyQuery[k] = v
+	}
+	
 	_, found := qb.FindByMapWithSession(session, bbsPostCollectionName, bbsPostReplyQuery)
 	if found {
 		panic(BusinessError{Message: "存在回复的主题帖不可删除"})
 	}
 }
 
-func (c BbsPostSupport) afterDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c BbsPostSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 反过账
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
@@ -249,5 +255,6 @@ func (c BbsPost) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }

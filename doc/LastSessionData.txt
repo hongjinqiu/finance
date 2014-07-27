@@ -1,0 +1,27 @@
+{
+	"_id": 34067,
+	"id": 34067,
+	"A": {
+		"resStruct" : {
+			"top_session" : "40517371e526ed5386ba9dcc0f8886504e8261b17597bmzr6J2m82691",
+			"url" : "http://127.0.0.1:8000/",
+			"agreement" : "true",
+			"app_key" : "12130139",
+			"agreementsign" : "12130139-22287347-346B2278422F673ECB579A9E682E0621",
+			"top_sign" : "5tQpWMO3Ws+eE+ygdPbgew==",
+			"top_appkey" : "12130139",
+			"topParameter" : {
+				"visitor_nick" : "sandbox_c_1",
+				"visitor_id" : "175978269",
+				"ts" : "1337240880774",
+				"iframe" : "1"
+			},
+			"top_parameters" : "aWZyYW1lPTEmdHM9MTMzNzI0MDg4MDc3NCZ2aXNpdG9yX2lkPTE3NTk3ODI2OSZ2aXNpdG9yX25pY2s9c2FuZGJveF9jXzE="
+		},
+		"updateTime" : 20120517154801,
+		"sysUserId" : 11,
+		"sysUnitId" : 2,
+		"id" : 34067,
+		"createTime" : 20120517130801
+	}
+}

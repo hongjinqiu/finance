@@ -6,6 +6,8 @@
 	<description>Demo表单</description>
 	<scripts>demo/demoModel.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
+	<security byUnit="true"/>
+	
 	<toolbar>
 		<button text="列表页" mode="fn" handler="doSave" iconCls="test"></button>
 		<button text="新增" mode="fn" handler="test" iconCls=""></button>

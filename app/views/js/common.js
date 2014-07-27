@@ -1,4 +1,21 @@
+if (typeof(console) == "undefined") {
+	console = {
+		log: function() {},
+		info: function() {},
+		error: function() {},
+		fatal: function() {}
+	};
+}
+
 function CommonUtil() {
+}
+
+function executeGYUI(func) {
+	if (typeof(g_Y) != "undefined" && g_Y) {
+		func(g_Y);
+	} else {
+		YUI(g_financeModule).use("finance-module", func);
+	}
 }
 
 CommonUtil.prototype.getFuncOrString = function(text) {
@@ -46,7 +63,11 @@ var panelZIndex = 6;
  * config: title,url
  */
 function showModalDialog(config) {
-	YUI(g_financeModule).use("finance-module", function(Y) {
+	var moduleName = config.moduleName;
+	if (!moduleName) {
+		moduleName = "finance-module";
+	}
+	var func = function(Y) {
 		var title = config["title"];
 		var url = config["url"];
 	//	node.getComputedStyle("width")
@@ -104,7 +125,12 @@ function showModalDialog(config) {
 	    dialog.dd.addHandle('.yui3-widget-hd');
 	    dialog.show();
 	    window.s_dialog = dialog;
-	});
+	};
+	if (moduleName == "finance-module") {
+		executeGYUI(func);
+	} else {
+		YUI(g_financeModule).use(moduleName, func);
+	}
 }
 
 /**
@@ -161,7 +187,7 @@ function showDialog(config){
         }];
 	}
 	
-	YUI(g_financeModule).use("finance-module", function(Y) {
+	executeGYUI(function(Y) {
 	    var dialog = new Y.Panel({
 	        contentBox : Y.Node.create('<div id="dialog" />'),
 	        headerContent: title,
@@ -272,7 +298,11 @@ function showConfirm(msg, callback, width, height){
 function ajaxRequest(option){
 	// 有用的配置为 doCallback, 自己对failure,error进行提示即可,
 	// url,params,async,scope,
-	YUI(g_financeModule).use("finance-module", function(Y){
+	var moduleName = option.moduleName;
+	if (!moduleName) {
+		moduleName = "finance-module";
+	}
+	YUI(g_financeModule).use(moduleName, function(Y){
 //		var paramData = Y.JSON.stringify(option["params"]);
 		var paramData = {};
 		if (option.params) {
@@ -289,7 +319,7 @@ function ajaxRequest(option){
 			method: option.method || 'POST',
 			data: Y.QueryString.stringify(paramData),
 			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
+				'Content-Type': 'application/x-www-form-urlencoded'
 			},
 			on: {
 				start: function(){
@@ -344,7 +374,7 @@ function ajaxRequest(option){
 				end: function(){
 //								console.log("end");
 				}
-			},
+			}
 		};
 //		console.log(Y.QueryString.stringify(paramData));
 		Y.io(option["url"], cfg);
@@ -590,5 +620,16 @@ function putOrAppend(dictObj, name, value, seperator) {
 		}
 	} else {
 		dictObj[name] = value || "";
+	}
+}
+
+function openTabOrJump(url) {
+	console.log(top && top.putTabIfAbsent);
+	if (top && top.putTabIfAbsent) {
+		var name = listTemplate.Description.replace("列表", "");
+		var isRefresh = true;
+		top.putTabIfAbsent(name, url, isRefresh);
+	} else {
+		location.href = url;
 	}
 }

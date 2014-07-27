@@ -143,5 +143,25 @@ func CloseSession(sId int) {
 	}
 }
 
+func RollbackTxn(sessionId int) {
+	txnId := GetGlobalAttr(sessionId, "txnId")
+	if txnId != nil {
+		if x := recover(); x != nil {
+			_, db := GetConnection(sessionId)
+			txnManager := TxnManager{db}
+			txnManager.Rollback(txnId.(int))
+			panic(x)
+		}
+	}
+}
+
+func CommitTxn(sessionId int) {
+	txnId := GetGlobalAttr(sessionId, "txnId")
+	if txnId != nil {
+		_, db := GetConnection(sessionId)
+		txnManager := TxnManager{db}
+		txnManager.Commit(txnId.(int))
+	}
+}
 
 

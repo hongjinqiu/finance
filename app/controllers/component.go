@@ -203,6 +203,7 @@ func (c Component) ListTemplate() revel.Result {
 			"listTemplateJson": template.JS(string(listTemplateByte)),
 			//		"columnsJson":   string(columnsByte),
 		}
+		//c.Response.ContentType = "text/html; charset=utf-8"
 		return c.Render(result)
 	}
 }
@@ -262,7 +263,7 @@ func (c Component) ScriptTest() revel.Result {
 
 func (c Component) MongoTest() revel.Result {
 	querySupport := QuerySupport{}
-	m, isFind := querySupport.Find("SysUser", `{"_id": 15}`)
+	m, isFind := querySupport.Find("SysUser", `{"_id": 15, "A.createUnit": 1}`)
 	if !isFind {
 		panic("not found")
 	}
@@ -425,7 +426,7 @@ func (c Component) GetColumnModelDataForListTemplate() revel.Result {
 		queryResult["items"] = items[:1]
 	}
 
-	columnResult := templateManager.GetColumnModelDataForListTemplate(listTemplate, items[:1])
+	columnResult := templateManager.GetColumnModelDataForListTemplate(sessionId, listTemplate, items[:1])
 	resultItems := columnResult["items"].([]interface{})
 	jsonByte, err := json.MarshalIndent(resultItems, "", "\t")
 	if err != nil {

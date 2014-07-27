@@ -4,6 +4,7 @@ package controllers
 import (
 	. "com/papersns/error"
 	"com/papersns/global"
+	. "com/papersns/component"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
@@ -234,16 +235,23 @@ func (o FinanceService) validateBODuplicate(sessionId int, dataSource DataSource
 }
 
 func (o FinanceService) validateMasterDataDuplicate(sessionId int, dataSource DataSource, bo map[string]interface{}) string {
+	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
+	if err != nil {
+		panic(err)
+	}
+	session, _ := global.GetConnection(sessionId)
+
 	message := ""
 	modelTemplateFactory := ModelTemplateFactory{}
 	strId := modelTemplateFactory.GetStrId(bo)
 	andQueryLi := []map[string]interface{}{
 	}
-	
+	qb := QuerySupport{}
 	andQueryLi = append(andQueryLi, map[string]interface{}{
 		"deleteFlag": map[string]interface{}{
 			"$ne": 9,
 		},
+		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	})
 	andFieldNameLi := []string{}
 	modelIterator := ModelIterator{}

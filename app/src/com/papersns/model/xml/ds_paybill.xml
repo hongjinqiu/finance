@@ -168,7 +168,7 @@
 						<jsRelationExpr mode="js">data["payerType"] == "3"</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
+						<displayField>code,nick</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 					<relationItem name="Null">
@@ -199,7 +199,7 @@
 						<jsRelationExpr>true</jsRelationExpr>
 						<relationModelId>SysUser</relationModelId>
 						<relationDataSetId>A</relationDataSetId>
-						<displayField>code,name</displayField>
+						<displayField>code,nick</displayField>
 						<valueField>id</valueField>
 					</relationItem>
 				</relationDS>

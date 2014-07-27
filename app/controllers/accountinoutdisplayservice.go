@@ -8,20 +8,27 @@ import (
 	. "com/papersns/model"
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 func (c AccountInOutDisplay) getDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	formTemplateId := c.Params.Get("formTemplateId")
 	jsonData := c.Params.Get("jsonData")
 
 	jsonMap := map[string]interface{}{}
-	err := json.Unmarshal([]byte(jsonData), &jsonMap)
+	err = json.Unmarshal([]byte(jsonData), &jsonMap)
 	if err != nil {
 		panic(err)
 	}
@@ -29,10 +36,11 @@ func (c AccountInOutDisplay) getDataCommon() ModelRenderVO {
 
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
-
-	accountLi := c.getAccountList(sessionId, queryMap)
-	origBalanceLi := c.getOrigBalanceList(sessionId, queryMap)
-	increaseReduceBalanceLi := c.getIncreaseReduceBalanceList(sessionId, queryMap)
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	accountLi := c.getAccountList(sessionId, formTemplate, queryMap)
+	origBalanceLi := c.getOrigBalanceList(sessionId, formTemplate, queryMap)
+	increaseReduceBalanceLi := c.getIncreaseReduceBalanceList(sessionId, formTemplate, queryMap)
 
 	dataSetLi := c.mergeAndCalceFinalBalance(accountLi, origBalanceLi, increaseReduceBalanceLi)
 	dataSetLi = c.filterEmpty(dataSetLi, queryMap)
@@ -50,9 +58,7 @@ func (c AccountInOutDisplay) getDataCommon() ModelRenderVO {
 	//	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 	usedCheckBo := map[string]interface{}{}
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
@@ -60,6 +66,7 @@ func (c AccountInOutDisplay) getDataCommon() ModelRenderVO {
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	return ModelRenderVO{
+		UserId:      userId,
 		Bo:          bo,
 		RelationBo:  relationBo,
 		UsedCheckBo: usedCheckBo,
@@ -208,7 +215,7 @@ func (c AccountInOutDisplay) mergeAndCalceFinalBalance(accountLi []interface{}, 
 获取账户,从Cash,BankAccountCurrencyType中,根据查询条件,查询账户出来,
 queryMap: 银行账户,现金账户,币别,银行账户属性
 */
-func (c AccountInOutDisplay) getAccountList(sessionId int, queryMap map[string]interface{}) []interface{} {
+func (c AccountInOutDisplay) getAccountList(sessionId int, formTemplate FormTemplate, queryMap map[string]interface{}) []interface{} {
 	session, _ := global.GetConnection(sessionId)
 	result := []interface{}{}
 	commonUtil := CommonUtil{}
@@ -231,7 +238,14 @@ func (c AccountInOutDisplay) getAccountList(sessionId int, queryMap map[string]i
 		isQueryBankAccount = true
 	}
 	if isQueryCashAccount { // 现金账户查询
-		cashAccountQuery := map[string]interface{}{}
+		querySupport := QuerySupport{}
+		cashAccountQuery := map[string]interface{}{
+		}
+		permissionSupport := PermissionSupport{}
+		permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+		for k, v := range permissionQueryDict {
+			cashAccountQuery[k] = v
+		}
 		//			cashAccountIdLi := commonUtil.GetIntLiFromMap(queryMap, "cashAccountId")
 		if len(cashAccountIdLi) > 0 {
 			cashAccountQuery["A.id"] = map[string]interface{}{
@@ -245,7 +259,6 @@ func (c AccountInOutDisplay) getAccountList(sessionId int, queryMap map[string]i
 			}
 		}
 
-		querySupport := QuerySupport{}
 		collectionName := "CashAccount"
 		pageNo := 1
 		pageSize := 1000
@@ -266,7 +279,14 @@ func (c AccountInOutDisplay) getAccountList(sessionId int, queryMap map[string]i
 		}
 	}
 	if isQueryBankAccount { // 银行账户查询
-		bankAccountQuery := map[string]interface{}{}
+		querySupport := QuerySupport{}
+		bankAccountQuery := map[string]interface{}{
+		}
+		permissionSupport := PermissionSupport{}
+		permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+		for k, v := range permissionQueryDict {
+			bankAccountQuery[k] = v
+		}
 
 		if len(bankAccountIdLi) > 0 {
 			bankAccountQuery["A.bankAccountId"] = map[string]interface{}{
@@ -284,7 +304,6 @@ func (c AccountInOutDisplay) getAccountList(sessionId int, queryMap map[string]i
 			bankAccountQuery["A.accountProperty"] = property
 		}
 
-		querySupport := QuerySupport{}
 		collectionName := "BankAccountCurrencyType"
 		pageNo := 1
 		pageSize := 1000
@@ -311,10 +330,17 @@ func (c AccountInOutDisplay) getAccountList(sessionId int, queryMap map[string]i
 /**
 获取账户的期初数据
 */
-func (c AccountInOutDisplay) getOrigBalanceList(sessionId int, queryMap map[string]interface{}) []interface{} {
+func (c AccountInOutDisplay) getOrigBalanceList(sessionId int, formTemplate FormTemplate, queryMap map[string]interface{}) []interface{} {
 	session, _ := global.GetConnection(sessionId)
 	result := []interface{}{}
-	accountInitQuery := map[string]interface{}{}
+	querySupport := QuerySupport{}
+	accountInitQuery := map[string]interface{}{
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		accountInitQuery[k] = v
+	}
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
 	if queryMap["cashAccountId"] != nil {
@@ -351,7 +377,6 @@ func (c AccountInOutDisplay) getOrigBalanceList(sessionId int, queryMap map[stri
 		}
 	}
 
-	querySupport := QuerySupport{}
 	collectionName := "AccountInit"
 	pageNo := 1
 	pageSize := 1000
@@ -375,7 +400,7 @@ func (c AccountInOutDisplay) getOrigBalanceList(sessionId int, queryMap map[stri
 /**
 获取本期增加,本期减少
 */
-func (c AccountInOutDisplay) getIncreaseReduceBalanceList(sessionId int, queryMap map[string]interface{}) []interface{} {
+func (c AccountInOutDisplay) getIncreaseReduceBalanceList(sessionId int, formTemplate FormTemplate, queryMap map[string]interface{}) []interface{} {
 	result := []interface{}{}
 	commonUtil := CommonUtil{}
 	if fmt.Sprint(queryMap["queryMode"]) == "1" { // 按日期查询
@@ -387,26 +412,26 @@ func (c AccountInOutDisplay) getIncreaseReduceBalanceList(sessionId int, queryMa
 		if billDateEnd == 0 {
 			billDateEnd = 99991212
 		}
-		lastAccountingYear, lastSequenceNo := c.getLastAccountingYearSequenceNo(sessionId, billDateBegin)
+		lastAccountingYear, lastSequenceNo := c.getLastAccountingYearSequenceNo(sessionId, formTemplate, billDateBegin)
 		// 当为0时,如何处理,TODO,
 		// 计算期初和本期增加,本期减少,
-		origBalanceLi := c.getOrigBalanceFromAccountInOut(sessionId, queryMap, lastAccountingYear, lastSequenceNo)
+		origBalanceLi := c.getOrigBalanceFromAccountInOut(sessionId, formTemplate, queryMap, lastAccountingYear, lastSequenceNo)
 		// 累加最近一个会计期结束日期+1 至 billDateBegin 之间的本期增加,本期减少到期初,
 		{
 			var lastEndDate int
 			if lastAccountingYear > 0 && lastSequenceNo > 0 {
 				accountInOutService := AccountInOutService{}
 				_, lastEndDate = accountInOutService.GetAccountingPeriodStartEndDate(sessionId, lastAccountingYear, lastSequenceNo)
-			} else {// 没有找到最近的一个会计期时,将lastEndDate置为19700101
+			} else { // 没有找到最近的一个会计期时,将lastEndDate置为19700101
 				lastEndDate = 19700101
 			}
 			dateUtil := DateUtil{}
 			nextOfLastEndDate := dateUtil.GetNextDate(lastEndDate)
 			preOfBillDateBegin := dateUtil.GetPreDate(billDateBegin)
-			amtIncreaseReduceLi := c.getAmtIncreaseReduceByDate(sessionId, queryMap, nextOfLastEndDate, preOfBillDateBegin)
+			amtIncreaseReduceLi := c.getAmtIncreaseReduceByDate(sessionId, formTemplate, queryMap, nextOfLastEndDate, preOfBillDateBegin)
 			origBalanceLi = c.addIncreaseReduceToOrigBalance(origBalanceLi, amtIncreaseReduceLi)
 		}
-		amtIncreaseReduceLi := c.getAmtIncreaseReduceByDate(sessionId, queryMap, billDateBegin, billDateEnd)
+		amtIncreaseReduceLi := c.getAmtIncreaseReduceByDate(sessionId, formTemplate, queryMap, billDateBegin, billDateEnd)
 		// 合并期初,本期增加,本期减少
 		result = c.mergeOrigBalanceAndIncreaseReduce(origBalanceLi, amtIncreaseReduceLi)
 	} else if fmt.Sprint(queryMap["queryMode"]) == "2" { // 按期间查询
@@ -423,11 +448,11 @@ func (c AccountInOutDisplay) getIncreaseReduceBalanceList(sessionId int, queryMa
 		if accountingPeriodEnd == 0 {
 			accountingPeriodEnd = 100
 		}
-		lastAccountingYear, lastSequenceNo := c.getLastAccountingYearSequenceNoByYearMonth(sessionId, accountingYearStart, accountingPeriodStart)
+		lastAccountingYear, lastSequenceNo := c.getLastAccountingYearSequenceNoByYearMonth(sessionId, formTemplate, accountingYearStart, accountingPeriodStart)
 
 		// 计算期初和本期增加,本期减少,
-		origBalanceLi := c.getOrigBalanceFromAccountInOut(sessionId, queryMap, lastAccountingYear, lastSequenceNo)
-		amtIncreaseReduceLi := c.getAmtIncreaseReduceByYearMonth(sessionId, queryMap, accountingYearStart, accountingPeriodStart, accountingYearEnd, accountingPeriodEnd)
+		origBalanceLi := c.getOrigBalanceFromAccountInOut(sessionId, formTemplate, queryMap, lastAccountingYear, lastSequenceNo)
+		amtIncreaseReduceLi := c.getAmtIncreaseReduceByYearMonth(sessionId, formTemplate, queryMap, accountingYearStart, accountingPeriodStart, accountingYearEnd, accountingPeriodEnd)
 		// 合并期初,本期增加,本期减少
 		result = c.mergeOrigBalanceAndIncreaseReduce(origBalanceLi, amtIncreaseReduceLi)
 	}
@@ -526,10 +551,18 @@ func (c AccountInOutDisplay) mergeOrigBalanceAndIncreaseReduce(origBalanceLi []i
 	return result
 }
 
-func (c AccountInOutDisplay) getOrigBalanceFromAccountInOut(sessionId int, queryMap map[string]interface{}, lastAccountingYear int, lastSequenceNo int) []interface{} {
+func (c AccountInOutDisplay) getOrigBalanceFromAccountInOut(sessionId int, formTemplate FormTemplate, queryMap map[string]interface{}, lastAccountingYear int, lastSequenceNo int) []interface{} {
 	session, _ := global.GetConnection(sessionId)
 	result := []interface{}{}
-	accountInitQuery := map[string]interface{}{}
+	querySupport := QuerySupport{}
+	accountInitQuery := map[string]interface{}{
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		accountInitQuery[k] = v
+	}
+	
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
 	if queryMap["cashAccountId"] != nil {
@@ -587,7 +620,6 @@ func (c AccountInOutDisplay) getOrigBalanceFromAccountInOut(sessionId int, query
 		}
 	}
 
-	querySupport := QuerySupport{}
 	collectionName := "AccountInOut"
 	pageNo := 1
 	pageSize := 10000
@@ -620,10 +652,18 @@ func (c AccountInOutDisplay) getOrigBalanceFromAccountInOut(sessionId int, query
 	return result
 }
 
-func (c AccountInOutDisplay) getAmtIncreaseReduceByDate(sessionId int, queryMap map[string]interface{}, billDateBegin int, billDateEnd int) []interface{} {
+func (c AccountInOutDisplay) getAmtIncreaseReduceByDate(sessionId int, formTemplate FormTemplate, queryMap map[string]interface{}, billDateBegin int, billDateEnd int) []interface{} {
 	session, _ := global.GetConnection(sessionId)
 	result := []interface{}{}
-	accountInitQuery := map[string]interface{}{}
+	querySupport := QuerySupport{}
+	accountInitQuery := map[string]interface{}{
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		accountInitQuery[k] = v
+	}
+	
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
 	if queryMap["cashAccountId"] != nil {
@@ -683,7 +723,6 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByDate(sessionId int, queryMap 
 		}
 	}
 
-	querySupport := QuerySupport{}
 	collectionName := "AccountInOutItem"
 	pageNo := 1
 	pageSize := 10000
@@ -730,10 +769,18 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByDate(sessionId int, queryMap 
 	return result
 }
 
-func (c AccountInOutDisplay) getAmtIncreaseReduceByYearMonth(sessionId int, queryMap map[string]interface{}, accountingYearStart int, accountingPeriodStart int, accountingYearEnd int, accountingPeriodEnd int) []interface{} {
+func (c AccountInOutDisplay) getAmtIncreaseReduceByYearMonth(sessionId int, formTemplate FormTemplate, queryMap map[string]interface{}, accountingYearStart int, accountingPeriodStart int, accountingYearEnd int, accountingPeriodEnd int) []interface{} {
 	session, _ := global.GetConnection(sessionId)
 	result := []interface{}{}
-	accountInitQuery := map[string]interface{}{}
+	querySupport := QuerySupport{}
+	accountInitQuery := map[string]interface{}{
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		accountInitQuery[k] = v
+	}
+	
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
 	if queryMap["cashAccountId"] != nil {
@@ -814,7 +861,6 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByYearMonth(sessionId int, quer
 		}
 	}
 
-	querySupport := QuerySupport{}
 	collectionName := "AccountInOut"
 	pageNo := 1
 	pageSize := 10000
@@ -864,8 +910,9 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByYearMonth(sessionId int, quer
 取得max(会计期结束日期<date)的会计期年月
 @param date yyyyMMdd
 */
-func (c AccountInOutDisplay) getLastAccountingYearSequenceNoByYearMonth(sessionId int, accountingYear int, sequenceNo int) (int, int) {
+func (c AccountInOutDisplay) getLastAccountingYearSequenceNoByYearMonth(sessionId int, formTemplate FormTemplate, accountingYear int, sequenceNo int) (int, int) {
 	session, _ := global.GetConnection(sessionId)
+	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"$or": []interface{}{
 			map[string]interface{}{
@@ -881,7 +928,12 @@ func (c AccountInOutDisplay) getLastAccountingYearSequenceNoByYearMonth(sessionI
 			},
 		},
 	}
-	querySupport := QuerySupport{}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	collectionName := "AccountingPeriod"
 	pageNo := 1
 	pageSize := 1
@@ -922,14 +974,20 @@ func (c AccountInOutDisplay) getLastAccountingYearSequenceNoByYearMonth(sessionI
 取得max(会计期结束日期<date)的会计期年月
 @param date yyyyMMdd
 */
-func (c AccountInOutDisplay) getLastAccountingYearSequenceNo(sessionId int, date int) (int, int) {
+func (c AccountInOutDisplay) getLastAccountingYearSequenceNo(sessionId int, formTemplate FormTemplate, date int) (int, int) {
 	session, _ := global.GetConnection(sessionId)
+	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"B.endDate": map[string]interface{}{
 			"$lt": date,
 		},
 	}
-	querySupport := QuerySupport{}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	collectionName := "AccountingPeriod"
 	pageNo := 1
 	pageSize := 1

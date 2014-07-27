@@ -227,6 +227,16 @@ def getDictionaryLi():
             {'code': 2,'name': '已读','order': 2},
         ],
     })
+    li.append({
+        'code': 'D_STEP_STATUS',
+        'name': '步骤状态',
+        'items': [
+            {'code': 1,'name': '未开始','order': 1},
+            #{'code': 2,'name': '进行中','order': 2},
+            {'code': 2,'name': '执行成功','order': 2},
+            {'code': 3,'name': '执行失败','order': 3},
+        ],
+    })
 
 
     return li

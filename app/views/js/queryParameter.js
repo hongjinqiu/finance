@@ -3,8 +3,7 @@ function QueryParameterManager() {}
 /**
  * 设置传入的默认值
  */
-QueryParameterManager.prototype.applyQueryDefaultValue = function() {
-	YUI(g_financeModule).use("finance-module", function(Y){
+QueryParameterManager.prototype.applyQueryDefaultValue = function(Y) {
 		if (g_defaultBo) {
 			for (var key in g_masterFormFieldDict) {
 				if (g_defaultBo[key]) {
@@ -18,14 +17,12 @@ QueryParameterManager.prototype.applyQueryDefaultValue = function() {
 				g_masterFormFieldDict[key].set("value", "");
 			}
 		}
-	});
 }
 
 /**
  * 设置url传入的参数值
  */
-QueryParameterManager.prototype.applyFormData = function() {
-	YUI(g_financeModule).use("finance-module", function(Y){
+QueryParameterManager.prototype.applyFormData = function(Y) {
 		if (g_formDataJson) {
 			for (var key in g_formDataJson) {
 				if (g_masterFormFieldDict[key]) {
@@ -37,7 +34,6 @@ QueryParameterManager.prototype.applyFormData = function() {
 				}
 			}
 		}
-	});
 }
 
 QueryParameterManager.prototype.applyObserveEventBehavior = function() {

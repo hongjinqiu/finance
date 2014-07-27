@@ -12,5 +12,6 @@ type Demo struct {
 }
 
 func (c Demo) Schema() revel.Result {
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }

@@ -7,8 +7,8 @@ import (
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	. "com/papersns/mongo"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -17,8 +17,14 @@ import (
 func (c BankAccountInit) saveCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	// 自己拆,再循环保存
 	//	dataSourceModelId := c.Params.Form.Get("dataSourceModelId")
@@ -27,7 +33,7 @@ func (c BankAccountInit) saveCommon() ModelRenderVO {
 	jsonBo := c.Params.Form.Get("jsonData")
 
 	bo := map[string]interface{}{}
-	err := json.Unmarshal([]byte(jsonBo), &bo)
+	err = json.Unmarshal([]byte(jsonBo), &bo)
 	if err != nil {
 		panic(err)
 	}
@@ -39,6 +45,8 @@ func (c BankAccountInit) saveCommon() ModelRenderVO {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	//	modelTemplateFactory.ConvertDataType(dataSource, &bo)
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
 
 	bankAccountInitLi := []map[string]interface{}{}
 	bDataSetLi := bo["B"].([]interface{})
@@ -67,15 +75,15 @@ func (c BankAccountInit) saveCommon() ModelRenderVO {
 	strAccountId := fmt.Sprint(queryData["accountId"])
 	// 先处理删除的数据,并弄到差异数据中
 	diffDataRowAllLi := []DiffDataRow{}
-	toDeleteLi := c.dealDelete(sessionId, dataSource, queryData, nowIdLi)
+	toDeleteLi := c.dealDelete(sessionId, dataSource, formTemplate, queryData, nowIdLi)
 	modelIterator := ModelIterator{}
 	for _, item := range toDeleteLi {
 		var result interface{} = ""
 		modelIterator.IterateDataBo(dataSource, &item, &result, func(fieldGroupLi []FieldGroup, data *map[string]interface{}, rowIndex int, result *interface{}) {
 			diffDataRow := DiffDataRow{
 				FieldGroupLi: fieldGroupLi,
-				SrcData: *data,
-				SrcBo: item,
+				SrcData:      *data,
+				SrcBo:        item,
 			}
 			diffDataRowAllLi = append(diffDataRowAllLi, diffDataRow)
 		})
@@ -97,19 +105,19 @@ func (c BankAccountInit) saveCommon() ModelRenderVO {
 			c.setCreateFixFieldValue(sessionId, dataSource, bankAccountInit)
 		} else {
 			c.setModifyFixFieldValue(sessionId, dataSource, bankAccountInit)
-			editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, *bankAccountInit)
+			editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, formTemplate, *bankAccountInit)
 			if !isValid {
 				panic(editMessage)
 			}
 		}
 		// 这样只会是新增和修改的数据
-		c.actionSupport.beforeSaveData(sessionId, dataSource, bankAccountInit)
+		c.actionSupport.beforeSaveData(sessionId, dataSource, formTemplate, bankAccountInit)
 		financeService := FinanceService{}
 		diffDataRowLi := financeService.SaveData(sessionId, dataSource, bankAccountInit)
-		c.actionSupport.afterSaveData(sessionId, dataSource, bankAccountInit, diffDataRowLi)
+		c.actionSupport.afterSaveData(sessionId, dataSource, formTemplate, bankAccountInit, diffDataRowLi)
 
 		bDataSetLi = append(bDataSetLi, (*bankAccountInit)["A"])
-		
+
 		for _, diffDataRowItem := range *diffDataRowLi {
 			diffDataRowAllLi = append(diffDataRowAllLi, diffDataRowItem)
 		}
@@ -120,15 +128,14 @@ func (c BankAccountInit) saveCommon() ModelRenderVO {
 
 	usedCheckBo := map[string]interface{}{}
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return ModelRenderVO{
+		UserId:      userId,
 		Bo:          bo,
 		RelationBo:  relationBo,
 		UsedCheckBo: usedCheckBo,
@@ -136,7 +143,7 @@ func (c BankAccountInit) saveCommon() ModelRenderVO {
 	}
 }
 
-func (c BankAccountInit) dealDelete(sessionId int, dataSource DataSource, queryData map[string]interface{}, nowIdLi []int) []map[string]interface{} {
+func (c BankAccountInit) dealDelete(sessionId int, dataSource DataSource, formTemplate FormTemplate, queryData map[string]interface{}, nowIdLi []int) []map[string]interface{} {
 	modelTemplateFactory := ModelTemplateFactory{}
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 	_, db := global.GetConnection(sessionId)
@@ -146,6 +153,12 @@ func (c BankAccountInit) dealDelete(sessionId int, dataSource DataSource, queryD
 		},
 		"A.accountType": 2,
 	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	strAccountId := fmt.Sprint(queryData["accountId"])
 	if strAccountId != "" && strAccountId != "0" {
 		accountIdLi := []int{}
@@ -186,12 +199,12 @@ func (c BankAccountInit) dealDelete(sessionId int, dataSource DataSource, queryD
 			usedCheck.DeleteAll(sessionId, fieldGroupLi, *data)
 		})
 
-		c.actionSupport.beforeDeleteData(sessionId, dataSource, &item)
+		c.actionSupport.beforeDeleteData(sessionId, dataSource, formTemplate, &item)
 		_, removeResult := txnManager.Remove(txnId, collectionName, item)
 		if !removeResult {
 			panic("删除失败")
 		}
-		c.actionSupport.afterDeleteData(sessionId, dataSource, &item)
+		c.actionSupport.afterDeleteData(sessionId, dataSource, formTemplate, &item)
 	}
 	return toDeleteLi
 }
@@ -199,26 +212,41 @@ func (c BankAccountInit) dealDelete(sessionId int, dataSource DataSource, queryD
 func (c BankAccountInit) getDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	//	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	dataSourceModelId := "AccountInit"
 	formTemplateId := c.Params.Get("formTemplateId")
 
+	session, _ := global.GetConnection(sessionId)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"A.accountType": 2,
 	}
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-	c.actionSupport.beforeGetData(sessionId, dataSource)
+	c.actionSupport.beforeGetData(sessionId, dataSource, formTemplate)
 	// 需要进行循环处理,再转回来,
 	pageNo := 1
 	pageSize := 1000
 	orderBy := ""
-	result := querySupport.Index(collectionName, queryMap, pageNo, pageSize, orderBy)
+	result := querySupport.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
 	items := result["items"].([]interface{})
 	dataSetLi := []interface{}{}
 	for _, item := range items {
@@ -229,7 +257,7 @@ func (c BankAccountInit) getDataCommon() ModelRenderVO {
 			"A":   line["A"],
 		}
 		modelTemplateFactory.ConvertDataType(dataSource, &bo)
-		c.actionSupport.afterGetData(sessionId, dataSource, &bo)
+		c.actionSupport.afterGetData(sessionId, dataSource, formTemplate, &bo)
 		dataSetLi = append(dataSetLi, bo["A"])
 	}
 	bo := map[string]interface{}{
@@ -246,9 +274,7 @@ func (c BankAccountInit) getDataCommon() ModelRenderVO {
 	//	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 	usedCheckBo := map[string]interface{}{}
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
@@ -256,6 +282,7 @@ func (c BankAccountInit) getDataCommon() ModelRenderVO {
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	return ModelRenderVO{
+		UserId:      userId,
 		Bo:          bo,
 		RelationBo:  relationBo,
 		UsedCheckBo: usedCheckBo,
@@ -266,15 +293,21 @@ func (c BankAccountInit) getDataCommon() ModelRenderVO {
 func (c BankAccountInit) editDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	//	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	dataSourceModelId := "AccountInit"
 	formTemplateId := c.Params.Get("formTemplateId")
 	queryDataStr := c.Params.Get("queryData")
 	queryData := map[string]interface{}{}
-	err := json.Unmarshal([]byte(queryDataStr), &queryData)
+	err = json.Unmarshal([]byte(queryDataStr), &queryData)
 	if err != nil {
 		panic(err)
 	}
@@ -285,10 +318,19 @@ func (c BankAccountInit) editDataCommon() ModelRenderVO {
 	//		panic(err)
 	//	}
 
+	session, _ := global.GetConnection(sessionId)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"A.accountType": 2,
 	}
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	if strAccountId != "" && strAccountId != "0" {
 		accountIdLi := []int{}
 		for _, item := range strings.Split(strAccountId, ",") {
@@ -305,15 +347,11 @@ func (c BankAccountInit) editDataCommon() ModelRenderVO {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-	//	bo, found := querySupport.FindByMap(collectionName, queryMap)
-	//	if !found {
-	//		panic("RefreshData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
-	//	}
 	// 需要进行循环处理,再转回来,
 	pageNo := 1
 	pageSize := 1000
 	orderBy := ""
-	result := querySupport.Index(collectionName, queryMap, pageNo, pageSize, orderBy)
+	result := querySupport.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
 	items := result["items"].([]interface{})
 	dataSetLi := []interface{}{}
 	for _, item := range items {
@@ -325,13 +363,13 @@ func (c BankAccountInit) editDataCommon() ModelRenderVO {
 		}
 
 		modelTemplateFactory.ConvertDataType(dataSource, &bo)
-		editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, bo)
+		editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, formTemplate, bo)
 		if !isValid {
 			panic(editMessage)
 		}
 
-		c.actionSupport.beforeEditData(sessionId, dataSource, &bo)
-		c.actionSupport.afterEditData(sessionId, dataSource, &bo)
+		c.actionSupport.beforeEditData(sessionId, dataSource, formTemplate, &bo)
+		c.actionSupport.afterEditData(sessionId, dataSource, formTemplate, &bo)
 		dataSetLi = append(dataSetLi, bo["A"])
 	}
 
@@ -349,34 +387,40 @@ func (c BankAccountInit) editDataCommon() ModelRenderVO {
 	//	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 	usedCheckBo := map[string]interface{}{}
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return ModelRenderVO{
+		UserId:      userId,
 		Bo:          bo,
 		RelationBo:  relationBo,
 		UsedCheckBo: usedCheckBo,
 		DataSource:  dataSource,
+		FormTemplate: formTemplate,
 	}
 }
 
 func (c BankAccountInit) giveUpDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	//	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	dataSourceModelId := "AccountInit"
 	formTemplateId := c.Params.Get("formTemplateId")
 	queryDataStr := c.Params.Get("queryData")
 	queryData := map[string]interface{}{}
-	err := json.Unmarshal([]byte(queryDataStr), &queryData)
+	err = json.Unmarshal([]byte(queryDataStr), &queryData)
 	if err != nil {
 		panic(err)
 	}
@@ -387,10 +431,19 @@ func (c BankAccountInit) giveUpDataCommon() ModelRenderVO {
 	//		panic(err)
 	//	}
 
+	session, _ := global.GetConnection(sessionId)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"A.accountType": 2,
 	}
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	if strAccountId != "" && strAccountId != "0" {
 		accountIdLi := []int{}
 		for _, item := range strings.Split(strAccountId, ",") {
@@ -407,14 +460,10 @@ func (c BankAccountInit) giveUpDataCommon() ModelRenderVO {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-	//	bo, found := querySupport.FindByMap(collectionName, queryMap)
-	//	if !found {
-	//		panic("giveUpData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
-	//	}
 	pageNo := 1
 	pageSize := 1000
 	orderBy := ""
-	result := querySupport.Index(collectionName, queryMap, pageNo, pageSize, orderBy)
+	result := querySupport.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
 	items := result["items"].([]interface{})
 	dataSetLi := []interface{}{}
 	for _, item := range items {
@@ -425,8 +474,8 @@ func (c BankAccountInit) giveUpDataCommon() ModelRenderVO {
 			"A":   line["A"],
 		}
 		modelTemplateFactory.ConvertDataType(dataSource, &bo)
-		c.actionSupport.beforeGiveUpData(sessionId, dataSource, &bo)
-		c.actionSupport.afterGiveUpData(sessionId, dataSource, &bo)
+		c.actionSupport.beforeGiveUpData(sessionId, dataSource, formTemplate, &bo)
+		c.actionSupport.afterGiveUpData(sessionId, dataSource, formTemplate, &bo)
 		dataSetLi = append(dataSetLi, bo["A"])
 	}
 	bo := map[string]interface{}{
@@ -443,15 +492,14 @@ func (c BankAccountInit) giveUpDataCommon() ModelRenderVO {
 	//	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 	usedCheckBo := map[string]interface{}{}
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return ModelRenderVO{
+		UserId:      userId,
 		Bo:          bo,
 		RelationBo:  relationBo,
 		UsedCheckBo: usedCheckBo,
@@ -462,15 +510,21 @@ func (c BankAccountInit) giveUpDataCommon() ModelRenderVO {
 func (c BankAccountInit) refreshDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	//	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	dataSourceModelId := "AccountInit"
 	formTemplateId := c.Params.Get("formTemplateId")
 	queryDataStr := c.Params.Get("queryData")
 	queryData := map[string]interface{}{}
-	err := json.Unmarshal([]byte(queryDataStr), &queryData)
+	err = json.Unmarshal([]byte(queryDataStr), &queryData)
 	if err != nil {
 		panic(err)
 	}
@@ -481,10 +535,19 @@ func (c BankAccountInit) refreshDataCommon() ModelRenderVO {
 	//		panic(err)
 	//	}
 
+	session, _ := global.GetConnection(sessionId)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
 		"A.accountType": 2,
 	}
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	if strAccountId != "" && strAccountId != "0" {
 		accountIdLi := []int{}
 		for _, item := range strings.Split(strAccountId, ",") {
@@ -501,15 +564,11 @@ func (c BankAccountInit) refreshDataCommon() ModelRenderVO {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-	//	bo, found := querySupport.FindByMap(collectionName, queryMap)
-	//	if !found {
-	//		panic("RefreshData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
-	//	}
 	// 需要进行循环处理,再转回来,
 	pageNo := 1
 	pageSize := 1000
 	orderBy := ""
-	result := querySupport.Index(collectionName, queryMap, pageNo, pageSize, orderBy)
+	result := querySupport.IndexWithSession(session, collectionName, queryMap, pageNo, pageSize, orderBy)
 	items := result["items"].([]interface{})
 	dataSetLi := []interface{}{}
 	for _, item := range items {
@@ -520,8 +579,8 @@ func (c BankAccountInit) refreshDataCommon() ModelRenderVO {
 			"A":   line["A"],
 		}
 		modelTemplateFactory.ConvertDataType(dataSource, &bo)
-		c.actionSupport.beforeRefreshData(sessionId, dataSource, &bo)
-		c.actionSupport.afterRefreshData(sessionId, dataSource, &bo)
+		c.actionSupport.beforeRefreshData(sessionId, dataSource, formTemplate, &bo)
+		c.actionSupport.afterRefreshData(sessionId, dataSource, formTemplate, &bo)
 		dataSetLi = append(dataSetLi, bo["A"])
 	}
 	bo := map[string]interface{}{
@@ -538,15 +597,14 @@ func (c BankAccountInit) refreshDataCommon() ModelRenderVO {
 	//	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 	usedCheckBo := map[string]interface{}{}
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return ModelRenderVO{
+		UserId:      userId,
 		Bo:          bo,
 		RelationBo:  relationBo,
 		UsedCheckBo: usedCheckBo,

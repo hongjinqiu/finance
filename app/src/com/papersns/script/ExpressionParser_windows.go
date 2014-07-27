@@ -1,14 +1,18 @@
 package script
 
+import "github.com/robfig/revel"
 import (
 	"sync"
 	"fmt"
-	"os"
-	"os/exec"
+//	"os"
+//	"os/exec"
 	"strings"
 	"log"
 	"regexp"
-	"strconv"
+//	"strconv"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 )
 
 var pyrwlock sync.RWMutex = sync.RWMutex{}
@@ -31,6 +35,35 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	if recordJson == "" {
 		recordJson = "{}"
 	}
+	
+	values := url.Values{}
+	values.Add("method", "parse")
+	values.Add("jsonString", recordJson)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("Parse(recordJson, expression string) bool")
+		log.Fatal("recordJson:" + recordJson)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result == "true"
+	
+	/*
 	os.Chdir("/goworkspace/src/finance/app/pyscript")
 	recordJson = strconv.QuoteToASCII(recordJson)
 	recordJson = recordJson[1:len(recordJson) - 1]
@@ -47,15 +80,45 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 		panic(err)
 	}
 	result := strings.ToLower(string(out))
-	regx := regexp.MustCompile(`\s+$`)
+	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	return result == "true"
+	*/
 }
 
 func (o ExpressionParser) Validate(text, expression string) bool {
 	if text == "" || expression == "" {
 		return true
 	}
+	
+	values := url.Values{}
+	values.Add("method", "validate")
+	values.Add("jsonString", text)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("Validate(text, expression string) bool")
+		log.Fatal("text:" + text)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result == "true"
+	
+	/*
 	os.Chdir("/goworkspace/src/finance/app/pyscript")
 	text = strconv.QuoteToASCII(text)
 	text = text[1:len(text) - 1]
@@ -72,9 +135,10 @@ func (o ExpressionParser) Validate(text, expression string) bool {
 		panic(err)
 	}
 	result := strings.ToLower(string(out))
-	regx := regexp.MustCompile(`\s+$`)
+	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	return result == "true"
+	*/
 }
 
 func (o ExpressionParser) ParseString(recordJson, expression string) string {
@@ -84,6 +148,35 @@ func (o ExpressionParser) ParseString(recordJson, expression string) string {
 	if recordJson == "" {
 		recordJson = "{}"
 	}
+	
+	values := url.Values{}
+	values.Add("method", "parseString")
+	values.Add("jsonString", recordJson)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("ParseString(recordJson, expression string) string")
+		log.Fatal("recordJson:" + recordJson)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result
+	
+	/*
 	os.Chdir("/goworkspace/src/finance/app/pyscript")
 	recordJson = strconv.QuoteToASCII(recordJson)
 	recordJson = recordJson[1:len(recordJson) - 1]
@@ -100,9 +193,10 @@ func (o ExpressionParser) ParseString(recordJson, expression string) string {
 		panic(err)
 	}
 	result := string(out)
-	regx := regexp.MustCompile(`\s+$`)
+	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	return result
+	*/
 }
 
 func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string {
@@ -115,6 +209,37 @@ func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string
 	if dataJson == "" {
 		dataJson = "{}"
 	}
+	
+	values := url.Values{}
+	values.Add("method", "parseModel")
+	values.Add("bo", boJson)
+	values.Add("data", dataJson)
+	values.Add("action", expression)
+
+	PYTHON_PARSE_URL := revel.Config.StringDefault("PYTHON_PARSE_URL", "")
+	resp, err := http.PostForm(PYTHON_PARSE_URL, values)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	
+	result := strings.ToLower(string(body))
+	regx := regexp.MustCompile(`^\s+|\s+$`)
+	result = regx.ReplaceAllString(result, "")
+	if result == "bad request" {
+		log.Fatal("ParseString(recordJson, expression string) string")
+		log.Fatal("boJson:" + boJson)
+		log.Fatal("dataJson:" + dataJson)
+		log.Fatal("expression:" + expression)
+		panic("parse error")
+	}
+	return result
+	
+	/*
 	os.Chdir("/goworkspace/src/finance/app/pyscript")
 	boJson = strconv.QuoteToASCII(boJson)
 	boJson = boJson[1:len(boJson) - 1]
@@ -135,9 +260,10 @@ func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string
 		panic(err)
 	}
 	result := string(out)
-	regx := regexp.MustCompile(`\s+$`)
+	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	return result
+	*/
 }
 
 func (o ExpressionParser) ParseBeforeBuildQuery(classMethod string, paramMap map[string]string) map[string]string {

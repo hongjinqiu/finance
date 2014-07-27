@@ -50,6 +50,14 @@ PayBill	付款单,用到,finish,
 AccountInOut	月档,used,finish,
 AccountInOutItem	日记账明细,finish,
 
+list_bbspost,
+list_bbspostreply,
+form_bbspost,
+form_bbspostadminremark,
+list_bbspostadmin,
+list_bbspostadminreply,
+
+
 再加个意见反馈的东东?
 帖子列表,
 主帖:id,标题,类型,内容,最后回复时间,最后回复人,创建时间倒序,管理员备注,
@@ -91,41 +99,124 @@ action,
 	bbspost(包含管理员的备注操作),
 	
 3.点击查看,进入 list_bbspostreply 页面,这个页面需要自己折腾一番,直接用td来操作了,finish,
-
-list_bbspostadmin,
-list_bbspostadminreply,
-form_bbspostadminremark,
-
-保存完后,隐藏掉回复div,清除掉里面的值,finish,
-
-basedataaction.go,finish,
-	sysUserMaster := sysUser["A"].(map[string]interface{})
-bbspostreply.go,finish,byTest,
-gatheringbill.go,pass,
-paybill.go,pass,
-accountinoutitemparam.go,pass,
-accountinoutservice.go,pass,
+3.1.给所有的页面都添加上 <security byUnit="true" />,finish,
+3.1.1.添加 ds_unit,要参考 afterket的东东,同时,添加初始数据,finish,
 
 
-最后,所有的查询,都要带上createUnit字段,running,------------------------------,
-	1.加入了createUnit字段,
-	2.以及各个查询,添加createUnit的东东,running,------------------------------,
-然后接入,的折腾,需要分析已有的python程序,做相应的修改即可,弄完就要看java的解析了,
-收付款单 list 界面上删除的赤字报错信息,即循环删除的解决,
+1.4.菜单的初始化界面,改菜单url,finish,
+2.管理员界面的实现,
+2.1.登录,finish,
+2.1.1.列表页,finish,
+2.2.写查看时跳转,
+	数据的准备,看一看,finish,
+	在点击时,做userId的赋值,finish,
+3.退出的折腾,finish,
+4.首页的数据构思,finish,
+	1.快捷菜单,finish,
+	2.右侧数据，最近收款，付款，finish,
+	2.1.店铺数据,finish,
+	3.我的菜单，finish,
+	4.意见反馈，finish,
+5.首页的开发完善，用上可伸缩的页面组件，finish,
+6.添加标签页的东东，finish,
+7.首页右上角的折腾,finish,
+7.1.相关链接的添加，
+	1.与我联系,在window.onload才会弄上,
+	2.我的桌面,finish,
+	3.我的菜单,finish,
+	4.用户反馈,finish,
+	5.退出，finish,
+8.页面body的左右部分的折腾,finish,
+9.我的菜单弹出后，在主页面添加上标签的开发，finish，
+10.IE下form慢的问题，finish,
 
-列表页面添加复制按钮,
+9.初始化是否正确的,----------,调通过了，剩下接入的东东，
+9.1.step要能够正确运行,因为step与初始化不相关,因此,可以单独测试,finish,
+9.1.弄清楚流程,进行初始化的流程模拟，
+9.2.测试初始化,查看数据是否正确,
+9.3.IE下底部分页的折腾,为什么出不来?yui grid remove column会报兼容性错误，先不管IE，直接折腾，
+
+收付款单 list 界面上删除的赤字报错信息,即循环删除的解决,finish，
+
+列表页面添加复制按钮,finish,
+选择页面,操作按钮的显示隐藏,finish,
+金额数字的格式化问题,running,----------------------,	主要是 被格式字段,格式的字段,
+	每个字段都要配置一个 reference 的东东,然后 onChange 的时候,刷新其值,
+	1.1.实现取值到页面上,
+	1.4.组件模型列表的东东,form页面的刷值取值问题的折腾，
+		1.1.模型里面有哪几个字段是定义金额的，
+		1.1.1.添加FormatSrcField	格式化来源字段Id	字段添加格式化字段来源,finish,先只实现 float,money,的相关的东东,
+		1.1.2.组件模型字段生成,
+			<attribute name="currencyField"></attribute><!-- 币别字段 -->			field.formatExpr
+			<attribute name="isMoney" type="boolean"></attribute>				field.fieldDataType = money,
+			<attribute name="isUnitPrice" type="boolean"></attribute>
+			<attribute name="isCost" type="boolean"></attribute>
+			<attribute name="isPercent" type="boolean"></attribute>
+			<attribute name="isQuantity" type="boolean"></attribute>
+			
+			修改 adapter	o.applyColumnExtend(*fieldGroup, column)
+			只要多一个 currencyField,finish,直接用选择器里面的东东，连东东都不要，
+			界面上是否有值，将其配置，添加到界面上的 sysParam里面去，localCurrency，将currency的值给弄进去，
+			用收款单,localCurrency看对不对,isMoney,
+			g_relationManager.getRelationBo("CurrencyTypeSelector", 3),
+			
+			修改 columnManager.currencyFormatFunc,要参考 createSelectColumn 里面的内容进行处理,只是,running,----------------------------,
+	1.2.再看一看流程，看能不能实现，
+	1.2.r-number里面的东东还没有折腾，将各个属性设置成函数，并提供refresh方法，yes，可参考日期控件的实现,
+	1.3.l-number,每个值赋进来的时候
+	
+	localCurrency的字段,刷新要进行清值,
 需要找一个go的大数进行计算,
-金额数字的格式化问题,
 程序中的长度是utf8 encode后的,因此,会有*3的效应,处理这个东东,
-返回时,用cookie=false来实现查询信息的保存,
 
 
 当数据量大时,过账会有bug,因此,我需要一个新的小 pendingTransaction 来操作,只需要其底下的几个字段修改即可,
 只在pendingTransaction里面存最初的一个obj即可,
+后台查询关联时,用减少查询语句的方式,来获取数据,
 
-界面上统一添加复制按钮,
-查询页面的l-trigger-field,可能有bug,默认显示为多选,
+js压缩输出时,添加日期标记，用读取配置文件的方式输出,并写回复报头,
 
+12.日期的替换，
+13.列表页输入日期的报错，
+14.cookie的添加的折腾，
+14.列表，表单页面的美化，
+10.最后才是接入是否正确，
+11.右上角的与我联系的window.onlad开发,
+
+
+
+
+
+ProviderType
+CurrencyType
+Bank
+MeasureUnit
+CustomerType
+TaxType
+IncomeType
+IncomeItem
+AccountingPeriod
+BillReceiveTypeParameter
+BillPaymentTypeParameter
+SystemParameter
+
+
+db.SysUnit.remove({'A.createUnit': 20})
+db.SysUser.remove({'A.createUnit': 20})
+db.ProviderType.remove({'A.createUnit': 20})
+db.CurrencyType.remove({'A.createUnit': 20})
+db.Bank.remove({'A.createUnit': 20})
+db.MeasureUnit.remove({'A.createUnit': 20})
+db.CustomerType.remove({'A.createUnit': 20})
+db.TaxType.remove({'A.createUnit': 20})
+db.IncomeType.remove({'A.createUnit': 20})
+db.IncomeItem.remove({'A.createUnit': 20})
+db.AccountingPeriod.remove({'A.createUnit': 20})
+db.BillTypeParameter.remove({'A.createUnit': 20})
+db.BillReceiveTypeParameter.remove({'A.createUnit': 20})
+db.BillPaymentTypeParameter.remove({'A.createUnit': 20})
+db.SystemParameter.remove({'A.createUnit': 20})
+db.SysStep.remove({'A.createUnit': 20})
 
 
 

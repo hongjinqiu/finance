@@ -29,8 +29,8 @@
 		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
 		</button>
 	</toolbar>
-
-	<!-- <security functionId="10018"></security> -->
+	
+	<security byUnit="true"/>
 
 	<!-- <before-build-query>Demo.beforeBuildQuery</before-build-query> <after-build-query>Demo.afterBuildQuery</after-build-query> -->
 	<!-- <after-query-data>ModelListTemplateInterceptor.AfterQueryData</after-query-data> -->

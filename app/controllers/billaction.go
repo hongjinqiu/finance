@@ -86,6 +86,7 @@ func (c BillAction) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }
 
@@ -101,8 +102,14 @@ func (c BillAction) CancelData() revel.Result {
 func (c BillAction) cancelDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	formTemplateId := c.Params.Get("formTemplateId")
@@ -113,8 +120,16 @@ func (c BillAction) cancelDataCommon() ModelRenderVO {
 	}
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id": id,
+		"_id":          id,
 	}
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -127,7 +142,7 @@ func (c BillAction) cancelDataCommon() ModelRenderVO {
 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
-	c.actionSupport.beforeCancelData(sessionId, dataSource, &bo)
+	c.actionSupport.beforeCancelData(sessionId, dataSource, formTemplate, &bo)
 	mainData := bo["A"].(map[string]interface{})
 	bo["A"] = mainData
 	if fmt.Sprint(mainData["billStatus"]) == "4" {
@@ -143,26 +158,26 @@ func (c BillAction) cancelDataCommon() ModelRenderVO {
 		panic("作废失败")
 	}
 
-	c.actionSupport.afterCancelData(sessionId, dataSource, &bo)
+	c.actionSupport.afterCancelData(sessionId, dataSource, formTemplate, &bo)
 
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
 
 	usedCheck := UsedCheck{}
 	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return ModelRenderVO{
-		Bo:          bo,
-		RelationBo:  relationBo,
-		UsedCheckBo: usedCheckBo,
-		DataSource:  dataSource,
+		UserId:       userId,
+		Bo:           bo,
+		RelationBo:   relationBo,
+		UsedCheckBo:  usedCheckBo,
+		DataSource:   dataSource,
+		FormTemplate: formTemplate,
 	}
 }
 
@@ -178,8 +193,14 @@ func (c BillAction) UnCancelData() revel.Result {
 func (c BillAction) unCancelDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 	defer c.rollbackTxn(sessionId)
+
+	userId, err := strconv.Atoi(c.Session["userId"])
+	if err != nil {
+		panic(err)
+	}
 
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	formTemplateId := c.Params.Get("formTemplateId")
@@ -190,8 +211,16 @@ func (c BillAction) unCancelDataCommon() ModelRenderVO {
 	}
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id": id,
+		"_id":          id,
 	}
+	templateManager := TemplateManager{}
+	formTemplate := templateManager.GetFormTemplate(formTemplateId)
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+	
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -204,7 +233,7 @@ func (c BillAction) unCancelDataCommon() ModelRenderVO {
 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	c.setModifyFixFieldValue(sessionId, dataSource, &bo)
-	c.actionSupport.beforeUnCancelData(sessionId, dataSource, &bo)
+	c.actionSupport.beforeUnCancelData(sessionId, dataSource, formTemplate, &bo)
 	mainData := bo["A"].(map[string]interface{})
 	if fmt.Sprint(mainData["billStatus"]) == "1" {
 		panic(BusinessError{Message: "单据已经反作废，不可再次反作废"})
@@ -219,25 +248,25 @@ func (c BillAction) unCancelDataCommon() ModelRenderVO {
 		panic("反作废失败")
 	}
 
-	c.actionSupport.afterUnCancelData(sessionId, dataSource, &bo)
+	c.actionSupport.afterUnCancelData(sessionId, dataSource, formTemplate, &bo)
 
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
 
 	usedCheck := UsedCheck{}
 	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
 
-	templateManager := TemplateManager{}
-	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	columnModelData := templateManager.GetColumnModelDataForFormTemplate(formTemplate, bo)
+	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 	c.commitTxn(sessionId)
 	return ModelRenderVO{
-		Bo:          bo,
-		RelationBo:  relationBo,
-		UsedCheckBo: usedCheckBo,
-		DataSource:  dataSource,
+		UserId:       userId,
+		Bo:           bo,
+		RelationBo:   relationBo,
+		UsedCheckBo:  usedCheckBo,
+		DataSource:   dataSource,
+		FormTemplate: formTemplate,
 	}
 }

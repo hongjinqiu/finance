@@ -9,13 +9,17 @@
 	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
+	<!-- 
 	<toolbar export="true">
 		<button text="新增" mode="url" handler="/console/formschema?@name=SystemParameter" iconCls="test" />
 
 		<button text="删除" mode="fn" handler="g_deleteRecords">
 		</button>
-	</toolbar>
+		<button text="新增" mode="url" handler="/console/formschema?@name=SystemParameter" iconCls="test" use-in="selector" />	</toolbar>
+	 -->
 
+	<security byUnit="true"/>
+	
 	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
@@ -29,10 +33,21 @@
 
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
+				<!-- 
+				<button text="复制" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=SystemParameter&amp;id={id}&amp;copyFlag=true">
+				</button>
+				 -->
 				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=SystemParameter&amp;id={id}">
 				</button>
-				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				<!-- <button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
 				</button>
+				 -->
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=SystemParameter&amp;id={id}&amp;formStatus=view">
+				</button>
+			</buttons>
+		</virtual-column>
+		<virtual-column name="FUN_C_SELECTOR" text="操作" width="40" use-in="selector">
+			<buttons>
 				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=SystemParameter&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
@@ -51,8 +66,20 @@
 		<query-parameter name="percentDecimals" auto="true" text=""></query-parameter>
 		<query-parameter name="percentRoundingWay" auto="true" text=""></query-parameter>
 		<query-parameter name="thousandDecimals" auto="true" text=""></query-parameter>
-		<query-parameter name="currencyTypeId" auto="true" text=""></query-parameter>
+		<query-parameter name="currencyTypeId" auto="true" text="">
+			<relationDS>
+				<relationItem name="CurrencyType">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
 		<query-parameter name="costDecimals" auto="true" text=""></query-parameter>
-		<query-parameter name="taxTypeId" auto="true" text=""></query-parameter>
+		<query-parameter name="taxTypeId" auto="true" text="">
+			<relationDS>
+				<relationItem name="TaxType">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
 	</query-parameters>
 </list-template>

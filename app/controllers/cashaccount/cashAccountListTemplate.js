@@ -7,6 +7,6 @@ var listTemplateExtraInfo = {
 	}
 };
 
-function main() {
+function main(Y) {
 	
 }

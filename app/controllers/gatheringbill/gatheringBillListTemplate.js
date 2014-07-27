@@ -28,10 +28,9 @@ var listTemplateExtraInfo = {
 	}
 };
 
-function main() {
-	YUI(g_financeModule).use("finance-module", function(YNotUse) {// 不能直接在父函数用use finance-module,会报错,因为在js父函数直接加载,其会直接使用调用
+function main(Y) {
+	
 		listTemplateExtraInfo.QueryParameter.property.listeners.valueChange(null, g_masterFormFieldDict["property"]);
 		listTemplateExtraInfo.QueryParameter.chamberlainType.listeners.valueChange(null, g_masterFormFieldDict["chamberlainType"]);
-	});
 }
 

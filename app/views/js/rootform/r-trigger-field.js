@@ -124,7 +124,7 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
         		return {};
         	};
         	
-            var url = "/console/selectorschema?@name={NAME_VALUE}&@id={ID_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}";
+            var url = "/console/selectorschema?@name={NAME_VALUE}&@id={ID_VALUE}&@multi={MULTI_VALUE}&@displayField={DISPLAY_FIELD_VALUE}&date=" + new Date();
             var selectorName = this._getStringOrFunctionResult(this.get("selectorName"));
             if (!selectorName || selectorName == "NullSelector") {
             	showAlert("无法打开选择器");
@@ -244,7 +244,7 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
     
     initializer: function() {
     	Y.RTriggerField.superclass.initializer.apply(this, arguments);
-    },
+    }
 
 },
 {

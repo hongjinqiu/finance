@@ -23,7 +23,7 @@ type BankAccountSupport struct {
 /**
 * 为避免并发问题,重设amtOriginalCurrencyBalance为数据库中值
  */
-func (o BankAccountSupport) beforeSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (o BankAccountSupport) beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	session, _ := global.GetConnection(sessionId)
 	modelTemplateFactory := ModelTemplateFactory{}
 	strId := modelTemplateFactory.GetStrId(*bo)
@@ -32,10 +32,16 @@ func (o BankAccountSupport) beforeSaveData(sessionId int, dataSource DataSource,
 		if err != nil {
 			panic(err)
 		}
+		qb := QuerySupport{}
 		queryMap := map[string]interface{}{
 			"_id": id,
 		}
-		qb := QuerySupport{}
+		permissionSupport := PermissionSupport{}
+		permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+		for k, v := range permissionQueryDict {
+			queryMap[k] = v
+		}
+		
 		collectionName := "BankAccount"
 		boInDb, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 		if !found {
@@ -66,11 +72,11 @@ func (o BankAccountSupport) beforeSaveData(sessionId int, dataSource DataSource,
 	}
 }
 
-func (c BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSetId := "B"
 	data := modelTemplateFactory.GetDataSetNewData(dataSource, dataSetId, *bo)
-
+	
 	// 设置默认的币别
 	qb := QuerySupport{}
 	session, _ := global.GetConnection(sessionId)
@@ -78,6 +84,12 @@ func (c BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, b
 	query := map[string]interface{}{
 		"A.code": "RMB",
 	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		query[k] = v
+	}
+	
 	currencyType, found := qb.FindByMapWithSession(session, collection, query)
 	if !found {
 		panic(BusinessError{Message: "没有找到币别人民币，请先配置默认币别"})
@@ -89,7 +101,7 @@ func (c BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, b
 	}
 }
 
-func (c BankAccountSupport) afterSaveData(sessionId int, dataSource DataSource, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+func (c BankAccountSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
 	for _, item := range *diffDataRowLi {
 		if item.FieldGroupLi[0].GetDataSetId() == "B" { // 币别分录
 			if item.SrcData != nil && item.DestData != nil { // 修改
@@ -110,6 +122,7 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 	if diffDataType == BEFORE_UPDATE { // 不管
 		return
 	}
+	
 	var addData map[string]interface{}
 	var deleteData map[string]interface{}
 	var afterUpdateData map[string]interface{}
@@ -130,11 +143,11 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 
 	if diffDataType == AFTER_UPDATE { // 重新获取一遍bo
 		beforeUpdateData := diffDataRow.SrcData
+		qb := QuerySupport{}
 		query := map[string]interface{}{
 			"A.bankAccountId":  bankAccountMasterData["id"],
 			"A.currencyTypeId": beforeUpdateData["currencyTypeId"],
 		}
-		qb := QuerySupport{}
 		bankAccountCurrencyType, found := qb.FindByMapWithSession(session, collectionName, query)
 		if found {
 			bo = bankAccountCurrencyType
@@ -214,7 +227,7 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 	}
 }
 
-func (c BankAccountSupport) afterDeleteData(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c BankAccountSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 直接删除,整个删除 账户币别中的数据
 	bankAccountMasterData := (*bo)["A"].(map[string]interface{})
 	_, db := global.GetConnection(sessionId)
@@ -297,5 +310,6 @@ func (c BankAccount) LogList() revel.Result {
 		c.Response.ContentType = "application/json; charset=utf-8"
 		return c.RenderJson(result)
 	}
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	return c.Render()
 }

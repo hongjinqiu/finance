@@ -28,6 +28,10 @@ type Console struct {
 
 func (c Console) Summary() revel.Result {
 	println("session is:", c.Session["userId"])
+	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
+	defer global.CloseSession(sessionId)
 
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate("Console")
@@ -71,7 +75,7 @@ func (c Console) Summary() revel.Result {
 				dataBo[item.ColumnModel.Name] = []interface{}{}
 			}
 			items := dataBo[item.ColumnModel.Name].([]interface{})
-			itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+			itemsDict := templateManager.GetColumnModelDataForColumnModel(sessionId, item.ColumnModel, items)
 			items = itemsDict["items"].([]interface{})
 			dataBo[item.ColumnModel.Name] = items
 		} else if item.XMLName.Local == "toolbar" {
@@ -114,7 +118,7 @@ func (c Console) Summary() revel.Result {
 			return a == b
 		},
 	}
-	c.Response.ContentType = "text/html; charset=utf-8"
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	tmpl, err := template.New("summary").Funcs(funcMap).Parse(string(fileContent))
 	if err != nil {
 		panic(err)
@@ -203,7 +207,7 @@ func (c Console) ListSchema() revel.Result {
 	listTemplate := templateManager.GetListTemplate(schemaName)
 
 	result := c.listSelectorCommon(&listTemplate, true)
-	
+
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
 		callback := c.Params.Get("callback")
@@ -216,15 +220,17 @@ func (c Console) ListSchema() revel.Result {
 		c.Response.ContentType = "text/javascript; charset=utf-8"
 		return c.RenderText(callback + "(" + dataBoText + ");")
 	} else {
+		//c.Response.ContentType = "text/html; charset=utf-8"
 		c.RenderArgs["result"] = result
 		return c.RenderTemplate(listTemplate.ViewTemplate.View)
-//		return c.Render(result)
+		//		return c.Render(result)
 	}
 }
 
 func (c Console) SelectorSchema() revel.Result {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 
 	schemaName := c.Params.Get("@name")
@@ -240,7 +246,7 @@ func (c Console) SelectorSchema() revel.Result {
 	result := c.listSelectorCommon(&listTemplate, isGetBo)
 
 	selectionBo := map[string]interface{}{
-		"url": templateManager.GetViewUrl(listTemplate),
+		"url":         templateManager.GetViewUrl(listTemplate),
 		"Description": listTemplate.Description,
 	}
 	ids := c.Params.Get("@id")
@@ -291,7 +297,10 @@ func (c Console) SelectorSchema() revel.Result {
 		c.Response.ContentType = "text/javascript; charset=utf-8"
 		return c.RenderText(callback + "(" + dataBoText + ");")
 	} else {
-		return c.Render(result)
+		//		return c.Render(result)
+		//c.Response.ContentType = "text/html; charset=utf-8"
+		c.RenderArgs["result"] = result
+		return c.RenderTemplate(listTemplate.ViewTemplate.SelectorView)
 	}
 }
 
@@ -325,21 +334,22 @@ func (c Console) setDisplayField(listTemplate *ListTemplate) {
 func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) map[string]interface{} {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	
+
 	// 1.toolbar bo
 	templateManager := TemplateManager{}
 	//templateManager.ApplyDictionaryForQueryParameter(listTemplate)
 	//templateManager.ApplyTreeForQueryParameter(listTemplate)
 	toolbarBo := templateManager.GetToolbarForListTemplate(*listTemplate)
 	paramMap := map[string]string{}
-	
+
 	defaultBo := templateManager.GetQueryDefaultValue(*listTemplate)
 	defaultBoByte, err := json.Marshal(&defaultBo)
 	if err != nil {
 		panic(err)
 	}
-	for key,value := range defaultBo {
+	for key, value := range defaultBo {
 		paramMap[key] = value
 	}
 	//	c.Request.URL
@@ -351,13 +361,13 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		value := strings.Join(v, ",")
 		paramMap[k] = value
 	}
-	
+
 	formDataByte, err := json.Marshal(&paramMap)
 	if err != nil {
 		panic(err)
 	}
-	
-//	}
+
+	//	}
 	pageNo := 1
 	pageSize := 10
 	if listTemplate.DataProvider.Size != "" {
@@ -390,24 +400,24 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		dataBo = templateManager.GetBoForListTemplate(sessionId, listTemplate, paramMap, pageNo, pageSize)
 		relationBo = dataBo["relationBo"].(map[string]interface{})
 		//delete(dataBo, "relationBo")
-		
+
 		// usedCheck的修改,
 		if listTemplate.DataSourceModelId != "" {
 			modelTemplateFactory := ModelTemplateFactory{}
 			dataSource := modelTemplateFactory.GetDataSource(listTemplate.DataSourceModelId)
 			items := dataBo["items"].([]interface{})
 			usedCheck := UsedCheck{}
-			
+
 			usedCheckBo = usedCheck.GetListUsedCheck(sessionId, dataSource, items, listTemplate.ColumnModel.DataSetId)
 		}
 	}
 	dataBo["usedCheckBo"] = usedCheckBo
-	
+
 	dataBoByte, err := json.Marshal(&dataBo)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	relationBoByte, err := json.Marshal(&relationBo)
 	if err != nil {
 		panic(err)
@@ -417,18 +427,27 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	if err != nil {
 		panic(err)
 	}
-	
+
 	usedCheckByte, err := json.Marshal(&usedCheckBo)
 	if err != nil {
 		panic(err)
 	}
 	
+	// 系统参数的获取
+	commonUtil := CommonUtil{}
+	userId := commonUtil.GetIntFromString(c.Session["userId"])
+	sysParam := c.getSysParam(sessionId, userId)
+	sysParamJson, err := json.Marshal(&sysParam)
+	if err != nil {
+		panic(err)
+	}
+
 	queryParameterRenderLi := c.getQueryParameterRenderLi(*listTemplate)
 
 	//showParameterLi := templateManager.GetShowParameterLiForListTemplate(listTemplate)
 	showParameterLi := []QueryParameter{}
 	hiddenParameterLi := templateManager.GetHiddenParameterLiForListTemplate(listTemplate)
-	
+
 	layerBo := templateManager.GetLayerForListTemplate(sessionId, *listTemplate)
 	iLayerBo := layerBo["layerBo"]
 	layerBoByte, err := json.Marshal(&iLayerBo)
@@ -440,44 +459,95 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	if err != nil {
 		panic(err)
 	}
-	commonUtil := CommonUtil{}
 	layerBoJson := string(layerBoByte)
 	layerBoJson = commonUtil.FilterJsonEmptyAttr(layerBoJson)
 	layerBoLiJson := string(layerBoLiByte)
 	layerBoLiJson = commonUtil.FilterJsonEmptyAttr(layerBoLiJson)
-	
+
 	result := map[string]interface{}{
-		"pageSize":          pageSize,
-		"listTemplate":      listTemplate,
-		"toolbarBo":         toolbarBo,
-		"showParameterLi":   showParameterLi,
-		"hiddenParameterLi": hiddenParameterLi,
+		"pageSize":               pageSize,
+		"listTemplate":           listTemplate,
+		"toolbarBo":              toolbarBo,
+		"showParameterLi":        showParameterLi,
+		"hiddenParameterLi":      hiddenParameterLi,
 		"queryParameterRenderLi": queryParameterRenderLi,
-		"dataBo":            dataBo,
+		"dataBo":                 dataBo,
 		//		"columns":       columns,
 		"dataBoText":       string(dataBoByte),
 		"dataBoJson":       template.JS(string(dataBoByte)),
-		"relationBoJson":       template.JS(string(relationBoByte)),
+		"relationBoJson":   template.JS(string(relationBoByte)),
 		"listTemplateJson": template.JS(string(listTemplateByte)),
-		"layerBoJson": template.JS(layerBoJson),
-		"layerBoLiJson": template.JS(layerBoLiJson),
-		"defaultBoJson": template.JS(string(defaultBoByte)),
-		"formDataJson": template.JS(string(formDataByte)),
-		"usedCheckJson": template.JS(string(usedCheckByte)),
+		"layerBoJson":      template.JS(layerBoJson),
+		"layerBoLiJson":    template.JS(layerBoLiJson),
+		"defaultBoJson":    template.JS(string(defaultBoByte)),
+		"formDataJson":     template.JS(string(formDataByte)),
+		"usedCheckJson":    template.JS(string(usedCheckByte)),
+		"sysParamJson":    template.JS(string(sysParamJson)),
 		//		"columnsJson":   string(columnsByte),
 	}
 	return result
+}
+
+func (c Console) getSysParam(sessionId int, userId int) map[string]interface{} {
+	commonUtil := CommonUtil{}
+	systemParameter := c.getSystemParameter(sessionId, userId)
+	systemParameterMain := systemParameter["A"].(map[string]interface{})
+	currencyTypeId := commonUtil.GetIntFromMap(systemParameterMain, "currencyTypeId")
+	currencyType := c.getCurrencyType(sessionId, currencyTypeId)
+	currencyTypeMain := currencyType["A"].(map[string]interface{})
+	thousandsSeparator := ","
+	if fmt.Sprint(systemParameterMain["thousandDecimals"]) == "1" {
+		thousandsSeparator = ""
+	}
+	amtDecimals := commonUtil.GetIntFromMap(currencyTypeMain, "amtDecimals")
+	upDecimals := commonUtil.GetIntFromMap(currencyTypeMain, "upDecimals")
+	costDecimals := commonUtil.GetIntFromMap(systemParameterMain, "costDecimals")
+	percentDecimals := commonUtil.GetIntFromMap(systemParameterMain, "percentDecimals")
+	return map[string]interface{}{
+		"localCurrency": map[string]interface{}{
+			"prefix": currencyTypeMain["currencyTypeSign"],
+			"decimalPlaces": amtDecimals - 1,
+			"unitPriceDecimalPlaces": upDecimals - 1,
+		},
+		"unitCostDecimalPlaces": costDecimals - 1,
+		"percentDecimalPlaces": percentDecimals - 1,
+		"thousandsSeparator": thousandsSeparator,
+	}
+}
+
+func (c Console) getSystemParameter(sessionId int, userId int) map[string]interface{} {
+	session, _ := global.GetConnection(sessionId)
+	querySupport := QuerySupport{}
+	user := querySupport.FindByMapWithSessionExact(session, "SysUser", map[string]interface{}{
+		"_id": userId,
+	})
+	userMain := user["A"].(map[string]interface{})
+	systemParameter := querySupport.FindByMapWithSessionExact(session, "SystemParameter", map[string]interface{}{
+		"A.createUnit": userMain["createUnit"],
+	})
+	return systemParameter
+}
+
+func (c Console) getCurrencyType(sessionId int, currencyTypeId int) map[string]interface{} {
+	session, _ := global.GetConnection(sessionId)
+	querySupport := QuerySupport{}
+	currencyType := querySupport.FindByMapWithSessionExact(session, "CurrencyType", map[string]interface{}{
+		"_id": currencyTypeId,
+	})
+	return currencyType
 }
 
 // TODO,by test
 func (c Console) FormSchema() revel.Result {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 
 	schemaName := c.Params.Get("@name")
 	strId := c.Params.Get("id")
 	formStatus := c.Params.Get("formStatus")
+	copyFlag := c.Params.Get("copyFlag")
 
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(schemaName)
@@ -486,6 +556,7 @@ func (c Console) FormSchema() revel.Result {
 		"formTemplate": formTemplate,
 		"id":           strId,
 		"formStatus":   formStatus,
+		"copyFlag":     copyFlag,
 	}
 	if formTemplate.DataSourceModelId != "" {
 		// 光有formTemplate不行,还要有model的内容,才可以渲染数据
@@ -550,6 +621,14 @@ func (c Console) FormSchema() revel.Result {
 	}
 
 	commonUtil := CommonUtil{}
+	userId := commonUtil.GetIntFromString(c.Session["userId"])
+	sysParam := c.getSysParam(sessionId, userId)
+	sysParamJson, err := json.Marshal(&sysParam)
+	if err != nil {
+		panic(err)
+	}
+	result["sysParamJson"] = template.JS(string(sysParamJson))
+	
 	formTemplateJsonData := string(formTemplateJsonDataArray)
 	formTemplateJsonData = commonUtil.FilterJsonEmptyAttr(formTemplateJsonData)
 	result["formTemplateJsonData"] = template.JS(formTemplateJsonData)
@@ -582,7 +661,7 @@ func (c Console) FormSchema() revel.Result {
 			return a == b
 		},
 	}
-	c.Response.ContentType = "text/html; charset=utf-8"
+	//c.Response.ContentType = "text/html; charset=utf-8"
 	tmpl, err := template.New("formSchema").Funcs(funcMap).Parse(string(fileContent))
 	if err != nil {
 		panic(err)
@@ -700,12 +779,12 @@ func (c Console) getQueryParameterRenderLi(listTemplate ListTemplate) [][]map[st
 	lineColSpanSum := 0
 	listTemplateIterator := ListTemplateIterator{}
 	var result interface{} = ""
-	listTemplateIterator.IterateTemplateQueryParameter(listTemplate, &result, func(queryParameter QueryParameter, result *interface{}){
+	listTemplateIterator.IterateTemplateQueryParameter(listTemplate, &result, func(queryParameter QueryParameter, result *interface{}) {
 		if queryParameter.Editor != "hiddenfield" {
 			columnColSpan := 2
 			containerItem = append(containerItem, map[string]interface{}{
-				"label":       queryParameter.Text,
-				"name":        queryParameter.Name,
+				"label": queryParameter.Text,
+				"name":  queryParameter.Name,
 			})
 			lineColSpanSum += columnColSpan
 			if lineColSpanSum >= lineColSpan {
@@ -724,6 +803,7 @@ func (c Console) getQueryParameterRenderLi(listTemplate ListTemplate) [][]map[st
 func (c Console) Relation() revel.Result {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
 
 	selectorId := c.Params.Get("selectorId")
@@ -754,6 +834,11 @@ func (c Console) Relation() revel.Result {
 }
 
 func (c Console) Refretor() revel.Result {
+	sessionId := global.GetSessionId()
+	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
+	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
+	defer global.CloseSession(sessionId)
+
 	refretorType := c.Params.Get("type")
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate("Console")
@@ -763,7 +848,7 @@ func (c Console) Refretor() revel.Result {
 		items := getSummaryListTemplateInfoLi(listTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Component" {
-				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(sessionId, item.ColumnModel, items)
 				items = itemsDict["items"].([]interface{})
 				break
 			}
@@ -781,7 +866,7 @@ func (c Console) Refretor() revel.Result {
 		items := getSummarySelectorTemplateInfoLi(selectorTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Selector" {
-				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(sessionId, item.ColumnModel, items)
 				items = itemsDict["items"].([]interface{})
 				break
 			}
@@ -798,7 +883,7 @@ func (c Console) Refretor() revel.Result {
 		items := getSummaryFormTemplateInfoLi(formTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "Form" {
-				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(sessionId, item.ColumnModel, items)
 				items = itemsDict["items"].([]interface{})
 				break
 			}
@@ -816,7 +901,7 @@ func (c Console) Refretor() revel.Result {
 		items := getSummaryDataSourceInfoLi(dataSourceTemplateInfoLi)
 		for _, item := range formTemplate.FormElemLi {
 			if item.XMLName.Local == "column-model" && item.ColumnModel.Name == "DataSource" {
-				itemsDict := templateManager.GetColumnModelDataForColumnModel(item.ColumnModel, items)
+				itemsDict := templateManager.GetColumnModelDataForColumnModel(sessionId, item.ColumnModel, items)
 				items = itemsDict["items"].([]interface{})
 				break
 			}
@@ -841,19 +926,23 @@ func (c Console) Xml() revel.Result {
 
 	if refretorType == "Component" {
 		listTemplate := templateManager.GetListTemplate(id)
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&listTemplate)
 	}
 	if refretorType == "Selector" {
 		selectorTemplate := templateManager.GetSelectorTemplate(id)
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&selectorTemplate)
 	}
 	if refretorType == "Form" {
 		formTemplate := templateManager.GetFormTemplate(id)
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&formTemplate)
 	}
 	if refretorType == "DataSource" {
 		modelTemplateFactory := ModelTemplateFactory{}
 		dataSourceTemplate := modelTemplateFactory.GetDataSource(id)
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&dataSourceTemplate)
 	}
 	c.Response.ContentType = "application/json; charset=utf-8"
@@ -886,6 +975,7 @@ func (c Console) RawXml() revel.Result {
 			panic(err)
 		}
 
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&listTemplate)
 	}
 	if refretorType == "Selector" {
@@ -907,6 +997,7 @@ func (c Console) RawXml() revel.Result {
 			panic(err)
 		}
 
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&selectorTemplate)
 	}
 	if refretorType == "Form" {
@@ -928,6 +1019,7 @@ func (c Console) RawXml() revel.Result {
 			panic(err)
 		}
 
+		c.Response.ContentType = "application/xml; charset=utf-8"
 		return c.RenderXml(&formTemplate)
 	}
 	c.Response.ContentType = "application/json; charset=utf-8"
@@ -935,4 +1027,3 @@ func (c Console) RawXml() revel.Result {
 		"message": "可能传入了错误的refretorType:" + refretorType,
 	})
 }
-

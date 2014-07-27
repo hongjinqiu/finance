@@ -6,6 +6,8 @@
 	<description>控制台</description>
 	<scripts>console/summary.js</scripts>
 	<view-template view="Console/FormSchema.html"/>
+	<!-- <security byUnit="true"/> -->
+	
 	<html>
 		<![CDATA[
 			<div id="tabContent" style="visibility: hidden;">
@@ -138,7 +140,7 @@
 				</div>
 			</div>
 			<script type="text/javascript">
-			YUI(g_financeModule).use("finance-module", function(Y) {
+			g_yuiCommondLi.push(function(Y) {
 				var tabview = new Y.TabView({srcNode:'#tabContent'});
 				tabview.render();
 				Y.one("#tabContent").setStyle("visibility", "visible");

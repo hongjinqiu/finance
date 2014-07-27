@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
+	<id>LastSessionData</id>
+	<selector-id>LastSessionDataSelector</selector-id>
+	<data-source-model-id>LastSessionData</data-source-model-id>
+
+	<adapter name="ModelListTemplateAdapter" />
+	<description>最后一次登录列表</description>
+	<scripts>js/ds_listtoolbar.js</scripts>
+	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
+
+	<toolbar export="true">
+		<button text="意见反馈" mode="url" handler="/console/listschema?@name=BbsPostAdmin&amp;cookie=false" iconCls="test" />
+		<!-- 
+		<button text="新增" mode="url" handler="/console/formschema?@name=LastSessionData" iconCls="test" />
+
+		<button text="删除" mode="fn" handler="g_deleteRecords">
+		</button>
+		 -->
+	</toolbar>
+
+	<security byAdmin="true"/>
+	
+	<data-provider size="10">
+		<collection></collection><!-- mongoDB collection name -->
+		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
+	</data-provider>
+
+	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选系统步骤" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
+		<checkbox-column name="checkboxSelect" hideable="false">
+			<expression></expression>
+		</checkbox-column>
+		<id-column name="id" text="编号" hideable="true" />
+
+		<virtual-column name="FUN_C" text="操作" width="40">
+			<buttons>
+				<!-- 
+				<button text="复制" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=LastSessionData&amp;id={id}&amp;copyFlag=true">
+				</button>
+				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=LastSessionData&amp;id={id}">
+				</button>
+				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				</button>
+				 -->
+				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url^" handler="/hjq/becomeshopuser/?id={sysUserId}">
+				</button>
+			</buttons>
+		</virtual-column>
+
+		<auto-column name="resStruct" />
+		<auto-column name="sysUserId" />
+		<auto-column name="sysUnitId" />
+	</column-model>
+
+	<query-parameters dataSetId="A">
+		<query-parameter name="sysUserId" auto="true" text="">
+			<relationDS>
+				<relationItem name="SysUser">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
+		<query-parameter name="sysUnitId" auto="true" text="">
+			<relationDS>
+				<relationItem name="SysUnit">
+					<relationConfig selectionMode="multi"/>
+				</relationItem>
+			</relationDS>
+		</query-parameter>
+	</query-parameters>
+</list-template>
