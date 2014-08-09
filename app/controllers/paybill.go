@@ -337,7 +337,10 @@ func (c PayBillSupport) logAccountForMaster(sessionId int, dataSource DataSource
 	if amtPay >= 0 {
 		accountInOutParam.AmtReduce = fmt.Sprint(contextData["amtPay"])
 	} else {
-		accountInOutParam.AmtIncrease = fmt.Sprint(-amtPay)
+		oldStr := "-"
+		newStr := ""
+		limit := -1
+		accountInOutParam.AmtIncrease = strings.Replace(fmt.Sprint(contextData["amtPay"]), oldStr, newStr, limit)
 	}
 	accountInOutParam.DiffDataType = diffDataType
 	accountInOutParam.CreateBy = c.getIntData(contextData, "createBy")
@@ -440,7 +443,10 @@ func (c PayBillSupport) logAccountForDetailB(sessionId int, dataSource DataSourc
 	if amtFee >= 0 { // 费用>0时,写到减少字段
 		accountInOutParam.AmtReduce = fmt.Sprint(contextData["amtFee"])
 	} else {
-		accountInOutParam.AmtIncrease = fmt.Sprint(-amtFee)
+		oldStr := "-"
+		newStr := ""
+		limit := -1
+		accountInOutParam.AmtIncrease = strings.Replace(fmt.Sprint(contextData["amtFee"]), oldStr, newStr, limit)
 	}
 	accountInOutParam.DiffDataType = diffDataType
 	accountInOutParam.CreateBy = c.getIntData(contextData, "createBy")

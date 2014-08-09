@@ -106,16 +106,18 @@
 				<limitMin>1</limitMin>
 				<limitMax>20</limitMax>
 			</field>
-			<field id="amtIncrease" extends="FLOAT_FIELD">
+			<field id="amtIncrease" extends="AMOUNT_FIELD">
 				<displayName>本期增加</displayName>
 				<allowEmpty>false</allowEmpty>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
 			</field>
-			<field id="amtReduce" extends="FLOAT_FIELD">
+			<field id="amtReduce" extends="AMOUNT_FIELD">
 				<displayName>本期减少</displayName>
 				<allowEmpty>false</allowEmpty>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>

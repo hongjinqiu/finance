@@ -6,6 +6,7 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>意见反馈详情</description>
+	<cookie name="BbsPostReply"/>
 	<scripts>js/ds_listtoolbar.js&amp;bbspost/bbsPostReply.js</scripts>
 	<view-template view="BbsPostReply/BbsPostReply.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 

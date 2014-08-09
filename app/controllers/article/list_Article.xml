@@ -6,15 +6,16 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>项目列表</description>
+	<cookie name="Article"/>
 	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<button text="新增" mode="url" handler="/console/formschema?@name=Article" iconCls="test" />
+		<button text="新增" mode="url" handler="/console/formschema?@name=Article" iconCls="but_box" />
 
-		<button text="删除" mode="fn" handler="g_deleteRecords">
+		<button text="删除" mode="fn" handler="g_deleteRecords" iconCls="but_box">
 		</button>
-		<button text="新增" mode="url" handler="/console/formschema?@name=Article" iconCls="test" use-in="selector" />	</toolbar>
+		<button text="新增" mode="url!" handler="/console/formschema?@name=Article" iconCls="but_box" use-in="selector" />	</toolbar>
 
 	<security byUnit="true"/>
 	
@@ -29,21 +30,21 @@
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="复制" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}&amp;copyFlag=true">
+				<button text="编辑" iconCls="img_edit" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}">
 				</button>
-				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}">
+				<button text="复制" iconCls="img_add" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}&amp;copyFlag=true">
 				</button>
-				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				<button name="btn_delete" text="删除" iconCls="img_delete" mode="fn" handler="g_deleteRecord">
 				</button>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>
 		<virtual-column name="FUN_C_SELECTOR" text="操作" width="40" use-in="selector">
 			<buttons>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=Article&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url!" handler="/console/formschema/?@name=Article&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>

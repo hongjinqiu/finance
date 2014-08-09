@@ -56,9 +56,9 @@ func (o ExpressionParser) Parse(recordJson, expression string) bool {
 	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	if result == "bad request" {
-		log.Fatal("Parse(recordJson, expression string) bool")
-		log.Fatal("recordJson:" + recordJson)
-		log.Fatal("expression:" + expression)
+		log.Print("Parse(recordJson, expression string) bool")
+		log.Print("recordJson:" + recordJson)
+		log.Print("expression:" + expression)
 		panic("parse error")
 	}
 	return result == "true"
@@ -111,9 +111,9 @@ func (o ExpressionParser) Validate(text, expression string) bool {
 	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	if result == "bad request" {
-		log.Fatal("Validate(text, expression string) bool")
-		log.Fatal("text:" + text)
-		log.Fatal("expression:" + expression)
+		log.Print("Validate(text, expression string) bool")
+		log.Print("text:" + text)
+		log.Print("expression:" + expression)
 		panic("parse error")
 	}
 	return result == "true"
@@ -169,9 +169,9 @@ func (o ExpressionParser) ParseString(recordJson, expression string) string {
 	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	if result == "bad request" {
-		log.Fatal("ParseString(recordJson, expression string) string")
-		log.Fatal("recordJson:" + recordJson)
-		log.Fatal("expression:" + expression)
+		log.Print("ParseString(recordJson, expression string) string")
+		log.Print("recordJson:" + recordJson)
+		log.Print("expression:" + expression)
 		panic("parse error")
 	}
 	return result
@@ -231,10 +231,10 @@ func (o ExpressionParser) ParseModel(boJson, dataJson, expression string) string
 	regx := regexp.MustCompile(`^\s+|\s+$`)
 	result = regx.ReplaceAllString(result, "")
 	if result == "bad request" {
-		log.Fatal("ParseString(recordJson, expression string) string")
-		log.Fatal("boJson:" + boJson)
-		log.Fatal("dataJson:" + dataJson)
-		log.Fatal("expression:" + expression)
+		log.Print("ParseString(recordJson, expression string) string")
+		log.Print("boJson:" + boJson)
+		log.Print("dataJson:" + dataJson)
+		log.Print("expression:" + expression)
 		panic("parse error")
 	}
 	return result

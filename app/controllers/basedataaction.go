@@ -8,7 +8,7 @@ import (
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	. "com/papersns/mongo"
-//	"com/papersns/mongo"
+	//	"com/papersns/mongo"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -323,7 +323,7 @@ func (c BaseDataAction) getDataCommon() ModelRenderVO {
 	session, _ := global.GetConnection(sessionId)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          id,
+		"_id": id,
 	}
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
@@ -332,7 +332,7 @@ func (c BaseDataAction) getDataCommon() ModelRenderVO {
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -394,7 +394,7 @@ func (c BaseDataAction) copyDataCommon() ModelRenderVO {
 
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          id,
+		"_id": id,
 	}
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
@@ -403,7 +403,7 @@ func (c BaseDataAction) copyDataCommon() ModelRenderVO {
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -464,7 +464,7 @@ func (c BaseDataAction) editDataCommon() ModelRenderVO {
 
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          id,
+		"_id": id,
 	}
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
@@ -473,7 +473,7 @@ func (c BaseDataAction) editDataCommon() ModelRenderVO {
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -566,14 +566,14 @@ func (c BaseDataAction) saveCommon() ModelRenderVO {
 
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          bo["id"],
+		"_id": bo["id"],
 	}
 	permissionSupport := PermissionSupport{}
 	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
 	bo, _ = querySupport.FindByMap(collectionName, queryMap)
 
@@ -627,7 +627,7 @@ func (c BaseDataAction) giveUpDataCommon() ModelRenderVO {
 
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          id,
+		"_id": id,
 	}
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
@@ -636,7 +636,7 @@ func (c BaseDataAction) giveUpDataCommon() ModelRenderVO {
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
@@ -717,7 +717,7 @@ func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
 	_, db := global.GetConnection(sessionId)
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          id,
+		"_id": id,
 	}
 	formTemplate := FormTemplate{}
 	if formTemplateId != "" {
@@ -729,7 +729,7 @@ func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	// 列表页也调用这个删除方法,但是列表页又没有传递formTemplateId,只有 gatheringBill等要做赤字判断,走与form相同的逻辑,才会传 formTemplateId,
@@ -817,7 +817,7 @@ func (c BaseDataAction) refreshDataCommon() ModelRenderVO {
 
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id":          id,
+		"_id": id,
 	}
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
@@ -826,7 +826,7 @@ func (c BaseDataAction) refreshDataCommon() ModelRenderVO {
 	for k, v := range permissionQueryDict {
 		queryMap[k] = v
 	}
-	
+
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)

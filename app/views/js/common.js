@@ -71,23 +71,24 @@ function showModalDialog(config) {
 		var title = config["title"];
 		var url = config["url"];
 	//	node.getComputedStyle("width")
-		var width = 700;
-		var height = 500;
-			var node = Y.one("window");
+//		var width = 700;
+//		var height = 500;
+		var node = Y.one("window");
 	//		width = parseInt(node.getComputedStyle("width"));
 	//		height = parseInt(node.getComputedStyle("height"));
-			width = parseInt(node.get("winWidth"), 10);
-			height = parseInt(node.get("winHeight"), 10);
-		var frameWidth = width - 40;
+		var width = parseInt(node.get("winWidth"), 10);
+		var height = parseInt(node.get("winHeight"), 10);
+		var edge = 100;
+		var frameWidth = width - edge;
 		if (frameWidth <= 0) {
 			frameWidth = 100;
 		}
-		var frameHeight = height - 40;
+		var frameHeight = height - edge;
 		if (frameHeight <= 0) {
 			frameHeight = 100;
 		}
 //	var bodyContent = null;
-		var bodyContent = "<iframe src='{src}' frameborder='0' style='width:100%;height:100%;overflow: auto;'></iframe>";
+		var bodyContent = "<iframe src='{src}' frameborder='0' style='width:100%;height:99%;overflow: auto;'></iframe>";
 		bodyContent = Y.Lang.sub(bodyContent, {
 			src: url
 //			,width: frameWidth
@@ -107,12 +108,13 @@ function showModalDialog(config) {
 	        plugins      : [Y.Plugin.Drag],
 	        buttons: [
 	                  {
-	                      value: "close",// string or html string
+	                      value: "",// string or html string
 	                      action: function(e) {
 	                          e.preventDefault();
 	                          dialog.hide();
 	                      },
-	                      section: Y.WidgetStdMod.HEADER
+	                      section: Y.WidgetStdMod.HEADER,
+	                      classNames: "closeBtn"
 	                  }
 	              ]
 	    });
@@ -133,6 +135,14 @@ function showModalDialog(config) {
 	}
 }
 
+function triggerShowModalDialog(config) {
+	if (top && top.putTabIfAbsent) {
+		top.putTabIfAbsent(config.title.replace("列表", ""), config.url);
+	} else {
+		showModalDialog(config);
+	}
+}
+
 /**
  * infoType:info,error,question,warn
  */
@@ -142,48 +152,59 @@ function showDialog(config){
 	var msg = config["msg"];
 	var callback = config["callback"];
 	var width = config["width"] || 410;
-	var height = config["height"] || 150;
+	var height = config["height"] || 130;
 	var bodyHeight = height - 23 - 40 - 50;
 	var bodyContent = null;
 	var footer = [];
 	if (infoType == "info") {
-		bodyContent = '<div class="message icon-info overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+//		bodyContent = '<div class="message icon-info overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+		bodyContent = '<div class="message icon-info overflowAuto" style="">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
-            action   : 'onOK'
+            action   : 'onOK',
+            classNames: 'message_bt1'
         }];
 	} else if (infoType == "success") {
-		bodyContent = '<div class="message icon-success overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+//		bodyContent = '<div class="message icon-success overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+		bodyContent = '<div class="message icon-success overflowAuto" style="">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
-            action   : 'onOK'
+            action   : 'onOK',
+            classNames: 'message_bt1'
         }];
 	} else if (infoType == "warn") {
-		bodyContent = '<div class="message icon-warn overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+//		bodyContent = '<div class="message icon-warn overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+		bodyContent = '<div class="message icon-warn overflowAuto" style="">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
-            action   : 'onOK'
+            action   : 'onOK',
+            classNames: 'message_bt1'
         }];
 	} else if (infoType == "question") {
-		bodyContent = '<div class="message icon-question overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+//		bodyContent = '<div class="message icon-question overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+		bodyContent = '<div class="message icon-question overflowAuto" style="">' + msg + '</div>';
 		footer = [{
             name  : 'cancel',
             label : '取消',
-            action: 'onCancel'
+            action: 'onCancel',
+            classNames: 'message_bt1'
         }, {
             name     : 'proceed',
             label    : '确定',
-            action   : 'onOK'
+            action   : 'onOK',
+            classNames: 'message_bt1'
         }];
 	} else if (infoType == "error") {
-		bodyContent = '<div class="message icon-error overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+//		bodyContent = '<div class="message icon-error overflowAuto" style="height:' + bodyHeight + 'px;">' + msg + '</div>';
+		bodyContent = '<div class="message icon-error overflowAuto" style="">' + msg + '</div>';
 		footer = [{
             name     : 'proceed',
             label    : '确定',
-            action   : 'onOK'
+            action   : 'onOK',
+            classNames: 'message_bt1'
         }];
 	}
 	
@@ -624,7 +645,6 @@ function putOrAppend(dictObj, name, value, seperator) {
 }
 
 function openTabOrJump(url) {
-	console.log(top && top.putTabIfAbsent);
 	if (top && top.putTabIfAbsent) {
 		var name = listTemplate.Description.replace("列表", "");
 		var isRefresh = true;

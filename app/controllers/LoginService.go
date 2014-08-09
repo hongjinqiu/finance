@@ -10,6 +10,7 @@ import (
 	"com/papersns/mongo"
 	. "com/papersns/taobao"
 	"fmt"
+	"log"
 )
 
 type LoginService struct{}
@@ -211,6 +212,7 @@ func (o LoginService) DealLoginTest(sessionId int, url string) (resStruct map[st
 @param url /asdfas/zasdfasdf/?param1=value1&param2=value2
 */
 func (o LoginService) DealLogin(sessionId int, url string) (resStruct map[string]interface{}, userId int, isStep bool) {
+	log.Print("receive top login request, url is:", url)
 	isStep = false
 
 	taobaoInterface := TaobaoInterface{}

@@ -35,16 +35,17 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 					});
 					rec.allowHTML = true;
 					if (virtualColumnForEditor != null) {
+						rec.width = virtualColumnForEditor.Width;
 						rec.formatter = function(o) {
 							var bodyHtmlLi = [];
 							for (var j = 0; j < virtualColumnForEditor.Buttons.ButtonLi.length; j++) {
 								var btnTemplate = null;
 								if (virtualColumnForEditor.Buttons.ButtonLi[j].Mode == "fn") {
-									btnTemplate = "<input type='button' value='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
+									btnTemplate = "<a title='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' href='javascript:void(0);' style='display:block;' />";
 								} else if (virtualColumnForEditor.Buttons.ButtonLi[j].Mode == "url") {
-									btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
+									btnTemplate = "<a title='{value}' onclick='location.href=\"{href}\"' class='{class}' href='javascript:void(0);' style='display:block;' />";
 								} else {
-									btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
+									btnTemplate = "<a title='{value}' onclick='window.open(\"{href}\")' class='{class}' href='javascript:void(0);' style='display:block;' />";
 								}
 								var handler = virtualColumnForEditor.Buttons.ButtonLi[j].Handler;
 								handler = Y.Lang.sub(handler, o.data);
@@ -59,19 +60,20 @@ YUI.add('papersns-form-quickedit', function(Y, NAME) {
 							return bodyHtmlLi.join("");
 						}
 					} else {
+						rec.width = "60";
 						rec.formatter = function(o) {
 							var bodyHtmlLi = [];
-							var btnTemplate = "<input type='button' value='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
+							var btnTemplate = "<a title='{value}' onclick='doPluginVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' href='javascript:void(0);' style='display:block;' />";
 							bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
 								value: "复制",
 								handler: "g_pluginCopyRow",
-								"class": "test",
+								"class": "img_add",
 								columnModelName: host.dataSetId
 							}));
 							bodyHtmlLi.push(Y.Lang.sub(btnTemplate, {
 								value: "删除",
 								handler: "g_pluginRemoveSingleRow",
-								"class": "test",
+								"class": "img_delete",
 								columnModelName: host.dataSetId
 							}));
 							return bodyHtmlLi.join("");

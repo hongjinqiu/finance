@@ -30,7 +30,7 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 					self.dt.addRows(li);
 				};
 				var bodyHtmlLi = [];
-				bodyHtmlLi.push("<div class='alignLeft'>");
+				bodyHtmlLi.push("<div class='alignLeft formToolbar'>");
 				
 				if (self.param.columnModel.EditorToolbar && self.param.columnModel.EditorToolbar.ButtonLi) {
 					for (var i = 0; i < self.param.columnModel.EditorToolbar.ButtonLi.length; i++) {
@@ -69,12 +69,19 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 				bodyHtmlLi.push("</div>");
 				bodyHtmlLi.push('<div style="overflow: auto" id="' + self.param.columnModelName + "_addrow" + '"></div>');
 
+				var node = Y.one("window");
+				var width = parseInt(node.get("winWidth"), 10);
+				var edge = 100;
+				var dialogWidth = width - edge;
+				if (dialogWidth <= 0) {
+					dialogWidth = 100;
+				}
 				var dialog = new Y.Panel({
 					contentBox : Y.Node.create('<div id="detail-grid-addrow-dialog" />'),
 					headerContent : "新增" + self.param.columnModel.Text,
 					bodyContent : bodyHtmlLi.join(""),
-					width : 1000,
-					zIndex : 6,
+					width : dialogWidth,
+					zIndex     : (++panelZIndex),
 					centered : true,
 					modal : true, // modal behavior
 					render : '.example',
@@ -84,11 +91,13 @@ DataTableManager.prototype.createAddRowGrid = function(inputDataLi) {
 						footer : [ {
 							name : 'cancel',
 							label : '取消',
-							action : 'onCancel'
+							action : 'onCancel',
+							classNames: 'message_bt1'
 						}, {
 							name : 'proceed',
 							label : '确定',
-							action : 'onOK'
+							action : 'onOK',
+							classNames: 'message_bt1'
 						} ]
 					}
 				});

@@ -43,6 +43,7 @@
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_ROUNDING_WAY_TYPE</dictionary>
 				<defaultValueExpr>2</defaultValueExpr>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
 			<field id="thousandDecimals" extends="INT_FIELD">
 				<displayName>千分位符</displayName>

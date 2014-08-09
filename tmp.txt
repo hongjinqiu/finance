@@ -250,3 +250,17 @@ http://yui.yahooapis.com/gallery-2012.12.05-21-01/gallery-aui-skin-classic/image
 
 
 
+
+or one of its dependencies could not be resolved: The following artifacts could not be resolved: 
+
+org.eclipse.tycho:tycho-surefire-plugin:0.19.0 
+org.eclipse.tycho:sisu-equinox-launching:jar:0.19.0, 
+org.eclipse.tycho:org.eclipse.tycho.surefire.junit:jar:0.19.0, 
+org.eclipse.tycho:org.eclipse.tycho.surefire.junit4:jar:0.19.0, 
+org.eclipse.tycho:org.eclipse.tycho.surefire.junit47:jar:0.19.0: 
+
+
+Could not transfer artifact org.eclipse.tycho:sisu-equinox-launching:jar:0.19.0
+
+
+

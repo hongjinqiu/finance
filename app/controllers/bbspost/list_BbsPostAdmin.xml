@@ -6,15 +6,16 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>意见反馈管理列表</description>
+	<cookie name="BbsPostAdmin"/>
 	<scripts>js/ds_listtoolbar.js&amp;bbspost/bbsPostListTemplate.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<!-- <toolbar export="true">
-		<button text="新增" mode="url" handler="/console/formschema?@name=BbsPost" iconCls="test" />
+		<button text="新增" mode="url" handler="/console/formschema?@name=BbsPost" iconCls="but_box" />
 
-		<button text="删除" mode="fn" handler="g_deleteRecords">
+		<button text="删除" mode="fn" handler="g_deleteRecords" iconCls="but_box">
 		</button>
-		<button text="新增" mode="url" handler="/console/formschema?@name=BbsPost" iconCls="test" use-in="selector" />	</toolbar> -->
+		<button text="新增" mode="url!" handler="/console/formschema?@name=BbsPost" iconCls="but_box" use-in="selector" />	</toolbar> -->
 
 	<security byAdmin="true"/>
 
@@ -33,11 +34,11 @@
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
 				<button text="备注" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=BbsPostAdminRemark&amp;id={id}">
 				</button>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/bbspostreplyschema?@name=BbsPostAdminReply&amp;id={id}&amp;bbsPostId={id}">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url" handler="/console/bbspostreplyschema?@name=BbsPostAdminReply&amp;id={id}&amp;bbsPostId={id}">
 				</button>
 			</buttons>
 		</virtual-column>

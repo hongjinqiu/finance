@@ -12,6 +12,7 @@ type ListTemplate struct {
 	DataSourceModelId   string              `xml:"data-source-model-id"`
 	Adapter             Adapter             `xml:"adapter"`
 	Description         string              `xml:"description"`
+	Cookie              Cookie              `xml:"cookie"`
 	Scripts             template.URL        `xml:"scripts"`
 	ViewTemplate        ViewTemplate        `xml:"view-template"`
 	Toolbar             Toolbar             `xml:"toolbar"`
@@ -49,6 +50,11 @@ type FormElem struct {
 
 type Adapter struct {
 	XMLName xml.Name `xml:"adapter"`
+	Name    string   `xml:"name,attr,omitempty"`
+}
+
+type Cookie struct {
+	XMLName xml.Name `xml:"cookie"`
 	Name    string   `xml:"name,attr,omitempty"`
 }
 

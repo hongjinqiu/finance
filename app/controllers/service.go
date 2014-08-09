@@ -2,9 +2,9 @@ package controllers
 
 //import "github.com/robfig/revel"
 import (
+	. "com/papersns/component"
 	. "com/papersns/error"
 	"com/papersns/global"
-	. "com/papersns/component"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
 	"com/papersns/mongo"
@@ -16,6 +16,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 type FinanceService struct{}
@@ -98,7 +99,7 @@ func (o FinanceService) SaveData(sessionId int, dataSource DataSource, bo *map[s
 			SrcBo:        srcBo,
 		})
 	})
-	
+
 	usedCheck := UsedCheck{}
 	// 删除的分录行数据的被用判断
 	for _, diffDataRow := range diffDataRowLi {
@@ -244,8 +245,7 @@ func (o FinanceService) validateMasterDataDuplicate(sessionId int, dataSource Da
 	message := ""
 	modelTemplateFactory := ModelTemplateFactory{}
 	strId := modelTemplateFactory.GetStrId(bo)
-	andQueryLi := []map[string]interface{}{
-	}
+	andQueryLi := []map[string]interface{}{}
 	qb := QuerySupport{}
 	andQueryLi = append(andQueryLi, map[string]interface{}{
 		"deleteFlag": map[string]interface{}{
@@ -411,7 +411,8 @@ func (o FinanceService) validateFieldGroup(fieldGroup FieldGroup, data map[strin
 			if err != nil {
 				panic(err)
 			}
-			if len(fieldValue) > limit {
+			fieldValueLength := utf8.RuneCountInString(fieldValue)
+			if fieldValueLength > limit {
 				messageLi = append(messageLi, fieldGroup.DisplayName+"长度超出最大值"+fieldGroup.FieldLength)
 			}
 		}

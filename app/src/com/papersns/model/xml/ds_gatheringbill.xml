@@ -267,7 +267,7 @@
 				<displayName>已冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
-				<formatExpr>currencyTypeId</formatExpr>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
@@ -277,6 +277,7 @@
 				<displayName>未冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
@@ -398,6 +399,7 @@
 				<displayName>费用金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>-1000000000</limitMin>
 				<limitMax>1000000000</limitMax>

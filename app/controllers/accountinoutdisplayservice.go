@@ -158,7 +158,7 @@ func (c AccountInOutDisplay) mergeAndCalceFinalBalance(accountLi []interface{}, 
 			data["bankAccountCurrencyTypeId"] = master["bankAccountCurrencyTypeId"]
 		}
 	}
-	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	// 累加origBalanceLi中的 amtEarly 字段到 origBalance 中,同时设到期末中,防止本期增加,本期减少没查询到数据时,期末结余被放空
 	for _, item := range origBalanceLi {
 		master := item.(map[string]interface{})
@@ -167,11 +167,11 @@ func (c AccountInOutDisplay) mergeAndCalceFinalBalance(accountLi []interface{}, 
 			data := uniqueMap[key].(map[string]interface{})
 			uniqueMap[key] = data
 
-			amtEarly := commonUtil.GetFloat64FromMap(master, "amtEarly")
-			origBalance := commonUtil.GetFloat64FromMap(data, "origBalance")
+			amtEarly := fmt.Sprint(master["amtEarly"])
+			origBalance := fmt.Sprint(data["origBalance"])
 
-			data["origBalance"] = fmt.Sprint(amtEarly + origBalance)
-			data["finalBalance"] = fmt.Sprint(amtEarly + origBalance)
+			data["origBalance"] = mathUtil.Add(amtEarly, origBalance)
+			data["finalBalance"] = mathUtil.Add(amtEarly, origBalance)
 		}
 	}
 	// 根据 increaseReduceBalanceLi,累加 origBalance 等字段计算出 finalBalance
@@ -182,26 +182,31 @@ func (c AccountInOutDisplay) mergeAndCalceFinalBalance(accountLi []interface{}, 
 			data := uniqueMap[key].(map[string]interface{})
 			uniqueMap[key] = data
 
-			origBalanceInMaster := commonUtil.GetFloat64FromMap(master, "origBalance")
-			amtIncreaseInMaster := commonUtil.GetFloat64FromMap(master, "amtIncrease")
-			amtReduceInMaster := commonUtil.GetFloat64FromMap(master, "amtReduce")
-			increaseCountInMaster := commonUtil.GetIntFromMap(master, "increaseCount")
-			reduceCountInMaster := commonUtil.GetIntFromMap(master, "reduceCount")
+			origBalanceInMaster := fmt.Sprint(master["origBalance"])
+			amtIncreaseInMaster := fmt.Sprint(master["amtIncrease"])
+			amtReduceInMaster := fmt.Sprint(master["amtReduce"])
+			increaseCountInMaster := fmt.Sprint(master["increaseCount"])
+			reduceCountInMaster := fmt.Sprint(master["reduceCount"])
 
-			origBalanceInData := commonUtil.GetFloat64FromMap(data, "origBalance")
-			amtIncreaseInData := commonUtil.GetFloat64FromMap(data, "amtIncrease")
-			amtReduceInData := commonUtil.GetFloat64FromMap(data, "amtReduce")
-			increaseCountInData := commonUtil.GetIntFromMap(data, "increaseCount")
-			reduceCountInData := commonUtil.GetIntFromMap(data, "reduceCount")
+			origBalanceInData := fmt.Sprint(data["origBalance"])
+			amtIncreaseInData := fmt.Sprint(data["amtIncrease"])
+			amtReduceInData := fmt.Sprint(data["amtReduce"])
+			increaseCountInData := fmt.Sprint(data["increaseCount"])
+			reduceCountInData := fmt.Sprint(data["reduceCount"])
 
-			data["origBalance"] = fmt.Sprint(origBalanceInMaster + origBalanceInData)
-			data["amtIncrease"] = fmt.Sprint(amtIncreaseInMaster + amtIncreaseInData)
-			data["amtReduce"] = fmt.Sprint(amtReduceInMaster + amtReduceInData)
+			data["origBalance"] = mathUtil.Add(origBalanceInMaster, origBalanceInData)
+			data["amtIncrease"] = mathUtil.Add(amtIncreaseInMaster, amtIncreaseInData)
+			data["amtReduce"] = mathUtil.Add(amtReduceInMaster, amtReduceInData)
 
-			data["finalBalance"] = fmt.Sprint(origBalanceInMaster + origBalanceInData + amtIncreaseInMaster + amtIncreaseInData - (amtReduceInMaster + amtReduceInData))
+			finalBalance := mathUtil.Add(origBalanceInMaster, origBalanceInData)
+			finalBalance = mathUtil.Add(finalBalance, amtIncreaseInMaster)
+			finalBalance = mathUtil.Add(finalBalance, amtIncreaseInData)
+			finalBalance = mathUtil.Sub(finalBalance, amtReduceInMaster)
+			finalBalance = mathUtil.Sub(finalBalance, amtReduceInData)
+			data["finalBalance"] = finalBalance
 
-			data["increaseCount"] = fmt.Sprint(increaseCountInMaster + increaseCountInData)
-			data["reduceCount"] = fmt.Sprint(reduceCountInMaster + reduceCountInData)
+			data["increaseCount"] = mathUtil.Add(increaseCountInMaster, increaseCountInData)
+			data["reduceCount"] = mathUtil.Add(reduceCountInMaster, reduceCountInData)
 		}
 	}
 	for _, item := range uniqueMap {
@@ -468,7 +473,7 @@ func (c AccountInOutDisplay) addIncreaseReduceToOrigBalance(origBalanceLi []inte
 		allLi = append(allLi, item)
 	}
 	uniqueMap := map[string]interface{}{}
-	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	for _, item := range allLi {
 		master := item.(map[string]interface{})
 		key := fmt.Sprint(master["accountType"]) + "_" + fmt.Sprint(master["accountId"]) + "_" + fmt.Sprint(master["currencyTypeId"])
@@ -481,13 +486,15 @@ func (c AccountInOutDisplay) addIncreaseReduceToOrigBalance(origBalanceLi []inte
 			}
 		}
 		data := uniqueMap[key].(map[string]interface{})
-		origBalanceInData := commonUtil.GetFloat64FromMap(data, "origBalance")
+		origBalanceInData := fmt.Sprint(data["origBalance"])
+		origBalance := fmt.Sprint(master["origBalance"])
+		amtIncrease := fmt.Sprint(master["amtIncrease"])
+		amtReduce := fmt.Sprint(master["amtReduce"])
 
-		origBalance := commonUtil.GetFloat64FromMap(master, "origBalance")
-		amtIncrease := commonUtil.GetFloat64FromMap(master, "amtIncrease")
-		amtReduce := commonUtil.GetFloat64FromMap(master, "amtReduce")
-
-		data["origBalance"] = fmt.Sprint(origBalanceInData + origBalance + amtIncrease - amtReduce)
+		origBalanceResult := mathUtil.Add(origBalanceInData, origBalance)
+		origBalanceResult = mathUtil.Add(origBalanceResult, amtIncrease)
+		origBalanceResult = mathUtil.Sub(origBalanceResult, amtReduce)
+		data["origBalance"] = origBalanceResult
 
 		uniqueMap[key] = data
 	}
@@ -508,6 +515,7 @@ func (c AccountInOutDisplay) mergeOrigBalanceAndIncreaseReduce(origBalanceLi []i
 	}
 	uniqueMap := map[string]interface{}{}
 	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	for _, item := range allLi {
 		master := item.(map[string]interface{})
 		key := fmt.Sprint(master["accountType"]) + "_" + fmt.Sprint(master["accountId"]) + "_" + fmt.Sprint(master["currencyTypeId"])
@@ -524,21 +532,21 @@ func (c AccountInOutDisplay) mergeOrigBalanceAndIncreaseReduce(origBalanceLi []i
 			}
 		}
 		data := uniqueMap[key].(map[string]interface{})
-		origBalanceInData := commonUtil.GetFloat64FromMap(data, "origBalance")
-		amtIncreaseInData := commonUtil.GetFloat64FromMap(data, "amtIncrease")
-		amtReduceInData := commonUtil.GetFloat64FromMap(data, "amtReduce")
+		origBalanceInData := fmt.Sprint(data["origBalance"])
+		amtIncreaseInData := fmt.Sprint(data["amtIncrease"])
+		amtReduceInData := fmt.Sprint(data["amtReduce"])
 		increaseCountInData := commonUtil.GetIntFromMap(data, "increaseCount")
 		reduceCountInData := commonUtil.GetIntFromMap(data, "reduceCount")
 
-		origBalance := commonUtil.GetFloat64FromMap(master, "origBalance")
-		amtIncrease := commonUtil.GetFloat64FromMap(master, "amtIncrease")
-		amtReduce := commonUtil.GetFloat64FromMap(master, "amtReduce")
+		origBalance := fmt.Sprint(master["origBalance"])
+		amtIncrease := fmt.Sprint(master["amtIncrease"])
+		amtReduce := fmt.Sprint(master["amtReduce"])
 		increaseCount := commonUtil.GetIntFromMap(master, "increaseCount")
 		reduceCount := commonUtil.GetIntFromMap(master, "reduceCount")
 
-		data["origBalance"] = fmt.Sprint(origBalanceInData + origBalance)
-		data["amtIncrease"] = fmt.Sprint(amtIncreaseInData + amtIncrease)
-		data["amtReduce"] = fmt.Sprint(amtReduceInData + amtReduce)
+		data["origBalance"] = mathUtil.Add(origBalanceInData, origBalance)
+		data["amtIncrease"] = mathUtil.Add(amtIncreaseInData, amtIncrease)
+		data["amtReduce"] = mathUtil.Add(amtReduceInData, amtReduce)
 		data["increaseCount"] = increaseCountInData + increaseCount
 		data["reduceCount"] = reduceCountInData + reduceCount
 
@@ -565,6 +573,7 @@ func (c AccountInOutDisplay) getOrigBalanceFromAccountInOut(sessionId int, formT
 	
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	if queryMap["cashAccountId"] != nil {
 		cashAccountIdLi := commonUtil.GetIntLiFromMap(queryMap, "cashAccountId")
 		if len(cashAccountIdLi) > 0 {
@@ -640,10 +649,12 @@ func (c AccountInOutDisplay) getOrigBalanceFromAccountInOut(sessionId int, formT
 			}
 		}
 		data := uniqueMap[key].(map[string]interface{})
-		origBalance := commonUtil.GetFloat64FromString(fmt.Sprint(data["origBalance"]))
-		amtIncrease := commonUtil.GetFloat64FromString(fmt.Sprint(master["amtIncrease"]))
-		amtReduce := commonUtil.GetFloat64FromString(fmt.Sprint(master["amtReduce"]))
-		data["origBalance"] = fmt.Sprint(origBalance + amtIncrease - amtReduce)
+		origBalance := fmt.Sprint(data["origBalance"])
+		amtIncrease := fmt.Sprint(master["amtIncrease"])
+		amtReduce := fmt.Sprint(master["amtReduce"])
+		origBalanceResult := mathUtil.Add(origBalance, amtIncrease)
+		origBalanceResult = mathUtil.Sub(origBalanceResult, amtReduce)
+		data["origBalance"] = origBalanceResult
 		uniqueMap[key] = data
 	}
 	for _, item := range uniqueMap {
@@ -666,6 +677,7 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByDate(sessionId int, formTempl
 	
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	if queryMap["cashAccountId"] != nil {
 		cashAccountIdLi := commonUtil.GetIntLiFromMap(queryMap, "cashAccountId")
 		if len(cashAccountIdLi) > 0 {
@@ -746,19 +758,19 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByDate(sessionId int, formTempl
 			}
 		}
 		data := uniqueMap[key].(map[string]interface{})
-		amtIncreaseInData := commonUtil.GetFloat64FromString(fmt.Sprint(data["amtIncrease"]))
-		amtReduceInData := commonUtil.GetFloat64FromString(fmt.Sprint(data["amtReduce"]))
+		amtIncreaseInData := fmt.Sprint(data["amtIncrease"])
+		amtReduceInData := fmt.Sprint(data["amtReduce"])
 		increaseCountInData := commonUtil.GetIntFromMap(data, "increaseCount")
 		reduceCountInData := commonUtil.GetIntFromMap(data, "reduceCount")
 
-		amtIncrease := commonUtil.GetFloat64FromString(fmt.Sprint(master["amtIncrease"]))
-		amtReduce := commonUtil.GetFloat64FromString(fmt.Sprint(master["amtReduce"]))
-		data["amtIncrease"] = fmt.Sprint(amtIncreaseInData + amtIncrease)
-		data["amtReduce"] = fmt.Sprint(amtReduceInData + amtReduce)
-		if amtIncrease > 0 {
+		amtIncrease := fmt.Sprint(master["amtIncrease"])
+		amtReduce := fmt.Sprint(master["amtReduce"])
+		data["amtIncrease"] = mathUtil.Add(amtIncreaseInData, amtIncrease)
+		data["amtReduce"] = mathUtil.Add(amtReduceInData, amtReduce)
+		if commonUtil.GetFloat64FromString(amtIncrease) > 0 {
 			data["increaseCount"] = increaseCountInData + 1
 		}
-		if amtReduce > 0 {
+		if commonUtil.GetFloat64FromString(amtReduce) > 0 {
 			data["reduceCount"] = reduceCountInData + 1
 		}
 		uniqueMap[key] = data
@@ -783,6 +795,7 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByYearMonth(sessionId int, form
 	
 	orQuery := []interface{}{}
 	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	if queryMap["cashAccountId"] != nil {
 		cashAccountIdLi := commonUtil.GetIntLiFromMap(queryMap, "cashAccountId")
 		if len(cashAccountIdLi) > 0 {
@@ -884,18 +897,18 @@ func (c AccountInOutDisplay) getAmtIncreaseReduceByYearMonth(sessionId int, form
 			}
 		}
 		data := uniqueMap[key].(map[string]interface{})
-		amtIncreaseInData := commonUtil.GetFloat64FromString(fmt.Sprint(data["amtIncrease"]))
-		amtReduceInData := commonUtil.GetFloat64FromString(fmt.Sprint(data["amtReduce"]))
+		amtIncreaseInData := fmt.Sprint(data["amtIncrease"])
+		amtReduceInData := fmt.Sprint(data["amtReduce"])
 		increaseCountInData := commonUtil.GetIntFromMap(data, "increaseCount")
 		reduceCountInData := commonUtil.GetIntFromMap(data, "reduceCount")
 
-		amtIncrease := commonUtil.GetFloat64FromString(fmt.Sprint(master["amtIncrease"]))
-		amtReduce := commonUtil.GetFloat64FromString(fmt.Sprint(master["amtReduce"]))
+		amtIncrease := fmt.Sprint(master["amtIncrease"])
+		amtReduce := fmt.Sprint(master["amtReduce"])
 		increaseCount := commonUtil.GetIntFromMap(master, "increaseCount")
 		reduceCount := commonUtil.GetIntFromMap(master, "reduceCount")
 
-		data["amtIncrease"] = fmt.Sprint(amtIncreaseInData + amtIncrease)
-		data["amtReduce"] = fmt.Sprint(amtReduceInData + amtReduce)
+		data["amtIncrease"] = mathUtil.Add(amtIncreaseInData, amtIncrease)
+		data["amtReduce"] = mathUtil.Add(amtReduceInData, amtReduce)
 		data["increaseCount"] = increaseCountInData + increaseCount
 		data["reduceCount"] = reduceCountInData + reduceCount
 		uniqueMap[key] = data

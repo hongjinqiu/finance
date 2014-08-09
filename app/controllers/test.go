@@ -2,15 +2,19 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	"code.google.com/p/godec/dec"
 	. "com/papersns/common"
 	. "com/papersns/model"
 	"com/papersns/mongo"
-	"fmt"
-	"math/rand"
-	"time"
-	"io"
 	"crypto/sha1"
-//	. "com/papersns/taobao"
+	"fmt"
+	"io"
+	"math/big"
+	"math/rand"
+	"strconv"
+	"strings"
+	"time"
+	//	. "com/papersns/taobao"
 )
 
 type Test struct {
@@ -156,8 +160,79 @@ func (c Test) initData(userId int, fieldGroup FieldGroup, masterData *map[string
 	}
 }
 
-//func (c Test) GetTokenTest() revel.Result {
-//	taobaoInterface := TaobaoInterface{}
-//	text := taobaoInterface.GetTokenTest(map[string]string{})
-//	return c.RenderText(text)
-//}
+func (c Test) NumTest1() revel.Result {
+	text := fmt.Sprint(94.85 / 100.0)
+	text += "____"
+	rat := big.Rat{}
+	rat.SetString("94.85/100.0")
+	text += rat.FloatString(10)
+	text += "____"
+	text += fmt.Sprint(c.getFloat("0.1") + c.getFloat("0.7"))
+	text += "____"
+	text += fmt.Sprint(c.getFloat("0.1") + c.getFloat("0.6"))
+	text += "____"
+	text += fmt.Sprint(c.getFloat("0.13") + c.getFloat("3.59"))
+	text += "_dec_"
+	dec1 := c.add("0.1", "0.7")
+	text += dec1.String()
+	text += "____"
+	dec1 = c.add("0.1", "0.6")
+	text += dec1.String()
+	text += "____"
+	dec1 = c.add("0.13", "3.59")
+	text += dec1.String()
+	return c.RenderText(text)
+}
+
+func (c Test) NumTest2() revel.Result {
+	commonUtil := CommonUtil{}
+	text1 := commonUtil.GetFloatFormat("111")
+	text2 := commonUtil.GetFloatFormat("")
+	text3 := commonUtil.GetFloatFormat("3.53")
+	text4 := commonUtil.GetFloatFormat("0.3442")
+	text5 := commonUtil.GetFloatFormat("1000022.3442")
+	li := []string{text1, text2, text3, text4, text5}
+	return c.RenderText(strings.Join(li, "|"))
+}
+
+func (c Test) getFloat(str string) float64 {
+	result, err := strconv.ParseFloat(fmt.Sprint(str), 64)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+func (c Test) add(str1 string, str2 string) dec.Dec {
+	dec1 := dec.Dec{}
+	dec1.SetString(str1)
+	dec2 := dec.Dec{}
+	dec2.SetString(str2)
+
+	result := dec.Dec{}
+	result.Add(&dec1, &dec2)
+	return result
+}
+
+func (c Test) getDec(str string) dec.Dec {
+	result := dec.Dec{}
+	result.SetString(str)
+	return result
+}
+
+/*
+package main
+
+import "fmt"
+import "code.google.com/p/godec/dec"
+
+func main() {
+	x, y := new(dec.Dec), new(dec.Dec)
+	x.SetString("16.80") // price
+	y.SetString("1.19")  // tax
+
+	subtotal := new(dec.Dec).Mul(x, y)
+	totalAmount := new(dec.Dec).Round(subtotal, dec.Scale(2), dec.RoundHalfEven)
+	fmt.Println(totalAmount)
+}
+*/

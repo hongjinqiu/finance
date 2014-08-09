@@ -3,10 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>菜单列表</title>
-{{if eq .RunMode "dev"}}
-<link rel="stylesheet" type="text/css" href="/public/css/bootstrap.css">
-<script src="/public/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
-{{end}}
+<link rel="stylesheet" type="text/css" href="/app/combo?yui.3.12.0/cssreset/cssreset-min.css&yui.3.12.0/cssfonts/cssfonts-min.css&yui.3.12.0/cssbase/cssbase-min.css&{{.flash.dateFlag}}" />
+<link rel="stylesheet" type="text/css" href="/public/css/global.css?{{.flash.dateFlag}}" />
 <script type="text/javascript">
 	function openUrl(name, url) {
 		if (parent && parent.putTabIfAbsent) {
@@ -19,21 +17,26 @@
 	}
 </script>
 </head>
-<body>
-<table border="1">
+<body class="yui3-skin-sam">
+<table border="0" class="menu-table">
 	<tr>
 		{{range $index, $item := .result.menuLi}}
 		<td valign="top">
-			{{$item.name}}<br />
-			{{range $subIndex,$subItem := $item.subMenuLi}}
-			<a href="javascript:void(0)" onclick="openUrl('{{$subItem.name}}','{{$subItem.url}}')">{{$subItem.name}}</a><br />
-			{{end}}
+			<table border="0" class="menu-table-bd">
+				<tr>
+					<th>{{$item.name}}</th>
+				</tr>
+				{{range $subIndex,$subItem := $item.subMenuLi}}
+				<tr>
+					<td>
+						<a href="javascript:void(0)" onclick="openUrl('{{$subItem.name}}','{{$subItem.url}}')">{{$subItem.name}}</a>
+					</td>
+				</tr>
+				{{end}}
+			</table>
 		</td>
 		{{end}}
 	</tr>
 </table>
-{{if eq .RunMode "dev"}}
-    {{template "debug.html" .}}
-  {{end}}
 </body>
 </html>

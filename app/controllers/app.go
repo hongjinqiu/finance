@@ -6,18 +6,33 @@ import (
 	. "com/papersns/common"
 	. "com/papersns/component"
 	"com/papersns/global"
+	. "com/papersns/mongo"
 	"compress/gzip"
+	"crypto/md5"
 	"fmt"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
-
-//	"time"
+	"sync"
+	//	"time"
 )
+
+var gzipRwlock sync.RWMutex = sync.RWMutex{}
+var isRunTxnPeriod bool = false
+var periodRwlock sync.RWMutex = sync.RWMutex{}
+
+func getRunTxnPeriod() bool {
+	periodRwlock.RLock()
+	defer periodRwlock.RUnlock()
+
+	return isRunTxnPeriod
+}
 
 func init() {
 	revel.TemplateFuncs["inc"] = func(a int, b int) int {
@@ -27,6 +42,20 @@ func init() {
 
 type App struct {
 	*revel.Controller
+}
+
+func (c App) StartRunTxnPeriod() revel.Result {
+	if !getRunTxnPeriod() {
+		periodRwlock.Lock()
+		defer periodRwlock.Unlock()
+
+		if !isRunTxnPeriod {
+			isRunTxnPeriod = true
+			TxnPeriodTask{}.RunTxnPeriod()
+		}
+
+	}
+	return c.RenderText("StartRunTxnPeriod")
 }
 
 func (c App) Step() revel.Result {
@@ -81,10 +110,10 @@ func (c App) IncomeTest() revel.Result {
 
 		resStruct, userId, isStep := LoginService{}.DealLoginTest(sessionId, url)
 		global.CommitTxn(sessionId)
-		
-//		if true {
-//			return c.RenderText("income test")
-//		}
+
+		//		if true {
+		//			return c.RenderText("income test")
+		//		}
 		c.Session["userId"] = fmt.Sprint(userId)
 
 		loginService := LoginService{}
@@ -180,7 +209,7 @@ func (c App) Index() revel.Result {
 		defer global.CloseSession(sessionId)
 		defer global.RollbackTxn(sessionId)
 
-		resStruct, userId, isStep := LoginService{}.DealLoginTest(sessionId, url)
+		resStruct, userId, isStep := LoginService{}.DealLogin(sessionId, url)
 		global.CommitTxn(sessionId)
 		c.Session["userId"] = fmt.Sprint(userId)
 
@@ -197,7 +226,7 @@ func (c App) Index() revel.Result {
 			stepLi := []interface{}{}
 			err := db.C("SysStep").Find(map[string]interface{}{
 				"A.sysUnitId": userMain["createUnit"],
-				"type": map[string]interface{}{
+				"A.type": map[string]interface{}{
 					"$in": stepTypeLi,
 				},
 			}).Sort("A.type").All(&stepLi)
@@ -300,7 +329,7 @@ func (c App) getGatheringBillLi(sessionId int, user map[string]interface{}) []ma
 			"chamberlainType": master["chamberlainType"],
 			"chamberlainId":   master["chamberlainId"],
 			"chamberlain":     "",
-			"amtGathering":    master["amtGathering"],
+			"amtGathering":    commonUtil.TrimZero(master["amtGathering"].(string)),
 		}
 		result = append(result, resultItem)
 	}
@@ -358,7 +387,7 @@ func (c App) getPayBillLi(sessionId int, user map[string]interface{}) []map[stri
 			"payerType": master["payerType"],
 			"payerId":   master["payerId"],
 			"payer":     "",
-			"amtPay":    master["amtPay"],
+			"amtPay":    commonUtil.TrimZero(master["amtPay"].(string)),
 		}
 		result = append(result, resultItem)
 	}
@@ -702,28 +731,26 @@ func (c App) Combo() revel.Result {
 	//	url := c.Request.URL.Path + "?" + c.Request.URL.RawQuery
 	//	start := time.Now()
 
-	jsPath := revel.Config.StringDefault("JS_PATH", "")
-	content := ""
-	for k := range c.Params.Query {
-		file, err := os.Open(path.Join(jsPath, k))
-		defer file.Close()
-		if err != nil {
-			panic(err)
-		}
-
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			panic(err)
-		}
-		content += string(data) + "\n"
-	}
+	nameConcat := c.getFileNameConcatFromQuery()
 
 	acceptEncoding := c.Request.Header.Get("Accept-Encoding")
 	if strings.Index(acceptEncoding, "gzip") > -1 {
-		data := bytes.Buffer{}
-		w := gzip.NewWriter(&data)
-		w.Write([]byte(content))
-		w.Close()
+		text := ""
+		if revel.Config.StringDefault("mode.dev", "true") == "true" {
+			content := c.getComboFileContent()
+			data := bytes.Buffer{}
+			w := gzip.NewWriter(&data)
+			w.Write([]byte(content))
+			w.Close()
+			text = data.String()
+		} else {
+			if c.isFileExist(nameConcat) {
+				text = string(c.getGzipContent(nameConcat))
+			} else {
+				content := c.getComboFileContent()
+				text = string(c.gzipAndSave(nameConcat, content))
+			}
+		}
 
 		c.Response.Status = http.StatusOK
 		if strings.Index(c.Params.Query.Encode(), ".css") <= -1 {
@@ -734,9 +761,10 @@ func (c App) Combo() revel.Result {
 		c.Response.Out.Header().Set("Content-Encoding", "gzip")
 		//		end := time.Now()
 		//		println("^^^^^^^^^^^^^^^^url is:" + url + " time spend is:" + fmt.Sprint((end.UnixNano() - start.UnixNano())))
-		return c.RenderText(data.String())
+		return c.RenderText(text)
 	}
 
+	content := c.getComboFileContent()
 	c.Response.Status = http.StatusOK
 	if strings.Index(c.Params.Query.Encode(), ".css") <= -1 {
 		c.Response.ContentType = "text/javascript;charset=UTF-8"
@@ -746,25 +774,42 @@ func (c App) Combo() revel.Result {
 	return c.RenderText(content)
 }
 
-func (c App) ComboView() revel.Result {
-	//	url := c.Request.URL.Path + "?" + c.Request.URL.RawQuery
-	//	start := time.Now()
+type StringArraySort struct {
+	objLi []string
+}
 
-	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
-	content := ""
+func (o StringArraySort) Len() int {
+	return len(o.objLi)
+}
+
+func (o StringArraySort) Less(i, j int) bool {
+	return o.objLi[i] <= o.objLi[j]
+}
+
+func (o StringArraySort) Swap(i, j int) {
+	o.objLi[i], o.objLi[j] = o.objLi[j], o.objLi[i]
+}
+
+func (c App) getFileNameConcatFromQuery() string {
+	queryLi := []string{}
+	name := ""
 	for k := range c.Params.Query {
-		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
-			panic("fileName is:" + k + ", expect ends with .js or .css")
-		}
-		isFileExist := false
-		for _, filePath := range strings.Split(jsPath, ":") {
-			if _, err := os.Stat(path.Join(filePath, k)); err != nil {
-				if os.IsNotExist(err) {
-					continue
-				}
-			}
-			isFileExist = true
-			file, err := os.Open(path.Join(filePath, k))
+		//		name += k
+		queryLi = append(queryLi, k)
+	}
+	stringArraySort := StringArraySort{queryLi}
+	sort.Sort(stringArraySort)
+	name = strings.Join(stringArraySort.objLi, "")
+	return name
+}
+
+func (c App) getComboFileContent() string {
+	jsPath := revel.Config.StringDefault("JS_PATH", "")
+	content := ""
+	commonUtil := CommonUtil{}
+	for k := range c.Params.Query {
+		if !commonUtil.IsNumber(k) && k != "" {
+			file, err := os.Open(path.Join(jsPath, k))
 			defer file.Close()
 			if err != nil {
 				panic(err)
@@ -775,19 +820,35 @@ func (c App) ComboView() revel.Result {
 				panic(err)
 			}
 			content += string(data) + "\n"
-			break
-		}
-		if !isFileExist {
-			panic(k + " is not exists")
 		}
 	}
+	return content
+}
+
+func (c App) ComboView() revel.Result {
+	//	url := c.Request.URL.Path + "?" + c.Request.URL.RawQuery
+	//	start := time.Now()
+
+	nameConcat := c.getFileNameConcatFromQuery()
 
 	acceptEncoding := c.Request.Header.Get("Accept-Encoding")
 	if strings.Index(acceptEncoding, "gzip") > -1 {
-		data := bytes.Buffer{}
-		w := gzip.NewWriter(&data)
-		w.Write([]byte(content))
-		w.Close()
+		text := ""
+		if revel.Config.StringDefault("mode.dev", "true") == "true" {
+			content := c.getComboViewFileContent()
+			data := bytes.Buffer{}
+			w := gzip.NewWriter(&data)
+			w.Write([]byte(content))
+			w.Close()
+			text = data.String()
+		} else {
+			if c.isFileExist(nameConcat) {
+				text = string(c.getGzipContent(nameConcat))
+			} else {
+				content := c.getComboViewFileContent()
+				text = string(c.gzipAndSave(nameConcat, content))
+			}
+		}
 
 		c.Response.Status = http.StatusOK
 		if strings.Index(c.Params.Query.Encode(), ".css") <= -1 {
@@ -798,9 +859,10 @@ func (c App) ComboView() revel.Result {
 		//		end := time.Now()
 		//		println("^^^^^^^^^^^^^^^^ comboview url is:" + url + " time spend is:" + fmt.Sprint((end.UnixNano() - start.UnixNano())))
 		c.Response.Out.Header().Set("Content-Encoding", "gzip")
-		return c.RenderText(data.String())
+		return c.RenderText(text)
 	}
 
+	content := c.getComboViewFileContent()
 	c.Response.Status = http.StatusOK
 	if strings.Index(c.Params.Query.Encode(), ".css") <= -1 {
 		c.Response.ContentType = "text/javascript;charset=UTF-8"
@@ -810,20 +872,94 @@ func (c App) ComboView() revel.Result {
 	return c.RenderText(content)
 }
 
+func (c App) getComboViewFileContent() string {
+	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
+	content := ""
+	commonUtil := CommonUtil{}
+	for k := range c.Params.Query {
+		if !commonUtil.IsNumber(k) && k != "" {
+			if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
+				panic("fileName is:" + k + ", expect ends with .js or .css")
+			}
+			isFileExist := false
+			for _, filePath := range strings.Split(jsPath, ":") {
+				if _, err := os.Stat(path.Join(filePath, k)); err != nil {
+					if os.IsNotExist(err) {
+						continue
+					}
+				}
+				isFileExist = true
+				file, err := os.Open(path.Join(filePath, k))
+				defer file.Close()
+				if err != nil {
+					panic(err)
+				}
+
+				data, err := ioutil.ReadAll(file)
+				if err != nil {
+					panic(err)
+				}
+				content += string(data) + "\n"
+				break
+			}
+			if !isFileExist {
+				panic(k + " is not exists")
+			}
+		}
+	}
+	return content
+}
+
 func (c App) FormJS() revel.Result {
 	//	start := time.Now()
 
+	acceptEncoding := c.Request.Header.Get("Accept-Encoding")
+	if strings.Index(acceptEncoding, "gzip") > -1 {
+		text := ""
+		if revel.Config.StringDefault("mode.dev", "true") == "true" {
+			content := c.getFormJsContent()
+			data := bytes.Buffer{}
+			w := gzip.NewWriter(&data)
+			w.Write([]byte(content))
+			w.Close()
+			text = data.String()
+		} else {
+			formJsNameLi := c.getFormJsLi()
+			nameConcat := strings.Join(formJsNameLi, "")
+			if c.isFileExist(nameConcat) {
+				text = string(c.getGzipContent(nameConcat))
+			} else {
+				content := c.getFormJsContent()
+				text = string(c.gzipAndSave(nameConcat, content))
+			}
+		}
+
+		c.Response.Status = http.StatusOK
+		c.Response.ContentType = "text/javascript;charset=UTF-8"
+		c.Response.Out.Header().Set("Content-Encoding", "gzip")
+
+		//		end := time.Now()
+		//		println("^^^^^^^^^^^^^^^^ formjs url time spend is:" + fmt.Sprint((end.UnixNano() - start.UnixNano())))
+		return c.RenderText(text)
+	}
+
+	content := c.getFormJsContent()
+	c.Response.Status = http.StatusOK
+	c.Response.ContentType = "text/javascript;charset=UTF-8"
+	return c.RenderText(content)
+}
+
+func (c App) getFormJsContent() string {
 	jsPath := revel.Config.StringDefault("COMBO_VIEW_PATH", "")
 	content := ""
-	formJsLi := []string{"js/rootform/r-form-field.js", "js/rootform/r-text-field.js", "js/rootform/r-hidden-field.js", "js/rootform/r-checkbox-field.js", "js/rootform/r-radio-field.js", "js/rootform/r-choice-field.js", "js/rootform/r-select-field.js", "js/rootform/r-trigger-field.js", "js/rootform/r-number-field.js", "js/rootform/r-display-field.js", "js/rootform/r-textarea-field.js", "js/rootform/r-date-field.js"}
-	lFormJsLi := []string{"js/listform/lformcommon.js", "js/listform/l-form-field.js", "js/listform/l-text-field.js", "js/listform/l-hidden-field.js", "js/listform/l-checkbox-field.js", "js/listform/l-radio-field.js", "js/listform/l-choice-field.js", "js/listform/l-select-field.js", "js/listform/l-trigger-field.js", "js/listform/l-number-field.js", "js/listform/l-display-field.js", "js/listform/l-textarea-field.js", "js/listform/l-date-field.js"}
-	pFormJsLi := []string{"js/form/p-form-field.js", "js/form/p-text-field.js", "js/form/p-hidden-field.js", "js/form/p-checkbox-field.js", "js/form/p-radio-field.js", "js/form/p-choice-field.js", "js/form/p-select-field.js", "js/form/p-trigger-field.js", "js/form/p-number-field.js", "js/form/p-display-field.js", "js/form/p-textarea-field.js", "js/form/p-date-field.js"}
-	for _, k := range pFormJsLi {
-		formJsLi = append(formJsLi, k)
-	}
-	for _, k := range lFormJsLi {
-		formJsLi = append(formJsLi, k)
-	}
+	formJsLi := c.getFormJsLi()
+	// 加入日期标记,gzip到目标文件时,有用,
+	//	commonUtil := CommonUtil{}
+	//	for k := range c.Params.Query {
+	//		if commonUtil.IsNumber(k) && k != "" {
+	//
+	//		}
+	//	}
 	for _, k := range formJsLi {
 		if strings.Index(k, ".js") == -1 && strings.Index(k, ".css") == -1 {
 			panic("fileName is:" + k + ", expect ends with .js or .css")
@@ -855,25 +991,77 @@ func (c App) FormJS() revel.Result {
 	}
 	prefix := "YUI.add('papersns-form', function(Y) {\n"
 	suffix := "}, '1.1.0' ,{requires:['node', 'widget-base', 'widget-htmlparser', 'io-form', 'widget-parent', 'widget-child', 'base-build', 'substitute', 'io-upload-iframe', 'collection', 'overlay', 'calendar', 'datatype-date']});\n"
-	content = prefix + content + suffix
+	return prefix + content + suffix
+}
 
-	acceptEncoding := c.Request.Header.Get("Accept-Encoding")
-	if strings.Index(acceptEncoding, "gzip") > -1 {
+func (c App) getFormJsLi() []string {
+	formJsLi := []string{"js/rootform/r-form-field.js", "js/rootform/r-text-field.js", "js/rootform/r-hidden-field.js", "js/rootform/r-checkbox-field.js", "js/rootform/r-radio-field.js", "js/rootform/r-choice-field.js", "js/rootform/r-select-field.js", "js/rootform/r-trigger-field.js", "js/rootform/r-number-field.js", "js/rootform/r-display-field.js", "js/rootform/r-textarea-field.js", "js/rootform/r-date-field.js"}
+	lFormJsLi := []string{"js/listform/lformcommon.js", "js/listform/l-form-field.js", "js/listform/l-text-field.js", "js/listform/l-hidden-field.js", "js/listform/l-checkbox-field.js", "js/listform/l-radio-field.js", "js/listform/l-choice-field.js", "js/listform/l-select-field.js", "js/listform/l-trigger-field.js", "js/listform/l-number-field.js", "js/listform/l-display-field.js", "js/listform/l-textarea-field.js", "js/listform/l-date-field.js"}
+	pFormJsLi := []string{"js/form/p-form-field.js", "js/form/p-text-field.js", "js/form/p-hidden-field.js", "js/form/p-checkbox-field.js", "js/form/p-radio-field.js", "js/form/p-choice-field.js", "js/form/p-select-field.js", "js/form/p-trigger-field.js", "js/form/p-number-field.js", "js/form/p-display-field.js", "js/form/p-textarea-field.js", "js/form/p-date-field.js"}
+	for _, k := range pFormJsLi {
+		formJsLi = append(formJsLi, k)
+	}
+	for _, k := range lFormJsLi {
+		formJsLi = append(formJsLi, k)
+	}
+	return formJsLi
+}
+
+func (c App) isFileExist(name string) bool {
+	h := md5.New()
+	io.WriteString(h, name)
+	gzipFileName := fmt.Sprintf("%x", h.Sum(nil))
+	gzipPath := revel.Config.StringDefault("GZIP_PATH", "")
+	if _, err := os.Stat(path.Join(gzipPath, gzipFileName)); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		panic(err)
+	}
+	return true
+}
+
+func (c App) getGzipContent(name string) []byte {
+	h := md5.New()
+	io.WriteString(h, name)
+	gzipFileName := fmt.Sprintf("%x", h.Sum(nil))
+	gzipPath := revel.Config.StringDefault("GZIP_PATH", "")
+	filePath := path.Join(gzipPath, gzipFileName)
+
+	bytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+	return bytes
+}
+
+func (c App) gzipAndSave(name string, content string) []byte {
+	gzipRwlock.Lock()
+	defer gzipRwlock.Unlock()
+
+	h := md5.New()
+	io.WriteString(h, name)
+	gzipFileName := fmt.Sprintf("%x", h.Sum(nil))
+	gzipPath := revel.Config.StringDefault("GZIP_PATH", "")
+	filePath := path.Join(gzipPath, gzipFileName)
+
+	if !c.isFileExist(name) {
 		data := bytes.Buffer{}
 		w := gzip.NewWriter(&data)
 		w.Write([]byte(content))
 		w.Close()
 
-		c.Response.Status = http.StatusOK
-		c.Response.ContentType = "text/javascript;charset=UTF-8"
-		c.Response.Out.Header().Set("Content-Encoding", "gzip")
-
-		//		end := time.Now()
-		//		println("^^^^^^^^^^^^^^^^ formjs url time spend is:" + fmt.Sprint((end.UnixNano() - start.UnixNano())))
-		return c.RenderText(data.String())
+		bytes := data.Bytes()
+		err := ioutil.WriteFile(filePath, bytes, os.ModeDevice|0666)
+		if err != nil {
+			panic(err)
+		}
+		return bytes
+	} else {
+		bytes, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			panic(err)
+		}
+		return bytes
 	}
-
-	c.Response.Status = http.StatusOK
-	c.Response.ContentType = "text/javascript;charset=UTF-8"
-	return c.RenderText(content)
 }

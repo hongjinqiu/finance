@@ -114,6 +114,7 @@ func (o TaobaoInterface) GetToken(paramDict map[string]string) map[string]interf
 	OAUTH_TOKEN_ENV_URL := revel.Config.StringDefault("OAUTH_TOKEN_ENV_URL", "")
 	resp, err := http.PostForm(OAUTH_TOKEN_ENV_URL, values)
 	if err != nil {
+		log.Print("GetToken request ", OAUTH_TOKEN_ENV_URL, " fail, request parameter is:", values)
 		panic(err)
 	}
 	defer resp.Body.Close()
@@ -124,6 +125,7 @@ func (o TaobaoInterface) GetToken(paramDict map[string]string) map[string]interf
 	rsp := map[string]interface{}{}
 	err = json.Unmarshal(body, &rsp)
 	if err != nil {
+		log.Print("GetToken convert response to json fail, body is:", body)
 		panic(err)
 	}
 	log.Println("response content is:" + string(body))
@@ -166,13 +168,16 @@ func (o TaobaoInterface) TaobaoShopGet(taobaoSysDict map[string]interface{}) map
 
 func (o TaobaoInterface) RepeatGetTaobaoDataTemplate(params map[string]string) map[string]interface{} {
 	repeatCount := 5
+	var outerErr error = nil
 	for runCount := 0; runCount < repeatCount; runCount++ {
 		taobaoData, err := o.GetTaobaoDataTemplate(params)
 		if err == nil {
 			return taobaoData
+		} else {
+			outerErr = err
 		}
 	}
-	return nil
+	panic(outerErr)
 }
 
 func (o TaobaoInterface) GetTaobaoDataTemplate(params map[string]string) (map[string]interface{}, error) {
@@ -212,6 +217,7 @@ func (o TaobaoInterface) ReadURL(params map[string]string) (map[string]interface
 	OAUTH_ENV_URL := revel.Config.StringDefault("OAUTH_ENV_URL", "")
 	resp, err := http.PostForm(OAUTH_ENV_URL, values)
 	if err != nil {
+		log.Println("readurl ", OAUTH_ENV_URL, " fail, parameter is:", values)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -240,6 +246,7 @@ func (o TaobaoInterface) ParseRsp(paramDict map[string]string, rsp string) (map[
 	rspStruct := map[string]interface{}{}
 	err := json.Unmarshal([]byte(rsp), &rspStruct)
 	if err != nil {
+		log.Println("ParseRsp fail, rsp is:", rsp)
 		return nil, err
 	}
 	rspStructByte, err := json.MarshalIndent(&rspStruct, "", "\t")

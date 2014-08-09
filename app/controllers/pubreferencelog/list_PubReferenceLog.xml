@@ -6,6 +6,7 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>被用信息列表</description>
+	<cookie name="PubReferenceLog"/>
 	<scripts>js/ds_listtoolbar.js&amp;pubreferencelog/pubReferenceLogListTemplate.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 

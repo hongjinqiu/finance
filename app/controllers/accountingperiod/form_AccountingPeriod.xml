@@ -9,15 +9,15 @@
 	<security byUnit="true"/>
 	
 	<toolbar>
-		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=AccountingPeriod" iconCls="test"></button>
-		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>
-		<button name="copyBtn" text="复制" mode="fn" handler="copyData"></button>
-		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
-		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
-		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
-		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button>
-		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
-		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
+		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=AccountingPeriod" iconCls="but_box"></button>
+		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls="but_box"></button>
+		<button name="copyBtn" text="复制" mode="fn" handler="copyData" iconCls="but_box"></button>
+		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls="but_box"></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls="but_box"></button>
+		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls="but_box"></button>
+		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls="but_box"></button>
+		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls="but_box"></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls="but_box"></button>
 	</toolbar>
 	
 	<column-model dataSetId="A" colSpan="4">
@@ -40,18 +40,18 @@
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<!-- <button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button> -->
-			<button text="编辑" mode="fn" handler="editAccountingDetail" iconCls="test"></button>
-			<!-- <button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button> -->
+			<!-- <button text="新增" mode="fn" handler="g_addRow" iconCls="but_box"></button> -->
+			<button text="编辑" mode="fn" handler="editAccountingDetail" iconCls="but_box"></button>
+			<!-- <button text="删除" mode="fn" handler="g_removeRow" iconCls="but_box"></button> -->
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="true" />
 		<id-column name="id" text="编号" hideable="true" />
 		<!-- 
-		<virtual-column name="FUN_C" text="操作">
+		<virtual-column name="FUN_C" text="操作" width="90">
 			<buttons>
-				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
-				<button text="复制" mode="fn" handler="g_copyRow" iconCls="test"></button>
-				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
+				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="img_edit"></button>
+				<button text="复制" mode="fn" handler="g_copyRow" iconCls="img_add"></button>
+				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="img_delete"></button>
 			</buttons>
 		</virtual-column>
 		 -->

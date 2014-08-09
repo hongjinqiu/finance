@@ -9,15 +9,15 @@
 	<security byUnit="true"/>
 	
 	<toolbar>
-		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=PayPact" iconCls="test"></button>
-		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button>
-		<button name="copyBtn" text="复制" mode="fn" handler="copyData"></button>
-		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls=""></button>
-		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls=""></button>
-		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls=""></button>
-		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button>
-		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls=""></button>
-		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button>
+		<button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=PayPact" iconCls="but_box"></button>
+		<button name="newBtn" text="新增" mode="fn" handler="newData" iconCls="but_box"></button>
+		<button name="copyBtn" text="复制" mode="fn" handler="copyData" iconCls="but_box"></button>
+		<button name="editBtn" text="修改" mode="fn" handler="editData" iconCls="but_box"></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="saveData" iconCls="but_box"></button>
+		<button name="giveUpBtn" text="放弃" mode="fn" handler="giveUpData" iconCls="but_box"></button>
+		<button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls="but_box"></button>
+		<button name="refreshBtn" text="刷新" mode="fn" handler="refreshData" iconCls="but_box"></button>
+		<button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls="but_box"></button>
 	</toolbar>
 	
 	<column-model dataSetId="A" colSpan="4">

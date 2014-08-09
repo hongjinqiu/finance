@@ -9,7 +9,7 @@
 	<security byUnit="true"/>
 	
 	<toolbar>
-		<button text="列表页" mode="fn" handler="doSave" iconCls="test"></button>
+		<button text="列表页" mode="fn" handler="doSave" iconCls="but_box"></button>
 		<button text="新增" mode="fn" handler="test" iconCls=""></button>
 		<button text="复制" mode="url" handler="doExport"></button>
 		<button text="修改" mode="fn" handler="test" iconCls=""></button>
@@ -72,9 +72,9 @@
 
 	<column-model dataSetId="B">
 		<toolbar>
-			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="选择" mode="fn" handler="doSelect" iconCls="but_box"></button>
 			<button text="新增" mode="fn" handler="addRow" iconCls="yui3-button btn-show"></button>
-			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="删除" mode="fn" handler="doSelect" iconCls="but_box"></button>
 		</toolbar>
 		<id-column name="id" text="编号" hideable="true" />
 		
@@ -100,9 +100,9 @@
 	
 	<column-model dataSetId="C">
 		<toolbar>
-			<button text="选择" mode="fn" handler="doSelect" iconCls="test"></button>
-			<button text="新增" mode="fn" handler="addRow" iconCls="test"></button>
-			<button text="删除" mode="fn" handler="doSelect" iconCls="test"></button>
+			<button text="选择" mode="fn" handler="doSelect" iconCls="but_box"></button>
+			<button text="新增" mode="fn" handler="addRow" iconCls="but_box"></button>
+			<button text="删除" mode="fn" handler="doSelect" iconCls="but_box"></button>
 		</toolbar>
 		<id-column name="id" text="编号" hideable="true" />
 		

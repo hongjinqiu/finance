@@ -1,4 +1,9 @@
 Y.PTriggerField = Y.Base.create('p-trigger-field', Y.RTriggerField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell trigger_input inputWidth',
+	SELECT_CLASS: 'trigger_select ptrigger_select',
+	VIEW_CLASS: 'trigger_view ptrigger_select',
+	DELETE_CLASS: 'trigger_delete ptrigger_select',
+	
 	_getFieldDict: function() {
 		var self = this;
 		var dataSetId = self.get("dataSetId");

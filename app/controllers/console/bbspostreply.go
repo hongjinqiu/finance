@@ -32,7 +32,8 @@ func (c Console) BbsPostAdminReplySchema() revel.Result {
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetListTemplate(schemaName)
 
-	result := c.listSelectorCommon(&listTemplate, true)
+	isFromList := true
+	result := c.listSelectorCommon(&listTemplate, true, isFromList)
 	bbsPostIdStr := c.Params.Get("bbsPostId")
 	bbsPostId, err := strconv.Atoi(bbsPostIdStr)
 	if err != nil {
@@ -72,7 +73,8 @@ func (c Console) BbsPostReplySchema() revel.Result {
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetListTemplate(schemaName)
 
-	result := c.listSelectorCommon(&listTemplate, true)
+	isFromList := true
+	result := c.listSelectorCommon(&listTemplate, true, isFromList)
 	bbsPostIdStr := c.Params.Get("bbsPostId")
 	bbsPostId, err := strconv.Atoi(bbsPostIdStr)
 	if err != nil {

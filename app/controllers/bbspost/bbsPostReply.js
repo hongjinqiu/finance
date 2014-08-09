@@ -27,11 +27,11 @@ function reply() {
 //			datalist
 			var trHtmlLi = [];
 			trHtmlLi.push("<tr>");
-			trHtmlLi.push("	<td>");
+			trHtmlLi.push("	<td class=\"searchTitle\">");
 			trHtmlLi.push("		{userDisplay}");
 			trHtmlLi.push("	</td>");
 			trHtmlLi.push("	<td>");
-			trHtmlLi.push("		<div>创建时间：{createTime}<br />{content}</div>");
+			trHtmlLi.push("		<div>创建时间：{createTime}<br /><br />内容：{content}</div>");
 			trHtmlLi.push("	</td>");
 			trHtmlLi.push("</tr>");
 			var trHtml = trHtmlLi.join("");

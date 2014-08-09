@@ -7,23 +7,23 @@
  * selection of choices
  */
 Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.WidgetChild], {
-	FIELD_CLASS : 'table-layout-cell trigger_input',
+	FIELD_CLASS : 'table-layout-cell trigger_input Wdate',
 	INPUT_TYPE: "text",
 	DATE_TEMPLATE: '<a></a>',
-	DATE_CLASS: 'trigger_date',
-	_dateNode: null,
+//	DATE_CLASS: 'trigger_date',
+//	_dateNode: null,
 	_olNode: null,
 	_overlay: null,
 	_calendar: null,
 	
-	_renderDateNode : function () {
-        this._dateNode = this._renderNode(this.DATE_TEMPLATE, this.DATE_CLASS);
-    },
+//	_renderDateNode : function () {
+//        this._dateNode = this._renderNode(this.DATE_TEMPLATE, this.DATE_CLASS);
+//    },
 	
 	renderUI: function() {
 		Y.RDateField.superclass.renderUI.apply(this, arguments);
 		
-		this._renderDateNode();
+//		this._renderDateNode();
 		this._olNode = Y.Node.create('<div></div>');
 		this.get('contentBox').appendChild(this._olNode);
     },
@@ -39,21 +39,34 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	}
     },
     
+    _hideOverlay: function() {
+    	if (this._calendar) {
+    		this._calendar.hide();
+    	}
+    	if (this._overlay) {
+    		this._overlay.hide();
+    	}
+    },
+    
     _createAndShowOverlay: function() {
     	var self = this;
     	if (this._overlay) {
+    		if (this._calendar) {
+    			this._calendar.show();
+    		}
+    		this._overlay.show();
     		return;
     	}
     	if (this.get("readonly")) {
     		return;
     	}
-    	//this._destroyOverlay();
+    	//this._hideOverlay();
     	
     	this._overlay = new Y.Overlay({
     		bodyContent:"<div></div>",
     		visible : false,
     		width : '250px',
-    		zIndex : 1000
+    		zIndex     : (++panelZIndex)
     		//,xy : [500, 100]
     	});
     	
@@ -69,11 +82,16 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	});
     	this._overlay.render(this._olNode);
     	
+    	var selectDate = self._getSelectDate();
     	this._calendar = new Y.Calendar({
     		width:'250px',
     		showPrevMonth: true,
     		showNextMonth: true,
-    		date: new Date()}).render(this._overlay.get("bodyContent").getDOMNodes()[0]);
+    		date: selectDate || new Date()}).render(this._overlay.get("bodyContent").getDOMNodes()[0]);
+    	if (selectDate) {
+    		this._calendar.selectDates(selectDate);
+    	}
+    	
     	
     	var dtdate = Y.DataType.Date;
 		this._calendar.on("selectionChange", function (ev) {
@@ -85,9 +103,30 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
 			self.set("value", dtdate.format(newDate, {
 				format: displayPattern
 			}));
-			self._destroyOverlay();
+			self._hideOverlay();
 		});
 		this._overlay.show();
+    },
+    
+    _getSelectDate: function() {
+    	var self = this;
+    	if (this.get("value") && this.get("value").length > 1) {
+    		var dbPattern = self.get("dbPattern");
+			var value = self.get("value") + "";
+			var index = dbPattern.indexOf("yyyy");
+			var yyyy = value.substr(index, 4);
+			index = dbPattern.indexOf("MM");
+			var MM = value.substr(index, 2);
+			index = dbPattern.indexOf("dd");
+			var dd = value.substr(index, 2);
+			
+			var selectDate = new Date();
+			selectDate.setFullYear(parseInt(yyyy, 10));
+			selectDate.setMonth(parseInt(MM, 10) - 1);
+			selectDate.setDate(parseInt(dd, 10));
+			return selectDate;
+    	}
+    	return null;
     },
     
     _isClickInBoundingBox: function(e) {
@@ -169,20 +208,25 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	
 
     	this._fieldNode.on('focus', Y.bind(function () {
-    		this._createAndShowOverlay();
-		}, this));
-    	
-    	this._dateNode.on("click", Y.bind(function(e) {
-    		if (!this._overlay) {
+    		if (!this.get("readonly")) {
     			this._createAndShowOverlay();
     		} else {
-    			this._destroyOverlay();
+    			this._hideOverlay();
     		}
-    	}, this));
+		}, this));
+    	
+//    	this._dateNode.on("click", Y.bind(function(e) {
+    		/*if (!this._overlay) {
+    			this._createAndShowOverlay();
+    		} else {
+    			this._hideOverlay();
+    		}*/
+//    		this._createAndShowOverlay();
+//    	}, this));
     	
     	Y.one("document").on("click", Y.bind(function(e){
     		if (!this._isClickInBoundingBox(e)) {
-    			this._destroyOverlay();
+    			this._hideOverlay();
     		}
     	}, this));
     },
@@ -196,27 +240,29 @@ Y.RDateField = Y.Base.create('r-date-field', Y.RFormField, [Y.WidgetParent, Y.Wi
     	
     	var value = this.get('readonly');
         if (value === true) {
-        	this._dateNode.setStyle("display", "none");
-        	this._destroyOverlay();
+//        	this._dateNode.setStyle("display", "none");
+        	this._hideOverlay();
+        	this._fieldNode.addClass('readonly');
         } else {
-        	this._dateNode.setStyle("display", "");
+//        	this._dateNode.setStyle("display", "");
+        	this._fieldNode.removeClass('readonly');
         }
     },
     
-    _syncDateNode: function() {
-    	if (this._dateNode) {
-    		this._dateNode.setAttrs({
-    			href: "javascript:void(0);",
-    			title: "日期选择",
-    			id: Y.guid() + Y.RFormField.FIELD_ID_SUFFIX
-    		});
-    	}
-    },
+//    _syncDateNode: function() {
+//    	if (this._dateNode) {
+//    		this._dateNode.setAttrs({
+//    			href: "javascript:void(0);",
+//    			title: "日期选择",
+//    			id: Y.guid() + Y.RFormField.FIELD_ID_SUFFIX
+//    		});
+//    	}
+//    },
     
     syncUI: function() {
     	Y.RDateField.superclass.syncUI.apply(this, arguments);
     	
-    	this._syncDateNode();
+//    	this._syncDateNode();
     },
     
     initializer: function() {

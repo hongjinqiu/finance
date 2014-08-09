@@ -315,9 +315,11 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
     _syncReadonly: function(e) {
         var value = this.get('readonly');
         if (value === true) {
-            this._fieldNode.setAttribute('readonly', 'readonly');
+        	this._fieldNode.setAttribute('readonly', 'readonly');
+        	this._fieldNode.addClass('readonly');
         } else {
             this._fieldNode.removeAttribute('readonly');
+            this._fieldNode.removeClass('readonly');
         }
     },
 
@@ -377,36 +379,72 @@ Y.RFormField = Y.Base.create('r-form-field', Y.Widget, [Y.WidgetParent, Y.Widget
     		x = xy[0];
     		y = xy[1];
     		var fieldWidth = parseInt(this._fieldNode.getComputedStyle("width"), 10);
-    		var width = 200;
-    		var height = 50;
+    		var marginPadding = 10;
+    		fieldWidth += marginPadding;
+    		y -= 5;
+//    		var width = 200;
+//    		var height = 50;
 //    		var height = parseInt(this._fieldNode.getComputedStyle("height"));
     		
     		var errorRenderId = this.get('id') + "_error";
         	var errorNode = Y.one("#" + errorRenderId);
     		if (!errorNode) {
-    			var errorStyleLi = [];
-    			errorStyleLi.push('position: absolute;');
-    			errorStyleLi.push('z-index: 999;');
-    			errorStyleLi.push('background-color: white;');
-//    			errorStyleLi.push('opacity: 0.5;');
-//    			errorStyleLi.push('filter:alpha(opacity=50);');
-    			errorStyleLi.push('width: ' + width + 'px;');
-    			errorStyleLi.push('height: ' + height + 'px;');
-    			errorStyleLi.push('left: ' + (x + fieldWidth) + 'px;');
-    			errorStyleLi.push('top: ' + y + 'px;');
-    			errorStyleLi.push('display: none;');
-    			errorStyleLi.push('border: 1px solid red;');
-
-
     			var htmlLi = [];
-    			htmlLi.push('<div id="' + errorRenderId + '" style="' + errorStyleLi.join("") + '">');
-    			htmlLi.push(err);
-    			htmlLi.push('</div>');
-    			Y.one("body").append(htmlLi.join(""));
-    			errorNode = Y.one("#" + errorRenderId);
+				htmlLi.push("<div id=\"" + errorRenderId + "\" class=\"tip-yellow\"");
+				htmlLi.push("	style=\"display: none; border: 0px; padding: 0px; background-image: none; background-color: transparent; opacity: 1;\">");
+				htmlLi.push("	<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"width: " + (err.length * 20) + "px;\">");
+				htmlLi.push("		<tbody>");
+				htmlLi.push("			<tr>");
+				htmlLi.push("				<td colspan=\"2\" class=\"tip-top tip-bg-image\"");
+				htmlLi.push("					style=\"background-image: url(&quot;/public/img/tip-yellow.png&quot;);\"><span></span>");
+				htmlLi.push("				</td>");
+				htmlLi.push("				<td rowspan=\"2\" class=\"tip-right tip-bg-image\"");
+				htmlLi.push("					style=\"background-image: url(&quot;/public/img/tip-yellow.png&quot;);\"><span></span>");
+				htmlLi.push("				</td>");
+				htmlLi.push("			</tr>");
+				htmlLi.push("			<tr>");
+				htmlLi.push("				<td rowspan=\"2\" class=\"tip-left tip-bg-image\"");
+				htmlLi.push("					style=\"background-image: url(&quot;/public/img/tip-yellow.png&quot;);\"><span></span>");
+				htmlLi.push("				</td>");
+				htmlLi.push("				<td style=\"width: 100%;border: 0px;\"><div class=\"tip-inner tip-bg-image\"");
+				htmlLi.push("						style=\"background-image: url(&quot;/public/img/tip-yellow.png&quot;);\">" + err + "</div>");
+				htmlLi.push("				</td>");
+				htmlLi.push("			</tr>");
+				htmlLi.push("			<tr>");
+				htmlLi.push("				<td colspan=\"2\" class=\"tip-bottom tip-bg-image\"");
+				htmlLi.push("					style=\"background-image: url(&quot;/public/img/tip-yellow.png&quot;);\"><span></span>");
+				htmlLi.push("				</td>");
+				htmlLi.push("			</tr>");
+				htmlLi.push("		</tbody>");
+				htmlLi.push("	</table>");
+				htmlLi.push("	<div class=\"tip-arrow tip-arrow-left\" style=\"visibility: inherit;\"></div>");
+				htmlLi.push("</div>");
+				Y.one("body").append(htmlLi.join(""));
+				errorNode = Y.one("#" + errorRenderId);
+    			
+				/*if (false) {
+					var errorStyleLi = [];
+					errorStyleLi.push('position: absolute;');
+					errorStyleLi.push('z-index: 999;');
+					errorStyleLi.push('background-color: white;');
+					errorStyleLi.push('width: ' + width + 'px;');
+					errorStyleLi.push('height: ' + height + 'px;');
+					errorStyleLi.push('left: ' + (x + fieldWidth) + 'px;');
+					errorStyleLi.push('top: ' + y + 'px;');
+					errorStyleLi.push('display: none;');
+					errorStyleLi.push('border: 1px solid red;');
+					
+					
+					var htmlLi = [];
+					htmlLi.push('<div id="' + errorRenderId + '" style="' + errorStyleLi.join("") + '">');
+					htmlLi.push(err);
+					htmlLi.push('</div>');
+					Y.one("body").append(htmlLi.join(""));
+					errorNode = Y.one("#" + errorRenderId);
+				}*/
     		}
-    		errorNode.setStyle("width", width + "px");
-    		errorNode.setStyle("height", height + "px");
+//    		errorNode.setStyle("width", width + "px");
+//    		errorNode.setStyle("height", height + "px");
     		errorNode.setStyle("left", (x + fieldWidth) + "px");
     		errorNode.setStyle("top", y + "px");
 

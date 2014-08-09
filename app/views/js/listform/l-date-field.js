@@ -1,7 +1,12 @@
 Y.LDateField = Y.Base.create('l-date-field', Y.RDateField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell trigger_input inputWidth Wdate',
+//	DATE_CLASS: 'ltrigger_date',
+	
 	initializer : function () {
 		Y.LDateField.superclass.initializer.apply(this, arguments);
 		var self = this;
+		
+		new LFormManager().initializeAttr(self, Y);
 		
 		var dbPattern = "";
 		var displayPattern = "";

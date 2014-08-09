@@ -1,4 +1,6 @@
 Y.PDateField = Y.Base.create('p-date-field', Y.RDateField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell trigger_input inputWidth Wdate',
+	
     bindUI: function() {
     	Y.PDateField.superclass.bindUI.apply(this, arguments);
     	

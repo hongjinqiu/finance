@@ -287,10 +287,12 @@ func (o TxnManager) update(txnId int, collection string, doc map[string]interfac
 		} else {
 			pendingTransactions = []interface{}{}
 		}
-		pendingTransactions = append(pendingTransactions, map[string]interface{}{
-			"update": oldDoc,
-		})
-		doc["pendingTransactions"] = pendingTransactions
+		if len(pendingTransactions) == 0 {
+			pendingTransactions = append(pendingTransactions, map[string]interface{}{
+				"update": oldDoc,
+			})
+			doc["pendingTransactions"] = pendingTransactions
+		}
 		if err := o.DB.C(collection).Update(query, doc); err != nil {
 			if err == mgo.ErrNotFound {
 				return nil, false
@@ -451,9 +453,11 @@ func (o TxnManager) remove(txnId int, collection string, doc map[string]interfac
 		} else {
 			pendingTransactions = []interface{}{}
 		}
-		pendingTransactions = append(pendingTransactions, map[string]interface{}{
-			"remove": true,
-		})
+		if len(pendingTransactions) == 0 {
+			pendingTransactions = append(pendingTransactions, map[string]interface{}{
+				"remove": true,
+			})
+		}
 		update := map[string]interface{}{
 			"$set": map[string]interface{}{
 				"txnId":               txnId,

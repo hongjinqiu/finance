@@ -6,13 +6,14 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>ActionTest列表</description>
+	<cookie name="ActionTest"/>
 	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
+		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="but_box" />
 
-		<button text="删除" mode="fn" handler="g_deleteRecords">
+		<button text="删除" mode="fn" handler="g_deleteRecords" iconCls="but_box">
 			<button-attribute name="code" value="D" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -22,9 +23,9 @@
 			<button-attribute name="functionId" value="10018" />
 		</button>
 
-		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
+		<button text="获取记录测试" mode="fn" handler="test" iconCls="but_box">
 		</button>
-		<button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" use-in="selector" />	</toolbar>
+		<button text="新增" mode="url!" handler="/console/formschema?@name=ActionTest" iconCls="but_box" use-in="selector" />	</toolbar>
 	
 	<security byUnit="true"/>
 
@@ -38,31 +39,31 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选ActionTest" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<toolbar>
-			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="doSave" iconCls="but_box"></button>
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="编辑" iconCls="bj_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}">
+				<button text="编辑" iconCls="img_edit" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}">
 					<expression></expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button name="btn_delete" text="删除" iconCls="bj_btn" mode="fn" handler="g_deleteRecord">
+				<button name="btn_delete" text="删除" iconCls="img_delete" mode="fn" handler="g_deleteRecord">
 					<expression></expression>
 					<button-attribute name="code" value="D" />
 				</button>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
 					<expression></expression>
 				</button>
 			</buttons>
 		</virtual-column>
 		<virtual-column name="FUN_C_SELECTOR" text="操作" width="40" use-in="selector">
 			<buttons>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url!" handler="/console/formschema/?@name=ActionTest&amp;id={id}&amp;formStatus=view">
 					<expression></expression>
 				</button>
 			</buttons>

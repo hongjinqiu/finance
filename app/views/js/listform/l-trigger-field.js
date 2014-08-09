@@ -1,7 +1,14 @@
 Y.LTriggerField = Y.Base.create('l-trigger-field', Y.RTriggerField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell trigger_input inputWidth',
+	SELECT_CLASS: 'trigger_select ltrigger_select',
+	VIEW_CLASS: 'trigger_view ltrigger_select',
+	DELETE_CLASS: 'trigger_delete ltrigger_select',
+	
 	initializer : function () {
 		Y.LTriggerField.superclass.initializer.apply(this, arguments);
 		var self = this;
+		
+		new LFormManager().applyEventBehavior(self);
 		
 		// 需要配置在extraInfo里面,
 		var selectFunc = function(selectValueLi, formObj){

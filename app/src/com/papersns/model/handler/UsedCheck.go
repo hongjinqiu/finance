@@ -4,6 +4,7 @@ import (
 	"com/papersns/global"
 	. "com/papersns/model"
 	. "com/papersns/mongo"
+	. "com/papersns/common"
 	"fmt"
 	"labix.org/v2/mgo"
 	"log"
@@ -58,6 +59,7 @@ func (o UsedCheck) Insert(sessionId int, fieldGroupLi []FieldGroup, bo *map[stri
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
+	createTime := DateUtil{}.GetCurrentYyyyMMddHHmmss()
 	for _, fieldGroup := range fieldGroupLi {
 		if fieldGroup.IsRelationField() {
 			modelTemplateFactory := ModelTemplateFactory{}
@@ -66,6 +68,11 @@ func (o UsedCheck) Insert(sessionId int, fieldGroupLi []FieldGroup, bo *map[stri
 				panic("数据源:" + fieldGroup.GetDataSource().Id + ",数据集:" + fieldGroup.GetDataSetId() + ",字段:" + fieldGroup.Id + ",配置的关联模型列表,不存在返回true的记录")
 			}
 			referenceData := map[string]interface{}{
+				"A": map[string]interface{}{
+					"createBy": (*data)["createBy"],
+					"createTime": createTime,
+					"createUnit": (*data)["createUnit"],
+				},
 				"reference":   o.GetSourceReferenceLi(db, fieldGroup, bo, data),
 				"beReference": o.GetBeReferenceLi(db, fieldGroup, relationItem, data),
 			}

@@ -4,6 +4,12 @@ Y.LFormField = Y.Base.create('l-form-field', Y.RFormField, [Y.WidgetChild], {
     	var self = this;
     	
     	new LFormManager().applyEventBehavior(self);
+    },
+    initializer: function() {
+    	Y.LFormField.superclass.initializer.apply(this, arguments);
+    	var self = this;
+    	
+    	new LFormManager().initializeAttr(self, Y);
     }
 },
 {

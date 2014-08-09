@@ -496,7 +496,7 @@
 			<!-- 是否纳入清单条件 -->
 			<!-- <element name="listWhereField" type="boolean" default="true" minOccurs="0" maxOccurs="1" /> -->
 			<!-- 格式化来源是字段 -->
-			<element name="formatExpr" type="string" default="" minOccurs="0" maxOccurs="1" />
+			<element name="formatExpr" type="string" default="localCurrency" minOccurs="0" maxOccurs="1" />
 			<!-- 关联模型集合 -->
 			<element name="relationDS" minOccurs="0" maxOccurs="1">
 				<complexType>

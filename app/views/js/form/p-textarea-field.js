@@ -1,4 +1,6 @@
 Y.PTextareaField = Y.Base.create('p-textarea-field', Y.RTextareaField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell table-layout-textarea textarea_box',
+	
     bindUI: function() {
     	Y.PTextareaField.superclass.bindUI.apply(this, arguments);
     	

@@ -2,7 +2,6 @@
 (?msi)GetSessionId\(\)((?!(CloseSession\(sessionId\))).)*(func )
 (?msi)GetTxnId\(sessionId\)((?!(commit)).)*(func )
 
-
 PayPact	付款条款,没用到,---------------------to delete----------------------,
 
 默认值,被用不可改,不可复制,列表页的多选选择,
@@ -140,51 +139,87 @@ action,
 
 列表页面添加复制按钮,finish,
 选择页面,操作按钮的显示隐藏,finish,
-金额数字的格式化问题,running,----------------------,	主要是 被格式字段,格式的字段,
-	每个字段都要配置一个 reference 的东东,然后 onChange 的时候,刷新其值,
-	1.1.实现取值到页面上,
-	1.4.组件模型列表的东东,form页面的刷值取值问题的折腾，
-		1.1.模型里面有哪几个字段是定义金额的，
-		1.1.1.添加FormatSrcField	格式化来源字段Id	字段添加格式化字段来源,finish,先只实现 float,money,的相关的东东,
-		1.1.2.组件模型字段生成,
-			<attribute name="currencyField"></attribute><!-- 币别字段 -->			field.formatExpr
-			<attribute name="isMoney" type="boolean"></attribute>				field.fieldDataType = money,
-			<attribute name="isUnitPrice" type="boolean"></attribute>
-			<attribute name="isCost" type="boolean"></attribute>
-			<attribute name="isPercent" type="boolean"></attribute>
-			<attribute name="isQuantity" type="boolean"></attribute>
-			
-			修改 adapter	o.applyColumnExtend(*fieldGroup, column)
-			只要多一个 currencyField,finish,直接用选择器里面的东东，连东东都不要，
-			界面上是否有值，将其配置，添加到界面上的 sysParam里面去，localCurrency，将currency的值给弄进去，
-			用收款单,localCurrency看对不对,isMoney,
-			g_relationManager.getRelationBo("CurrencyTypeSelector", 3),
-			
-			修改 columnManager.currencyFormatFunc,要参考 createSelectColumn 里面的内容进行处理,只是,running,----------------------------,
-	1.2.再看一看流程，看能不能实现，
-	1.2.r-number里面的东东还没有折腾，将各个属性设置成函数，并提供refresh方法，yes，可参考日期控件的实现,
-	1.3.l-number,每个值赋进来的时候
-	
-	localCurrency的字段,刷新要进行清值,
-需要找一个go的大数进行计算,
-程序中的长度是utf8 encode后的,因此,会有*3的效应,处理这个东东,
-
-
+金额数字的格式化问题,finish,主要是 被格式字段,格式的字段,
+需要找一个go的大数进行计算,用godec即可,试验过可行，finish，
+程序中的长度是utf8 encode后的,因此,会有*3的效应,处理这个东东,finish,
 当数据量大时,过账会有bug,因此,我需要一个新的小 pendingTransaction 来操作,只需要其底下的几个字段修改即可,
-只在pendingTransaction里面存最初的一个obj即可,
-后台查询关联时,用减少查询语句的方式,来获取数据,
+只在pendingTransaction里面存最初的一个obj即可,finish，
+js压缩输出时,添加日期标记，用读取配置文件的方式输出,并写回复报头,finish,
 
-js压缩输出时,添加日期标记，用读取配置文件的方式输出,并写回复报头,
+11.金额字段的查询区间的错误，需要用前面补0，后面补空格0，然后相关的空格处理，finish，
+12.日期的替换，用alloy的东东，需要阅读后，复制代码到程序中，finish,先暂时用自己的东东,比较强大了，
+13.列表页输入日期的报错，即其如果不是正确的格式,finish,
+14.列表页查询之前，做基本的校验，finish,
+14.cookie的添加的折腾，finish，
+14.1.showModalDialog的多弹出层的折腾，应该配合上WidgetStack即可，明天再奋战，finish，直接改 zIndex即可，
+15.事务的定期回滚，在程序里面实现定期的奔跑，用time.after，txnManager里面？
+	完成，需要部署脚本跑一下 访问一下，/app/startruntxnperiod
+14.列表，表单页面的美化，top应用图标。上班时间其实也可以弄。
+	列表，finish，
+		1.查询条件，当查询条件较少时，不显示展开，
+			1.1.长度，finish,
+		2.查询条件label，右对齐，finish，
+		3.工具栏，按钮，finish，
+		4.列表栏显示标题，finish，
+		5.表格最大化，finish，
+		6.表格样式，finish，
+		6.1.head,finish，
+		6.2.body,finish，
+		6.3.virtualColumn,button,finish，
+		6.4.修改各个组件模型中的样式，finish，
+		7.字段的提示信息的折腾，finish,
+		8.编辑与复制换个地方,finish,
+		8.IE8下的修改,先不管，全部弄完再说．
+	选择器，finish，
+	弹出，finish，
+	我的菜单，finish，
+	表单，finish,
+	选择列表中的trigger-field中的查看弹窗，改成默认用标签页打开，finish，
+	查看时，某些字段非只读，finish，
+	被用查询为什么没数据，finish，
+	意见反馈的开发？查看页面很难看，finish，
+	首页的金额显示：finish，
+	正式环境下控制台不会报错？finish，简单地控制台输出
+	1.log下接入的url，finish，
+	2.在访问淘宝报错时，log出请求和返回的内容，finish，
+10.80*80的图标，finish，
 
-12.日期的替换，
-13.列表页输入日期的报错，
-14.cookie的添加的折腾，
-14.列表，表单页面的美化，
-10.最后才是接入是否正确，
-11.右上角的与我联系的window.onlad开发,
+1.先测试一下应用环境下为什么会被缓存住，否则问题就大了，测试中,finish，改掉了一个bug，
+1.1.接入测试，running,----------------------，
+	OAUTH_ENV_URL = https://eco.taobao.com/router/rest			开发测试相同,
+	OAUTH_TOKEN_ENV_URL = https://oauth.taobao.com/token		开发测试相同,
+	OAUTH_LOGOUT_PATH = http://localhost:9000/hjq/login			正式环境为:	OAUTH_LOGOUT_PATH = https://oauth.taobao.com/logoff，
+	REDIRECT_URI = http://127.0.0.1:9000/								正式环境需要上线后修改，
+	TAOBAO_APP_KEY_FINANCE = 21210514							需要修改，
+	TAOBAO_APP_SECRET_FINANCE = sandbox2e27c6e6feda44114bbf6d1d8	需要修改，
+	TAOBAO_PATH = http://www.taobao.com
+	PYTHON_PARSE_URL = http://localhost:8000/pyscript/parse/
 
 
+OAUTH_ENV_URL = https://gw.api.tbsandbox.com/router/rest
+OAUTH_TOKEN_ENV_URL = https://oauth.tbsandbox.com/token
+OAUTH_LOGOUT_PATH = http://localhost:9000/hjq/login
+REDIRECT_URI = http://127.0.0.1:9000/
+TAOBAO_APP_KEY_FINANCE = 1021821702
+TAOBAO_APP_SECRET_FINANCE = sandbox3f2883d0ab2c942caae7f69b5
 
+_linux加入error的记录，
+
+	相关的变量名是否正确?
+15.简单的并发测试，有时间就做，没时间就不做，挂起，
+
+10.最后才是接入是否正确，成功，
+11.购买服务器，准备部署的东东，running,---------------------------,
+	go1.3,python,revel,mongodb,git,
+	
+12.相关文件上传到github，
+13.可否部署成功的折腾，
+11.建立使用说明的页面，
+12.
+
+
+12.rownumber的东东,当前先不用管,上线后处理,
+13.cookie里面的userId,重新放到服务端实现的方法,当前只设置 cookie host,cookie存活时间,
 
 
 ProviderType
@@ -217,11 +252,6 @@ db.BillReceiveTypeParameter.remove({'A.createUnit': 20})
 db.BillPaymentTypeParameter.remove({'A.createUnit': 20})
 db.SystemParameter.remove({'A.createUnit': 20})
 db.SysStep.remove({'A.createUnit': 20})
-
-
-
-
-
 
 
 

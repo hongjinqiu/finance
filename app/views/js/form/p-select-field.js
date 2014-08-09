@@ -1,4 +1,6 @@
 Y.PSelectField = Y.Base.create('p-select-field', Y.RSelectField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell selectWidth',
+	
     bindUI: function() {
     	Y.PSelectField.superclass.bindUI.apply(this, arguments);
     	

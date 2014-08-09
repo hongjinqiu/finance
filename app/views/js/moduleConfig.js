@@ -1,4 +1,7 @@
 var g_financeModule = {
+//	lang: "zh-Hans",
+	lang: "zh-HANT-TW",
+//	filter: 'raw',
 	modules: {
         "papersns-form": {
             fullpath: '/app/FormJS',

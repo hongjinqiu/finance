@@ -1,9 +1,11 @@
 package component
 
 import (
+	. "com/papersns/common"
+	"fmt"
 	"strconv"
 	"strings"
-	"time"
+//	"time"
 )
 
 type QueryParameterBuilder struct {
@@ -14,19 +16,19 @@ type RestrictionEditorFunc func(queryParameter QueryParameter, value string) map
 func (o QueryParameterBuilder) buildQuery(queryParameter QueryParameter, value string) map[string]interface{} {
 	funcMap := map[string]map[string]RestrictionEditorFunc{
 		"textfield":     o.stringCmpMap(),
-		"textareafield":      o.stringCmpMap(),
+		"textareafield": o.stringCmpMap(),
 		"numberfield":   o.intOrFloatCmpMap(),
 		"datefield":     o.dateCmpMap(),
-		"combofield":         o.intOrFloatOrStringCmpMap(),
+		"combofield":    o.intOrFloatOrStringCmpMap(),
 		"combotree":     o.intOrFloatOrStringCmpMap(),
 		"displayfield":  nil,
-		"hiddenfield":        o.intOrFloatOrStringOrLikeCmpMap(),
+		"hiddenfield":   o.intOrFloatOrStringOrLikeCmpMap(),
 		"htmleditor":    o.stringCmpMap(),
-		"checkboxfield":      o.intOrFloatOrStringCmpMap(),
+		"checkboxfield": o.intOrFloatOrStringCmpMap(),
 		"checkboxgroup": o.intOrFloatOrStringCmpMap(),
-		"radiofield":         o.intOrFloatOrStringCmpMap(),
+		"radiofield":    o.intOrFloatOrStringCmpMap(),
 		"radiogroup":    o.intOrFloatOrStringCmpMap(),
-		"triggerfield":       o.intOrFloatCmpMap(),
+		"triggerfield":  o.intOrFloatCmpMap(),
 	}
 	if funcMap[queryParameter.Editor] != nil {
 		if funcMap[queryParameter.Editor][queryParameter.Restriction] != nil {
@@ -165,15 +167,40 @@ func (o QueryParameterBuilder) intOrFloatCmp(operator string) RestrictionEditorF
 func (o QueryParameterBuilder) intOrFloatOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
 	resultLi := []map[string]interface{}{}
 	intValue, err := strconv.ParseInt(value, 10, 0)
+	commonUtil := CommonUtil{}
 	if err == nil {
 		if operator == "$eq" {
+			//			resultLi = append(resultLi, map[string]interface{}{
+			//				o.GetQueryName(queryParameter): intValue,
+			//			})
 			resultLi = append(resultLi, map[string]interface{}{
-				o.GetQueryName(queryParameter): intValue,
+				"$or": []map[string]interface{}{
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): intValue,
+					},
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): commonUtil.GetFloatFormat(fmt.Sprint(intValue)),
+					},
+				},
 			})
 		} else {
+			//			resultLi = append(resultLi, map[string]interface{}{
+			//				o.GetQueryName(queryParameter): map[string]int{
+			//					operator: int(intValue),
+			//				},
+			//			})
 			resultLi = append(resultLi, map[string]interface{}{
-				o.GetQueryName(queryParameter): map[string]int{
-					operator: int(intValue),
+				"$or": []map[string]interface{}{
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): map[string]interface{}{
+							operator: int(intValue),
+						},
+					},
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): map[string]interface{}{
+							operator: commonUtil.GetFloatFormat(fmt.Sprint(intValue)),
+						},
+					},
 				},
 			})
 		}
@@ -186,13 +213,37 @@ func (o QueryParameterBuilder) intOrFloatOperator(queryParameter QueryParameter,
 	floatValue, err := strconv.ParseFloat(value, 32)
 	if err == nil {
 		if operator == "$eq" {
+			//			resultLi = append(resultLi, map[string]interface{}{
+			//				o.GetQueryName(queryParameter): float32(floatValue),
+			//			})
 			resultLi = append(resultLi, map[string]interface{}{
-				o.GetQueryName(queryParameter): float32(floatValue),
+				"$or": []map[string]interface{}{
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): float32(floatValue),
+					},
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): commonUtil.GetFloatFormat(value),
+					},
+				},
 			})
 		} else {
+			//			resultLi = append(resultLi, map[string]interface{}{
+			//				o.GetQueryName(queryParameter): map[string]float32{
+			//					operator: float32(floatValue),
+			//				},
+			//			})
 			resultLi = append(resultLi, map[string]interface{}{
-				o.GetQueryName(queryParameter): map[string]float32{
-					operator: float32(floatValue),
+				"$or": []map[string]interface{}{
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): map[string]interface{}{
+							operator: int(floatValue),
+						},
+					},
+					map[string]interface{}{
+						o.GetQueryName(queryParameter): map[string]interface{}{
+							operator: commonUtil.GetFloatFormat(value),
+						},
+					},
 				},
 			})
 		}
@@ -278,6 +329,7 @@ func (o QueryParameterBuilder) dateCmp(operator string) RestrictionEditorFunc {
 }
 
 func (o QueryParameterBuilder) dateOperator(queryParameter QueryParameter, value string, operator string) map[string]interface{} {
+	/*
 	displayPattern := "yyyy-MM-dd"
 	dbPattern := "yyyyMMdd"
 	for _, parameterAttribute := range queryParameter.ParameterAttributeLi {
@@ -298,6 +350,11 @@ func (o QueryParameterBuilder) dateOperator(queryParameter QueryParameter, value
 
 	queryDataStr := t.Format(dbPattern)
 	queryData, err := strconv.ParseInt(queryDataStr, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	*/
+	queryData, err := strconv.ParseInt(value, 10, 64)
 	if err != nil {
 		panic(err)
 	}

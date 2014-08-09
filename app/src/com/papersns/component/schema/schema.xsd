@@ -105,6 +105,7 @@
 				<element ref="tns:data-source-model-id" minOccurs="0" />
 				<element ref="tns:adapter" minOccurs="0" />
 				<element ref="tns:description" minOccurs="0" />
+				<element ref="tns:cookie" minOccurs="0" />
 				<element ref="tns:scripts" minOccurs="0" />
 				<element ref="tns:view-template" minOccurs="0" />
 				<element ref="tns:toolbar" minOccurs="0" />
@@ -149,6 +150,19 @@
 		<annotation>
 			<documentation>描述</documentation>
 		</annotation>
+	</element>
+	
+	<element name="cookie">
+		<annotation>
+			<documentation>cookie</documentation>
+		</annotation>
+		<complexType>
+			<attribute name="name" use="required">
+				<annotation>
+					<documentation>cookie名称</documentation>
+				</annotation>
+			</attribute>
+		</complexType>
 	</element>
 
 	<element name="scripts">

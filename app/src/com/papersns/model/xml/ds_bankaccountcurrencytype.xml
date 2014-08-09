@@ -95,18 +95,20 @@
 				<fixHide>true</fixHide>
 				<fixReadOnly>true</fixReadOnly>
 			</field>
-			<field id="amtSecureBalance" extends="FLOAT_FIELD">
+			<field id="amtSecureBalance" extends="AMOUNT_FIELD">
 				<displayName>安全余额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>true</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
-			<field id="amtLimits" extends="FLOAT_FIELD">
+			<field id="amtLimits" extends="AMOUNT_FIELD">
 				<displayName>限额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>true</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
 				<zeroShowEmpty>true</zeroShowEmpty>

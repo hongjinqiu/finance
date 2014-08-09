@@ -135,7 +135,7 @@ DataTableManager.prototype.showLoadingImg = function() {
 		var htmlLi = [];
 		htmlLi.push('<div id="' + gridRenderId + '_loading" style="' + loadingStyleLi.join("") + '">');
 		htmlLi.push('<div id="' + gridRenderId + '_loadingImg" style="' + loadingImgLi.join("") + '">');
-		htmlLi.push('<img src="/public/galleryimages/loading_indicator.gif" title="加载中..." border="0" width="16" height="16"/>');
+		htmlLi.push('<img src="/public/galleryimages/loading_indicator.gif?{{.DATE_FLAG}}" title="加载中..." border="0" width="16" height="16"/>');
 		htmlLi.push('</div>');
 		htmlLi.push('</div>');
 		Y.one("body").append(htmlLi.join(""));
@@ -224,7 +224,8 @@ DataTableManager.prototype.createDataGrid = function(Y, param, config) {
 	}
 	var gridConfig = {
 		columns : columns,
-		data : data
+		data : data,
+		width: "100%"
 		//		,datasource: dataSource
 	};
 	if (paginatorContainer) {

@@ -1,6 +1,6 @@
 		{{$queryParameterRenderLen := len .result.queryParameterRenderLi}}
 		<div id="queryParameters" class="queryDiv" {{if eq $queryParameterRenderLen 0}}style="display: none;"{{end}}>
-			<div class="queryTitle">查询参数</div>
+			<div class="queryTitle">查询条件</div>
 			<form action="/component/listtemplate" method="post" name="queryForm" id="queryForm">
 				{{range $index, $item := .result.hiddenParameterLi}}
 					<div id="q_{{$item.Name}}_render" style="display: none"></div>
@@ -18,10 +18,10 @@
 						{{range $index, $item := .result.queryParameterRenderLi}}
 							<tr class="queryLine">
 								{{range $tdIndex, $tdItem := $item}}
-									<td width="">
+									<td class="searchTitle">
 										{{$tdItem.label}}：
 									</td>
-									<td width="" colspan="">
+									<td>
 										<div id="q_{{$tdItem.name}}_render"></div>
 										<script type="text/javascript">
 										g_yuiCommondLi.push(function(Y) {
@@ -35,8 +35,10 @@
 								{{end}}
 								{{if eq $index 0}}
 									<td>
+										{{if gt $queryParameterRenderLen 1}}
 										<input style="display: inline;" class="btnMore" id="btnMore" value="更多条件" type="button" />
 										<input style="display: none;" id="btnUp" class="btnUp" value="收回" type="button" />
+										{{end}}
 										<input type="button" value="查询" id="queryBtn" class="queryBtn" />
 										<input type="button" value="重置" id="queryReset" class="queryReset" />
 									</td>

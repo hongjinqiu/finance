@@ -68,6 +68,8 @@ func (o ModelTemplateFactory) GetDataSourceInfo(id string) DataSourceInfo {
 			if err != nil {
 				panic(err)
 			}
+			// 自己load要自己applyReverseRelation
+			o.applyReverseRelation(&dataSourceInfo.DataSource)
 			if dataSourceInfo.DataSource.Id == id {
 				return dataSourceInfo
 			}
@@ -97,7 +99,9 @@ func (o ModelTemplateFactory) findDataSourceInfo(id string) (DataSourceInfo, boo
 	defer rwlock.RUnlock()
 
 	if gDataSourceDict[id].Path != "" {
-		return gDataSourceDict[id], true
+		dataSourceInfo := gDataSourceDict[id]
+		o.applyReverseRelation(&dataSourceInfo.DataSource)
+		return dataSourceInfo, true
 	}
 	return DataSourceInfo{}, false
 }
@@ -162,7 +166,6 @@ func (o ModelTemplateFactory) loadSingleDataSource(path string) (DataSourceInfo,
 	}
 
 	o.applyFieldExtend(&dataSource)
-	o.applyReverseRelation(&dataSource)
 
 	dataSourceInfo := DataSourceInfo{
 		Path:       path,
@@ -850,7 +853,7 @@ func (o ModelTemplateFactory) applyFieldGroupValueByString(fieldGroup FieldGroup
 				(*data)[fieldGroup.Id] = "0"
 			} else {
 				if commonUtil.IsFloat(content) {
-					(*data)[fieldGroup.Id] = content
+					(*data)[fieldGroup.Id] = commonUtil.GetFloatFormat(content)
 				} else {
 					panic("id:" + fieldGroup.Id + ",DisplayName:" + fieldGroup.DisplayName + ",类型为float_field,赋值:" + content + ",非法,必须由-,数字,小数点组成")
 				}

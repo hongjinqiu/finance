@@ -48,6 +48,7 @@
 				<allowEmpty>false</allowEmpty>
 				<dictionary>D_ROUNDING_WAY_TYPE</dictionary>
 				<defaultValueExpr>2</defaultValueExpr>
+				<fixReadOnly>true</fixReadOnly>
 			</field>
 			<field id="amtDecimals" extends="INT_FIELD">
 				<displayName>金额小数位数</displayName>

@@ -253,28 +253,31 @@
 				<limitMax>100</limitMax>
 				<defaultValueExpr>1</defaultValueExpr>
 			</field>
-			<field id="amtPay" extends="FLOAT_FIELD">
+			<field id="amtPay" extends="AMOUNT_FIELD">
 				<displayName>付款金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
-			<field id="amtAgainst" extends="FLOAT_FIELD">
+			<field id="amtAgainst" extends="AMOUNT_FIELD">
 				<displayName>已冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
-			<field id="amtNotAgainst" extends="FLOAT_FIELD">
+			<field id="amtNotAgainst" extends="AMOUNT_FIELD">
 				<displayName>未冲销金额</displayName>
 				<allowEmpty>true</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000000000</limitMax>
@@ -384,10 +387,11 @@
 					</relationItem>
 				</relationDS>
 			</field>
-			<field id="amtFee" extends="FLOAT_FIELD">
+			<field id="amtFee" extends="AMOUNT_FIELD">
 				<displayName>费用金额</displayName>
 				<allowEmpty>false</allowEmpty>
 				<allowCopy>false</allowCopy>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>-1000000000</limitMin>
 				<limitMax>1000000000</limitMax>

@@ -10,7 +10,7 @@ import (
 	. "com/papersns/mongo"
 	"encoding/json"
 	"fmt"
-	"log"
+//	"log"
 	"strconv"
 	"time"
 )
@@ -36,13 +36,13 @@ func (o AccountInOutService) GetFirstAccountingPeriodStartEndDate(sessionId int,
 	}
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
-		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+		"A.createUnit":     qb.GetCreateUnitByUserId(session, userId),
 	}
 	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
-		//		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
-		log.Println("会计年度:" + fmt.Sprint(year) + "未找到对应会计期")
-		return 0, 0
+		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + "未找到对应会计期"})
+		//		log.Println("会计年度:" + fmt.Sprint(year) + "未找到对应会计期")
+		//		return 0, 0
 	}
 	var startDate int
 	var endDate int
@@ -71,13 +71,13 @@ func (o AccountInOutService) GetAccountingPeriodStartEndDate(sessionId int, year
 	queryMap := map[string]interface{}{
 		"A.accountingYear": year,
 		"B.sequenceNo":     sequenceNo,
-		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+		"A.createUnit":     qb.GetCreateUnitByUserId(session, userId),
 	}
 	accountingPeriod, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
-		//		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
-		log.Println("会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期")
-		return 0, 0
+		panic(BusinessError{Message: "会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期"})
+		//		log.Println("会计年度:" + fmt.Sprint(year) + ",会计期序号:" + fmt.Sprint(sequenceNo) + "未找到对应会计期")
+		//		return 0, 0
 	}
 	var startDate int
 	var endDate int
@@ -120,9 +120,9 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 		if err != nil {
 			panic(err)
 		}
-		log.Println("单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期")
-		return 0,0
-//		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期"})
+		//		log.Println("单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期")
+		//		return 0,0
+		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "未找到对应会计期"})
 	}
 	masterData := accountingPeriod["A"].(map[string]interface{})
 	year, err := strconv.Atoi(fmt.Sprint(masterData["accountingYear"]))
@@ -141,13 +141,13 @@ func (o AccountInOutService) GetAccountingPeriodYearSequenceNo(sessionId int, ym
 			break
 		}
 	}
-//	if sequenceNo == 0 {
-//		billDate, err := time.Parse("20060102", fmt.Sprint(ymd))
-//		if err != nil {
-//			panic(err)
-//		}
-//		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "找到年度" + fmt.Sprint(year) + ",未找到会计期"})
-//	}
+	//	if sequenceNo == 0 {
+	//		billDate, err := time.Parse("20060102", fmt.Sprint(ymd))
+	//		if err != nil {
+	//			panic(err)
+	//		}
+	//		panic(BusinessError{Message: "单据日期" + billDate.Format("2006-01-02") + "找到年度" + fmt.Sprint(year) + ",未找到会计期"})
+	//	}
 
 	return year, sequenceNo
 }
@@ -286,7 +286,7 @@ func (o AccountInOutService) CheckCashAccountLimitControl(sessionId int, account
 	}
 	session, _ := global.GetConnection(sessionId)
 	queryMap := map[string]interface{}{
-		"_id": accountId,
+		"_id":          accountId,
 		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
 	collectionName := "CashAccount"
@@ -342,7 +342,7 @@ func (o AccountInOutService) CheckBankAccountLimitControl(sessionId int, account
 	}
 	qb := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id": accountId,
+		"_id":          accountId,
 		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
 	}
 	collectionName := "BankAccount"
@@ -413,7 +413,7 @@ func (o AccountInOutService) LogCashAccountInOut(sessionId int, accountInOutPara
 	collectionName := "CashAccount"
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id": accountInOutParam.AccountId,
+		"_id":          accountInOutParam.AccountId,
 		"A.createUnit": querySupport.GetCreateUnitByUserId(session, userId),
 	}
 	cashAccountBo, found := querySupport.FindByMapWithSession(session, collectionName, queryMap)
@@ -425,24 +425,26 @@ func (o AccountInOutService) LogCashAccountInOut(sessionId int, accountInOutPara
 		panic(BusinessError{Message: "现金账户没找到，查询条件为:" + string(queryMapByte)})
 	}
 
-	commonUtil := CommonUtil{}
+	mathUtil := MathUtil{}
 	cashAccount := cashAccountBo["A"].(map[string]interface{})
 	if fmt.Sprint(cashAccount["currencyTypeId"]) != fmt.Sprint(accountInOutParam.CurrencyTypeId) {
 		panic(BusinessError{Message: "过账现金账户:" + fmt.Sprint(cashAccount["name"]) + "未找到对应币别"})
 	}
 
-	amtOriginalCurrencyBalanceStr := fmt.Sprint(cashAccount["amtOriginalCurrencyBalance"])
-	amtOriginalCurrencyBalance := commonUtil.GetFloat64FromString(amtOriginalCurrencyBalanceStr)
+	amtOriginalCurrencyBalance := fmt.Sprint(cashAccount["amtOriginalCurrencyBalance"])
 
-	amtIncrease := commonUtil.GetFloat64FromString(accountInOutParam.AmtIncrease)
-	amtReduce := commonUtil.GetFloat64FromString(accountInOutParam.AmtReduce)
+	amtIncrease := accountInOutParam.AmtIncrease
+	amtReduce := accountInOutParam.AmtReduce
 
 	if accountInOutParam.DiffDataType == ADD || accountInOutParam.DiffDataType == AFTER_UPDATE { // 正过账
-		amtOriginalCurrencyBalance += (amtIncrease - amtReduce) // TODO AMT_INCREASE - AMT_REDUCE
+		amtOriginalCurrencyBalance = mathUtil.Add(amtOriginalCurrencyBalance, amtIncrease)
+		amtOriginalCurrencyBalance = mathUtil.Sub(amtOriginalCurrencyBalance, amtReduce)
 	} else if accountInOutParam.DiffDataType == BEFORE_UPDATE || accountInOutParam.DiffDataType == DELETE { // 反过账
-		amtOriginalCurrencyBalance -= (amtIncrease - amtReduce) /// TODO AMT_INCREASE - AMT_REDUCE
+		amtOriginalCurrencyBalance = mathUtil.Sub(amtOriginalCurrencyBalance, amtIncrease)
+		amtOriginalCurrencyBalance = mathUtil.Add(amtOriginalCurrencyBalance, amtReduce)
 	}
-	cashAccount["amtOriginalCurrencyBalance"] = fmt.Sprint(amtOriginalCurrencyBalance)
+	commonUtil := CommonUtil{}
+	cashAccount["amtOriginalCurrencyBalance"] = commonUtil.GetFloatFormat(amtOriginalCurrencyBalance)
 	cashAccountBo["A"] = cashAccount
 	txnManager := TxnManager{db}
 	txnId := global.GetTxnId(sessionId)
@@ -550,8 +552,9 @@ func (o AccountInOutService) logMonthInOut(sessionId int, accountInOutParam Acco
 	session, db := global.GetConnection(sessionId)
 	// 参数中加入 currencyTypeId
 	commonUtil := CommonUtil{}
-	amtIncrease := commonUtil.GetFloat64FromString(accountInOutParam.AmtIncrease)
-	amtReduce := commonUtil.GetFloat64FromString(accountInOutParam.AmtReduce)
+	mathUtil := MathUtil{}
+	amtIncrease := accountInOutParam.AmtIncrease
+	amtReduce := accountInOutParam.AmtReduce
 
 	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
@@ -565,7 +568,7 @@ func (o AccountInOutService) logMonthInOut(sessionId int, accountInOutParam Acco
 		"A.accountType":           accountInOutParam.AccountType,
 		"A.accountingPeriodYear":  accountInOutParam.AccountingPeriodYear,
 		"A.accountingPeriodMonth": accountInOutParam.AccountingPeriodMonth,
-		"A.createUnit": qb.GetCreateUnitByUserId(session, userId),
+		"A.createUnit":            qb.GetCreateUnitByUserId(session, userId),
 	}
 
 	dataSourceModelId := "AccountInOut"
@@ -586,35 +589,35 @@ func (o AccountInOutService) logMonthInOut(sessionId int, accountInOutParam Acco
 
 	masterData := accountInOut["A"].(map[string]interface{})
 	accountInOut["A"] = masterData
-	amtIncreaseInDb := commonUtil.GetFloat64FromString(fmt.Sprint(masterData["amtIncrease"]))
-	amtReduceInDb := commonUtil.GetFloat64FromString(fmt.Sprint(masterData["amtReduce"]))
+	amtIncreaseInDb := fmt.Sprint(masterData["amtIncrease"])
+	amtReduceInDb := fmt.Sprint(masterData["amtReduce"])
 
 	increaseCountInDb := commonUtil.GetIntFromString(fmt.Sprint(masterData["increaseCount"]))
 	reduceCountInDb := commonUtil.GetIntFromString(fmt.Sprint(masterData["reduceCount"]))
 
 	if accountInOutParam.DiffDataType == ADD || accountInOutParam.DiffDataType == AFTER_UPDATE {
-		amtIncreaseInDb += amtIncrease
-		amtReduceInDb += amtReduce
+		amtIncreaseInDb = mathUtil.Add(amtIncreaseInDb, amtIncrease)
+		amtReduceInDb = mathUtil.Add(amtReduceInDb, amtReduce)
 
-		if amtIncrease > 0 {
+		if commonUtil.GetFloat64FromString(amtIncrease) > 0 {
 			increaseCountInDb += 1
 		}
-		if amtReduce > 0 {
+		if commonUtil.GetFloat64FromString(amtReduce) > 0 {
 			reduceCountInDb += 1
 		}
 	} else {
-		amtIncreaseInDb -= amtIncrease
-		amtReduceInDb -= amtReduce
+		amtIncreaseInDb = mathUtil.Sub(amtIncreaseInDb, amtIncrease)
+		amtReduceInDb = mathUtil.Sub(amtReduceInDb, amtReduce)
 
-		if amtIncrease > 0 {
+		if commonUtil.GetFloat64FromString(amtIncrease) > 0 {
 			increaseCountInDb -= 1
 		}
-		if amtReduce > 0 {
+		if commonUtil.GetFloat64FromString(amtReduce) > 0 {
 			reduceCountInDb -= 1
 		}
 	}
-	masterData["amtIncrease"] = fmt.Sprint(amtIncreaseInDb)
-	masterData["amtReduce"] = fmt.Sprint(amtReduceInDb)
+	masterData["amtIncrease"] = commonUtil.GetFloatFormat(amtIncreaseInDb)
+	masterData["amtReduce"] = commonUtil.GetFloatFormat(amtReduceInDb)
 	masterData["increaseCount"] = increaseCountInDb
 	masterData["reduceCount"] = reduceCountInDb
 
@@ -684,16 +687,16 @@ func (o AccountInOutService) LogAllBankDeposit(sessionId int, accountInOutParam 
 func (o AccountInOutService) LogBankAccountInOut(sessionId int, accountInOutParam AccountInOutParam) {
 	// 从银行账户初始化那里面拷贝一份出来,
 	session, db := global.GetConnection(sessionId)
-	
+
 	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
 		panic(err)
 	}
-	
+
 	collectionName := "BankAccount"
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
-		"_id": accountInOutParam.AccountId,
+		"_id":          accountInOutParam.AccountId,
 		"A.createUnit": querySupport.GetCreateUnitByUserId(session, userId),
 	}
 	bankAccountBo, found := querySupport.FindByMapWithSession(session, collectionName, queryMap)
@@ -706,22 +709,24 @@ func (o AccountInOutService) LogBankAccountInOut(sessionId int, accountInOutPara
 	}
 	currencyTypeId := accountInOutParam.CurrencyTypeId
 	bDetailDataLi := bankAccountBo["B"].([]interface{})
+	mathUtil := MathUtil{}
 	commonUtil := CommonUtil{}
 	isFound := false
 	for i, item := range bDetailDataLi {
 		bankAccountCurrencyType := item.(map[string]interface{})
 		if fmt.Sprint(bankAccountCurrencyType["currencyTypeId"]) == fmt.Sprint(currencyTypeId) {
-			amtOriginalCurrencyBalanceStr := fmt.Sprint(bankAccountCurrencyType["amtOriginalCurrencyBalance"])
-			amtOriginalCurrencyBalance := commonUtil.GetFloat64FromString(amtOriginalCurrencyBalanceStr)
-			amtIncrease := commonUtil.GetFloat64FromString(accountInOutParam.AmtIncrease)
-			amtReduce := commonUtil.GetFloat64FromString(accountInOutParam.AmtReduce)
+			amtOriginalCurrencyBalance := fmt.Sprint(bankAccountCurrencyType["amtOriginalCurrencyBalance"])
+			amtIncrease := accountInOutParam.AmtIncrease
+			amtReduce := accountInOutParam.AmtReduce
 
 			if accountInOutParam.DiffDataType == ADD || accountInOutParam.DiffDataType == AFTER_UPDATE { // 正过账
-				amtOriginalCurrencyBalance += (amtIncrease - amtReduce)
+				amtOriginalCurrencyBalance = mathUtil.Add(amtOriginalCurrencyBalance, amtIncrease)
+				amtOriginalCurrencyBalance = mathUtil.Sub(amtOriginalCurrencyBalance, amtReduce)
 			} else if accountInOutParam.DiffDataType == BEFORE_UPDATE || accountInOutParam.DiffDataType == DELETE { // 反过账
-				amtOriginalCurrencyBalance -= (amtIncrease - amtReduce)
+				amtOriginalCurrencyBalance = mathUtil.Sub(amtOriginalCurrencyBalance, amtIncrease)
+				amtOriginalCurrencyBalance = mathUtil.Add(amtOriginalCurrencyBalance, amtReduce)
 			}
-			bankAccountCurrencyType["amtOriginalCurrencyBalance"] = fmt.Sprint(amtOriginalCurrencyBalance)
+			bankAccountCurrencyType["amtOriginalCurrencyBalance"] = commonUtil.GetFloatFormat(amtOriginalCurrencyBalance)
 			bDetailDataLi[i] = bankAccountCurrencyType
 			isFound = true
 			break

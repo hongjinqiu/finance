@@ -46,14 +46,16 @@ var modelExtraInfo = {
 		if (bo.A.property == "1" || bo.A.property == "2") {
 			var accountIdValue = g_masterFormFieldDict["accountId"].get("value");
 			if (!accountIdValue || accountIdValue == "0") {
-				masterMessageLi.push("收款账户不能为空");
+				masterMessageLi.push("收款账户不允许为空");
+				g_masterFormFieldDict["accountId"].set("error", "不允许为空");
 			}
 		}
 		// 收款对象类型
 		if (bo.A.chamberlainType == "1" || bo.A.chamberlainType == "2" || bo.A.chamberlainType == "3") {
 			var chamberlainIdValue = g_masterFormFieldDict["chamberlainId"].get("value");
 			if (!chamberlainIdValue || chamberlainIdValue == "0") {
-				masterMessageLi.push("收款对象不能为空");
+				masterMessageLi.push("收款对象不允许为空");
+				g_masterFormFieldDict["chamberlainId"].set("error", "不允许为空");
 			}
 		}
 	}
@@ -90,6 +92,8 @@ function main(Y) {
 			}
 		});
 	}
-	modelExtraInfo.A.property.listeners.valueChange(null, g_masterFormFieldDict["property"]);
-	modelExtraInfo.A.chamberlainType.listeners.valueChange(null, g_masterFormFieldDict["chamberlainType"]);
+	if (g_formStatus != "view") {
+		modelExtraInfo.A.property.listeners.valueChange(null, g_masterFormFieldDict["property"]);
+		modelExtraInfo.A.chamberlainType.listeners.valueChange(null, g_masterFormFieldDict["chamberlainType"]);
+	}
 }

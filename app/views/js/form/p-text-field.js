@@ -1,4 +1,6 @@
 Y.PTextField = Y.Base.create('p-text-field', Y.RTextField, [Y.WidgetChild], {
+	FIELD_CLASS : 'table-layout-cell inputWidth',
+	
     bindUI: function() {
     	Y.PTextField.superclass.bindUI.apply(this, arguments);
     	

@@ -113,13 +113,176 @@ FormManager.prototype.initializeAttr = function(formObj, Y) {
     		}
     		return false;
     	});
-
+    	
+    	// apply number field currencyFormat
     	var formManager = new FormManager();
+    	formManager.applyNumberDisplayPattern(formObj, Y);
+
     	formObj.after("render", function(){
     		formManager.updateSingleFieldAttr4GlobalParam(formObj, Y);
     	});
     	self.set("validator", formManager.dsFormFieldValidator);
     }
+}
+
+/**
+ * 获取币别格式
+ */
+FormManager.prototype._getCurrencyFormat = function(dataSetId, currencyField, fieldDict) {// 本行记录中是否存在对应币别
+	var self = this;
+	var prefix = null;
+	var decimalPlaces = null;
+	var currencyFieldColumnConfig = null;
+	var templateIterator = new TemplateIterator();
+	var result = "";
+	
+	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function(column, result){
+		if (column.Name == currencyField) {
+			currencyFieldColumnConfig = column;
+			return true;
+		}
+		return false;
+	});
+
+	if (currencyFieldColumnConfig) {
+		var commonUtil = new CommonUtil();
+		var bo = self.getBo();
+		var data = {};
+		for (var item in fieldDict) {
+			data[item] = fieldDict[item].get("value");
+		}
+		var relationItem = commonUtil.getCRelationItem(currencyFieldColumnConfig.CRelationDS, bo, data);
+		var selectorName = relationItem.CRelationConfig.SelectorName;
+		
+		var relationBo = g_relationManager.getRelationBo(selectorName, data[currencyField]);
+		if (relationBo) {
+			prefix = relationBo["currencyTypeSign"];
+			decimalPlaces = parseInt(relationBo["amtDecimals"]) - 1;
+		}
+	}
+	return {
+		prefix: prefix,
+		decimalPlaces: decimalPlaces
+	}
+}
+
+/**
+ * 应用numberField的currency的格式化
+ */
+FormManager.prototype.applyNumberDisplayPattern = function(formObj, Y) {
+	var self = formObj;
+	var templateIterator = new TemplateIterator();
+	var result = "";
+	var dataSetId = self.get("dataSetId");
+	
+	templateIterator.iterateAnyTemplateColumn(dataSetId, result, function(column, result){
+		if (column.Name == self.get("name")) {
+			var currencyField = column.CurrencyField;
+			if (currencyField) {
+				self.set("displayPattern", function(formObj, column, Y){
+					return function(value) {
+						var self = formObj;
+						if (typeof(value) == "string") {
+							value = parseFloat(value);
+						}
+						var dataSetId = self.get("dataSetId");
+						var formManager = new FormManager();
+						var fieldDict = self._getFieldDict();
+						var currencyField = column.CurrencyField;
+						var prefix = null;
+						var decimalPlaces = null;
+						if (column.IsMoney == "true") {// 是否金额
+							if (sysParam[currencyField]) {// 本位币
+								prefix = sysParam[currencyField]["prefix"];
+								decimalPlaces = sysParam[currencyField]["decimalPlaces"];
+							}
+							if (fieldDict[currencyField]) {// 本行记录中是否存在对应币别
+								var currencyFormat = formManager._getCurrencyFormat(dataSetId, currencyField, fieldDict);
+								prefix = currencyFormat["prefix"];
+								decimalPlaces = currencyFormat["decimalPlaces"];
+							}
+						} else if (column.IsUnitPrice == "true") {// 单价
+							if (sysParam[currencyField]) {// 本位币
+								prefix = sysParam[currencyField]["prefix"];
+								decimalPlaces = sysParam[currencyField]["unitPriceDecimalPlaces"];
+							}
+							if (fieldDict[currencyField]) {// 本行记录中是否存在对应币别
+								var currencyFormat = formManager._getCurrencyFormat(dataSetId, currencyField, fieldDict);
+								prefix = currencyFormat["prefix"];
+								decimalPlaces = currencyFormat["decimalPlaces"];
+							}
+						} else if (column.IsCost == "true") {// 成本
+							if (sysParam[currencyField]) {// 本位币
+								prefix = sysParam[currencyField]["prefix"];
+								decimalPlaces = sysParam["unitCostDecimalPlaces"];
+							}
+							if (fieldDict[currencyField]) {// 本行记录中是否存在对应币别
+								var currencyFormat = formManager._getCurrencyFormat(dataSetId, currencyField, fieldDict);
+								prefix = currencyFormat["prefix"];
+								decimalPlaces = currencyFormat["decimalPlaces"];
+							}
+						} else {// 是否金额
+							if (sysParam[currencyField]) {// 本位币
+								prefix = sysParam[currencyField]["prefix"];
+								decimalPlaces = sysParam[currencyField]["decimalPlaces"];
+							}
+							if (fieldDict[currencyField]) {// 本行记录中是否存在对应币别
+								var currencyFormat = formManager._getCurrencyFormat(dataSetId, currencyField, fieldDict);
+								prefix = currencyFormat["prefix"];
+								decimalPlaces = currencyFormat["decimalPlaces"];
+							}
+						}
+	
+						if (prefix !== null) {
+							return Y.DataType.Number.format(value, {
+								prefix : prefix,
+								decimalPlaces : decimalPlaces,
+								decimalSeparator : ".",
+								thousandsSeparator : sysParam.thousandsSeparator,
+								suffix : ""
+							});
+						} else {
+							console.log("在系统参数和本行记录中,没有找到currencyField:" + currencyField + ", fieldName is:" + formObj.get("name"));
+						}
+					};
+				}(formObj, column, Y));
+			} else if (column.IsPercent == "true") {
+				self.set("displayPattern", function(formObj, column, Y){
+					return function(value) {
+						var self = formObj;
+						if (typeof(value) == "string") {
+							value = parseFloat(value);
+						}
+						return Y.DataType.Number.format(value, {
+							prefix : "",
+							decimalPlaces : sysParam["percentDecimalPlaces"],
+							decimalSeparator : ".",
+							thousandsSeparator : sysParam.thousandsSeparator,
+							suffix : "%"
+						});
+					};
+				}(formObj, column, Y));
+			} else {
+				self.set("displayPattern", function(formObj, column, Y){
+					return function(value) {
+						var self = formObj;
+						if (typeof(value) == "string") {
+							value = parseFloat(value);
+						}
+						return Y.DataType.Number.format(value, {
+							prefix : column.Prefix,
+							decimalPlaces : column.DecimalPlaces,
+							decimalSeparator : column.DecimalSeparator,
+							thousandsSeparator : column.ThousandsSeparator,
+							suffix : column.Suffix
+						});
+					};
+				}(formObj, column, Y));
+			}
+			return true;
+		}
+		return false;
+	});
 }
 
 /**

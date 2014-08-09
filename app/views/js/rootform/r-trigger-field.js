@@ -165,7 +165,7 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
     				url = Y.Lang.sub(url, relationItem);
     				if (url) {
     					var selectorTitle = this._getStringOrFunctionResult(this.get("selectorTitle"));
-    					showModalDialog({
+    					triggerShowModalDialog({
     						"title": selectorTitle,
     						"url": url
     					});
@@ -192,9 +192,11 @@ Y.RTriggerField = Y.Base.create('r-trigger-field', Y.RFormField, [Y.WidgetParent
         if (value === true) {
         	this._selectNode.setStyle("display", "none");
         	this._deleteNode.setStyle("display", "none");
+        	this._fieldNode.addClass('readonly');
         } else {
         	this._selectNode.setStyle("display", "");
         	this._deleteNode.setStyle("display", "");
+        	this._fieldNode.removeClass('readonly');
         }
     },
     

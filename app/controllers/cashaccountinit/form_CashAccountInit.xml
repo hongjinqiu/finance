@@ -9,15 +9,15 @@
 	<security byUnit="true"/>
 	
 	<toolbar>
-		<!-- <button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=CashAccountInit" iconCls="test"></button> -->
-		<!-- <button name="newBtn" text="新增" mode="fn" handler="newData" iconCls=""></button> -->
-		<!-- <button name="copyBtn" text="复制" mode="fn" handler="copyData"></button> -->
-		<button name="editBtn" text="修改" mode="fn" handler="cashAccountInitEditData" iconCls=""></button>
-		<button name="saveBtn" text="保存" mode="fn" handler="limitControlSaveData" iconCls=""></button>
-		<button name="giveUpBtn" text="放弃" mode="fn" handler="cashAccountInitGiveUpData" iconCls=""></button>
-		<!-- <button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls=""></button> -->
-		<button name="refreshBtn" text="刷新" mode="fn" handler="cashAccountInitQueryData" iconCls=""></button>
-		<!-- <button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls=""></button> -->
+		<!-- <button name="listBtn" text="列表页" mode="url" handler="/console/listschema?@name=CashAccountInit" iconCls="but_box"></button> -->
+		<!-- <button name="newBtn" text="新增" mode="fn" handler="newData" iconCls="but_box"></button> -->
+		<!-- <button name="copyBtn" text="复制" mode="fn" handler="copyData" iconCls="but_box"></button> -->
+		<button name="editBtn" text="修改" mode="fn" handler="cashAccountInitEditData" iconCls="but_box"></button>
+		<button name="saveBtn" text="保存" mode="fn" handler="limitControlSaveData" iconCls="but_box"></button>
+		<button name="giveUpBtn" text="放弃" mode="fn" handler="cashAccountInitGiveUpData" iconCls="but_box"></button>
+		<!-- <button name="delBtn" text="删除" mode="fn" handler="deleteData" iconCls="but_box"></button> -->
+		<button name="refreshBtn" text="刷新" mode="fn" handler="cashAccountInitQueryData" iconCls="but_box"></button>
+		<!-- <button name="usedQueryBtn" text="被用查询" mode="fn" handler="logList" iconCls="but_box"></button> -->
 	</toolbar>
 
 	<column-model dataSetId="A" colSpan="3">
@@ -31,7 +31,7 @@
 			</relationDS>
 		</select-column>
 		<html colSpan="3"><![CDATA[
-			<td width="15%">
+			<td width="15%" class="searchTitle">
 				账户名称
 			</td>
 			<td width="20%" colspan="1">
@@ -47,15 +47,15 @@
 				</script>
 			</td>
 			<td>
-				<input id="queryBtn" type="button" value="查询" onclick="cashAccountInitQueryData()" />
-				<input id="resetBtn" type="button" value="重置" onclick="resetQueryParameter()" />
+				<input id="queryBtn" type="button" value="查询" onclick="cashAccountInitQueryData()" class="but_box" />
+				<input id="resetBtn" type="button" value="重置" onclick="resetQueryParameter()" class="but_box" />
 			</td>
 		]]></html>
 	</column-model>
 	
 	<column-model dataSetId="B">
 		<toolbar>
-			<button name="selectRowBtn" text="选择" mode="fn" handler="g_selectRow" iconCls="yui3-button btn-show">
+			<button name="selectRowBtn" text="选择" mode="fn" handler="g_selectRow" iconCls="but_box">
 				<relationDS>
 					<relationItem name="CashAccount">
 						<relationExpr>true</relationExpr>
@@ -65,21 +65,21 @@
 					</relationItem>
 				</relationDS>
 			</button>
-			<button text="新增" mode="fn" handler="g_addRow" iconCls="yui3-button btn-show"></button>
-			<button text="编辑" mode="fn" handler="g_editRow" iconCls="test"></button>
-			<button text="删除" mode="fn" handler="g_removeRow" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="g_addRow" iconCls="but_box"></button>
+			<button text="编辑" mode="fn" handler="g_editRow" iconCls="but_box"></button>
+			<button text="删除" mode="fn" handler="g_removeRow" iconCls="but_box"></button>
 		</toolbar>
 		<editor-toolbar>
-			<button text="新增" mode="fn" handler="g_pluginAddRow" iconCls="yui3-button btn-show"></button>
-			<button text="删除" mode="fn" handler="g_pluginRemoveRow" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="g_pluginAddRow" iconCls="but_box"></button>
+			<button text="删除" mode="fn" handler="g_pluginRemoveRow" iconCls="but_box"></button>
 		</editor-toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false" />
 		<id-column name="id" text="编号" hideable="true" />
-		<virtual-column name="FUN_C" text="操作">
+		<virtual-column name="FUN_C" text="操作" width="90">
 			<buttons>
-				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="test"></button>
-				<button text="复制" mode="fn" handler="g_copyRow" iconCls="test"></button>
-				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="test"></button>
+				<button text="编辑" mode="fn" handler="g_editSingleRow" iconCls="img_edit"></button>
+				<button text="复制" mode="fn" handler="g_copyRow" iconCls="img_add"></button>
+				<button text="删除" mode="fn" handler="g_removeSingleRow" iconCls="img_delete"></button>
 			</buttons>
 		</virtual-column>
 		<auto-column name="accountType" hideable="true" />

@@ -3,15 +3,50 @@ var g_errorLog = {};
 function ColumnManager() {
 }
 
+ColumnManager.prototype._getCurrencyFormat = function(o, currencyField) {// 本行记录中是否存在对应币别
+	var prefix = null;
+	var decimalPlaces = null;
+	var currencyFieldColumnConfig = null;
+	var listTemplateIterator = new ListTemplateIterator();
+	var columnLi = [];
+	listTemplateIterator.recursionGetColumnItem(o.column.columnModel, columnLi);
+	for (var i = 0; i < columnLi.length; i++) {
+		if (columnLi[i].Name == currencyField) {
+			currencyFieldColumnConfig = columnLi[i];
+			break;
+		}
+	}
+	if (currencyFieldColumnConfig) {
+		var commonUtil = new CommonUtil();
+		var bo = {"A": o.data};
+		var relationItem = commonUtil.getCRelationItem(currencyFieldColumnConfig.CRelationDS, bo, o.data);
+		var selectorName = relationItem.CRelationConfig.SelectorName;
+		
+		var relationBo = g_relationManager.getRelationBo(selectorName, o.data[currencyField]);
+		if (relationBo) {
+			prefix = relationBo["currencyTypeSign"];
+			decimalPlaces = parseInt(relationBo["amtDecimals"]) - 1;
+		}
+	}
+	return {
+		prefix: prefix,
+		decimalPlaces: decimalPlaces
+	}
+}
+
+ColumnManager.prototype.isZeroShowEmpty = function(o) {
+	return o.column.zeroShowEmpty == "true" && (o.value == "0" || o.value == "00000000000000000000.0000000000");
+}
+
 ColumnManager.prototype.currencyFormatFunc = function(o) {
-	if (o.column.zeroShowEmpty == "true" && o.value == "0") {
+	if (new ColumnManager().isZeroShowEmpty(o)) {
 		return "";
 	}
 	var self = this;
 	var yInst = self.yInst;
 	var formatConfig = null;
 	var currencyField = o.column.currencyField;
-	if (currencyField != "") {
+	if (currencyField) {
 		var prefix = null;
 		var decimalPlaces = null;
 		if (o.column.isMoney == "true") {// 是否金额
@@ -20,8 +55,9 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 				decimalPlaces = sysParam[currencyField]["decimalPlaces"];
 			}
 			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
-				prefix = o.data[currencyField]["prefix"];
-				decimalPlaces = o.data[currencyField]["decimalPlaces"];
+				var currencyFormat = self._getCurrencyFormat(o, currencyField);
+				prefix = currencyFormat["prefix"];
+				decimalPlaces = currencyFormat["decimalPlaces"];
 			}
 		} else if (o.column.isUnitPrice == "true") {// 单价
 			if (sysParam[currencyField]) {// 本位币
@@ -29,8 +65,9 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 				decimalPlaces = sysParam[currencyField]["unitPriceDecimalPlaces"];
 			}
 			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
-				prefix = o.data[currencyField]["prefix"];
-				decimalPlaces = o.data[currencyField]["unitPriceDecimalPlaces"];
+				var currencyFormat = self._getCurrencyFormat(o, currencyField);
+				prefix = currencyFormat["prefix"];
+				decimalPlaces = currencyFormat["decimalPlaces"];
 			}
 		} else if (o.column.isCost == "true") {// 成本
 			if (sysParam[currencyField]) {// 本位币
@@ -38,8 +75,9 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 				decimalPlaces = sysParam["unitCostDecimalPlaces"];
 			}
 			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
-				prefix = o.data[currencyField]["prefix"];
-				decimalPlaces = sysParam["unitCostDecimalPlaces"];
+				var currencyFormat = self._getCurrencyFormat(o, currencyField);
+				prefix = currencyFormat["prefix"];
+				decimalPlaces = currencyFormat["decimalPlaces"];
 			}
 		} else {// 是否金额
 			if (sysParam[currencyField]) {// 本位币
@@ -47,8 +85,9 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 				decimalPlaces = sysParam[currencyField]["decimalPlaces"];
 			}
 			if (o.data[currencyField]) {// 本行记录中是否存在对应币别
-				prefix = o.data[currencyField]["prefix"];
-				decimalPlaces = o.data[currencyField]["decimalPlaces"];
+				var currencyFormat = self._getCurrencyFormat(o, currencyField);
+				prefix = currencyFormat["prefix"];
+				decimalPlaces = currencyFormat["decimalPlaces"];
 			}
 		}
 
@@ -105,6 +144,7 @@ ColumnManager.prototype.currencyFormatFunc = function(o) {
 ColumnManager.prototype.createIdColumn = function(columnModel) {
 	if (columnModel.IdColumn.Hideable != "true") {
 		return {
+			width: columnModel.IdColumn.Width || "",
 			key: columnModel.IdColumn.Name,
 			label: columnModel.IdColumn.Text
 		};
@@ -117,6 +157,7 @@ ColumnManager.prototype.createCheckboxColumn = function(columnModel) {
 		var key = columnModel.CheckboxColumn.Name;
 		if (columnModel.SelectionMode == "radio") {
 			return {
+				width: "40",
 				key:        key,
 				allowHTML:  true, // to avoid HTML escaping
 				label:      '选择',
@@ -131,6 +172,7 @@ ColumnManager.prototype.createCheckboxColumn = function(columnModel) {
 			};
 		} else {
 			return {
+				width: "40",
 				key:        key,
 				allowHTML:  true, // to avoid HTML escaping
 				label:      '<input type="checkbox" class="protocol-select-all" title="全部选中"/>',
@@ -155,6 +197,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 	if (columnModel.ColumnLi[i].XMLName.Local == "virtual-column" && columnModel.ColumnLi[i].Hideable != "true") {
 		var virtualColumn = columnModel.ColumnLi[i];
 		return {
+			width: columnModel.ColumnLi[i].Width || "",
 			key: columnModel.ColumnLi[i].Name,
 			label: columnModel.ColumnLi[i].Text,
 			allowHTML:  true, // to avoid HTML escaping
@@ -169,13 +212,13 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 					for (var j = 0; j < virtualColumn.Buttons.ButtonLi.length; j++) {
 						var btnTemplate = null;
 						if (virtualColumn.Buttons.ButtonLi[j].Mode == "fn") {
-							btnTemplate = "<input type='button' value='{value}' onclick='doVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' />";
+							btnTemplate = "<a title='{value}' onclick='doVirtualColumnBtnAction(\"{columnModelName}\", this, {handler})' class='{class}' href='javascript:void(0);' style='display:block;' />";
 						} else if (virtualColumn.Buttons.ButtonLi[j].Mode == "url") {
-							btnTemplate = "<input type='button' value='{value}' onclick='location.href=\"{href}\"' class='{class}' />";
+							btnTemplate = "<a title='{value}' onclick='location.href=\"{href}\"' class='{class}' href='javascript:void(0);' style='display:block;' />";
 						} else if (virtualColumn.Buttons.ButtonLi[j].Mode == "url!") {
-							btnTemplate = "<input type='button' value='{value}' onclick='openTabOrJump(\"{href}\")' class='{class}' />";
+							btnTemplate = "<a title='{value}' onclick='openTabOrJump(\"{href}\")' class='{class}' href='javascript:void(0);' style='display:block;' />";
 						} else {
-							btnTemplate = "<input type='button' value='{value}' onclick='window.open(\"{href}\")' class='{class}' />";
+							btnTemplate = "<a title='{value}' onclick='window.open(\"{href}\")' class='{class}' href='javascript:void(0);' style='display:block;' />";
 						}
 						if (!buttonBoLi || buttonBoLi[j]["isShow"]) {
 							var id = columnModel.IdColumn.Name;
@@ -218,7 +261,7 @@ ColumnManager.prototype.createVirtualColumn = function(columnModelName, columnMo
 	return null;
 }
 
-ColumnManager.prototype.createNumberColumn = function(columnConfig) {
+ColumnManager.prototype.createNumberColumn = function(columnConfig, columnModel) {
 	var self = this;
 	var yInst = self.yInst;
 	var decimalPlaces = 2;
@@ -247,6 +290,7 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 	*/
 	if (isFormatter) {
 		return {
+			width: columnConfig.Width || "",
 			key: columnConfig.Name,
 			label: columnConfig.Text,
 			formatter: yInst.bind(self.currencyFormatFunc, self),
@@ -262,11 +306,13 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 			isMoney: columnConfig.IsMoney,
 			isUnitPrice: columnConfig.IsUnitPrice,
 			isCost: columnConfig.IsCost,
-			zeroShowEmpty: columnConfig.ZeroShowEmpty
+			zeroShowEmpty: columnConfig.ZeroShowEmpty,
+			columnModel: columnModel
 		};
 	}
 	if (zeroShowEmpty) {
 		return {
+			width: columnConfig.Width || "",
 			key: columnConfig.Name,
 			label: columnConfig.Text,
 			formatter: function(o) {
@@ -278,6 +324,7 @@ ColumnManager.prototype.createNumberColumn = function(columnConfig) {
 		};
 	}
 	return {
+		width: columnConfig.Width || "",
 		key: columnConfig.Name,
 		label: columnConfig.Text
 	};
@@ -304,13 +351,14 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 	var displayPattern = columnConfig.DisplayPattern;
 	if (dbPattern && displayPattern) {
 		return {
+			width: columnConfig.Width || "",
 			key: columnConfig.Name,
 			label: columnConfig.Text,
 			dbPattern: dbPattern,
 			displayPattern: displayPattern,
 			zeroShowEmpty: columnConfig.ZeroShowEmpty,
 			formatter: function(o) {
-				if (o.column.zeroShowEmpty == "true" && o.value == "0") {
+				if (new ColumnManager().isZeroShowEmpty(o)) {
 					return "";
 				}
 				if (o.value !== undefined && o.value !== null) {
@@ -372,6 +420,7 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 	var zeroShowEmpty = columnConfig.ZeroShowEmpty == "true";
 	if (zeroShowEmpty) {
 		return {
+			width: columnConfig.Width || "",
 			key: columnConfig.Name,
 			label: columnConfig.Text,
 			formatter: function(o) {
@@ -383,6 +432,7 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 		};
 	}
 	return {
+		width: columnConfig.Width || "",
 		key: columnConfig.Name,
 		label: columnConfig.Text
 	};
@@ -390,6 +440,7 @@ ColumnManager.prototype.createDateColumn = function(columnConfig) {
 
 ColumnManager.prototype.createBooleanColumn = function(columnConfig) {
 	return {
+		width: columnConfig.Width || "",
 		key: columnConfig.Name,
 		label: columnConfig.Text,
 		formatter: function(o) {
@@ -405,6 +456,7 @@ ColumnManager.prototype.createBooleanColumn = function(columnConfig) {
 
 ColumnManager.prototype.createDictionaryColumn = function(columnConfig) {
 	return {
+		width: columnConfig.Width || "",
 		key: columnConfig.Name,
 		label: columnConfig.Text,
 		formatter: function(o) {
@@ -427,17 +479,28 @@ ColumnManager.prototype.createDictionaryColumn = function(columnConfig) {
 ColumnManager.prototype.createSelectColumn = function(columnConfig) {
 	var self = this;
 	return {
+		width: columnConfig.Width || "",
 		key: columnConfig.Name,
 		label: columnConfig.Text,
 		allowHTML:  true,
 		zeroShowEmpty: columnConfig.ZeroShowEmpty,
 		formatter: function(o) {
-			if (o.column.zeroShowEmpty == "true" && o.value == "0") {
+			if (new ColumnManager().isZeroShowEmpty(o)) {
 				return "";
 			}
 			var commonUtil = new CommonUtil();
 			var bo = {"A": o.data};
 			var relationItem = commonUtil.getCRelationItem(columnConfig.CRelationDS, bo, o.data);
+			if (!relationItem) {
+				if (!g_errorLog[columnConfig.Name]) {
+					g_errorLog[columnConfig.Name] = columnConfig.Name;
+					console.log(o);
+					console.log(o.data);
+					console.log(columnConfig);
+					console.log(columnConfig.Name);
+					console.log("未找到匹配的relationItem，有可能配置错误，目标referenceDataSourceModelId为:" + o.data.referenceDataSourceModelId);
+				}
+			}
 			var selectorName = relationItem.CRelationConfig.SelectorName;
 			var displayField = relationItem.CRelationConfig.DisplayField;
 			var selectorData = g_relationManager.getRelationBo(selectorName, o.value);
@@ -454,8 +517,8 @@ ColumnManager.prototype.createSelectColumn = function(columnConfig) {
         		var selectorTitle = g_relationBo[selectorName].Description;
         		var url = g_relationBo[selectorName].url || "";
         		url = self.yInst.Lang.sub(url, selectorData);
-        		var jsAction = "showModalDialog({'title': '" + selectorTitle + "','url': '" + url + "'})";
-        		html.push('<a class="trigger_view selectIndent" href="javascript:void(0);" title="查看" onclick="' + jsAction + '"></a>');
+        		var jsAction = "triggerShowModalDialog({'title': '" + selectorTitle + "','url': '" + url + "'})";
+        		html.push('<a class="etrigger_view selectIndent" href="javascript:void(0);" title="查看" onclick="' + jsAction + '"></a>');
         		return html.join("");
 			} else {
 				if (!g_errorLog[columnConfig.Name]) {
@@ -475,6 +538,7 @@ ColumnManager.prototype.createSelectColumn = function(columnConfig) {
 ColumnManager.prototype.createRowIndexColumn = function(columnModel) {
 	if (columnModel.Rownumber == "true") {
 		return {
+			width: 40,
 			key: "",
 			label: "序号",
 			formatter: function(o) {
@@ -485,7 +549,7 @@ ColumnManager.prototype.createRowIndexColumn = function(columnModel) {
 	return null;
 }
 
-ColumnManager.prototype.createColumn = function(columnConfig) {
+ColumnManager.prototype.createColumn = function(columnConfig, columnModel) {
 	var self = this;
 	if (columnConfig.XMLName.Local != "virtual-column" && columnConfig.Hideable != "true") {
 		if (columnConfig.ColumnModel.ColumnLi) {
@@ -494,7 +558,7 @@ ColumnManager.prototype.createColumn = function(columnConfig) {
 				"children": []
 			};
 			for (var i = 0; i < columnConfig.ColumnModel.ColumnLi.length; i++) {
-				var childColumn = self.createColumn(columnConfig.ColumnModel.ColumnLi[i]);
+				var childColumn = self.createColumn(columnConfig.ColumnModel.ColumnLi[i], columnModel);
 				if (childColumn) {
 					result.children.push(childColumn);
 				}
@@ -503,7 +567,7 @@ ColumnManager.prototype.createColumn = function(columnConfig) {
 		}
 		
 		if (columnConfig.XMLName.Local == "number-column") {
-			return self.createNumberColumn(columnConfig);
+			return self.createNumberColumn(columnConfig, columnModel);
 		} else if (columnConfig.XMLName.Local == "date-column") {
 			return self.createDateColumn(columnConfig);
 		} else if (columnConfig.XMLName.Local == "boolean-column") {
@@ -514,6 +578,7 @@ ColumnManager.prototype.createColumn = function(columnConfig) {
 			return self.createSelectColumn(columnConfig);
 		}
 		return {
+			width: columnConfig.Width || "",
 			key: columnConfig.Name,
 			label: columnConfig.Text
 		};
@@ -539,7 +604,7 @@ ColumnManager.prototype._getColumnsCommon = function(columnModelName, columnMode
 	}
 	
 	for (var i = 0; i < columnModel.ColumnLi.length; i++) {
-		var column = self.createColumn(columnModel.ColumnLi[i]);
+		var column = self.createColumn(columnModel.ColumnLi[i], columnModel);
 		if (column) {
 			columns.push(column);
 		} else {
@@ -557,7 +622,7 @@ ColumnManager.prototype._getColumnsCommon = function(columnModelName, columnMode
 ColumnManager.prototype.getColumns = function(columnModelName, columnModel, Y) {
 	var self = this;
 	return self._getColumnsCommon(columnModelName, columnModel, Y, function(column){
-		return column.UseIn == "" || column.UseIn == "list";
+		return column.UseIn == undefined || column.UseIn == "" || column.UseIn == "list";
 	});
 }
 

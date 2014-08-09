@@ -31,6 +31,52 @@ func (o CommonUtil) IsFloat(str string) bool {
 	return regx.MatchString(str)
 }
 
+/**
+	删除首尾0
+*/
+func (o CommonUtil) TrimZero(str string) string {
+	result := str
+
+	regx := regexp.MustCompile(`^0+|\.?0+$`)
+	result = regx.ReplaceAllString(result, "")
+	
+	return result
+}
+
+/**
+	对传入的str前后补零,返回20.10格式的字符
+*/
+func (o CommonUtil) GetFloatFormat(str string) string {
+	if o.IsFloat(str) {
+		zeroLi := []string{}
+		for i := 0; i < 20; i++ {
+			zeroLi = append(zeroLi, "0")
+		}
+		twentyZero := strings.Join(zeroLi, "")
+		strLi := strings.Split(str, ".")
+		if len(strLi) > 0 {
+			body := strLi[0]
+			if body == "" {
+				body = twentyZero
+			} else if body[0] == '-' {
+				body = "-" + twentyZero[0:(20 - len(body))] + body[1:]
+			} else {
+				body = twentyZero[0:(20 - len(body))] + body
+			}
+			if len(strLi) == 1 {
+				return body + "." + twentyZero[0:10]
+			} else {
+				subfix := strLi[1]
+				subfix = subfix + twentyZero[0:(10 - len(subfix))]
+				return body + "." + subfix
+			}
+		} else {
+			return twentyZero
+		}
+	}
+	return ""
+}
+
 func (o CommonUtil) GetIntFromMap(data map[string]interface{}, name string) int {
 	if data[name] != nil {
 		return o.GetIntFromString(fmt.Sprint(data[name]))

@@ -3,22 +3,43 @@ package app
 import "github.com/robfig/revel"
 
 import (
+	. "com/papersns/common"
 	. "com/papersns/error"
-	"reflect"
-	//	"runtime"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"reflect"
+	"runtime"
+	"runtime/debug"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 	"time"
-	"runtime/pprof"
-	"os"
+	"sync"
 )
 
 var adminURLLi []string = []string{"/hjq/becomeshopuser"}
-var noSessionURLLi []string = []string{"", "/", "/hjq/login"}
+var noSessionURLLi []string = []string{"", "/", "/hjq/login", "/app/startruntxnperiod"}
+var noCacheURLLi []string = []string{"/app/combo", "/public", "/app/comboview", "/app/FormJS"}
+var dateRwLock sync.RWMutex = sync.RWMutex{}
+var dateFlag string = ""
+
+func getDateFlag() string {
+	dateRwLock.RLock()
+	defer dateRwLock.RUnlock()
+	
+	return dateFlag
+}
+
+func setDateFlag() {
+	dateRwLock.Lock()
+	defer dateRwLock.Unlock()
+	
+	dateFlag = fmt.Sprint(DateUtil{}.GetCurrentYyyyMMddHHmmss())
+}
 
 func SessionAdapter(c *revel.Controller, fc []revel.Filter) {
 	userAgent := strings.Join(c.Request.Header["User-Agent"], ",")
@@ -73,6 +94,32 @@ func SessionEffectFilter(c *revel.Controller, fc []revel.Filter) {
 
 func UTF8Filter(c *revel.Controller, fc []revel.Filter) {
 	c.Response.ContentType = "text/html; charset=utf-8"
+	fc[0](c, fc[1:])
+}
+
+func DateFlagFilter(c *revel.Controller, fc []revel.Filter) {
+	if revel.Config.StringDefault("mode.dev", "true") == "true" {
+		dateUtil := DateUtil{}
+		c.Flash.Out["dateFlag"] = fmt.Sprint(dateUtil.GetCurrentYyyyMMddHHmmss())
+	} else {
+		c.Flash.Out["dateFlag"] = getDateFlag()
+	}
+	fc[0](c, fc[1:])
+}
+
+func CacheControlFilter(c *revel.Controller, fc []revel.Filter) {
+	if revel.Config.StringDefault("mode.dev", "true") != "true" {
+		for _, item := range noCacheURLLi {
+			if strings.Index(c.Request.URL.Path, item) == 0 {
+				currentTime := time.Now()
+				currentTime = currentTime.Add(time.Hour * 24 * 365 * 10)
+				expiresFormat := currentTime.Format("Mon, 02 Jan 2006 15:04:05 GMT")
+				c.Response.Out.Header().Set("Cache-Control", "max-age=315360000")
+				c.Response.Out.Header().Set("Expires", expiresFormat)
+				break
+			}
+		}
+	}
 	fc[0](c, fc[1:])
 }
 
@@ -160,7 +207,7 @@ func ProfileFilter(c *revel.Controller, fc []revel.Filter) {
 	if err != nil {
 		panic(err)
 	}
-	defer func(){
+	defer func() {
 		pprof.StopCPUProfile()
 		profileWriter.LogFile.Close()
 		println("close file")
@@ -180,6 +227,9 @@ func BusinessPanicFilter(c *revel.Controller, fc []revel.Filter) {
 					"message": err.Error(),
 				})
 			} else {
+				if revel.Config.StringDefault("mode.dev", "true") != "true" {
+					log.Print(x, "\n", string(debug.Stack()))
+				}
 				panic(x)
 			}
 		}
@@ -189,8 +239,9 @@ func BusinessPanicFilter(c *revel.Controller, fc []revel.Filter) {
 
 func init() { // 运行的顺序是从上往下
 	//	runtime.GOMAXPROCS(1)
-	//	runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	// Filters is the default set of global filters.
+	setDateFlag()
 	revel.Filters = []revel.Filter{
 		revel.PanicFilter, // Recover from panics and display an error page instead.
 		BusinessPanicFilter,
@@ -205,8 +256,10 @@ func init() { // 运行的顺序是从上往下
 		//		SessionAdapter,
 		SessionEffectFilter,
 		UTF8Filter,
-//		TimeStatFilter,
-//		ProfileFilter,
+		DateFlagFilter,
+		CacheControlFilter,
+		//		TimeStatFilter,
+		//		ProfileFilter,
 		revel.ActionInvoker, // Invoke the action.
 	}
 }

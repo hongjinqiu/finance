@@ -120,15 +120,47 @@ function listMain(Y) {
 	createGridWithUrl(Y, url);
 }
 
+function queryFormValidator() {
+	var messageLi = [];
+	
+	var listTemplateIterator = new ListTemplateIterator();
+	var result = "";
+	listTemplateIterator.iterateAllTemplateQueryParameter(result, function(queryParameter, result){
+		for (var key in g_masterFormFieldDict) {
+			if (queryParameter.Name == key) {
+				if (!g_masterFormFieldDict[key].validateField()) {
+					messageLi.push(queryParameter.Text + g_masterFormFieldDict[key].get("error"));
+				}
+			}
+		}
+	});
+	
+	if (messageLi.length > 0) {
+		return {
+			"result": false,
+			"message": messageLi.join("<br />")
+		};
+	}
+	return {
+		"result": true
+	};
+}
+
 function applyQueryBtnBehavior(Y) {
 		if (Y.one("#queryBtn")) {
 			Y.one("#queryBtn").on("click", function(e){
-				var pagModel = dtInst.dt.get('paginator').get('model');
-				var page = pagModel.get("page");
-				if (page == 1) {
-					dtInst.dt.refreshPaginator();
+				var validateResult = queryFormValidator();
+				
+				if (!validateResult.result) {
+					showError(validateResult.message);
 				} else {
-					pagModel.set("page", 1);
+					var pagModel = dtInst.dt.get('paginator').get('model');
+					var page = pagModel.get("page");
+					if (page == 1) {
+						dtInst.dt.refreshPaginator();
+					} else {
+						pagModel.set("page", 1);
+					}
 				}
 			});
 			/*
@@ -142,34 +174,36 @@ $("#btn_more").click(function(){
 	$("#btn_up").css("display","none");	
 	$("#search1").slideUp();
 			 */
-			var duration = 0.4;
-			Y.one("#btnMore").on("click", function(e){
-				var trCount = Y.all("#queryMain .queryLine").size();
-				if (trCount > 1) {
+			if (Y.one("#btnMore")) {
+				var duration = 0.4;
+				Y.one("#btnMore").on("click", function(e){
+					var trCount = Y.all("#queryMain .queryLine").size();
+					if (trCount > 1) {
+						var myAnim = new Y.Anim({
+							node: '#queryContent',
+							to: {
+								height: 26 * trCount
+							},
+							duration: duration
+						});
+						myAnim.run();
+					}
+					Y.one("#btnMore").setStyle("display", "none");
+					Y.one("#btnUp").setStyle("display", "");
+				});
+				Y.one("#btnUp").on("click", function(e){
 					var myAnim = new Y.Anim({
 						node: '#queryContent',
 						to: {
-							height: 26 * trCount
+							height: 22
 						},
 						duration: duration
 					});
 					myAnim.run();
-				}
-				Y.one("#btnMore").setStyle("display", "none");
-				Y.one("#btnUp").setStyle("display", "");
-			});
-			Y.one("#btnUp").on("click", function(e){
-				var myAnim = new Y.Anim({
-					node: '#queryContent',
-					to: {
-						height: 22
-					},
-					duration: duration
+					Y.one("#btnMore").setStyle("display", "");
+					Y.one("#btnUp").setStyle("display", "none");
 				});
-				myAnim.run();
-				Y.one("#btnMore").setStyle("display", "");
-				Y.one("#btnUp").setStyle("display", "none");
-			});
+			}
 			Y.one("#queryReset").on("click", function(e){
 				var queryParameterManager = new QueryParameterManager();
 				queryParameterManager.applyQueryDefaultValue(Y);

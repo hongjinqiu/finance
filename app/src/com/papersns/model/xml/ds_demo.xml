@@ -51,6 +51,7 @@
 			</field>
 			<field id="moneyNumberColumn" extends="AMOUNT_FIELD">
 				<displayName>moneyNumberColumn测试</displayName>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000</limitMax>
@@ -122,9 +123,8 @@
 	<detailData>
 		<id>B</id>
 		<displayName>分录数据集B</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
+		<allowEmpty>false</allowEmpty>
 		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
@@ -157,6 +157,7 @@
 			</field>
 			<field id="moneyNumberColumn" extends="AMOUNT_FIELD">
 				<displayName>detailB_moneyNumberColumn测试</displayName>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000</limitMax>
@@ -228,9 +229,8 @@
 	<detailData>
 		<id>C</id>
 		<displayName>分录数据集C</displayName>
-		<allowEmptyRow>false</allowEmptyRow>
+		<allowEmpty>false</allowEmpty>
 		<allowCopy>true</allowCopy>
-		<readonly>false</readonly>
 		<fixField>
 			<primaryKey id="id" extends="PRIMARY_KEY" />
 			<createBy id="createBy" extends="CREATE_BY" />
@@ -263,6 +263,7 @@
 			</field>
 			<field id="moneyNumberColumn" extends="AMOUNT_FIELD">
 				<displayName>detailC_moneyNumberColumn测试</displayName>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>0</limitMin>
 				<limitMax>1000</limitMax>

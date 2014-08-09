@@ -145,9 +145,10 @@
 				<limitMax>100</limitMax>
 				<defaultValueExpr>1</defaultValueExpr>
 			</field>
-			<field id="amtEarly" extends="FLOAT_FIELD">
+			<field id="amtEarly" extends="AMOUNT_FIELD">
 				<displayName>期初金额</displayName>
 				<allowEmpty>true</allowEmpty>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitRange</limitOption>
 				<limitMin>-1000000000</limitMin>
 				<limitMax>1000000000</limitMax>

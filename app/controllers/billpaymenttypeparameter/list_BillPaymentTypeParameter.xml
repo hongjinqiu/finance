@@ -6,13 +6,14 @@
 	<data-source-model-id></data-source-model-id>
 
 	<description>单据类型参数列表</description>
+	<cookie name="BillPaymentTypeParameter"/>
 	<scripts>js/ds_listtoolbar.js</scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<!-- <button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="test" />
+		<!-- <button text="新增" mode="url" handler="/console/formschema?@name=ActionTest" iconCls="but_box" />
 
-		<button text="删除" mode="fn" handler="g_deleteRecords">
+		<button text="删除" mode="fn" handler="g_deleteRecords" iconCls="but_box">
 			<button-attribute name="code" value="D" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -22,7 +23,7 @@
 			<button-attribute name="functionId" value="10018" />
 		</button>
 
-		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
+		<button text="获取记录测试" mode="fn" handler="test" iconCls="but_box">
 		</button> -->
 	</toolbar>
 	
@@ -42,19 +43,19 @@
 		</checkbox-column>
 		<id-column name="id" text="id" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="编辑" iconCls="bj_btn" mode="fn" handler="xxxxxxxx">
+				<button text="编辑" iconCls="img_edit" mode="fn" handler="xxxxxxxx">
 					<expression></expression>
 					<button-attribute name="code" value="U" />
 				</button>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=BillPaymentTypeParameter&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url" handler="/console/formschema/?@name=BillPaymentTypeParameter&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>
 		<virtual-column name="FUN_C_SELECTOR" text="操作" width="40" use-in="selector">
 			<buttons>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="url" handler="/console/formschema/?@name=BillPaymentTypeParameter&amp;id={id}&amp;formStatus=view">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="url!" handler="/console/formschema/?@name=BillPaymentTypeParameter&amp;id={id}&amp;formStatus=view">
 				</button>
 			</buttons>
 		</virtual-column>

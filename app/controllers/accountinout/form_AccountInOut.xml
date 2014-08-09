@@ -30,7 +30,7 @@
 		
 		<html colSpan="2">
 			<![CDATA[
-				<td width="15%">
+				<td width="15%" class="searchTitle">
 					<input type="radio" id="queryByDate" name="queryMode" value="1" onclick="updateQueryModeWidget()" />
 					<label for="queryByDate">按日期查询</label>
 				</td>
@@ -78,12 +78,12 @@
 		
 		<html colSpan="2">
 			<![CDATA[
-				<td width="15%">
+				<td width="15%" class="searchTitle">
 					<input type="radio" id="queryByPeriod" name="queryMode" value="2" checked="checked" onclick="updateQueryModeWidget()" />
 					<label for="queryByPeriod">按期间查询</label>
 				</td>
 				<td>
-					<table border="0" width="100%">
+					<table border="0" width="100%" cellspacing="0" cellpadding="0">
 						<tr>
 							<td>会计期间：</td>
 							<td>
@@ -157,7 +157,7 @@
 	</column-model>
 	
 	<toolbar>
-		<button name="searchBtn" text="载入资料" mode="fn" handler="queryForm" iconCls="test"></button>
+		<button name="searchBtn" text="载入资料" mode="fn" handler="queryForm" iconCls="but_box"></button>
 		<!-- <button name="newBtn" text="明细查询" mode="fn" handler="newData" iconCls=""></button> -->
 		<!-- <button name="excelExportBtn" text="导出Excel" mode="fn" handler="excelExport"></button> -->
 	</toolbar>
@@ -166,7 +166,7 @@
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作" width="40">
 			<buttons>
-				<button name="btn_view" text="查看" iconCls="ck_btn" mode="fn" handler="viewItem">
+				<button name="btn_view" text="查看" iconCls="img_look" mode="fn" handler="viewItem">
 				</button>
 			</buttons>
 		</virtual-column>

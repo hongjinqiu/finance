@@ -338,7 +338,10 @@ func (c GatheringBillSupport) logAccountForMaster(sessionId int, dataSource Data
 	if amtGathering >= 0 {
 		accountInOutParam.AmtIncrease = fmt.Sprint(contextData["amtGathering"])
 	} else {
-		accountInOutParam.AmtReduce = fmt.Sprint(-amtGathering)
+		oldStr := "-"
+		newStr := ""
+		limit := -1
+		accountInOutParam.AmtReduce = strings.Replace(fmt.Sprint(contextData["amtGathering"]), oldStr, newStr, limit)
 	}
 	accountInOutParam.DiffDataType = diffDataType
 	accountInOutParam.CreateBy = c.getIntData(contextData, "createBy")
@@ -441,7 +444,10 @@ func (c GatheringBillSupport) logAccountForDetailB(sessionId int, dataSource Dat
 	if amtFee >= 0 { // 费用>0时,写到减少字段
 		accountInOutParam.AmtReduce = fmt.Sprint(contextData["amtFee"])
 	} else {
-		accountInOutParam.AmtIncrease = fmt.Sprint(-amtFee)
+		oldStr := "-"
+		newStr := ""
+		limit := -1
+		accountInOutParam.AmtIncrease = strings.Replace(fmt.Sprint(contextData["amtFee"]), oldStr, newStr, limit)
 	}
 	accountInOutParam.DiffDataType = diffDataType
 	accountInOutParam.CreateBy = c.getIntData(contextData, "createBy")

@@ -22,7 +22,7 @@
 		]]>
 	</html>
 	<toolbar name="ComponentToolbar">
-		<button text="重构模型" mode="fn" handler="doRefretorComponent" iconCls="test">
+		<button text="重构模型" mode="fn" handler="doRefretorComponent" iconCls="but_box">
 		</button>
 	</toolbar>
 
@@ -30,7 +30,7 @@
 		<checkbox-column name="checkboxSelect" hideable="false">
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
 				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/listschema?@name={id}">
 					<expression></expression>
@@ -53,7 +53,7 @@
 		]]>
 	</html>
 	<toolbar name="SelectorToolbar">
-		<button text="重构模型" mode="fn" handler="doRefretorSelector" iconCls="test">
+		<button text="重构模型" mode="fn" handler="doRefretorSelector" iconCls="but_box">
 		</button>
 	</toolbar>
 
@@ -61,7 +61,7 @@
 		<checkbox-column name="checkboxSelect" hideable="false">
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
 				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/selectorschema?@name={id}">
 				</button>
@@ -83,7 +83,7 @@
 		]]>
 	</html>
 	<toolbar name="FormToolbar">
-		<button text="重构模型" mode="fn" handler="doRefretorForm" iconCls="test">
+		<button text="重构模型" mode="fn" handler="doRefretorForm" iconCls="but_box">
 		</button>
 	</toolbar>
 
@@ -92,7 +92,7 @@
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
 				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/formschema?@name={id}">
 				</button>
@@ -114,7 +114,7 @@
 		]]>
 	</html>
 	<toolbar name="DataSourceToolbar">
-		<button text="重构模型" mode="fn" handler="doRefretorDataSource" iconCls="test">
+		<button text="重构模型" mode="fn" handler="doRefretorDataSource" iconCls="but_box">
 		</button>
 	</toolbar>
 
@@ -123,7 +123,7 @@
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
 				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=DataSource">
 				</button>

@@ -6,17 +6,18 @@
 
 	<adapter name="ModelListTemplateAdapter" />
 	<description>Demo列表</description>
+	<cookie name="Demo"/>
 	<scripts></scripts>
 	<view-template view="Console/ListSchema.html" selectorView="Console/SelectorSchema.html" selectorScripts="" />
 
 	<toolbar export="true">
-		<button text="新增" mode="fn" handler="doSave" iconCls="test">
+		<button text="新增" mode="fn" handler="doSave" iconCls="but_box">
 			<expression>test_expression</expression>
 			<button-attribute name="code" value="C" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
 
-		<button text="删除" mode="fn" handler="g_deleteRecords">
+		<button text="删除" mode="fn" handler="g_deleteRecords" iconCls="but_box">
 			<button-attribute name="code" value="D" />
 			<button-attribute name="functionId" value="50010" />
 		</button>
@@ -26,7 +27,7 @@
 			<button-attribute name="functionId" value="10018" />
 		</button>
 
-		<button text="获取记录测试" mode="fn" handler="test" iconCls="">
+		<button text="获取记录测试" mode="fn" handler="test" iconCls="but_box">
 		</button>
 	</toolbar>
 	
@@ -42,16 +43,16 @@
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选Demo" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<toolbar>
-			<button text="新增" mode="fn" handler="doSave" iconCls="test"></button>
+			<button text="新增" mode="fn" handler="doSave" iconCls="but_box"></button>
 		</toolbar>
 		<checkbox-column name="checkboxSelect" hideable="false">
 			<expression></expression>
 		</checkbox-column>
 		<id-column name="id" text="编号" hideable="true" />
 
-		<virtual-column name="FUN_C" text="操作" width="40">
+		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="编辑" iconCls="bj_btn" mode="fn" handler="doEdit">
+				<button text="编辑" iconCls="img_edit" mode="fn" handler="doEdit">
 					<expression></expression>
 					<button-attribute name="code" value="U" />
 				</button>

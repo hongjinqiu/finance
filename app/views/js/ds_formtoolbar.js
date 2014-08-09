@@ -209,10 +209,20 @@ function test() {
 function ToolbarManager(){}
 
 function setBorderTmp(btn, status) {
+//	if (true) {
+//		return;
+//	}
 	if (status == "disabled") {
-		btn.style.border = "1px solid black";
+		if (!btn.origClassName) {
+			btn.origClassName = btn.className;
+		}
+//		btn.style.border = "1px solid black";
+		btn.className = "disable_but_box";
 	} else {
-		btn.style.border = "1px solid red";
+//		btn.style.border = "1px solid red";
+		if (btn.className == "disable_but_box") {
+			btn.className = btn.origClassName;
+		}
 	}
 }
 

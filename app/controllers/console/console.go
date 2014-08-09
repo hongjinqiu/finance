@@ -206,7 +206,8 @@ func (c Console) ListSchema() revel.Result {
 	templateManager := TemplateManager{}
 	listTemplate := templateManager.GetListTemplate(schemaName)
 
-	result := c.listSelectorCommon(&listTemplate, true)
+	isFromList := true
+	result := c.listSelectorCommon(&listTemplate, true, isFromList)
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -222,6 +223,8 @@ func (c Console) ListSchema() revel.Result {
 	} else {
 		//c.Response.ContentType = "text/html; charset=utf-8"
 		c.RenderArgs["result"] = result
+		c.RenderArgs["flash"] = c.Flash.Out
+		c.RenderArgs["session"] = c.Session
 		return c.RenderTemplate(listTemplate.ViewTemplate.View)
 		//		return c.Render(result)
 	}
@@ -243,7 +246,8 @@ func (c Console) SelectorSchema() revel.Result {
 	if c.Params.Get("format") != "" {
 		isGetBo = true
 	}
-	result := c.listSelectorCommon(&listTemplate, isGetBo)
+	isFromList := false
+	result := c.listSelectorCommon(&listTemplate, isGetBo, isFromList)
 
 	selectionBo := map[string]interface{}{
 		"url":         templateManager.GetViewUrl(listTemplate),
@@ -331,7 +335,7 @@ func (c Console) setDisplayField(listTemplate *ListTemplate) {
 	}
 }
 
-func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) map[string]interface{} {
+func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool, isFromList bool) map[string]interface{} {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
@@ -352,15 +356,7 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 	for key, value := range defaultBo {
 		paramMap[key] = value
 	}
-	//	c.Request.URL
-	for k, v := range c.Params.Form {
-		value := strings.Join(v, ",")
-		paramMap[k] = value
-	}
-	for k, v := range c.Params.Query {
-		value := strings.Join(v, ",")
-		paramMap[k] = value
-	}
+	paramMap, _ = c.getCookieDataAndParamMap(sessionId, *listTemplate, isFromList, paramMap)
 
 	formDataByte, err := json.Marshal(&paramMap)
 	if err != nil {
@@ -486,6 +482,68 @@ func (c Console) listSelectorCommon(listTemplate *ListTemplate, isGetBo bool) ma
 		//		"columnsJson":   string(columnsByte),
 	}
 	return result
+}
+
+func (c Console) getCookieDataAndParamMap(sessionId int, listTemplate ListTemplate, isFromList bool, paramMap map[string]string) (map[string]string, map[string]string) {
+	isHasCookie := false
+	if c.Params.Query.Get("cookie") != "false" {
+		isHasCookie = true
+	}
+	isConfigCookie := false
+	if listTemplate.Cookie.Name != "" {
+		isConfigCookie = true
+	}
+	cookieData := map[string]string{}
+	if isFromList && isHasCookie && isConfigCookie {
+		cookieStr := c.Session[listTemplate.Cookie.Name]
+		if cookieStr != "" {
+			err := json.Unmarshal([]byte(cookieStr), &cookieData)
+			if err != nil {
+				panic(err)
+			}
+			for k, v := range cookieData {
+				paramMap[k] = v
+			}
+		}
+	}
+	formQueryData := map[string]string{}
+	//	c.Request.URL
+	for k, v := range c.Params.Form {
+		value := strings.Join(v, ",")
+		paramMap[k] = value
+		formQueryData[k] = value
+	}
+	for k, v := range c.Params.Query {
+		value := strings.Join(v, ",")
+		paramMap[k] = value
+		formQueryData[k] = value
+	}
+	
+	if isFromList && isConfigCookie && !isHasCookie {
+		c.Session[listTemplate.Cookie.Name] = ""
+	} else if isFromList && isConfigCookie && isHasCookie {
+		cookieFormQueryData := map[string]string{}
+		for k, v := range cookieData {
+			cookieFormQueryData[k] = v
+		}
+		for k, v := range formQueryData {
+			cookieFormQueryData[k] = v
+		}
+		cookieStr, err := json.Marshal(&cookieFormQueryData)
+		if err != nil {
+			panic(err)
+		}
+		c.Session[listTemplate.Cookie.Name] = string(cookieStr)
+	}
+	cookieData = map[string]string{}
+	cookieStr := c.Session[listTemplate.Cookie.Name]
+	if cookieStr != "" {
+		err := json.Unmarshal([]byte(cookieStr), &cookieData)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return paramMap, cookieData
 }
 
 func (c Console) getSysParam(sessionId int, userId int) map[string]interface{} {
@@ -668,6 +726,8 @@ func (c Console) FormSchema() revel.Result {
 	}
 	tmplResult := map[string]interface{}{
 		"result": result,
+		"flash": c.Flash.Out,
+		"session": c.Session,
 	}
 	tmpl.Execute(c.Response.Out, tmplResult)
 	return nil

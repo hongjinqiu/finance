@@ -78,25 +78,28 @@
 				<allowEmpty>true</allowEmpty>
 				<fieldLength>100</fieldLength>
 			</field>
-			<field id="amtSecureBalance" extends="FLOAT_FIELD">
+			<field id="amtSecureBalance" extends="AMOUNT_FIELD">
 				<displayName>安全余额</displayName>
 				<allowEmpty>true</allowEmpty>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
 				<zeroShowEmpty>true</zeroShowEmpty>
 			</field>
-			<field id="amtOriginalCurrencyBalance" extends="FLOAT_FIELD">
+			<field id="amtOriginalCurrencyBalance" extends="AMOUNT_FIELD">
 				<displayName>当前余额</displayName>
 				<allowEmpty>true</allowEmpty>
+				<formatExpr>localCurrency</formatExpr>
 				<fixReadOnly>true</fixReadOnly>
 				<limitOption>limitMin</limitOption>
 				<limitMin>-1000000000</limitMin>
 				<zeroShowEmpty>true</zeroShowEmpty>
 				<allowCopy>false</allowCopy>
 			</field>
-			<field id="amtLimits" extends="FLOAT_FIELD">
+			<field id="amtLimits" extends="AMOUNT_FIELD">
 				<displayName>限额</displayName>
 				<allowEmpty>true</allowEmpty>
+				<formatExpr>localCurrency</formatExpr>
 				<limitOption>limitMin</limitOption>
 				<limitMin>0</limitMin>
 				<zeroShowEmpty>true</zeroShowEmpty>

@@ -6,6 +6,7 @@ import (
 	. "com/papersns/component"
 	"com/papersns/global"
 	. "com/papersns/model"
+	. "com/papersns/error"
 	"fmt"
 	"strconv"
 	"strings"
@@ -63,6 +64,45 @@ func (o AccountingPeriodSupport) afterNewData(sessionId int, dataSource DataSour
 
 	(*bo)["B"] = detailDataLi
 }
+
+/**
+	 删除前判断被用，会计期内有单据则视为被用
+*/
+func (o AccountingPeriodSupport) beforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+	bDataSetLi := (*bo)["B"].([]interface{})
+	firstLineData := bDataSetLi[0].(map[string]interface{})
+	lastLineData := bDataSetLi[len(bDataSetLi)-1].(map[string]interface{})
+
+	commonUtil := CommonUtil{}
+	firstStartDate := commonUtil.GetIntFromMap(firstLineData, "startDate")
+	lastEndDate := commonUtil.GetIntFromMap(lastLineData, "endDate")
+
+	qb := QuerySupport{}
+	session, _ := global.GetConnection(sessionId)
+	queryMap := map[string]interface{}{
+		"A.billDate": map[string]interface{}{
+			"$gte": firstStartDate,
+			"$lt":  lastEndDate,
+		},
+	}
+	permissionSupport := PermissionSupport{}
+	permissionQueryDict := permissionSupport.GetPermissionQueryDict(sessionId, formTemplate.Security)
+	for k, v := range permissionQueryDict {
+		queryMap[k] = v
+	}
+
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSourceIdLi := []string{"GatheringBill", "PayBill"}
+	for _, dataSourceId := range dataSourceIdLi {
+		tmpDataSource := modelTemplateFactory.GetDataSource(dataSourceId)
+		collectionName := modelTemplateFactory.GetCollectionName(tmpDataSource)
+		_, found := qb.FindByMapWithSession(session, collectionName, queryMap)
+		if found {
+			panic(BusinessError{Message:"会计期范围内存在单据，不能删除"})
+		}
+	}
+}
+
 
 type AccountingPeriod struct {
 	BaseDataAction

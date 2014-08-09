@@ -230,6 +230,51 @@
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
+					<relationItem name="SystemParameter">
+						<id>SystemParameterSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "SystemParameter"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "SystemParameter"</jsRelationExpr>
+						<relationModelId>SystemParameter</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="GatheringBill">
+						<id>GatheringBillSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "GatheringBill"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "GatheringBill"</jsRelationExpr>
+						<relationModelId>GatheringBill</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>billNo</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="PayBill">
+						<id>PayBillSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "PayBill"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "PayBill"</jsRelationExpr>
+						<relationModelId>PayBill</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>billNo</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="AccountInOut">
+						<id>AccountInOutSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "AccountInOut"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "AccountInOut"</jsRelationExpr>
+						<relationModelId>AccountInOut</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<relationItem name="AccountInOutItem">
+						<id>AccountInOutItemSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "AccountInOutItem"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "AccountInOutItem"</jsRelationExpr>
+						<relationModelId>AccountInOutItem</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>code,name</displayField>
+						<valueField>id</valueField>
+					</relationItem>
 				</relationDS>
 			</field>
 		</bizField>

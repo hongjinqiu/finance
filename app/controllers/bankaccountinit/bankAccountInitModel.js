@@ -58,20 +58,36 @@ function main(Y) {
 
 function enableQueryParameters() {
 	g_masterFormFieldDict["accountId"].set("readonly", false);
-	document.getElementById("queryBtn").disabled = "";
-	document.getElementById("resetBtn").disabled = "";
+	var qBtn = document.getElementById("queryBtn");
+	var rBtn = document.getElementById("resetBtn");
+	qBtn.disabled = "";
+	rBtn.disabled = "";
 	
-	document.getElementById("queryBtn").style.border = "1px solid red";
-	document.getElementById("resetBtn").style.border = "1px solid red";
+	if (qBtn.className == "disable_but_box") {
+		qBtn.className = qBtn.origClassName;
+	}
+	
+	if (rBtn.className == "disable_but_box") {
+		rBtn.className = rBtn.origClassName;
+	}
 }
 
 function disableQueryParameters() {
 	g_masterFormFieldDict["accountId"].set("readonly", true);
-	document.getElementById("queryBtn").disabled = "true";
-	document.getElementById("resetBtn").disabled = "true";
+	var qBtn = document.getElementById("queryBtn");
+	var rBtn = document.getElementById("resetBtn");
+	qBtn.disabled = "true";
+	rBtn.disabled = "true";
 	
-	document.getElementById("queryBtn").style.border = "1px solid blue";
-	document.getElementById("resetBtn").style.border = "1px solid blue";
+	if (!qBtn.origClassName) {
+		qBtn.origClassName = qBtn.className;
+	}
+	qBtn.className = "disable_but_box";
+	
+	if (!rBtn.origClassName) {
+		rBtn.origClassName = rBtn.className;
+	}
+	rBtn.className = "disable_but_box";
 }
 
 function bankAccountInitGiveUpData() {
