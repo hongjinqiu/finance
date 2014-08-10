@@ -32,12 +32,12 @@
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/listschema?@name={id}">
+				<button text="访问" iconCls="img_look" mode="url^" handler="/console/listschema?@name={id}">
 					<expression></expression>
 				</button>
-				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Component">
+				<button text="raw xml" iconCls="img_look" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Component">
 				</button>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=Component">
+				<button text="xml" iconCls="img_look" mode="url^" handler="/console/xml?@name={id}&amp;type=Component">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -63,11 +63,11 @@
 		<id-column name="id" text="编号" hideable="true" />
 		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/selectorschema?@name={id}">
+				<button text="访问" iconCls="img_look" mode="url^" handler="/console/selectorschema?@name={id}">
 				</button>
-				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Selector">
+				<button text="raw xml" iconCls="img_look" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Selector">
 				</button>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=Selector">
+				<button text="xml" iconCls="img_look" mode="url^" handler="/console/xml?@name={id}&amp;type=Selector">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -94,11 +94,11 @@
 
 		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="访问" iconCls="ck_btn" mode="url^" handler="/console/formschema?@name={id}">
+				<button text="访问" iconCls="img_look" mode="url^" handler="/console/formschema?@name={id}">
 				</button>
-				<button text="raw xml" iconCls="ck_btn" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Form">
+				<button text="raw xml" iconCls="img_look" mode="url^" handler="/console/rawxml?@name={id}&amp;type=Form">
 				</button>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=Form">
+				<button text="xml" iconCls="img_look" mode="url^" handler="/console/xml?@name={id}&amp;type=Form">
 				</button>
 			</buttons>
 		</virtual-column>
@@ -125,7 +125,7 @@
 
 		<virtual-column name="FUN_C" text="操作" width="120">
 			<buttons>
-				<button text="xml" iconCls="ck_btn" mode="url^" handler="/console/xml?@name={id}&amp;type=DataSource">
+				<button text="xml" iconCls="img_look" mode="url^" handler="/console/xml?@name={id}&amp;type=DataSource">
 				</button>
 			</buttons>
 		</virtual-column>
