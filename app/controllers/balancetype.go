@@ -14,6 +14,7 @@ type BalanceTypeSupport struct {
 }
 
 type BalanceType struct {
+	*revel.Controller
 	BaseDataAction
 }
 

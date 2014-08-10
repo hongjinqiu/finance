@@ -82,6 +82,7 @@ func (c BankAccountInitSupport) logBankAccount(sessionId int, dataSource DataSou
 }
 
 type BankAccountInit struct {
+	*revel.Controller
 	BaseDataAction
 }
 

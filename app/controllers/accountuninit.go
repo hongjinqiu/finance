@@ -14,6 +14,7 @@ type AccountUnInitSupport struct {
 }
 
 type AccountUnInit struct {
+	*revel.Controller
 	BaseDataAction
 }
 

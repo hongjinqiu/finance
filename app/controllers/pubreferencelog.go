@@ -14,6 +14,7 @@ type PubReferenceLogSupport struct {
 }
 
 type PubReferenceLog struct {
+	*revel.Controller
 	BaseDataAction
 }
 

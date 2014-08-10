@@ -14,6 +14,7 @@ type CashReportSupport struct {
 }
 
 type CashReport struct {
+	*revel.Controller
 	BaseDataAction
 }
 

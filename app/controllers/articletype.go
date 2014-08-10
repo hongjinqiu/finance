@@ -14,6 +14,7 @@ type ArticleTypeSupport struct {
 }
 
 type ArticleType struct {
+	*revel.Controller
 	BaseDataAction
 }
 

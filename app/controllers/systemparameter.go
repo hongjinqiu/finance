@@ -14,6 +14,7 @@ type SystemParameterSupport struct {
 }
 
 type SystemParameter struct {
+	*revel.Controller
 	BaseDataAction
 }
 

@@ -14,6 +14,7 @@ type FundSummarySupport struct {
 }
 
 type FundSummary struct {
+	*revel.Controller
 	BaseDataAction
 }
 

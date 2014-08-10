@@ -14,6 +14,7 @@ type BankSupport struct {
 }
 
 type Bank struct {
+	*revel.Controller
 	BaseDataAction
 }
 

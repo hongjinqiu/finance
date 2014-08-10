@@ -14,6 +14,7 @@ type MeasureUnitSupport struct {
 }
 
 type MeasureUnit struct {
+	*revel.Controller
 	BaseDataAction
 }
 

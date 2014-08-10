@@ -556,6 +556,7 @@ func (c PayBillSupport) RAfterUnCancelData(sessionId int, dataSource DataSource,
 }
 
 type PayBill struct {
+	*revel.Controller
 	BillAction
 }
 

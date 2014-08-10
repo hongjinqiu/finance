@@ -242,6 +242,7 @@ func (c BankAccountSupport) RAfterDeleteData(sessionId int, dataSource DataSourc
 }
 
 type BankAccount struct {
+	*revel.Controller
 	BaseDataAction
 }
 

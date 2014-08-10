@@ -84,6 +84,7 @@ func (c CashAccountInitSupport) logCashAccount(sessionId int, dataSource DataSou
 }
 
 type CashAccountInit struct {
+	*revel.Controller
 	BaseDataAction
 }
 

@@ -14,6 +14,7 @@ type AccountEndInitSupport struct {
 }
 
 type AccountEndInit struct {
+	*revel.Controller
 	BaseDataAction
 }
 

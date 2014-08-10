@@ -25,6 +25,7 @@ func (c ActionTestSupport) RAfterSaveData(sessionId int, dataSource DataSource, 
 }
 
 type ActionTest struct {
+	*revel.Controller
 	BillAction
 }
 

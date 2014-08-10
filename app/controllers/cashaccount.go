@@ -79,6 +79,7 @@ func (o CashAccountSupport) RBeforeSaveData(sessionId int, dataSource DataSource
 }
 
 type CashAccount struct {
+	*revel.Controller
 	BaseDataAction
 }
 

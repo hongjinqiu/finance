@@ -557,6 +557,7 @@ func (c GatheringBillSupport) RAfterUnCancelData(sessionId int, dataSource DataS
 }
 
 type GatheringBill struct {
+	*revel.Controller
 	BillAction
 }
 

@@ -14,6 +14,7 @@ type BillReceiveTypeParameterSupport struct {
 }
 
 type BillReceiveTypeParameter struct {
+	*revel.Controller
 	BaseDataAction
 }
 

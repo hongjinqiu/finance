@@ -14,6 +14,7 @@ type IncomeItemSupport struct {
 }
 
 type IncomeItem struct {
+	*revel.Controller
 	BaseDataAction
 }
 

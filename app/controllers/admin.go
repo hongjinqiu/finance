@@ -15,6 +15,7 @@ func init() {
 }
 
 type Hjq struct {
+	*revel.Controller
 	BaseDataAction
 }
 

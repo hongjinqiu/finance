@@ -14,6 +14,7 @@ type SysUserSupport struct {
 }
 
 type SysUser struct {
+	*revel.Controller
 	BaseDataAction
 }
 

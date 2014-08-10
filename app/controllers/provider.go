@@ -14,6 +14,7 @@ type ProviderSupport struct {
 }
 
 type Provider struct {
+	*revel.Controller
 	BaseDataAction
 }
 

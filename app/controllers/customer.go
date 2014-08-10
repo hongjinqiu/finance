@@ -14,6 +14,7 @@ type CustomerSupport struct {
 }
 
 type Customer struct {
+	*revel.Controller
 	BaseDataAction
 }
 

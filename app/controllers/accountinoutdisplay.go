@@ -52,6 +52,7 @@ func (o AccountInOutDisplaySupport) RAfterNewData(sessionId int, dataSource Data
 }
 
 type AccountInOutDisplay struct {
+	*revel.Controller
 	BaseDataAction
 }
 

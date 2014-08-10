@@ -14,6 +14,7 @@ type CurrencyTypeSupport struct {
 }
 
 type CurrencyType struct {
+	*revel.Controller
 	BaseDataAction
 }
 

@@ -187,6 +187,7 @@ func (c BbsPostSupport) RAfterDeleteData(sessionId int, dataSource DataSource, f
 }
 
 type BbsPost struct {
+	*revel.Controller
 	BaseDataAction
 }
 

@@ -105,10 +105,11 @@ func (o AccountingPeriodSupport) RBeforeDeleteData(sessionId int, dataSource Dat
 }
 
 type AccountingPeriod struct {
+	*revel.Controller
 	BaseDataAction
 }
 
-func (c AccountingPeriod) RRenderCommon(modelRenderVO ModelRenderVO) revel.Result {
+func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result {
 	bo := modelRenderVO.Bo
 	relationBo := modelRenderVO.RelationBo
 	dataSource := modelRenderVO.DataSource
@@ -197,32 +198,32 @@ func (c AccountingPeriod) RRenderCommon(modelRenderVO ModelRenderVO) revel.Resul
 func (c AccountingPeriod) SaveData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.RSaveCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) DeleteData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 
 	modelRenderVO := c.RDeleteDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) EditData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.REditDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) NewData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.RNewDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) GetData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.RGetDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -231,7 +232,7 @@ func (c AccountingPeriod) GetData() revel.Result {
 func (c AccountingPeriod) CopyData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.RCopyDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -240,7 +241,7 @@ func (c AccountingPeriod) CopyData() revel.Result {
 func (c AccountingPeriod) GiveUpData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.RGiveUpDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 /**
@@ -249,7 +250,7 @@ func (c AccountingPeriod) GiveUpData() revel.Result {
 func (c AccountingPeriod) RefreshData() revel.Result {
 	c.RActionSupport = AccountingPeriodSupport{}
 	modelRenderVO := c.RRefreshDataCommon()
-	return c.RRenderCommon(modelRenderVO)
+	return c.renderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) LogList() revel.Result {

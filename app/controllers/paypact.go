@@ -14,6 +14,7 @@ type PayPactSupport struct {
 }
 
 type PayPact struct {
+	*revel.Controller
 	BaseDataAction
 }
 

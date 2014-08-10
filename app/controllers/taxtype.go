@@ -14,6 +14,7 @@ type TaxTypeSupport struct {
 }
 
 type TaxType struct {
+	*revel.Controller
 	BaseDataAction
 }
 

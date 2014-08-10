@@ -14,6 +14,7 @@ type BillTypeSupport struct {
 }
 
 type BillType struct {
+	*revel.Controller
 	BaseDataAction
 }
 
