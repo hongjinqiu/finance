@@ -195,7 +195,7 @@ func (o LoginService) DealLoginTest(sessionId int, url string) (resStruct map[st
 		}
 		sysUser = subSysUser
 	}
-	//	c.commitTxn(sessionId)
+	//	c.CommitTxn(sessionId)
 	userId = commonUtil.GetIntFromMap(sysUser, "id")
 	if isStep {
 		go StepService{}.Run(sysUser)
@@ -353,7 +353,7 @@ func (o LoginService) DealLogin(sessionId int, url string) (resStruct map[string
 		}
 		sysUser = subSysUser
 	}
-	//	c.commitTxn(sessionId)
+	//	c.CommitTxn(sessionId)
 	userId = commonUtil.GetIntFromMap(sysUser, "id")
 	if isStep {
 		go StepService{}.Run(sysUser)

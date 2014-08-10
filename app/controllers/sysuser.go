@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	"strings"
 )
 
@@ -17,65 +18,65 @@ type SysUser struct {
 }
 
 func (c SysUser) SaveData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c SysUser) DeleteData() revel.Result {
-	c.actionSupport = SysUserSupport{}
+	c.RActionSupport = SysUserSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c SysUser) EditData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c SysUser) NewData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c SysUser) GetData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c SysUser) CopyData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c SysUser) GiveUpData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c SysUser) RefreshData() revel.Result {
-	c.actionSupport = SysUserSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = SysUserSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c SysUser) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

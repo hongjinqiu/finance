@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	"strings"
 )
 
@@ -17,65 +18,65 @@ type PubReferenceLog struct {
 }
 
 func (c PubReferenceLog) SaveData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PubReferenceLog) DeleteData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
+	c.RActionSupport = PubReferenceLogSupport{}
 	
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PubReferenceLog) EditData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PubReferenceLog) NewData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PubReferenceLog) GetData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c PubReferenceLog) CopyData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c PubReferenceLog) GiveUpData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c PubReferenceLog) RefreshData() revel.Result {
-	c.actionSupport = PubReferenceLogSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PubReferenceLogSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PubReferenceLog) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

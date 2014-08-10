@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	"strings"
 )
 
@@ -17,65 +18,65 @@ type CashReport struct {
 }
 
 func (c CashReport) SaveData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c CashReport) DeleteData() revel.Result {
-	c.actionSupport = CashReportSupport{}
+	c.RActionSupport = CashReportSupport{}
 	
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c CashReport) EditData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c CashReport) NewData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c CashReport) GetData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c CashReport) CopyData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c CashReport) GiveUpData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c CashReport) RefreshData() revel.Result {
-	c.actionSupport = CashReportSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = CashReportSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c CashReport) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	"strings"
 )
 
@@ -17,65 +18,65 @@ type Bank struct {
 }
 
 func (c Bank) SaveData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c Bank) DeleteData() revel.Result {
-	c.actionSupport = BankSupport{}
+	c.RActionSupport = BankSupport{}
 	
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c Bank) EditData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c Bank) NewData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c Bank) GetData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c Bank) CopyData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c Bank) GiveUpData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c Bank) RefreshData() revel.Result {
-	c.actionSupport = BankSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c Bank) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	. "com/papersns/common"
 	. "com/papersns/component"
 	. "com/papersns/error"
@@ -22,7 +23,7 @@ type BbsPostSupport struct {
 	ActionSupport
 }
 
-func (c BbsPostSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+func (c BbsPostSupport) RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
 	master := (*bo)["A"].(map[string]interface{})
 	if fmt.Sprint(master["type"]) == "1" { // 主题帖
 		c.bbsPostAfterSaveData(sessionId, dataSource, bo, diffDateRowLi)
@@ -106,7 +107,7 @@ func (c BbsPostSupport) addOrUpdateBbsPostRead(sessionId int, bbsPostId int) {
 		"A.readBy":    userId,
 	})
 	if found {
-		bbsPost.setModifyFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
+		bbsPost.RSetModifyFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
 		bbsPostReadA := bbsPostRead["A"].(map[string]interface{})
 		bbsPostRead["A"] = bbsPostReadA
 
@@ -144,11 +145,11 @@ func (c BbsPostSupport) addBbsPostRead(sessionId int, bbsPostId int) {
 			"lastReadTime": dateUtil.GetCurrentYyyyMMddHHmmss(),
 		},
 	}
-	bbsPost.setCreateFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
+	bbsPost.RSetCreateFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
 	txnManager.Insert(txnId, "BbsPostRead", bbsPostRead)
 }
 
-func (o BbsPostSupport) beforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})   {
+func (o BbsPostSupport) RBeforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})   {
 	session, _ := global.GetConnection(sessionId)
 	// 已回复过的帖子不可删除
 	qb := QuerySupport{}
@@ -168,7 +169,7 @@ func (o BbsPostSupport) beforeDeleteData(sessionId int, dataSource DataSource, f
 	}
 }
 
-func (c BbsPostSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c BbsPostSupport) RAfterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 反过账
 	_, db := global.GetConnection(sessionId)
 	txnManager := TxnManager{db}
@@ -190,65 +191,65 @@ type BbsPost struct {
 }
 
 func (c BbsPost) SaveData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BbsPost) DeleteData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
+	c.RActionSupport = BbsPostSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BbsPost) EditData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BbsPost) NewData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BbsPost) GetData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c BbsPost) CopyData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c BbsPost) GiveUpData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c BbsPost) RefreshData() revel.Result {
-	c.actionSupport = BbsPostSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BbsPostSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BbsPost) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

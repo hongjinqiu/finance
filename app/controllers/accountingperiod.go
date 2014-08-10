@@ -4,9 +4,10 @@ import "github.com/robfig/revel"
 import (
 	. "com/papersns/common"
 	. "com/papersns/component"
+	. "com/papersns/error"
 	"com/papersns/global"
 	. "com/papersns/model"
-	. "com/papersns/error"
+	. "com/papersns/revel"
 	"fmt"
 	"strconv"
 	"strings"
@@ -20,7 +21,7 @@ type AccountingPeriodSupport struct {
 	ActionSupport
 }
 
-func (o AccountingPeriodSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o AccountingPeriodSupport) RAfterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	masterData := (*bo)["A"].(map[string]interface{})
 
 	year := time.Now().Year()
@@ -38,7 +39,7 @@ func (o AccountingPeriodSupport) afterNewData(sessionId int, dataSource DataSour
 	dataSetId := "B"
 	for i := 0; i < numAccountingPeriod; i++ {
 		data := modelTemplateFactory.GetDataSetNewData(dataSource, dataSetId, *bo)
-		data["id"] = "afterNewData" + fmt.Sprint(i)
+		data["id"] = "RAfterNewData" + fmt.Sprint(i)
 		data["sequenceNo"] = i + 1
 		numStr := fmt.Sprint(i + 1)
 		if i+1 < 10 {
@@ -66,9 +67,9 @@ func (o AccountingPeriodSupport) afterNewData(sessionId int, dataSource DataSour
 }
 
 /**
-	 删除前判断被用，会计期内有单据则视为被用
+删除前判断被用，会计期内有单据则视为被用
 */
-func (o AccountingPeriodSupport) beforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o AccountingPeriodSupport) RBeforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	bDataSetLi := (*bo)["B"].([]interface{})
 	firstLineData := bDataSetLi[0].(map[string]interface{})
 	lastLineData := bDataSetLi[len(bDataSetLi)-1].(map[string]interface{})
@@ -98,17 +99,16 @@ func (o AccountingPeriodSupport) beforeDeleteData(sessionId int, dataSource Data
 		collectionName := modelTemplateFactory.GetCollectionName(tmpDataSource)
 		_, found := qb.FindByMapWithSession(session, collectionName, queryMap)
 		if found {
-			panic(BusinessError{Message:"会计期范围内存在单据，不能删除"})
+			panic(BusinessError{Message: "会计期范围内存在单据，不能删除"})
 		}
 	}
 }
-
 
 type AccountingPeriod struct {
 	BaseDataAction
 }
 
-func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result {
+func (c AccountingPeriod) RRenderCommon(modelRenderVO ModelRenderVO) revel.Result {
 	bo := modelRenderVO.Bo
 	relationBo := modelRenderVO.RelationBo
 	dataSource := modelRenderVO.DataSource
@@ -157,7 +157,7 @@ func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result
 				masterUsedCheck := usedCheckBo["A"].(map[string]interface{})
 				usedCheckBo["A"] = masterUsedCheck
 				masterUsedCheck[strId] = true
-				
+
 				// 分录数据集设置被用标记
 				if usedCheckBo["B"] == nil {
 					usedCheckBo["B"] = map[string]interface{}{}
@@ -195,65 +195,65 @@ func (c AccountingPeriod) renderCommon(modelRenderVO ModelRenderVO) revel.Result
 }
 
 func (c AccountingPeriod) SaveData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) DeleteData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
+	c.RActionSupport = AccountingPeriodSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) EditData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) NewData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) GetData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c AccountingPeriod) CopyData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c AccountingPeriod) GiveUpData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c AccountingPeriod) RefreshData() revel.Result {
-	c.actionSupport = AccountingPeriodSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = AccountingPeriodSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c AccountingPeriod) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

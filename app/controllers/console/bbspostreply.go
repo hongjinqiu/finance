@@ -25,7 +25,7 @@ func (c Console) BbsPostAdminReplySchema() revel.Result {
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	schemaName := c.Params.Get("@name")
 
@@ -40,7 +40,7 @@ func (c Console) BbsPostAdminReplySchema() revel.Result {
 		panic(err)
 	}
 	c.addOrUpdateBbsPostRead(sessionId, bbsPostId)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -66,7 +66,7 @@ func (c Console) BbsPostReplySchema() revel.Result {
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	schemaName := c.Params.Get("@name")
 
@@ -81,7 +81,7 @@ func (c Console) BbsPostReplySchema() revel.Result {
 		panic(err)
 	}
 	c.addOrUpdateBbsPostRead(sessionId, bbsPostId)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -102,7 +102,7 @@ func (c Console) BbsPostReplySchema() revel.Result {
 	}
 }
 
-func (c Console) commitTxn(sessionId int) {
+func (c Console) CommitTxn(sessionId int) {
 	txnId := global.GetGlobalAttr(sessionId, "txnId")
 	if txnId != nil {
 		_, db := global.GetConnection(sessionId)
@@ -111,7 +111,7 @@ func (c Console) commitTxn(sessionId int) {
 	}
 }
 
-func (c Console) rollbackTxn(sessionId int) {
+func (c Console) RRollbackTxn(sessionId int) {
 	txnId := global.GetGlobalAttr(sessionId, "txnId")
 	if txnId != nil {
 		if x := recover(); x != nil {
@@ -142,7 +142,7 @@ func (c Console) addOrUpdateBbsPostRead(sessionId int, bbsPostId int) {
 		"A.readBy":     userId,
 	})
 	if found {
-		c.setModifyFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
+		c.RSetModifyFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
 		bbsPostReadA := bbsPostRead["A"].(map[string]interface{})
 		bbsPostRead["A"] = bbsPostReadA
 
@@ -179,11 +179,11 @@ func (c Console) addBbsPostRead(sessionId int, bbsPostId int) {
 			"lastReadTime": dateUtil.GetCurrentYyyyMMddHHmmss(),
 		},
 	}
-	c.setCreateFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
+	c.RSetCreateFixFieldValue(sessionId, bbsPostReadDS, &bbsPostRead)
 	txnManager.Insert(txnId, "BbsPostRead", bbsPostRead)
 }
 
-func (c Console) setCreateFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c Console) RSetCreateFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 	var result interface{} = ""
 	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
@@ -211,7 +211,7 @@ func (c Console) setCreateFixFieldValue(sessionId int, dataSource DataSource, bo
 	})
 }
 
-func (c Console) setModifyFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c Console) RSetModifyFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 	var result interface{} = ""
 	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
@@ -244,7 +244,7 @@ func (c Console) setModifyFixFieldValue(sessionId int, dataSource DataSource, bo
 	if err != nil {
 		panic(err)
 	}
-	log.Println("setModifyFixFieldValue,collectionName:" + collectionName + ", query:" + string(srcQueryByte))
+	log.Println("RSetModifyFixFieldValue,collectionName:" + collectionName + ", query:" + string(srcQueryByte))
 	db.C(collectionName).Find(srcQuery).One(&srcBo)
 	modelIterator := ModelIterator{}
 	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {

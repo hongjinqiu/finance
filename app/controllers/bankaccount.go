@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	. "com/papersns/component"
 	. "com/papersns/error"
 	"com/papersns/global"
@@ -23,7 +24,7 @@ type BankAccountSupport struct {
 /**
 * 为避免并发问题,重设amtOriginalCurrencyBalance为数据库中值
  */
-func (o BankAccountSupport) beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o BankAccountSupport) RBeforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	session, _ := global.GetConnection(sessionId)
 	modelTemplateFactory := ModelTemplateFactory{}
 	strId := modelTemplateFactory.GetStrId(*bo)
@@ -72,7 +73,7 @@ func (o BankAccountSupport) beforeSaveData(sessionId int, dataSource DataSource,
 	}
 }
 
-func (c BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c BankAccountSupport) RAfterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSetId := "B"
 	data := modelTemplateFactory.GetDataSetNewData(dataSource, dataSetId, *bo)
@@ -101,7 +102,7 @@ func (c BankAccountSupport) afterNewData(sessionId int, dataSource DataSource, f
 	}
 }
 
-func (c BankAccountSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+func (c BankAccountSupport) RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
 	for _, item := range *diffDataRowLi {
 		if item.FieldGroupLi[0].GetDataSetId() == "B" { // 币别分录
 			if item.SrcData != nil && item.DestData != nil { // 修改
@@ -207,9 +208,9 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 		boMaster := bo["A"].(map[string]interface{})
 		boMaster["id"] = masterSeqId
 		bo["A"] = boMaster
-		bankAccountAction.setCreateFixFieldValue(sessionId, dataSource, &bo)
+		bankAccountAction.RSetCreateFixFieldValue(sessionId, dataSource, &bo)
 	} else {
-		bankAccountAction.setModifyFixFieldValue(sessionId, dataSource, &bo)
+		bankAccountAction.RSetModifyFixFieldValue(sessionId, dataSource, &bo)
 	}
 
 	if diffDataType == ADD {
@@ -227,7 +228,7 @@ func (c BankAccountSupport) logBankAccountCurrencyType(sessionId int, bankAccoun
 	}
 }
 
-func (c BankAccountSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c BankAccountSupport) RAfterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 直接删除,整个删除 账户币别中的数据
 	bankAccountMasterData := (*bo)["A"].(map[string]interface{})
 	_, db := global.GetConnection(sessionId)
@@ -245,65 +246,65 @@ type BankAccount struct {
 }
 
 func (c BankAccount) SaveData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BankAccount) DeleteData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
+	c.RActionSupport = BankAccountSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BankAccount) EditData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BankAccount) NewData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BankAccount) GetData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c BankAccount) CopyData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c BankAccount) GiveUpData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c BankAccount) RefreshData() revel.Result {
-	c.actionSupport = BankAccountSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = BankAccountSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BankAccount) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {

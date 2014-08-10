@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	. "com/papersns/accountinout"
 	. "com/papersns/component"
 	. "com/papersns/error"
@@ -22,7 +23,7 @@ type GatheringBillSupport struct {
 	ActionSupport
 }
 
-func (c GatheringBillSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c GatheringBillSupport) RAfterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	master := (*bo)["A"].(map[string]interface{})
 	(*bo)["A"] = master
 	modelTemplateFactory := ModelTemplateFactory{}
@@ -64,7 +65,7 @@ func (c GatheringBillSupport) afterNewData(sessionId int, dataSource DataSource,
 	c.setBillNo(sessionId, bo)
 }
 
-func (o GatheringBillSupport) afterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o GatheringBillSupport) RAfterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 单据编号
 	o.setBillNo(sessionId, bo)
 }
@@ -131,7 +132,7 @@ func (c GatheringBillSupport) getDestDiffDataRowItem(diffDataRow DiffDataRow) Di
 	return tmpItem
 }
 
-func (c GatheringBillSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+func (c GatheringBillSupport) RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
 	for _, item := range *diffDataRowLi {
 		if item.SrcData != nil && item.DestData != nil { // 修改
 			// 旧数据反过账,新数据正过账
@@ -265,7 +266,7 @@ func (c GatheringBillSupport) checkLimitsControlPanicMessage(sessionId int, bo m
 	}
 }
 
-func (c GatheringBillSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c GatheringBillSupport) RAfterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	masterData := (*bo)["A"].(map[string]interface{})
 	if fmt.Sprint(masterData["billStatus"]) == "4" {// 4为已作废,已作废单据不过账,不检查赤字
 		return
@@ -502,7 +503,7 @@ func (c GatheringBillSupport) logAccountForDetailB(sessionId int, dataSource Dat
 /**
  * 作废过账,赤字判断
 */
-func (c GatheringBillSupport) afterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})   {
+func (c GatheringBillSupport) RAfterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})   {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	// 过账,
@@ -530,7 +531,7 @@ func (c GatheringBillSupport) afterCancelData(sessionId int, dataSource DataSour
 /**
  * 反作废过账,赤字判断
 */
-func (c GatheringBillSupport) afterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})  {
+func (c GatheringBillSupport) RAfterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})  {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	// 过账,
@@ -560,65 +561,65 @@ type GatheringBill struct {
 }
 
 func (c GatheringBill) SaveData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) DeleteData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
+	c.RActionSupport = GatheringBillSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) EditData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) NewData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) GetData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c GatheringBill) CopyData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c GatheringBill) GiveUpData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c GatheringBill) RefreshData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c GatheringBill) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -633,16 +634,16 @@ func (c GatheringBill) LogList() revel.Result {
  * 作废
  */
 func (c GatheringBill) CancelData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.cancelDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RCancelDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 反作废
  */
 func (c GatheringBill) UnCancelData() revel.Result {
-	c.actionSupport = GatheringBillSupport{}
-	modelRenderVO := c.unCancelDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = GatheringBillSupport{}
+	modelRenderVO := c.RUnCancelDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }

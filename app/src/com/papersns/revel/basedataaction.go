@@ -21,27 +21,27 @@ func init() {
 }
 
 type IActionSupport interface {
-	beforeNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate)
-	afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate)
-	afterGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, srcBo map[string]interface{})
-	afterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	editValidate(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo map[string]interface{}) (string, bool)
-	beforeEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow)
-	beforeGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	beforeUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
-	afterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate)
+	RAfterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate)
+	RAfterGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, srcBo map[string]interface{})
+	RAfterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	REditValidate(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo map[string]interface{}) (string, bool)
+	RBeforeEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow)
+	RBeforeGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RBeforeUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
+	RAfterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{})
 }
 
 type ModelRenderVO struct {
@@ -56,56 +56,56 @@ type ModelRenderVO struct {
 type ActionSupport struct {
 }
 
-func (o ActionSupport) beforeNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate) {
+func (o ActionSupport) RBeforeNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate) {
 }
-func (o ActionSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate) {
+func (o ActionSupport) RBeforeGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate) {
 }
-func (o ActionSupport) afterGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterGetData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, srcBo map[string]interface{}) {
+func (o ActionSupport) RBeforeCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, srcBo map[string]interface{}) {
 }
-func (o ActionSupport) afterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) editValidate(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo map[string]interface{}) (string, bool) {
+func (o ActionSupport) REditValidate(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo map[string]interface{}) (string, bool) {
 	return "", true
 }
-func (o ActionSupport) beforeEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterEditData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+func (o ActionSupport) RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
 }
-func (o ActionSupport) beforeGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterGiveUpData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterRefreshData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) beforeUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RBeforeUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
-func (o ActionSupport) afterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o ActionSupport) RAfterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 }
 
 type BaseDataAction struct {
 	*revel.Controller
-	actionSupport IActionSupport
+	RActionSupport IActionSupport
 }
 
-func (c BaseDataAction) setCreateFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) RSetCreateFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 	var result interface{} = ""
 	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
@@ -133,7 +133,7 @@ func (c BaseDataAction) setCreateFixFieldValue(sessionId int, dataSource DataSou
 	})
 }
 
-func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
+func (c BaseDataAction) RSetModifyFixFieldValue(sessionId int, dataSource DataSource, bo *map[string]interface{}) {
 	var result interface{} = ""
 	userId, err := strconv.Atoi(fmt.Sprint(global.GetGlobalAttr(sessionId, "userId")))
 	if err != nil {
@@ -165,7 +165,7 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 	if err != nil {
 		panic(err)
 	}
-	log.Println("setModifyFixFieldValue,collectionName:" + collectionName + ", query:" + string(srcQueryByte))
+	log.Println("RSetModifyFixFieldValue,collectionName:" + collectionName + ", query:" + string(srcQueryByte))
 	db.C(collectionName).Find(srcQuery).One(&srcBo)
 	modelIterator := ModelIterator{}
 	modelIterator.IterateDiffBo(dataSource, bo, srcBo, &result, func(fieldGroupLi []FieldGroup, destData *map[string]interface{}, srcData map[string]interface{}, result *interface{}) {
@@ -191,7 +191,7 @@ func (c BaseDataAction) setModifyFixFieldValue(sessionId int, dataSource DataSou
 	})
 }
 
-func (c BaseDataAction) rollbackTxn(sessionId int) {
+func (c BaseDataAction) RRollbackTxn(sessionId int) {
 	txnId := global.GetGlobalAttr(sessionId, "txnId")
 	if txnId != nil {
 		if x := recover(); x != nil {
@@ -203,7 +203,7 @@ func (c BaseDataAction) rollbackTxn(sessionId int) {
 	}
 }
 
-func (c BaseDataAction) commitTxn(sessionId int) {
+func (c BaseDataAction) CommitTxn(sessionId int) {
 	txnId := global.GetGlobalAttr(sessionId, "txnId")
 	if txnId != nil {
 		_, db := global.GetConnection(sessionId)
@@ -212,7 +212,7 @@ func (c BaseDataAction) commitTxn(sessionId int) {
 	}
 }
 
-func (c BaseDataAction) renderCommon(modelRenderVO ModelRenderVO) revel.Result {
+func (c BaseDataAction) RRenderCommon(modelRenderVO ModelRenderVO) revel.Result {
 	bo := modelRenderVO.Bo
 	relationBo := modelRenderVO.RelationBo
 	dataSource := modelRenderVO.DataSource
@@ -250,18 +250,18 @@ func (c BaseDataAction) renderCommon(modelRenderVO ModelRenderVO) revel.Result {
  * 新增
  */
 func (c BaseDataAction) NewData() revel.Result {
-	c.actionSupport = ActionSupport{}
+	c.RActionSupport = ActionSupport{}
 
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) newDataCommon() ModelRenderVO {
+func (c BaseDataAction) RNewDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -274,9 +274,9 @@ func (c BaseDataAction) newDataCommon() ModelRenderVO {
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	templateManager := TemplateManager{}
 	formTemplate := templateManager.GetFormTemplate(formTemplateId)
-	c.actionSupport.beforeNewData(sessionId, dataSource, formTemplate)
+	c.RActionSupport.RBeforeNewData(sessionId, dataSource, formTemplate)
 	bo := modelTemplateFactory.GetInstanceByDS(dataSource)
-	c.actionSupport.afterNewData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterNewData(sessionId, dataSource, formTemplate, &bo)
 
 	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
@@ -284,7 +284,7 @@ func (c BaseDataAction) newDataCommon() ModelRenderVO {
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
 
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -295,17 +295,17 @@ func (c BaseDataAction) newDataCommon() ModelRenderVO {
 }
 
 func (c BaseDataAction) GetData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) getDataCommon() ModelRenderVO {
+func (c BaseDataAction) RGetDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -336,12 +336,12 @@ func (c BaseDataAction) getDataCommon() ModelRenderVO {
 	modelTemplateFactory := ModelTemplateFactory{}
 	dataSource := modelTemplateFactory.GetDataSource(dataSourceModelId)
 	collectionName := modelTemplateFactory.GetCollectionName(dataSource)
-	c.actionSupport.beforeGetData(sessionId, dataSource, formTemplate)
+	c.RActionSupport.RBeforeGetData(sessionId, dataSource, formTemplate)
 	bo, found := querySupport.FindByMapWithSession(session, collectionName, queryMap)
 	if !found {
 		panic("GetData, dataSouceModelId=" + dataSourceModelId + ", id=" + strId + " not found")
 	}
-	c.actionSupport.afterGetData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterGetData(sessionId, dataSource, formTemplate, &bo)
 
 	usedCheck := UsedCheck{}
 	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
@@ -367,17 +367,17 @@ func (c BaseDataAction) getDataCommon() ModelRenderVO {
  * 复制
  */
 func (c BaseDataAction) CopyData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) copyDataCommon() ModelRenderVO {
+func (c BaseDataAction) RCopyDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -413,16 +413,16 @@ func (c BaseDataAction) copyDataCommon() ModelRenderVO {
 	}
 
 	modelTemplateFactory.ConvertDataType(dataSource, &srcBo)
-	c.actionSupport.beforeCopyData(sessionId, dataSource, formTemplate, srcBo)
+	c.RActionSupport.RBeforeCopyData(sessionId, dataSource, formTemplate, srcBo)
 	dataSource, bo := modelTemplateFactory.GetCopyInstance(dataSourceModelId, srcBo)
-	c.actionSupport.afterCopyData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterCopyData(sessionId, dataSource, formTemplate, &bo)
 
 	columnModelData := templateManager.GetColumnModelDataForFormTemplate(sessionId, formTemplate, bo)
 	bo = columnModelData["bo"].(map[string]interface{})
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -436,18 +436,18 @@ func (c BaseDataAction) copyDataCommon() ModelRenderVO {
  * 修改,只取数据,没涉及到数据库保存,涉及到数据库保存的方法是SaveData,
  */
 func (c BaseDataAction) EditData() revel.Result {
-	c.actionSupport = ActionSupport{}
+	c.RActionSupport = ActionSupport{}
 
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) editDataCommon() ModelRenderVO {
+func (c BaseDataAction) REditDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -483,13 +483,13 @@ func (c BaseDataAction) editDataCommon() ModelRenderVO {
 	}
 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, formTemplate, bo)
+	editMessage, isValid := c.RActionSupport.REditValidate(sessionId, dataSource, formTemplate, bo)
 	if !isValid {
 		panic(editMessage)
 	}
 
-	c.actionSupport.beforeEditData(sessionId, dataSource, formTemplate, &bo)
-	c.actionSupport.afterEditData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RBeforeEditData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterEditData(sessionId, dataSource, formTemplate, &bo)
 
 	usedCheck := UsedCheck{}
 	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
@@ -499,7 +499,7 @@ func (c BaseDataAction) editDataCommon() ModelRenderVO {
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -514,17 +514,17 @@ func (c BaseDataAction) editDataCommon() ModelRenderVO {
  * 保存
  */
 func (c BaseDataAction) SaveData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) saveCommon() ModelRenderVO {
+func (c BaseDataAction) RSaveCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -548,21 +548,21 @@ func (c BaseDataAction) saveCommon() ModelRenderVO {
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
 	strId := modelTemplateFactory.GetStrId(bo)
 	if strId == "" || strId == "0" {
-		c.setCreateFixFieldValue(sessionId, dataSource, &bo)
+		c.RSetCreateFixFieldValue(sessionId, dataSource, &bo)
 	} else {
-		c.setModifyFixFieldValue(sessionId, dataSource, &bo)
-		editMessage, isValid := c.actionSupport.editValidate(sessionId, dataSource, formTemplate, bo)
+		c.RSetModifyFixFieldValue(sessionId, dataSource, &bo)
+		editMessage, isValid := c.RActionSupport.REditValidate(sessionId, dataSource, formTemplate, bo)
 		if !isValid {
 			panic(editMessage)
 		}
 	}
 
-	c.actionSupport.beforeSaveData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RBeforeSaveData(sessionId, dataSource, formTemplate, &bo)
 	financeService := FinanceService{}
 
 	diffDataRowLi := financeService.SaveData(sessionId, dataSource, &bo)
 
-	c.actionSupport.afterSaveData(sessionId, dataSource, formTemplate, &bo, diffDataRowLi)
+	c.RActionSupport.RAfterSaveData(sessionId, dataSource, formTemplate, &bo, diffDataRowLi)
 
 	querySupport := QuerySupport{}
 	queryMap := map[string]interface{}{
@@ -585,7 +585,7 @@ func (c BaseDataAction) saveCommon() ModelRenderVO {
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -600,17 +600,17 @@ func (c BaseDataAction) saveCommon() ModelRenderVO {
  * 放弃保存,回到浏览状态
  */
 func (c BaseDataAction) GiveUpData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) giveUpDataCommon() ModelRenderVO {
+func (c BaseDataAction) RGiveUpDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -646,8 +646,8 @@ func (c BaseDataAction) giveUpDataCommon() ModelRenderVO {
 	}
 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.actionSupport.beforeGiveUpData(sessionId, dataSource, formTemplate, &bo)
-	c.actionSupport.afterGiveUpData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RBeforeGiveUpData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterGiveUpData(sessionId, dataSource, formTemplate, &bo)
 
 	usedCheck := UsedCheck{}
 	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
@@ -657,7 +657,7 @@ func (c BaseDataAction) giveUpDataCommon() ModelRenderVO {
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -672,10 +672,10 @@ func (c BaseDataAction) giveUpDataCommon() ModelRenderVO {
  * 删除
  */
 func (c BaseDataAction) DeleteData() revel.Result {
-	c.actionSupport = ActionSupport{}
+	c.RActionSupport = ActionSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c BaseDataAction) setRequestParameterToBo(bo *map[string]interface{}) {
@@ -694,12 +694,12 @@ func (c BaseDataAction) setRequestParameterToBo(bo *map[string]interface{}) {
 	}
 }
 
-func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
+func (c BaseDataAction) RDeleteDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -742,7 +742,7 @@ func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
 	c.setRequestParameterToBo(&bo)
 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.actionSupport.beforeDeleteData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RBeforeDeleteData(sessionId, dataSource, formTemplate, &bo)
 
 	usedCheck := UsedCheck{}
 	if usedCheck.CheckUsed(sessionId, dataSource, bo) {
@@ -764,7 +764,7 @@ func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
 		panic("删除失败")
 	}
 
-	c.actionSupport.afterDeleteData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterDeleteData(sessionId, dataSource, formTemplate, &bo)
 
 	// 列表页也调用这个删除方法,但是列表页又没有传递formTemplateId
 	relationBo := map[string]interface{}{}
@@ -776,7 +776,7 @@ func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
 	}
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -790,17 +790,17 @@ func (c BaseDataAction) deleteDataCommon() ModelRenderVO {
  * 刷新
  */
 func (c BaseDataAction) RefreshData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
-func (c BaseDataAction) refreshDataCommon() ModelRenderVO {
+func (c BaseDataAction) RRefreshDataCommon() ModelRenderVO {
 	sessionId := global.GetSessionId()
 	global.SetGlobalAttr(sessionId, "userId", c.Session["userId"])
 	global.SetGlobalAttr(sessionId, "adminUserId", c.Session["adminUserId"])
 	defer global.CloseSession(sessionId)
-	defer c.rollbackTxn(sessionId)
+	defer c.RRollbackTxn(sessionId)
 
 	userId, err := strconv.Atoi(c.Session["userId"])
 	if err != nil {
@@ -836,8 +836,8 @@ func (c BaseDataAction) refreshDataCommon() ModelRenderVO {
 	}
 
 	modelTemplateFactory.ConvertDataType(dataSource, &bo)
-	c.actionSupport.beforeRefreshData(sessionId, dataSource, formTemplate, &bo)
-	c.actionSupport.afterRefreshData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RBeforeRefreshData(sessionId, dataSource, formTemplate, &bo)
+	c.RActionSupport.RAfterRefreshData(sessionId, dataSource, formTemplate, &bo)
 
 	usedCheck := UsedCheck{}
 	usedCheckBo := usedCheck.GetFormUsedCheck(sessionId, dataSource, bo)
@@ -847,7 +847,7 @@ func (c BaseDataAction) refreshDataCommon() ModelRenderVO {
 	relationBo := columnModelData["relationBo"].(map[string]interface{})
 
 	modelTemplateFactory.ClearReverseRelation(&dataSource)
-	c.commitTxn(sessionId)
+	c.CommitTxn(sessionId)
 	return ModelRenderVO{
 		UserId:       userId,
 		Bo:           bo,
@@ -862,7 +862,7 @@ func (c BaseDataAction) refreshDataCommon() ModelRenderVO {
  * 被用查询
  */
 func (c BaseDataAction) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -873,7 +873,7 @@ func (c BaseDataAction) LogList() revel.Result {
 	return c.Render()
 }
 
-func (c BaseDataAction) logListCommon() map[string]interface{} {
+func (c BaseDataAction) RLogListCommon() map[string]interface{} {
 	dataSourceModelId := c.Params.Get("dataSourceModelId")
 	//formTemplateId := c.Params.Get("formTemplateId")
 	strId := c.Params.Get("id")

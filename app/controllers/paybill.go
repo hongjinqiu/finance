@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	. "com/papersns/accountinout"
 	. "com/papersns/common"
 	. "com/papersns/component"
@@ -22,7 +23,7 @@ type PayBillSupport struct {
 	ActionSupport
 }
 
-func (c PayBillSupport) afterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c PayBillSupport) RAfterNewData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	master := (*bo)["A"].(map[string]interface{})
 	modelTemplateFactory := ModelTemplateFactory{}
 	billTypeParameterDataSource := modelTemplateFactory.GetDataSource("BillPaymentTypeParameter")
@@ -63,7 +64,7 @@ func (c PayBillSupport) afterNewData(sessionId int, dataSource DataSource, formT
 	c.setBillNo(sessionId, bo)
 }
 
-func (o PayBillSupport) afterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (o PayBillSupport) RAfterCopyData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	// 单据编号
 	o.setBillNo(sessionId, bo)
 }
@@ -130,7 +131,7 @@ func (c PayBillSupport) getDestDiffDataRowItem(diffDataRow DiffDataRow) DiffData
 	return tmpItem
 }
 
-func (c PayBillSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
+func (c PayBillSupport) RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDataRowLi *[]DiffDataRow) {
 	for _, item := range *diffDataRowLi {
 		if item.SrcData != nil && item.DestData != nil { // 修改
 			// 旧数据反过账,新数据正过账
@@ -264,7 +265,7 @@ func (c PayBillSupport) checkLimitsControlPanicMessage(sessionId int, bo map[str
 	}
 }
 
-func (c PayBillSupport) afterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c PayBillSupport) RAfterDeleteData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	masterData := (*bo)["A"].(map[string]interface{})
 	if fmt.Sprint(masterData["billStatus"]) == "4" { // 4为已作废,已作废单据不过账,不检查赤字
 		return
@@ -501,7 +502,7 @@ func (c PayBillSupport) logAccountForDetailB(sessionId int, dataSource DataSourc
 /**
  * 作废过账,赤字判断
  */
-func (c PayBillSupport) afterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c PayBillSupport) RAfterCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	// 过账,
@@ -529,7 +530,7 @@ func (c PayBillSupport) afterCancelData(sessionId int, dataSource DataSource, fo
 /**
  * 反作废过账,赤字判断
  */
-func (c PayBillSupport) afterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+func (c PayBillSupport) RAfterUnCancelData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
 	modelIterator := ModelIterator{}
 	var result interface{} = ""
 	// 过账,
@@ -559,65 +560,65 @@ type PayBill struct {
 }
 
 func (c PayBill) SaveData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PayBill) DeleteData() revel.Result {
-	c.actionSupport = PayBillSupport{}
+	c.RActionSupport = PayBillSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PayBill) EditData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PayBill) NewData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PayBill) GetData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c PayBill) CopyData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c PayBill) GiveUpData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c PayBill) RefreshData() revel.Result {
-	c.actionSupport = PayBillSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = PayBillSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c PayBill) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -632,16 +633,16 @@ func (c PayBill) LogList() revel.Result {
  * 作废
  */
 func (c PayBill) CancelData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.cancelDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RCancelDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 反作废
  */
 func (c PayBill) UnCancelData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.unCancelDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RUnCancelDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }

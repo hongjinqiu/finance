@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	. "com/papersns/component"
 	. "com/papersns/model"
 	. "com/papersns/model/handler"
@@ -15,12 +16,12 @@ type ActionTestSupport struct {
 	ActionSupport
 }
 
-func (c ActionTestSupport) beforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
-	println("ActionTestSupport beforeSaveData")
+func (c ActionTestSupport) RBeforeSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}) {
+	println("ActionTestSupport RBeforeSaveData")
 }
 
-func (c ActionTestSupport) afterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
-	println("ActionTestSupport afterSaveData")
+func (c ActionTestSupport) RAfterSaveData(sessionId int, dataSource DataSource, formTemplate FormTemplate, bo *map[string]interface{}, diffDateRowLi *[]DiffDataRow) {
+	println("ActionTestSupport RAfterSaveData")
 }
 
 type ActionTest struct {
@@ -28,65 +29,65 @@ type ActionTest struct {
 }
 
 func (c ActionTest) SaveData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.saveCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RSaveCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c ActionTest) DeleteData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
+	c.RActionSupport = ActionTestSupport{}
 
-	modelRenderVO := c.deleteDataCommon()
-	return c.renderCommon(modelRenderVO)
+	modelRenderVO := c.RDeleteDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c ActionTest) EditData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.editDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.REditDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c ActionTest) NewData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.newDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RNewDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c ActionTest) GetData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.getDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RGetDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 复制
  */
 func (c ActionTest) CopyData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.copyDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RCopyDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 放弃保存,回到浏览状态
  */
 func (c ActionTest) GiveUpData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.giveUpDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RGiveUpDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 /**
  * 刷新
  */
 func (c ActionTest) RefreshData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.refreshDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RRefreshDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c ActionTest) LogList() revel.Result {
-	result := c.logListCommon()
+	result := c.RLogListCommon()
 
 	format := c.Params.Get("format")
 	if strings.ToLower(format) == "json" {
@@ -98,13 +99,13 @@ func (c ActionTest) LogList() revel.Result {
 }
 
 func (c ActionTest) CancelData() revel.Result {
-	c.actionSupport = ActionTestSupport{}
-	modelRenderVO := c.cancelDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionTestSupport{}
+	modelRenderVO := c.RCancelDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }
 
 func (c ActionTest) UnCancelData() revel.Result {
-	c.actionSupport = ActionSupport{}
-	modelRenderVO := c.unCancelDataCommon()
-	return c.renderCommon(modelRenderVO)
+	c.RActionSupport = ActionSupport{}
+	modelRenderVO := c.RUnCancelDataCommon()
+	return c.RRenderCommon(modelRenderVO)
 }

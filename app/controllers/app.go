@@ -2,6 +2,7 @@ package controllers
 
 import "github.com/robfig/revel"
 import (
+	. "com/papersns/revel"
 	"bytes"
 	. "com/papersns/common"
 	. "com/papersns/component"

@@ -197,7 +197,25 @@ js压缩输出时,添加日期标记，用读取配置文件的方式输出,并�
 	1.install git,finish,
 	2.install pip,
 	3.install go,
+	
+	3.2.上传mongoDB,并进行配置,
+	2.0.2,环境变量的配置,
+	2.0.3.建目录 /data/db,
+	mv xxx /usr/local/lib/
+	mkdir /data/db
+	mkdir /var/lib/mongodb
+	mkdir /var/log/mongodb
+	2.0.3.启动的设置，/etc/rc.local,running,---------------,
+	
+	
 	3.1.开始配置go,并着手准备go的相关本地的goworkspace的东东,准备上传,
+	3.1.配置goworkspace的东东,finish，
+	3.2.配置系统变量，
+	3.3.go install revel,
+	3.4.revel run finance看是否成功,折腾一番，
+	3.5.编写部署脚本，
+	3.6.接入测试，要修改成改用域名?话说域名在哪里?
+	
 	
 12.相关文件上传到github，finish,
 13.可否部署成功的折腾，
