@@ -275,8 +275,28 @@
 						<displayField>code,name</displayField>
 						<valueField>id</valueField>
 					</relationItem>
+					<relationItem name="BbsPost">
+						<id>BbsPostSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "BbsPost"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "BbsPost"</jsRelationExpr>
+						<relationModelId>BbsPost</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>title</displayField>
+						<valueField>id</valueField>
+					</relationItem>
+					<!-- <relationItem name="BbsPostRead">
+						<id>BbsPostReadSelector</id>
+						<relationExpr mode="python">data["referenceDataSourceModelId"] == "BbsPostRead"</relationExpr>
+						<jsRelationExpr mode="js">data["referenceDataSourceModelId"] == "BbsPostRead"</jsRelationExpr>
+						<relationModelId>BbsPostRead</relationModelId>
+						<relationDataSetId>A</relationDataSetId>
+						<displayField>bbsPostId</displayField>
+						<valueField>id</valueField>
+					</relationItem> -->
 				</relationDS>
 			</field>
 		</bizField>
 	</masterData>
+	
+	
 </datasource>

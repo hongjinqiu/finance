@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list-template xmlns="http://www.papersns.com/template" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.papersns.com/template http://www.papersns.com/template ">
 	<id>BbsPostReply</id>
-	<selector-id>BbsPostSelector</selector-id>
+	<selector-id>BbsPostReplySelector</selector-id>
 	<data-source-model-id>BbsPost</data-source-model-id>
 
 	<adapter name="ModelListTemplateAdapter" />

@@ -1210,6 +1210,30 @@ td.tip-bg-image {
 	vertical-align: middle;
 }
 
+.instructionTable {
+	width: 100%;
+}
 
+.instructionTable th, .instructionTable td {
+	border: 0px;
+}
+
+.instructionTable-left {
+	padding: 5px;
+	line-height: 25px;
+	padding-left: 10px;
+}
+
+.instructionTable-left a:hover {
+	color:#F00;
+}
+
+.instructionTable-childContent {
+	line-height: 20px;
+}
+
+.instructionTable-childContent-content {
+	margin-left: 40px;
+}
 
 

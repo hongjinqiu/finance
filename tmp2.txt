@@ -185,36 +185,22 @@ js压缩输出时,添加日期标记，用读取配置文件的方式输出,并�
 10.80*80的图标，finish，
 
 1.先测试一下应用环境下为什么会被缓存住，否则问题就大了，测试中,finish，改掉了一个bug，
-1.1.接入测试，running,----------------------，
-	OAUTH_ENV_URL = https://eco.taobao.com/router/rest			开发测试相同,
-	OAUTH_TOKEN_ENV_URL = https://oauth.taobao.com/token		开发测试相同,
-	OAUTH_LOGOUT_PATH = http://localhost:9000/hjq/login			正式环境为:	OAUTH_LOGOUT_PATH = https://oauth.taobao.com/logoff，
-	REDIRECT_URI = http://127.0.0.1:9000/								正式环境需要上线后修改，
-	TAOBAO_APP_KEY_FINANCE = 21210514							需要修改，
-	TAOBAO_APP_SECRET_FINANCE = sandbox2e27c6e6feda44114bbf6d1d8	需要修改，
-	TAOBAO_PATH = http://www.taobao.com
-	PYTHON_PARSE_URL = http://localhost:8000/pyscript/parse/
-
-
-OAUTH_ENV_URL = https://gw.api.tbsandbox.com/router/rest
-OAUTH_TOKEN_ENV_URL = https://oauth.tbsandbox.com/token
-OAUTH_LOGOUT_PATH = http://localhost:9000/hjq/login
-REDIRECT_URI = http://127.0.0.1:9000/
-TAOBAO_APP_KEY_FINANCE = 1021821702
-TAOBAO_APP_SECRET_FINANCE = sandbox3f2883d0ab2c942caae7f69b5
-
-_linux加入error的记录，
-
 	相关的变量名是否正确?
 15.简单的并发测试，有时间就做，没时间就不做，挂起，
 
 10.最后才是接入是否正确，成功，
+11.建立使用说明的页面，running,----------------,
+	我的菜单:http://localhost:9000/app/menulist,
+	意见反馈:listschema?@name=BbsPost,
 11.购买服务器，准备部署的东东，running,---------------------------,
 	go1.3,python,revel,mongodb,git,
+	1.install git,finish,
+	2.install pip,
+	3.install go,
+	3.1.开始配置go,并着手准备go的相关本地的goworkspace的东东,准备上传,
 	
-12.相关文件上传到github，
+12.相关文件上传到github，finish,
 13.可否部署成功的折腾，
-11.建立使用说明的页面，
 12.
 
 

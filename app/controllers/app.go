@@ -704,6 +704,10 @@ func (c App) MenuList() revel.Result {
 	return c.Render(result)
 }
 
+func (c App) Instructions() revel.Result {
+	return c.Render()
+}
+
 func (c App) Logout() revel.Result {
 	c.Session["userId"] = ""
 	c.Session["adminUserId"] = ""
