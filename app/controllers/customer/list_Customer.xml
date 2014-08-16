@@ -16,11 +16,13 @@
 		<button text="删除" mode="fn" handler="g_deleteRecords" iconCls="but_box">
 		</button>
 		<button text="新增" mode="url!" handler="/console/formschema?@name=Customer" iconCls="but_box" use-in="selector" />	</toolbar>
+	
+	<security byUnit="true"/>
 
-	<data-customer size="10">
+	<data-provider size="10">
 		<collection></collection><!-- mongoDB collection name -->
 		<fix-bson-query></fix-bson-query><!-- mongoDB fix query, json format -->
-	</data-customer>
+	</data-provider>
 
 	<column-model selectionMode="checkbox" rownumber="true" selectionTitle="已选客户" selectionTemplate="{code},{name}" bsonOrderBy="code" dataSetId="A">
 		<checkbox-column name="checkboxSelect" hideable="false">
