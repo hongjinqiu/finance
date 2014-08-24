@@ -1,24 +1,25 @@
 package model
 
 import (
-	"reflect"
+//	"reflect"
 	. "com/papersns/script"
 	"encoding/json"
 )
 
 func (o FieldGroup) IsMasterField() bool {
-	if o.Parent != nil {
-		if reflect.TypeOf(o.Parent).Name() == "FixField" {
-			fixField := o.Parent.(FixField)
-			return reflect.TypeOf(fixField.Parent).Name() == "MasterData"
-		}
-		if reflect.TypeOf(o.Parent).Name() == "BizField" {
-			bizField := o.Parent.(BizField)
-			return reflect.TypeOf(bizField.Parent).Name() == "MasterData"
-		}
-	}
-
-	return false
+	return o.DataSetId == "A"
+//	if o.Parent != nil {
+//		if reflect.TypeOf(o.Parent).Name() == "FixField" {
+//			fixField := o.Parent.(FixField)
+//			return reflect.TypeOf(fixField.Parent).Name() == "MasterData"
+//		}
+//		if reflect.TypeOf(o.Parent).Name() == "BizField" {
+//			bizField := o.Parent.(BizField)
+//			return reflect.TypeOf(bizField.Parent).Name() == "MasterData"
+//		}
+//	}
+//
+//	return false
 }
 
 func (o FieldGroup) IsRelationField() bool {
@@ -60,15 +61,18 @@ func (o FieldGroup) GetRelationItem(bo map[string]interface{}, data map[string]i
 }
 
 func (o FieldGroup) GetMasterData() (MasterData, bool) {
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(o.DataSourceId)
 	if o.IsMasterField() {
-		if reflect.TypeOf(o.Parent).Name() == "FixField" {
-			fixField := o.Parent.(FixField)
-			return fixField.Parent.(MasterData), true
-		}
-		if reflect.TypeOf(o.Parent).Name() == "BizField" {
-			bizField := o.Parent.(BizField)
-			return bizField.Parent.(MasterData), true
-		}
+		return dataSource.MasterData, true
+//		if reflect.TypeOf(o.Parent).Name() == "FixField" {
+//			fixField := o.Parent.(FixField)
+//			return fixField.Parent.(MasterData), true
+//		}
+//		if reflect.TypeOf(o.Parent).Name() == "BizField" {
+//			bizField := o.Parent.(BizField)
+//			return bizField.Parent.(MasterData), true
+//		}
 	}
 	return MasterData{}, false
 }
@@ -77,31 +81,41 @@ func (o FieldGroup) GetDetailData() (DetailData, bool) {
 	if o.IsMasterField() {
 		return DetailData{}, false
 	}
-	if reflect.TypeOf(o.Parent).Name() == "FixField" {
-		fixField := o.Parent.(FixField)
-		return fixField.Parent.(DetailData), true
+	modelTemplateFactory := ModelTemplateFactory{}
+	dataSource := modelTemplateFactory.GetDataSource(o.DataSourceId)
+	for _, detailData := range dataSource.DetailDataLi {
+		if detailData.Id == o.DataSetId {
+			return detailData, true
+		}
 	}
-	if reflect.TypeOf(o.Parent).Name() == "BizField" {
-		bizField := o.Parent.(BizField)
-		return bizField.Parent.(DetailData), true
-	}
+//	if reflect.TypeOf(o.Parent).Name() == "FixField" {
+//		fixField := o.Parent.(FixField)
+//		return fixField.Parent.(DetailData), true
+//	}
+//	if reflect.TypeOf(o.Parent).Name() == "BizField" {
+//		bizField := o.Parent.(BizField)
+//		return bizField.Parent.(DetailData), true
+//	}
 	return DetailData{}, false
 }
 
 func (o FieldGroup) GetDataSource() DataSource {
-	if o.IsMasterField() {
-		masterData, _ := o.GetMasterData()
-		return masterData.Parent.(DataSource)
-	}
-	detailData, _ := o.GetDetailData()
-	return detailData.Parent.(DataSource)
+	modelTemplateFactory := ModelTemplateFactory{}
+	return modelTemplateFactory.GetDataSource(o.DataSourceId)
+//	if o.IsMasterField() {
+//		masterData, _ := o.GetMasterData()
+//		return masterData.Parent.(DataSource)
+//	}
+//	detailData, _ := o.GetDetailData()
+//	return detailData.Parent.(DataSource)
 }
 
 func (o FieldGroup) GetDataSetId() string {
-	if o.IsMasterField() {
-		masterData, _ := o.GetMasterData()
-		return masterData.Id
-	}
-	detailData, _ := o.GetDetailData()
-	return detailData.Id
+	return o.DataSetId
+//	if o.IsMasterField() {
+//		masterData, _ := o.GetMasterData()
+//		return masterData.Id
+//	}
+//	detailData, _ := o.GetDetailData()
+//	return detailData.Id
 }

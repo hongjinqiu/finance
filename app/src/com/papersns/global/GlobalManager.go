@@ -139,7 +139,8 @@ func CloseSession(sId int) {
 			pSession := session.(*mgo.Session)
 			pSession.Close()
 		}
-		globalMap[sId] = nil
+//		globalMap[sId] = nil
+		delete(globalMap, sId)
 	}
 }
 

@@ -215,6 +215,7 @@ js压缩输出时,添加日期标记，用读取配置文件的方式输出,并�
 	3.4.revel run finance看是否成功,折腾一番，
 	3.5.编写部署脚本，
 	3.6.接入测试，要修改成改用域名?话说域名在哪里?
+	做一下性能测试，然后看其它的东东，
 	
 1.然后接入测试，
 
@@ -222,9 +223,19 @@ js压缩输出时,添加日期标记，用读取配置文件的方式输出,并�
 
 
 启动一下，然后跑一跑脚本，
-(?msi)view-template((?!(security)).)+tool-bar
+
+如何来做内存分析?开500个并发，一下子就不行了。
+200个并发，84.737，内存占700M左右，
+300个并发，58.16，内存379M左右，
+400个并发，56.715，内存416M左右，
+500个并发，59.214，内存502M左右，
+600个并发，59.985，内存512M左右，
+700个并发，62.05，内存518M左右，
+800个并发，67.828，537M左右，
 
 
+2014/08/17 17:00:53 init.go:231: Post http://localhost:8000/pyscript/parse/: dial tcp 127.0.0.1:8000: too many open files
+2014/08/17 17:00:53 server.go:1745: http: panic serving 127.0.0.1:34786: open /home/hongjinqiu/goworkspace/src/finance/app/init.go: too many open files
 
 12.rownumber的东东,当前先不用管,上线后处理,
 13.cookie里面的userId,重新放到服务端实现的方法,当前只设置 cookie host,cookie存活时间,
@@ -262,7 +273,7 @@ db.SystemParameter.remove({'A.createUnit': 20})
 db.SysStep.remove({'A.createUnit': 20})
 
 
-
+试一试注释掉 findDataSourceInfo, 里面的 applyReverse，看有没有效果，
 
 
 

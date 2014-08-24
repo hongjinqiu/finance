@@ -598,36 +598,29 @@ func (o ModelTemplateFactory) applyDataSetCalcValue(dataSource DataSource, dataS
 }
 
 /**
- * 建立父子双向关联
+ * 建立父子双向关联，不能用Parent指向父object，避免双向引用，双向引用会引起gc不了，导致内存泄漏
  */
 func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
-	dataSource.MasterData.Parent = (*dataSource)
-	for i, _ := range dataSource.DetailDataLi {
-		dataSource.DetailDataLi[i].Parent = (*dataSource)
-	}
-	dataSource.MasterData.FixField.Parent = dataSource.MasterData
-	dataSource.MasterData.BizField.Parent = dataSource.MasterData
-
 	modelIterator := ModelIterator{}
 	masterFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.MasterData.FixField)
 	for i, _ := range *masterFixFieldLi {
-		(*masterFixFieldLi)[i].Parent = dataSource.MasterData.FixField
+		(*masterFixFieldLi)[i].DataSourceId = dataSource.Id
+		(*masterFixFieldLi)[i].DataSetId = dataSource.MasterData.Id
 	}
 	for i, _ := range dataSource.MasterData.BizField.FieldLi {
-		dataSource.MasterData.BizField.FieldLi[i].Parent = dataSource.MasterData.BizField
+		dataSource.MasterData.BizField.FieldLi[i].DataSourceId = dataSource.Id
+		dataSource.MasterData.BizField.FieldLi[i].DataSetId = dataSource.MasterData.Id
 	}
-
 	for i, _ := range dataSource.DetailDataLi {
-		dataSource.DetailDataLi[i].FixField.Parent = dataSource.DetailDataLi[i]
-		dataSource.DetailDataLi[i].BizField.Parent = dataSource.DetailDataLi[i]
-
 		detailFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.DetailDataLi[i].FixField)
 		for j, _ := range *detailFixFieldLi {
-			(*detailFixFieldLi)[j].Parent = dataSource.DetailDataLi[i].FixField
+			(*detailFixFieldLi)[j].DataSourceId = dataSource.Id
+			(*detailFixFieldLi)[j].DataSetId = dataSource.DetailDataLi[i].Id
 		}
 
 		for j, _ := range dataSource.DetailDataLi[i].BizField.FieldLi {
-			dataSource.DetailDataLi[i].BizField.FieldLi[j].Parent = dataSource.DetailDataLi[i].BizField
+			dataSource.DetailDataLi[i].BizField.FieldLi[j].DataSourceId = dataSource.Id
+			dataSource.DetailDataLi[i].BizField.FieldLi[j].DataSetId = dataSource.DetailDataLi[i].Id
 		}
 	}
 }
@@ -636,35 +629,6 @@ func (o ModelTemplateFactory) applyReverseRelation(dataSource *DataSource) {
  * 清除父子双向关联,双向关联会引起json.Marshal死循环
  */
 func (o ModelTemplateFactory) ClearReverseRelation(dataSource *DataSource) {
-	dataSource.MasterData.Parent = nil
-	for i, _ := range dataSource.DetailDataLi {
-		dataSource.DetailDataLi[i].Parent = nil
-	}
-	dataSource.MasterData.FixField.Parent = nil
-	dataSource.MasterData.BizField.Parent = nil
-
-	modelIterator := ModelIterator{}
-	masterFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.MasterData.FixField)
-	for i, _ := range *masterFixFieldLi {
-		(*masterFixFieldLi)[i].Parent = nil
-	}
-	for i, _ := range dataSource.MasterData.BizField.FieldLi {
-		dataSource.MasterData.BizField.FieldLi[i].Parent = nil
-	}
-
-	for i, _ := range dataSource.DetailDataLi {
-		dataSource.DetailDataLi[i].FixField.Parent = nil
-		dataSource.DetailDataLi[i].BizField.Parent = nil
-
-		detailFixFieldLi := modelIterator.GetFixFieldLi(&dataSource.DetailDataLi[i].FixField)
-		for j, _ := range *detailFixFieldLi {
-			(*detailFixFieldLi)[j].Parent = nil
-		}
-
-		for j, _ := range dataSource.DetailDataLi[i].BizField.FieldLi {
-			dataSource.DetailDataLi[i].BizField.FieldLi[j].Parent = nil
-		}
-	}
 }
 
 func (o ModelTemplateFactory) applyRelationFieldValue(dataSource DataSource, bo *map[string]interface{}) {

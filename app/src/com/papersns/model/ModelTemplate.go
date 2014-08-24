@@ -37,7 +37,6 @@ type MasterData struct {
 	PrimaryKey  string      `xml:"primaryKey"`
 	FixField    FixField    `xml:"fixField"`
 	BizField    BizField    `xml:"bizField"`
-	Parent      interface{} `xml:"-"`
 }
 
 type DetailData struct {
@@ -45,14 +44,13 @@ type DetailData struct {
 	Id          string   `xml:"id"`
 	DisplayName string   `xml:"displayName"`
 	//	ParentId      string      `xml:"parentId"`
-	AllowEmpty    string      `xml:"allowEmpty"`
+	AllowEmpty string `xml:"allowEmpty"`
 	//AllowEmptyRow string      `xml:"allowEmptyRow"`
-	AllowCopy     string      `xml:"allowCopy"`
+	AllowCopy string `xml:"allowCopy"`
 	//Readonly      string      `xml:"readonly"`
-	PrimaryKey    string      `xml:"primaryKey"`
-	FixField      FixField    `xml:"fixField"`
-	BizField      BizField    `xml:"bizField"`
-	Parent        interface{} `xml:"-"`
+	PrimaryKey string      `xml:"primaryKey"`
+	FixField   FixField    `xml:"fixField"`
+	BizField   BizField    `xml:"bizField"`
 }
 
 type FixField struct {
@@ -67,13 +65,11 @@ type FixField struct {
 	BillStatus  BillStatus  `xml:"billStatus"`
 	AttachCount AttachCount `xml:"attachCount"`
 	Remark      Remark      `xml:"remark"`
-	Parent      interface{} `xml:"-"`
 }
 
 type BizField struct {
 	XMLName xml.Name    `xml:"bizField"`
 	FieldLi []Field     `xml:"field"`
-	Parent  interface{} `xml:"-"`
 }
 
 type PrimaryKey struct {
@@ -158,7 +154,8 @@ type FieldGroup struct {
 	ListWhereField    string           `xml:"listWhereField"`
 	FormatExpr        string           `xml:"formatExpr"`
 	RelationDS        RelationDS       `xml:"relationDS"`
-	Parent            interface{}      `xml:"-"`
+	DataSourceId      string           `xml:"-"`
+	DataSetId         string           `xml:"-"`
 }
 
 type DefaultValueExpr struct {
@@ -176,7 +173,6 @@ type CalcValueExpr struct {
 type RelationDS struct {
 	XMLName        xml.Name       `xml:"relationDS"`
 	RelationItemLi []RelationItem `xml:"relationItem"`
-	Parent         interface{}    `xml:"-"`
 }
 
 type RelationItem struct {
@@ -189,7 +185,6 @@ type RelationItem struct {
 	RelationDataSetId string         `xml:"relationDataSetId"`
 	DisplayField      string         `xml:"displayField"`
 	ValueField        string         `xml:"valueField"`
-	Parent            interface{}    `xml:"-"`
 }
 
 type RelationExpr struct {

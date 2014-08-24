@@ -8,6 +8,7 @@ import (
 	. "com/papersns/component"
 	"com/papersns/global"
 	. "com/papersns/mongo"
+	. "com/papersns/model"
 	"compress/gzip"
 	"crypto/md5"
 	"fmt"
@@ -22,6 +23,7 @@ import (
 	"strings"
 	"sync"
 	//	"time"
+	"runtime/pprof"
 )
 
 var gzipRwlock sync.RWMutex = sync.RWMutex{}
@@ -43,6 +45,24 @@ func init() {
 
 type App struct {
 	*revel.Controller
+}
+
+func (c App) WriteHeapProfile() revel.Result {
+	logFile, err := os.Create("/home/hongjinqiu/tmp/heap.out")
+	if err != nil {
+		panic(err)
+	}
+	err = pprof.WriteHeapProfile(logFile)
+	if err != nil {
+		panic(err)
+	}
+	return c.RenderText("write success")
+}
+
+func (c App) ModelTest() revel.Result {
+	modelTemplateFactory := ModelTemplateFactory{}
+	modelTemplateFactory.GetDataSource("GatheringBill")
+	return c.RenderText("modelTest success")
 }
 
 func (c App) StartRunTxnPeriod() revel.Result {
