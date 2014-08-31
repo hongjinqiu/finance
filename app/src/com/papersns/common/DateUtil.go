@@ -16,6 +16,10 @@ func (o DateUtil) GetCurrentYyyyMMdd() int {
 	return date
 }
 
+func (o DateUtil) GetDateByFormat(format string) string {
+	return time.Now().Format(format)
+}
+
 func (o DateUtil) GetCurrentYyyyMMddHHmmss() int64 {
 	createTime, err := strconv.ParseInt(time.Now().Format("20060102150405"), 10, 64)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	. "com/papersns/lock"
 	. "com/papersns/mongo"
 	"com/papersns/mongo"
-	. "com/papersns/taobao"
+	. "com/papersns/open"
 	"fmt"
 	"log"
 )
@@ -81,7 +81,7 @@ func (o LoginService) DealLoginTest(sessionId int, url string) (resStruct map[st
 	txnId := global.GetTxnId(sessionId)
 	commonUtil := CommonUtil{}
 	if !found {
-		//taobaoShop := taobaoInterface.TaobaoShopGet(resStruct)
+		//taobaoShop := taobaoInterface.GetShopInfo(resStruct)
 		taobaoShop := map[string]interface{}{
 			"shop_get_response": map[string]interface{}{
 				"shop": map[string]interface{}{
@@ -215,8 +215,9 @@ func (o LoginService) DealLogin(sessionId int, url string) (resStruct map[string
 	log.Print("receive top login request, url is:", url)
 	isStep = false
 
-	taobaoInterface := TaobaoInterface{}
-	resStruct = taobaoInterface.GetUserInfo(url)
+	thirdOpenFactory := ThirdOpenFactory{}
+	thirdOpen := thirdOpenFactory.GetThirdOpen()
+	resStruct = thirdOpen.GetUserInfo(url)
 	topParameter := resStruct["topParameter"].(map[string]interface{})
 
 	username := fmt.Sprint(topParameter["visitor_id"])
@@ -248,7 +249,7 @@ func (o LoginService) DealLogin(sessionId int, url string) (resStruct map[string
 	txnId := global.GetTxnId(sessionId)
 	commonUtil := CommonUtil{}
 	if !found {
-		taobaoShop := taobaoInterface.TaobaoShopGet(resStruct)
+		taobaoShop := thirdOpen.GetShopInfo(resStruct)
 		shoGetResponse := taobaoShop["shop_get_response"].(map[string]interface{})
 		shop := shoGetResponse["shop"].(map[string]interface{})
 		sid := fmt.Sprint(shop["sid"])

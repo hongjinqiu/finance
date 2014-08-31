@@ -277,3 +277,14 @@ db.SysStep.remove({'A.createUnit': 20})
 
 
 
+cannot find package "code.google.com/p/go.text/simplifiedchinese" in any of: - 
+/usr/local/go/src/pkg/ code.google.com/p/go.text/simplifiedchinese (from $GOROOT) - 
+/home/hongjinqiu/goworkspace/src/finance/src/code.google.com/p/go.text/simplifiedchinese (from $GOPATH) - 
+/home/hongjinqiu/goworkspace/src/code.google.com/p/go.text/simplifiedchinese - 
+/home/hongjinqiu/goworkspace/src/finance/src/code.google.com/p/go.text/simplifiedchinese - 
+/home/hongjinqiu/goworkspace/src/finance/app/src/code.google.com/p/go.text/simplifiedchinese - 
+/home/hongjinqiu/goworkspace/src/geebooxml/app/src/code.google.com/p/go.text/simplifiedchinese
+
+
+
+/home/hongjinqiu/goworkspace/src/code.google.com/p/

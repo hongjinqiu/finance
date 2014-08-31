@@ -1,4 +1,4 @@
-package taobao
+package open
 
 import "github.com/robfig/revel"
 import (
@@ -154,7 +154,7 @@ func (o TaobaoInterface) GetToken(paramDict map[string]string) map[string]interf
 	return oResult
 }
 
-func (o TaobaoInterface) TaobaoShopGet(taobaoSysDict map[string]interface{}) map[string]interface{} {
+func (o TaobaoInterface) GetShopInfo(taobaoSysDict map[string]interface{}) map[string]interface{} {
 	topParameter := taobaoSysDict["topParameter"].(map[string]interface{})
 	params := map[string]string{
 		"method":  "taobao.shop.get",

@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	//	. "com/papersns/taobao"
+	//	. "com/papersns/open"
 )
 
 type Test struct {
