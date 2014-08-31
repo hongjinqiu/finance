@@ -42,8 +42,9 @@
 			{{.result.user.A.nick}}
 			<!-- [
 			<a id="feedback" onclick="feedback()">用户反馈</a>
-			] -->
+			]
 			[<span id="wangwangConnectMe"></span>]
+			 -->
 		  </p>
 	      <ul class="top_ul">
 	        <li><a onclick="selectTab('tab1')" href="javascript:void(0);">我的桌面</a></li>
@@ -198,7 +199,7 @@ var oldLoadFunc = window.onload;
 window.onload = function() {
     var elem = document.getElementById("wangwangConnectMe");
     if (elem) {
-        elem.innerHTML = '<a target="_blank" href="http://amos1.taobao.com/msg.ww?v=2&uid=hjq20021984&s=1" ><img border="0" src="http://amos1.taobao.com/online.ww?v=2&uid=hjq20021984&s=1" alt="点击这里给我发消息" /></a>';
+        //elem.innerHTML = '<a target="_blank" href="http://amos1.taobao.com/msg.ww?v=2&uid=hjq20021984&s=1" ><img border="0" src="http://amos1.taobao.com/online.ww?v=2&uid=hjq20021984&s=1" alt="点击这里给我发消息" /></a>';
     }
     if (oldLoadFunc)
         oldLoadFunc();
