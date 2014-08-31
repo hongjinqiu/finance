@@ -732,7 +732,8 @@ func (c App) Instructions() revel.Result {
 func (c App) Logout() revel.Result {
 	c.Session["userId"] = ""
 	c.Session["adminUserId"] = ""
-	return c.Redirect(revel.Config.StringDefault("OAUTH_LOGOUT_PATH", ""))
+//	return c.Redirect(revel.Config.StringDefault("OAUTH_LOGOUT_PATH", ""))
+	return c.Redirect(revel.Config.StringDefault("JD_OAUTH_LOGOUT_PATH", ""))
 }
 
 /*
